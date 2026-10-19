@@ -11,3 +11,7 @@ export const school = {
 // Shown on the fix-it report form. Wording from the plan.
 export const SAFETY_COPY =
   "Emergencies or anything dangerous: tell a teacher now, don't use the app.";
+
+// Grades offered in pickers (announcement audiences, admin user editing).
+// Placeholder until the school confirms which grades use the app (Q9).
+export const GRADES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] as const;

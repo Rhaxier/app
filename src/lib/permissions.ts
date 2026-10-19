@@ -25,3 +25,8 @@ export function canReviewVenues(user: CurrentUser): boolean {
 export function canPostSchoolWide(user: CurrentUser): boolean {
   return isAdmin(user);
 }
+
+/** Edit or delete an announcement: its author (if still staff) or any admin. */
+export function canEditAnnouncement(user: CurrentUser, authorId: string): boolean {
+  return isAdmin(user) || (isStaff(user) && authorId === user.id);
+}

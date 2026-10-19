@@ -1,0 +1,34 @@
+.card {
+  padding: 0;
+}
+
+/* The whole card is one link, so the tap area is the whole card. */
+.link {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: var(--space-4) 17px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.title {
+  font-size: 17px;
+  line-height: 1.3;
+}
+
+.body {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: var(--text-small);
+  opacity: 0.85;
+}

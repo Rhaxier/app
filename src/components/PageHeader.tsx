@@ -44,13 +44,15 @@ export function PageHeader({ title, eyebrow, subtitle, back, action }: PageHeade
 interface SectionHeaderProps {
   title: string;
   action?: ReactNode;
+  /** Lets a <section aria-labelledby> point at this heading. */
+  id?: string;
 }
 
 /** "Announcements ……… See all" */
-export function SectionHeader({ title, action }: SectionHeaderProps) {
+export function SectionHeader({ title, action, id }: SectionHeaderProps) {
   return (
     <div className={styles.section}>
-      <h2>{title}</h2>
+      <h2 id={id}>{title}</h2>
       {action}
     </div>
   );
