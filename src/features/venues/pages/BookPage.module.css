@@ -1,0 +1,12 @@
+/* The Request button stays in view above the tab bar while scrolling. */
+.footer {
+  position: sticky;
+  bottom: calc(var(--height-tabbar) + var(--space-3));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding-top: var(--space-2);
+  background: linear-gradient(to bottom, transparent, var(--color-bg) 30%);
+  text-align: center;
+}

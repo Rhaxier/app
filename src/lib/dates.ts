@@ -59,6 +59,16 @@ export function dateBlock(value: DateInput): { month: string; day: string; weekd
   };
 }
 
+/** Labels for a day key in date strips: { weekday: "Sun", day: "12", long: "Sunday 12 October" }. */
+export function dayLabels(key: string): { weekday: string; day: string; long: string } {
+  const noon = atSchoolTime(key, '12:00');
+  return {
+    weekday: format(noon, 'EEE', { in: inSchoolZone }),
+    day: format(noon, 'd', { in: inSchoolZone }),
+    long: format(noon, 'EEEE d MMMM', { in: inSchoolZone }),
+  };
+}
+
 /** "Just now", "5m ago", "2h ago", "Yesterday", "Thu", "12 Oct" */
 export function relativeTime(value: DateInput, now: Date = new Date()): string {
   const date = toDate(value);
