@@ -1,0 +1,18 @@
+.hint {
+  color: var(--color-accent);
+  font-size: var(--text-small);
+  font-weight: 600;
+}
+
+.heading {
+  font-family: var(--font-body);
+  font-size: var(--text-card-title);
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.twoColumns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}

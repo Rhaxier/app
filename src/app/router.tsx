@@ -1,6 +1,18 @@
 // Every screen and its address. One route per screen; staff-only and
 // admin-only screens sit inside RequireRole.
 import { createBrowserRouter } from 'react-router-dom';
+import { AdminHomePage } from '@/features/admin/pages/AdminHomePage';
+import { AuditLogPage } from '@/features/admin/pages/AuditLogPage';
+import { MapAdminPage } from '@/features/admin/pages/MapAdminPage';
+import { ModerationPage } from '@/features/admin/pages/ModerationPage';
+import { OutboxPage } from '@/features/admin/pages/OutboxPage';
+import { ResponsibilitiesPage } from '@/features/admin/pages/ResponsibilitiesPage';
+import { RoutesPage } from '@/features/admin/pages/RoutesPage';
+import { SettingsPage } from '@/features/admin/pages/SettingsPage';
+import { StaffEmailsPage } from '@/features/admin/pages/StaffEmailsPage';
+import { UsersPage } from '@/features/admin/pages/UsersPage';
+import { VenuesAdminPage } from '@/features/admin/pages/VenuesAdminPage';
+import { ApprovalsPage } from '@/features/approvals/pages/ApprovalsPage';
 import { AnnouncementDetailPage } from '@/features/announcements/pages/AnnouncementDetailPage';
 import {
   EditAnnouncementPage,
@@ -72,6 +84,23 @@ export const router = createBrowserRouter([
                 children: [
                   { path: '/announcements/new', element: <NewAnnouncementPage /> },
                   { path: '/announcements/:id/edit', element: <EditAnnouncementPage /> },
+                  { path: '/approvals', element: <ApprovalsPage /> },
+                ],
+              },
+              {
+                element: <RequireRole role="admin" />,
+                children: [
+                  { path: '/admin', element: <AdminHomePage /> },
+                  { path: '/admin/users', element: <UsersPage /> },
+                  { path: '/admin/responsibilities', element: <ResponsibilitiesPage /> },
+                  { path: '/admin/staff-emails', element: <StaffEmailsPage /> },
+                  { path: '/admin/venues', element: <VenuesAdminPage /> },
+                  { path: '/admin/map', element: <MapAdminPage /> },
+                  { path: '/admin/routes', element: <RoutesPage /> },
+                  { path: '/admin/settings', element: <SettingsPage /> },
+                  { path: '/admin/moderation', element: <ModerationPage /> },
+                  { path: '/admin/audit', element: <AuditLogPage /> },
+                  { path: '/admin/outbox', element: <OutboxPage /> },
                 ],
               },
               { path: '*', element: <NotFoundPage /> },
