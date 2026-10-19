@@ -12,6 +12,9 @@ import { ProfilePage } from '@/features/auth/pages/ProfilePage';
 import { HomePage } from '@/features/home/pages/HomePage';
 import { InboxPage } from '@/features/notifications/pages/InboxPage';
 import { NotificationSettingsPage } from '@/features/notifications/pages/NotificationSettingsPage';
+import { EventDetailPage } from '@/features/volunteering/pages/EventDetailPage';
+import { EditEventPage, NewEventPage } from '@/features/volunteering/pages/EventFormPage';
+import { VolunteerPage } from '@/features/volunteering/pages/VolunteerPage';
 import { AppLayout } from './AppLayout';
 import { RequireAuth, RequireRole } from './guards';
 import { NotFoundPage } from './NotFoundPage';
@@ -32,6 +35,10 @@ export const router = createBrowserRouter([
               { path: '/me', element: <ProfilePage /> },
               { path: '/notifications', element: <InboxPage /> },
               { path: '/notifications/settings', element: <NotificationSettingsPage /> },
+              { path: '/volunteer', element: <VolunteerPage /> },
+              { path: '/volunteer/new', element: <NewEventPage /> },
+              { path: '/volunteer/:id', element: <EventDetailPage /> },
+              { path: '/volunteer/:id/edit', element: <EditEventPage /> },
               { path: '/announcements', element: <AnnouncementsPage /> },
               { path: '/announcements/:id', element: <AnnouncementDetailPage /> },
               {

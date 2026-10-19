@@ -18,3 +18,10 @@ export const supabase = createClient<Database>(
     },
   },
 );
+
+// Dev builds only: lets you poke the database from the browser console, e.g.
+//   await supabase.from('announcements').update({ pinned: true }).eq('id', '…')
+// to see RLS refuse something the UI hides. Never included in production builds.
+if (import.meta.env.DEV) {
+  (window as unknown as { supabase: typeof supabase }).supabase = supabase;
+}

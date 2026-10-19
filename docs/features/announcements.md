@@ -118,9 +118,10 @@ the form, what the card shows. Run with `npm test`.
 2. Home → See all → **+** → post to Grade 8.
 3. Switch to **Student Grade 8 A**: the post is in the feed and the bell has a new
    notification. Switch to **Student Grade 10 A**: it isn't there.
-4. As **Teacher B**, try to pin it: the option isn't shown. Try it anyway in the
-   browser console with `supabase.from('announcements').update({ pinned: true })…` and
-   the database refuses.
+4. As **Teacher B**, try to pin it: the option isn't shown. Try it anyway from the
+   browser console (dev builds put the client on `window.supabase`):
+   `await supabase.from('announcements').update({ pinned: true }).eq('id', '<id>')`
+   returns a row-level security error. The database refuses, whatever the UI shows.
 
 ## Copying the pattern for a new feature
 

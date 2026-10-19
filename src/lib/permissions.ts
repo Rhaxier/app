@@ -30,3 +30,27 @@ export function canPostSchoolWide(user: CurrentUser): boolean {
 export function canEditAnnouncement(user: CurrentUser, authorId: string): boolean {
   return isAdmin(user) || (isStaff(user) && authorId === user.id);
 }
+
+interface EventLike {
+  creator_id: string;
+  approved_by: string | null;
+  status: Enums<'volunteer_event_status'>;
+}
+
+/** Mirrors can_confirm_hours() in the volunteering migration. */
+export function canConfirmEventHours(user: CurrentUser, event: EventLike): boolean {
+  if (isAdmin(user)) return true;
+  if (!isStaff(user)) return false;
+  return (
+    hasResponsibility(user, 'supw') || event.approved_by === user.id || event.creator_id === user.id
+  );
+}
+
+/** Students can edit their event until it's approved; staff organisers any time. */
+export function canEditEvent(user: CurrentUser, event: EventLike): boolean {
+  if (isAdmin(user)) return true;
+  if (event.creator_id !== user.id) return false;
+  return isStaff(user) || event.status === 'awaiting_approval' || event.status === 'sent_back';
+}
+
+export const canDeleteEvent = canEditEvent;

@@ -1,0 +1,23 @@
+.card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  background: var(--color-accent-soft);
+}
+
+.card :global(.label) {
+  color: var(--color-accent);
+}
+
+.hours {
+  font-family: var(--font-heading);
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--color-accent);
+}
+
+.target {
+  font-size: var(--text-card-title);
+  color: var(--color-accent);
+}
