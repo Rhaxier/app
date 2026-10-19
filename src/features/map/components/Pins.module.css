@@ -1,0 +1,40 @@
+/* Leaflet positions these boxes; the styles only draw them. */
+.room,
+.busy,
+.report {
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--color-card);
+  box-shadow: 0 2px 6px rgba(21, 32, 43, 0.25);
+  cursor: pointer;
+}
+
+.room {
+  border-radius: 50%;
+  background: var(--color-accent);
+}
+
+.busy {
+  border-radius: 50%;
+  background: var(--color-ink);
+  outline: 3px solid var(--color-accent-soft);
+}
+
+.report {
+  border-radius: 6px;
+  background: var(--color-alert);
+  color: var(--color-on-accent);
+  font-weight: 700;
+  font-size: 12px;
+}
+
+/* The pin whose details are open below the map. */
+.selected {
+  outline: 4px solid rgba(164, 82, 15, 0.3);
+  outline-offset: 2px;
+}
+
+.room.selected,
+.busy.selected {
+  outline-color: rgba(14, 104, 87, 0.35);
+}

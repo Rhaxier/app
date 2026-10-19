@@ -25,6 +25,7 @@ export const venueKeys = {
   mine: (userId: string) => [...venueKeys.all, 'mine', userId] as const,
   toSupervise: (userId: string) => [...venueKeys.all, 'supervise', userId] as const,
   forReview: () => [...venueKeys.all, 'review'] as const,
+  now: () => [...venueKeys.all, 'now'] as const,
 };
 
 export function useVenues() {
@@ -35,6 +36,18 @@ export function useApprovedBookings(from: string, to: string, venueId?: string) 
   return useQuery({
     queryKey: venueKeys.approved(from, to, venueId),
     queryFn: () => fetchApprovedBookings(from, to, venueId),
+  });
+}
+
+/** Approved bookings happening right now, checked every minute (map "in use"). */
+export function useBookingsNow() {
+  return useQuery({
+    queryKey: venueKeys.now(),
+    queryFn: () => {
+      const now = new Date();
+      return fetchApprovedBookings(now.toISOString(), new Date(now.getTime() + 60_000).toISOString());
+    },
+    refetchInterval: 60_000,
   });
 }
 

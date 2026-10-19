@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700" width="1000" height="700" font-family="DM Sans, system-ui, sans-serif">
+  <!-- PLACEHOLDER floor plan for floor 2. Replace with the real plan (docs/OPEN_QUESTIONS.md, Q6). -->
+  <rect width="1000" height="700" fill="#ffffff"/>
+  <rect x="40" y="380" width="920" height="50" rx="12" fill="#f4f2ec"/>
+  <text x="500" y="412" text-anchor="middle" font-size="18" letter-spacing="3" fill="#5b6470">MAIN CORRIDOR</text>
+  <rect x="40" y="40" width="620" height="320" rx="16" fill="#eeebe3"/>
+  <text x="58" y="320" font-size="22" font-weight="600" fill="#15202b">Multipurpose hall</text>
+  <text x="58" y="344" font-size="18" fill="#5b6470">2.01</text>
+  <rect x="700" y="40" width="260" height="320" rx="16" fill="#eeebe3"/>
+  <text x="718" y="320" font-size="22" font-weight="600" fill="#15202b">Art room</text>
+  <text x="718" y="344" font-size="18" fill="#5b6470">2.02</text>
+  <rect x="240" y="450" width="520" height="190" rx="16" fill="#eeebe3"/>
+  <text x="258" y="600" font-size="22" font-weight="600" fill="#15202b">Music room</text>
+  <text x="258" y="624" font-size="18" fill="#5b6470">2.03</text>
+  <text x="980" y="690" text-anchor="end" font-size="14" fill="#5b6470">Placeholder plan · Floor 2</text>
+</svg>
