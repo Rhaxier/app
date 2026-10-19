@@ -62,6 +62,7 @@ export type Database = {
           booking_slots_per_day: number;
           collab_requires_teacher: boolean;
           created_at: string;
+          grades: number[];
           id: boolean;
           school_days: number[];
           school_email_domain: string | null;
@@ -81,6 +82,7 @@ export type Database = {
           booking_slots_per_day?: number;
           collab_requires_teacher?: boolean;
           created_at?: string;
+          grades?: number[];
           id?: boolean;
           school_days?: number[];
           school_email_domain?: string | null;
@@ -99,6 +101,7 @@ export type Database = {
           booking_slots_per_day?: number;
           collab_requires_teacher?: boolean;
           created_at?: string;
+          grades?: number[];
           id?: boolean;
           school_days?: number[];
           school_email_domain?: string | null;

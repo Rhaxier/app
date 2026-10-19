@@ -20,6 +20,7 @@ const settings: AppSettings = {
   students_can_request_venues: true,
   collab_requires_teacher: false,
   supw_hours_target: null,
+  grades: [8, 10, 12],
   venue_reminder_hours: 48,
   venue_reminder_days_before: 3,
   school_days: [0, 1, 2, 3, 4],
@@ -56,11 +57,13 @@ describe('settings form', () => {
       staffEmailPattern: '([a-z]',
       bookingSlotMinutes: '5',
       schoolDays: [],
+      grades: [],
     });
     expect(errors.schoolEmailDomain).toBe('Just the domain, e.g. school.example (no @).');
     expect(errors.staffEmailPattern).toBe("That pattern isn't valid.");
     expect(errors.bookingSlotMinutes).toBe('Between 15 and 480 minutes.');
     expect(errors.schoolDays).toBe('Choose at least one school day.');
+    expect(errors.grades).toBe('Choose at least one grade.');
   });
 
   it('saves empty optional fields as null and numbers as numbers', () => {

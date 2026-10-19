@@ -80,21 +80,25 @@ functions above (events awaiting approval, `booking_details()`, `report_feed()`,
 
 ## Screens (routes)
 
-| Route                                                                   | Screen                                                                                             | Who                           |
-| ----------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | ----------------------------- |
-| `/login`                                                                | Sign in                                                                                            | everyone                      |
-| `/`                                                                     | Home: greeting, tiles, today at school, announcements                                              | everyone                      |
-| `/announcements`, `/announcements/new`, `/announcements/:id/edit`       | Feed and editor                                                                                    | read: all; write: staff       |
-| `/notifications`, `/notifications/settings`                             | Inbox and mutes                                                                                    | everyone                      |
-| `/map`, `/map/report`                                                   | Campus map with fix-it pins; new report form                                                       | everyone                      |
-| `/reports/:id`                                                          | Fix-it report detail and staff actions                                                             | everyone (staff act)          |
-| `/volunteer`, `/volunteer/new`, `/volunteer/:id`, `/volunteer/:id/edit` | SUPW events, roles, sign-ups                                                                       | everyone                      |
-| `/projects`, `/projects/new`, `/projects/:id`                           | Projects and teacher feedback                                                                      | students own; teachers shared |
-| `/collab`, `/collab/new`, `/collab/:id`                                 | Collab posts, requests, team                                                                       | everyone                      |
-| `/book`, `/book/request`, `/book/mine`                                  | Venue calendar, request form, my bookings                                                          | everyone                      |
-| `/approvals`                                                            | Staff queue                                                                                        | teachers and admins           |
-| `/admin/*`                                                              | Users, responsibilities, staff emails, venues, map editor, routes, settings, moderation, audit log | admins                        |
-| `/me`                                                                   | Profile, SUPW hours, sign out                                                                      | everyone                      |
+All routes are in `src/app/router.tsx`. Most screens load lazily (their code downloads on
+first visit), so the app starts faster on phones.
+
+| Route                                                                   | Screen                                                                                                            | Who                     |
+| ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- | ----------------------- |
+| `/login`                                                                | Sign in (dev password; Google / Microsoft when configured)                                                        | everyone                |
+| `/`                                                                     | Home: greeting, search, six tools, today at school, announcements                                                 | everyone                |
+| `/search?q=`                                                            | Search rooms, events, announcements, collab posts                                                                 | everyone                |
+| `/announcements`, `/announcements/:id`                                  | Feed and one announcement                                                                                         | read: all               |
+| `/announcements/new`, `/announcements/:id/edit`                         | Announcement editor                                                                                               | staff                   |
+| `/notifications`, `/notifications/settings`                             | Inbox and mutes                                                                                                   | everyone                |
+| `/me`                                                                   | Who you are, your jobs, notification settings, sign out                                                           | everyone                |
+| `/map`, `/map/report`, `/reports/:id`                                   | Campus map with fix-it pins; report form; report detail                                                           | everyone (staff act)    |
+| `/volunteer`, `/volunteer/new`, `/volunteer/:id`, `/volunteer/:id/edit` | SUPW events, roles, sign-ups                                                                                      | everyone                |
+| `/projects`, `/projects/new`, `/projects/:id`, `/projects/:id/edit`     | Projects and teacher feedback                                                                                     | owners; shared teachers |
+| `/collab`, `/collab/new`, `/collab/:id`, `/collab/:id/edit`             | Collab posts, requests, team                                                                                      | everyone                |
+| `/book`, `/book/request`, `/book/mine`                                  | Venue calendar, request form, my bookings                                                                         | everyone                |
+| `/approvals`                                                            | Staff queue                                                                                                       | teachers and admins     |
+| `/admin/*`                                                              | Users, responsibilities, staff emails, venues, map editor, report routes, settings, moderation, audit log, outbox | admins                  |
 
 ## Decisions worth knowing
 

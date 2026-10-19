@@ -8,7 +8,14 @@ export interface OutboxRow {
   id: string;
   recipient_id: string;
   kind: 'immediate' | 'digest';
-  payload: { type: string; title: string; body: string; link: string | null; urgent: boolean; email?: string };
+  payload: {
+    type: string;
+    title: string;
+    body: string;
+    link: string | null;
+    urgent: boolean;
+    email?: string;
+  };
   created_at: string;
 }
 
@@ -23,7 +30,10 @@ export function isServiceCaller(request: Request): boolean {
   return Boolean(key) && request.headers.get('Authorization') === `Bearer ${key}`;
 }
 
-export async function queuedRows(table: 'email_outbox' | 'push_outbox', kind?: 'immediate' | 'digest') {
+export async function queuedRows(
+  table: 'email_outbox' | 'push_outbox',
+  kind?: 'immediate' | 'digest',
+) {
   let query = serviceClient()
     .from(table)
     .select('id, recipient_id, kind, payload, created_at')

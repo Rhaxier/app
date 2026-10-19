@@ -1,19 +1,30 @@
 .wrap {
   display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.weekRow {
+  display: flex;
   align-items: center;
-  gap: 2px;
-  margin: 0 calc(var(--space-2) * -1);
+  justify-content: space-between;
+  margin-top: calc(var(--space-2) * -1);
+}
+
+.arrows {
+  display: flex;
+  margin-right: calc(var(--space-2) * -1);
 }
 
 .arrow {
   display: grid;
   place-items: center;
-  flex: none;
-  width: 28px;
+  width: var(--touch-min);
   height: var(--touch-min);
   border: 0;
+  border-radius: 50%;
   background: transparent;
-  color: var(--color-muted);
+  color: var(--color-ink);
   cursor: pointer;
 }
 
@@ -23,7 +34,6 @@
 }
 
 .days {
-  flex: 1;
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: 1fr;

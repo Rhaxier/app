@@ -10,7 +10,7 @@ import { PageHeader } from '@/components/PageHeader';
 import { Sheet } from '@/components/Sheet';
 import { EmptyState, ErrorState, LoadingState } from '@/components/States';
 import { Switch } from '@/components/Switch';
-import { GRADES } from '@/config/school';
+import { useAppSettings } from '@/features/settings/hooks';
 import { errorMessage } from '@/lib/errors';
 import { responsibilityLabel, roleLabel } from '@/lib/status';
 import { Constants } from '@/types/database';
@@ -84,6 +84,7 @@ function UserEditor({ user, onClose }: { user: AdminUser; onClose: () => void })
   const setRole = useSetRole();
   const updateProfile = useUpdateProfile();
   const toggle = useToggleResponsibility();
+  const grades = useAppSettings().data?.grades ?? [];
   const [fullName, setFullName] = useState(user.full_name);
   const [grade, setGrade] = useState(user.grade ? String(user.grade) : '');
   const [section, setSection] = useState(user.section ?? '');
@@ -110,7 +111,7 @@ function UserEditor({ user, onClose }: { user: AdminUser; onClose: () => void })
       <div className={styles.twoColumns}>
         <SelectField label="Grade" value={grade} onChange={(e) => setGrade(e.target.value)}>
           <option value="">None</option>
-          {GRADES.map((g) => (
+          {grades.map((g) => (
             <option key={g} value={g}>
               {g}
             </option>

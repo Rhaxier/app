@@ -27,7 +27,11 @@ Deno.serve(async (request) => {
     const people = groupByRecipient(rows);
     const preview = [...people.entries()].slice(0, 5).map(([recipient, items]) => ({
       recipient,
-      notifications: items.map((item) => ({ title: item.payload.title, body: item.payload.body, link: item.payload.link })),
+      notifications: items.map((item) => ({
+        title: item.payload.title,
+        body: item.payload.body,
+        link: item.payload.link,
+      })),
     }));
     return json({ dryRun: true, queuedRows: rows.length, recipients: people.size, preview });
   } catch (error) {

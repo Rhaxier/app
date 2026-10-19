@@ -23,6 +23,7 @@ export interface SettingsFormValues {
   studentsCanRequestVenues: boolean;
   collabRequiresTeacher: boolean;
   supwHoursTarget: string;
+  grades: number[];
   venueReminderHours: string;
   venueReminderDaysBefore: string;
   schoolDays: number[];
@@ -42,9 +43,10 @@ export function valuesFromSettings(settings: AppSettings): SettingsFormValues {
     studentsCanRequestVenues: settings.students_can_request_venues,
     collabRequiresTeacher: settings.collab_requires_teacher,
     supwHoursTarget: settings.supw_hours_target === null ? '' : String(settings.supw_hours_target),
+    grades: [...settings.grades].sort((a, b) => a - b),
     venueReminderHours: String(settings.venue_reminder_hours),
     venueReminderDaysBefore: String(settings.venue_reminder_days_before),
-    schoolDays: [...settings.school_days].sort(),
+    schoolDays: [...settings.school_days].sort((a, b) => a - b),
     bookingDayStart: settings.booking_day_start.slice(0, 5),
     bookingSlotMinutes: String(settings.booking_slot_minutes),
     bookingSlotsPerDay: String(settings.booking_slots_per_day),
@@ -73,6 +75,7 @@ export function validateSettings(values: SettingsFormValues): SettingsFormErrors
   if (values.supwHoursTarget.trim() && !(Number(values.supwHoursTarget) >= 0)) {
     errors.supwHoursTarget = 'Enter a number of hours, or leave it empty.';
   }
+  if (values.grades.length === 0) errors.grades = 'Choose at least one grade.';
   if (!isWhole(values.venueReminderHours, 1, 720))
     errors.venueReminderHours = 'Between 1 and 720 hours.';
   if (!isWhole(values.venueReminderDaysBefore, 0, 60))
@@ -96,6 +99,7 @@ export function toSettingsChanges(values: SettingsFormValues) {
     students_can_request_venues: values.studentsCanRequestVenues,
     collab_requires_teacher: values.collabRequiresTeacher,
     supw_hours_target: values.supwHoursTarget.trim() ? Number(values.supwHoursTarget) : null,
+    grades: values.grades,
     venue_reminder_hours: Number(values.venueReminderHours),
     venue_reminder_days_before: Number(values.venueReminderDaysBefore),
     school_days: values.schoolDays,

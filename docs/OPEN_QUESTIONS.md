@@ -120,7 +120,8 @@ on the **Admin > Settings** screen; you can also run SQL in Supabase Studio
 
 - Default used: `[SCHOOL NAME]` placeholder, a generic icon, no term dates, no SUPW
   hours target (the Volunteer screen shows hours so far without a target).
-- Where it lives: `app_settings.school_name`, `app_settings.supw_hours_target`;
+- Where it lives: `app_settings.school_name`, `app_settings.supw_hours_target`,
+  `app_settings.grades` (see Q25);
   `src/config/school.ts` (name shown before sign-in, app name); `public/favicon.svg`.
 - To change it: **Admin > Settings** for the name and SUPW target; edit
   `src/config/school.ts` and replace `public/favicon.svg` for the sign-in screen and
@@ -228,12 +229,18 @@ on the **Admin > Settings** screen; you can also run SQL in Supabase Studio
   exact slot that was approved. Title, purpose and attendance can be edited until it
   is decided.
 - Where it lives: `bookings_before_update()` (`..._120800_venues.sql`).
+- To change it: remove the lines that copy `starts_at`, `ends_at` and `venue_id` from
+  `old` at the top of that function (and re-check clashes when times change).
 
 ## Q21: Which fix-it reports can students see?
 
 - Default used: unresolved reports (they are on the map), plus their own and any they
   said "me too" to, in any status. Staff see all. Nobody but staff sees who reported.
-- Where it lives: `can_see_report()` and `report_feed()` (`..._120900_fixit.sql`).
+- Where it lives: `can_see_report()`, `report_feed()` and the "Read reports you may see"
+  policy (`..._120900_fixit.sql`; the policy repeats the rule on purpose, see
+  `docs/features/fixit.md`).
+- To change it: edit the rule in all three places together, e.g. drop the status
+  condition to let students see resolved reports too.
 
 ## Q22: Content reports (the Report button) don't notify anyone
 
@@ -250,6 +257,8 @@ on the **Admin > Settings** screen; you can also run SQL in Supabase Studio
   Changes made directly in the Supabase dashboard or by the seed have no app user and
   aren't logged there (Supabase keeps its own logs).
 - Where it lives: `audit_change()` and the admin functions (`..._120100_identity.sql`).
+- To change it: attach the `audit_change()` trigger to more tables in a new migration,
+  or remove the `auth.uid() is null` early return to also log dashboard changes.
 
 ## Q24: Placeholder app identity
 
@@ -257,3 +266,38 @@ on the **Admin > Settings** screen; you can also run SQL in Supabase Studio
 - Where it lives: `capacitor.config.ts`, `src/config/school.ts`, `index.html` title.
 - To change it: edit those three before the first store build (the app id can't
   change after publishing).
+
+## Q25: Which grades use the app?
+
+- Default used: grades 1 to 12 are offered when posting announcements and editing a
+  student's grade. Seed students are in grades 8, 10 and 12.
+- Where it lives: `app_settings.grades` (`..._120100_identity.sql`).
+- To change it: **Admin > Settings > Grades**.
+
+## Q26: What does search cover?
+
+- Default used: the search box on Home finds rooms, volunteering events, announcements
+  and collab posts (from data the app already loads). It doesn't search people: there
+  are no profile pages to open, and a searchable list of students across grades is a
+  safeguarding decision for the school.
+- Where it lives: `src/features/search/` (`logic.ts`, `pages/SearchPage.tsx`).
+- To change it: add another source to `searchAll()` in `SearchPage.tsx`.
+
+## Q27: Volunteering categories (the mockup's "Environment" chip)
+
+- Default used: the plan has no event categories, so the filter chips are All, This week,
+  In school (events in a room on the map) and Signed up.
+- Where it lives: `volunteerFilters` and `filterEvents()` in
+  `src/features/volunteering/logic.ts`.
+- To change it: add a `category` column to `volunteer_events` in a new migration, a field
+  on the event form, and a chip per category.
+
+## Q28: Whose pending venue requests appear on the calendar?
+
+- Default used: everyone sees approved bookings; students and teachers also see their own
+  waiting requests (and ones they supervise); venue staff see every waiting request. The
+  mockup's orange "Pending approval" slot is shown under those rules.
+- Where it lives: `booking_details()` (`..._120800_venues.sql`) and `fetchWaitingRequests()`
+  in `src/features/venues/api.ts`.
+- To change it: to show everyone that a slot is contested (without saying by whom), add a
+  function returning only the times of pending requests and draw them as "Requested".

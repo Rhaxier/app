@@ -17,13 +17,13 @@ export function SearchBox({ initialQuery = '' }: { initialQuery?: string }) {
     <form role="search" className={styles.box} onSubmit={handleSubmit}>
       <Icon name="search" size={20} />
       <label htmlFor="home-search" className="visually-hidden">
-        Search rooms, events, people
+        Search rooms, events, posts
       </label>
       <input
         id="home-search"
         type="search"
         className={styles.input}
-        placeholder="Search rooms, events, people"
+        placeholder="Search rooms, events, posts"
         value={query}
         onChange={(event) => setQuery(event.target.value)}
       />

@@ -1,52 +1,61 @@
 // Every screen and its address. One route per screen; staff-only and
 // admin-only screens sit inside RequireRole.
+//
+// Most screens are loaded "lazily": their code is downloaded the first time
+// someone opens them, so the app starts faster on a phone. (The map library
+// and the admin screens, for example, are only needed by some people.)
+// Home, sign-in, Me and the inbox are needed straight away, so they're not.
+import type { ComponentType } from 'react';
 import { createBrowserRouter } from 'react-router-dom';
-import { AdminHomePage } from '@/features/admin/pages/AdminHomePage';
-import { AuditLogPage } from '@/features/admin/pages/AuditLogPage';
-import { MapAdminPage } from '@/features/admin/pages/MapAdminPage';
-import { ModerationPage } from '@/features/admin/pages/ModerationPage';
-import { OutboxPage } from '@/features/admin/pages/OutboxPage';
-import { ResponsibilitiesPage } from '@/features/admin/pages/ResponsibilitiesPage';
-import { RoutesPage } from '@/features/admin/pages/RoutesPage';
-import { SettingsPage } from '@/features/admin/pages/SettingsPage';
-import { StaffEmailsPage } from '@/features/admin/pages/StaffEmailsPage';
-import { UsersPage } from '@/features/admin/pages/UsersPage';
-import { VenuesAdminPage } from '@/features/admin/pages/VenuesAdminPage';
-import { ApprovalsPage } from '@/features/approvals/pages/ApprovalsPage';
-import { AnnouncementDetailPage } from '@/features/announcements/pages/AnnouncementDetailPage';
-import {
-  EditAnnouncementPage,
-  NewAnnouncementPage,
-} from '@/features/announcements/pages/AnnouncementFormPage';
-import { AnnouncementsPage } from '@/features/announcements/pages/AnnouncementsPage';
+import { LoadingState } from '@/components/States';
 import { LoginPage } from '@/features/auth/pages/LoginPage';
 import { ProfilePage } from '@/features/auth/pages/ProfilePage';
 import { HomePage } from '@/features/home/pages/HomePage';
 import { InboxPage } from '@/features/notifications/pages/InboxPage';
 import { NotificationSettingsPage } from '@/features/notifications/pages/NotificationSettingsPage';
-import { EventDetailPage } from '@/features/volunteering/pages/EventDetailPage';
-import { EditEventPage, NewEventPage } from '@/features/volunteering/pages/EventFormPage';
-import { VolunteerPage } from '@/features/volunteering/pages/VolunteerPage';
-import { ProjectDetailPage } from '@/features/projects/pages/ProjectDetailPage';
-import { EditProjectPage, NewProjectPage } from '@/features/projects/pages/ProjectFormPage';
-import { ProjectsPage } from '@/features/projects/pages/ProjectsPage';
-import { CollabDetailPage } from '@/features/collab/pages/CollabDetailPage';
-import { EditCollabPage, NewCollabPage } from '@/features/collab/pages/CollabFormPage';
-import { CollabPage } from '@/features/collab/pages/CollabPage';
-import { BookingRequestPage } from '@/features/venues/pages/BookingRequestPage';
-import { BookPage } from '@/features/venues/pages/BookPage';
-import { MyBookingsPage } from '@/features/venues/pages/MyBookingsPage';
-import { ReportDetailPage } from '@/features/fixit/pages/ReportDetailPage';
-import { ReportFormPage } from '@/features/fixit/pages/ReportFormPage';
-import { MapPage } from '@/features/map/pages/MapPage';
 import { AppLayout } from './AppLayout';
 import { RequireAuth, RequireRole } from './guards';
 import { NotFoundPage } from './NotFoundPage';
 import { RootLayout } from './RootLayout';
 
+/**
+ * A route that loads its screen on first visit:
+ *   lazyPage(() => import('@/features/map/pages/MapPage'), 'MapPage')
+ * loads that file, then shows its exported MapPage component.
+ */
+function lazyPage<M extends Record<string, unknown>>(
+  load: () => Promise<M>,
+  name: keyof M & string,
+) {
+  return async () => ({ Component: (await load())[name] as ComponentType });
+}
+
+const announcements = () => import('@/features/announcements/pages/AnnouncementsPage');
+const announcement = () => import('@/features/announcements/pages/AnnouncementDetailPage');
+const announcementForm = () => import('@/features/announcements/pages/AnnouncementFormPage');
+const volunteer = () => import('@/features/volunteering/pages/VolunteerPage');
+const event = () => import('@/features/volunteering/pages/EventDetailPage');
+const eventForm = () => import('@/features/volunteering/pages/EventFormPage');
+const projects = () => import('@/features/projects/pages/ProjectsPage');
+const project = () => import('@/features/projects/pages/ProjectDetailPage');
+const projectForm = () => import('@/features/projects/pages/ProjectFormPage');
+const collab = () => import('@/features/collab/pages/CollabPage');
+const collabPost = () => import('@/features/collab/pages/CollabDetailPage');
+const collabForm = () => import('@/features/collab/pages/CollabFormPage');
+const map = () => import('@/features/map/pages/MapPage');
+const reportForm = () => import('@/features/fixit/pages/ReportFormPage');
+const report = () => import('@/features/fixit/pages/ReportDetailPage');
+const book = () => import('@/features/venues/pages/BookPage');
+const bookingRequest = () => import('@/features/venues/pages/BookingRequestPage');
+const myBookings = () => import('@/features/venues/pages/MyBookingsPage');
+const search = () => import('@/features/search/pages/SearchPage');
+const approvals = () => import('@/features/approvals/pages/ApprovalsPage');
+
 export const router = createBrowserRouter([
   {
     element: <RootLayout />,
+    // Shown while the first screen's code loads.
+    hydrateFallbackElement: <LoadingState />,
     children: [
       { path: '/login', element: <LoginPage /> },
       {
@@ -59,48 +68,115 @@ export const router = createBrowserRouter([
               { path: '/me', element: <ProfilePage /> },
               { path: '/notifications', element: <InboxPage /> },
               { path: '/notifications/settings', element: <NotificationSettingsPage /> },
-              { path: '/volunteer', element: <VolunteerPage /> },
-              { path: '/volunteer/new', element: <NewEventPage /> },
-              { path: '/volunteer/:id', element: <EventDetailPage /> },
-              { path: '/volunteer/:id/edit', element: <EditEventPage /> },
-              { path: '/projects', element: <ProjectsPage /> },
-              { path: '/projects/new', element: <NewProjectPage /> },
-              { path: '/projects/:id', element: <ProjectDetailPage /> },
-              { path: '/projects/:id/edit', element: <EditProjectPage /> },
-              { path: '/collab', element: <CollabPage /> },
-              { path: '/collab/new', element: <NewCollabPage /> },
-              { path: '/collab/:id', element: <CollabDetailPage /> },
-              { path: '/collab/:id/edit', element: <EditCollabPage /> },
-              { path: '/map', element: <MapPage /> },
-              { path: '/map/report', element: <ReportFormPage /> },
-              { path: '/reports/:id', element: <ReportDetailPage /> },
-              { path: '/book', element: <BookPage /> },
-              { path: '/book/request', element: <BookingRequestPage /> },
-              { path: '/book/mine', element: <MyBookingsPage /> },
-              { path: '/announcements', element: <AnnouncementsPage /> },
-              { path: '/announcements/:id', element: <AnnouncementDetailPage /> },
+              { path: '/search', lazy: lazyPage(search, 'SearchPage') },
+              { path: '/volunteer', lazy: lazyPage(volunteer, 'VolunteerPage') },
+              { path: '/volunteer/new', lazy: lazyPage(eventForm, 'NewEventPage') },
+              { path: '/volunteer/:id', lazy: lazyPage(event, 'EventDetailPage') },
+              { path: '/volunteer/:id/edit', lazy: lazyPage(eventForm, 'EditEventPage') },
+              { path: '/projects', lazy: lazyPage(projects, 'ProjectsPage') },
+              { path: '/projects/new', lazy: lazyPage(projectForm, 'NewProjectPage') },
+              { path: '/projects/:id', lazy: lazyPage(project, 'ProjectDetailPage') },
+              { path: '/projects/:id/edit', lazy: lazyPage(projectForm, 'EditProjectPage') },
+              { path: '/collab', lazy: lazyPage(collab, 'CollabPage') },
+              { path: '/collab/new', lazy: lazyPage(collabForm, 'NewCollabPage') },
+              { path: '/collab/:id', lazy: lazyPage(collabPost, 'CollabDetailPage') },
+              { path: '/collab/:id/edit', lazy: lazyPage(collabForm, 'EditCollabPage') },
+              { path: '/map', lazy: lazyPage(map, 'MapPage') },
+              { path: '/map/report', lazy: lazyPage(reportForm, 'ReportFormPage') },
+              { path: '/reports/:id', lazy: lazyPage(report, 'ReportDetailPage') },
+              { path: '/book', lazy: lazyPage(book, 'BookPage') },
+              { path: '/book/request', lazy: lazyPage(bookingRequest, 'BookingRequestPage') },
+              { path: '/book/mine', lazy: lazyPage(myBookings, 'MyBookingsPage') },
+              { path: '/announcements', lazy: lazyPage(announcements, 'AnnouncementsPage') },
+              {
+                path: '/announcements/:id',
+                lazy: lazyPage(announcement, 'AnnouncementDetailPage'),
+              },
               {
                 element: <RequireRole role="staff" />,
                 children: [
-                  { path: '/announcements/new', element: <NewAnnouncementPage /> },
-                  { path: '/announcements/:id/edit', element: <EditAnnouncementPage /> },
-                  { path: '/approvals', element: <ApprovalsPage /> },
+                  {
+                    path: '/announcements/new',
+                    lazy: lazyPage(announcementForm, 'NewAnnouncementPage'),
+                  },
+                  {
+                    path: '/announcements/:id/edit',
+                    lazy: lazyPage(announcementForm, 'EditAnnouncementPage'),
+                  },
+                  { path: '/approvals', lazy: lazyPage(approvals, 'ApprovalsPage') },
                 ],
               },
               {
                 element: <RequireRole role="admin" />,
                 children: [
-                  { path: '/admin', element: <AdminHomePage /> },
-                  { path: '/admin/users', element: <UsersPage /> },
-                  { path: '/admin/responsibilities', element: <ResponsibilitiesPage /> },
-                  { path: '/admin/staff-emails', element: <StaffEmailsPage /> },
-                  { path: '/admin/venues', element: <VenuesAdminPage /> },
-                  { path: '/admin/map', element: <MapAdminPage /> },
-                  { path: '/admin/routes', element: <RoutesPage /> },
-                  { path: '/admin/settings', element: <SettingsPage /> },
-                  { path: '/admin/moderation', element: <ModerationPage /> },
-                  { path: '/admin/audit', element: <AuditLogPage /> },
-                  { path: '/admin/outbox', element: <OutboxPage /> },
+                  {
+                    path: '/admin',
+                    lazy: lazyPage(
+                      () => import('@/features/admin/pages/AdminHomePage'),
+                      'AdminHomePage',
+                    ),
+                  },
+                  {
+                    path: '/admin/users',
+                    lazy: lazyPage(() => import('@/features/admin/pages/UsersPage'), 'UsersPage'),
+                  },
+                  {
+                    path: '/admin/responsibilities',
+                    lazy: lazyPage(
+                      () => import('@/features/admin/pages/ResponsibilitiesPage'),
+                      'ResponsibilitiesPage',
+                    ),
+                  },
+                  {
+                    path: '/admin/staff-emails',
+                    lazy: lazyPage(
+                      () => import('@/features/admin/pages/StaffEmailsPage'),
+                      'StaffEmailsPage',
+                    ),
+                  },
+                  {
+                    path: '/admin/venues',
+                    lazy: lazyPage(
+                      () => import('@/features/admin/pages/VenuesAdminPage'),
+                      'VenuesAdminPage',
+                    ),
+                  },
+                  {
+                    path: '/admin/map',
+                    lazy: lazyPage(
+                      () => import('@/features/admin/pages/MapAdminPage'),
+                      'MapAdminPage',
+                    ),
+                  },
+                  {
+                    path: '/admin/routes',
+                    lazy: lazyPage(() => import('@/features/admin/pages/RoutesPage'), 'RoutesPage'),
+                  },
+                  {
+                    path: '/admin/settings',
+                    lazy: lazyPage(
+                      () => import('@/features/admin/pages/SettingsPage'),
+                      'SettingsPage',
+                    ),
+                  },
+                  {
+                    path: '/admin/moderation',
+                    lazy: lazyPage(
+                      () => import('@/features/admin/pages/ModerationPage'),
+                      'ModerationPage',
+                    ),
+                  },
+                  {
+                    path: '/admin/audit',
+                    lazy: lazyPage(
+                      () => import('@/features/admin/pages/AuditLogPage'),
+                      'AuditLogPage',
+                    ),
+                  },
+                  {
+                    path: '/admin/outbox',
+                    lazy: lazyPage(() => import('@/features/admin/pages/OutboxPage'), 'OutboxPage'),
+                  },
                 ],
               },
               { path: '*', element: <NotFoundPage /> },

@@ -12,3 +12,11 @@
   background: var(--color-card);
   font-family: var(--font-body);
 }
+
+/* Leaflet's zoom buttons are 30px; make them a full 44px touch target. */
+.frame :global(.leaflet-control-zoom a) {
+  width: var(--touch-min);
+  height: var(--touch-min);
+  line-height: var(--touch-min);
+  font-size: 22px;
+}

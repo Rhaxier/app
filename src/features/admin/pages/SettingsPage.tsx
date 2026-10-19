@@ -21,6 +21,8 @@ import {
 import styles from './SettingsPage.module.css';
 
 const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+// Every grade the database accepts (profiles.grade is 1 to 13).
+const allGrades = Array.from({ length: 13 }, (_, i) => i + 1);
 
 export function SettingsPage() {
   const settings = useAppSettings();
@@ -52,6 +54,15 @@ function SettingsForm({ settings }: { settings: AppSettings }) {
     );
   }
 
+  function toggleGrade(grade: number) {
+    update(
+      'grades',
+      values.grades.includes(grade)
+        ? values.grades.filter((g) => g !== grade)
+        : [...values.grades, grade].sort((a, b) => a - b),
+    );
+  }
+
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
     const found = validateSettings(values);
@@ -78,6 +89,26 @@ function SettingsForm({ settings }: { settings: AppSettings }) {
           onChange={(e) => update('supwHoursTarget', e.target.value)}
           error={errors.supwHoursTarget}
         />
+      </Card>
+
+      <Card className="stack-tight">
+        <h2 className={styles.heading}>Grades</h2>
+        <fieldset className={styles.fieldset}>
+          <legend className={styles.legend}>Grades that use the app</legend>
+          <div className="row-wrap">
+            {allGrades.map((grade) => (
+              <FilterChip
+                key={grade}
+                selected={values.grades.includes(grade)}
+                onClick={() => toggleGrade(grade)}
+              >
+                {grade}
+              </FilterChip>
+            ))}
+          </div>
+          {errors.grades && <p className={styles.error}>{errors.grades}</p>}
+        </fieldset>
+        <p className="meta">Offered when posting announcements and editing students.</p>
       </Card>
 
       <Card className="stack-tight">

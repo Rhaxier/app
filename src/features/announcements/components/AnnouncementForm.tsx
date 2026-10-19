@@ -11,8 +11,8 @@ import { Button, ButtonLink } from '@/components/Button';
 import { FilterChip } from '@/components/Chip';
 import { CheckboxField, FormError, TextArea, TextField } from '@/components/Input';
 import { SegmentedControl } from '@/components/SegmentedControl';
-import { GRADES } from '@/config/school';
 import { useCurrentUser } from '@/features/auth/hooks';
+import { useAppSettings } from '@/features/settings/hooks';
 import { canPostSchoolWide } from '@/lib/permissions';
 import {
   BODY_MAX,
@@ -43,6 +43,8 @@ export function AnnouncementForm({
 }: AnnouncementFormProps) {
   const user = useCurrentUser();
   const isAdmin = canPostSchoolWide(user);
+  // The school's grades come from app_settings (Admin > Settings).
+  const grades = useAppSettings().data?.grades ?? [];
   const [values, setValues] = useState(initialValues);
   const [errors, setErrors] = useState<AnnouncementErrors>({});
 
@@ -119,7 +121,7 @@ export function AnnouncementForm({
         >
           <legend className={styles.legend}>Grades</legend>
           <div className="row-wrap">
-            {GRADES.map((grade) => (
+            {grades.map((grade) => (
               <FilterChip
                 key={grade}
                 selected={values.grades.includes(grade)}

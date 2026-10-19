@@ -48,6 +48,8 @@ create table public.app_settings (
   collab_requires_teacher boolean not null default false,
   -- Q9: SUPW hours each student should reach. Null = not set yet.
   supw_hours_target numeric(5, 1),
+  -- Q25: the grades offered in pickers (announcement audiences, user editing).
+  grades int[] not null default '{1,2,3,4,5,6,7,8,9,10,11,12}' check (cardinality(grades) > 0),
   -- Q10: when to remind venue approvers about a waiting request.
   venue_reminder_hours int not null default 48 check (venue_reminder_hours > 0),
   venue_reminder_days_before int not null default 3 check (venue_reminder_days_before >= 0),

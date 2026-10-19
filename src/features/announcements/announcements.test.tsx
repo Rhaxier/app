@@ -31,6 +31,10 @@ const admin = makeUser({ id: 'admin-1', role: 'admin', grade: null });
 // The form reads the signed-in person; the test decides who that is.
 let signedIn: CurrentUser = teacher;
 vi.mock('@/features/auth/hooks', () => ({ useCurrentUser: () => signedIn }));
+// The grade chips come from app_settings; give the form the school's grades.
+vi.mock('@/features/settings/hooks', () => ({
+  useAppSettings: () => ({ data: { grades: [8, 9, 10] } }),
+}));
 
 const valid: AnnouncementFormValues = {
   ...emptyAnnouncementValues,
