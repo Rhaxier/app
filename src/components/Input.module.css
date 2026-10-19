@@ -1,0 +1,91 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: var(--text-small);
+  font-weight: 600;
+}
+
+.input {
+  width: 100%;
+  min-height: var(--height-input);
+  padding: 0 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-input);
+  background: var(--color-card);
+  font-size: var(--text-body);
+}
+
+.input::placeholder {
+  color: var(--color-muted);
+}
+
+.input[aria-invalid='true'] {
+  border-color: var(--color-alert);
+}
+
+.textarea {
+  padding: 12px 14px;
+  resize: vertical;
+  line-height: 1.45;
+}
+
+.select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%235b6470' stroke-width='1.8' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 40px;
+}
+
+.hint {
+  display: block;
+  color: var(--color-muted);
+  font-size: var(--text-meta);
+}
+
+.error {
+  color: var(--color-alert-ink);
+  font-size: var(--text-meta);
+  font-weight: 500;
+}
+
+.checkboxRow {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  min-height: var(--touch-min);
+}
+
+.checkboxRow label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: 11px;
+  cursor: pointer;
+}
+
+.checkbox {
+  width: 22px;
+  height: 22px;
+  margin: 11px 0 0;
+  flex: none;
+  accent-color: var(--color-accent);
+}
+
+.checkboxLabel {
+  font-size: var(--text-body);
+  font-weight: 500;
+}
+
+.formError {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-input);
+  background: var(--color-alert-soft);
+  color: var(--color-alert-ink);
+  font-size: var(--text-small);
+  font-weight: 500;
+}

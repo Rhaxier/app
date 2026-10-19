@@ -1,0 +1,70 @@
+/*
+ * Design tokens from docs/School-App-Design.pdf, page 1.
+ * Every colour, size and radius in the app comes from here, so a design
+ * change is a one-line edit. Components use var(--token), never raw hex.
+ */
+:root {
+  /* Colour */
+  --color-bg: #f4f2ec;
+  --color-card: #ffffff;
+  --color-ink: #15202b;
+  --color-muted: #5b6470;
+  --color-border: #e2ded4;
+  --color-quiet: #eeebe3;
+  --color-accent: #0e6857; /* teal: primary actions, "good" states */
+  --color-accent-soft: #dcede8;
+  --color-alert: #a4520f; /* orange: fix-it actions, "attention" states */
+  --color-alert-soft: #f8e6d3;
+  --color-alert-ink: #7a3e0b; /* text on --color-alert-soft */
+  --color-on-accent: #ffffff;
+
+  /* Typography */
+  --font-heading: 'Bricolage Grotesque', system-ui, sans-serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --text-page-title: 28px;
+  --text-section-title: 20px;
+  --text-card-title: 16px;
+  --text-body: 15px;
+  --text-small: 14px;
+  --text-meta: 13px;
+  --text-label: 12px; /* small caps-style labels */
+  --text-tab: 11px;
+  --tracking-title: -0.02em;
+  --tracking-label: 0.05em;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px; /* screen padding */
+  --space-6: 24px;
+  --space-8: 32px;
+  --gap-block: 18px; /* vertical gap between blocks (design: 16–22px) */
+
+  /* Shape */
+  --radius-card: 18px;
+  --radius-input: 14px;
+  --radius-button: 14px;
+  --radius-small: 10px;
+  --radius-pill: 999px;
+
+  /* Sizes */
+  --height-input: 48px;
+  --height-button: 48px;
+  --height-button-small: 44px; /* never below 44px: touch target minimum */
+  --height-chip: 34px;
+  --height-badge: 26px;
+  --height-tabbar: 78px;
+  --touch-min: 44px;
+  --icon-size: 22px;
+  --icon-stroke: 1.8;
+
+  /* Layout */
+  --phone-width: 390px;
+  --content-max: 480px; /* desktop: centred column */
+
+  /* Elevation (only for floating things: sheets, the map card, FAB) */
+  --shadow-float: 0 8px 28px rgba(21, 32, 43, 0.12);
+  --focus-ring: 0 0 0 3px rgba(14, 104, 87, 0.35);
+}

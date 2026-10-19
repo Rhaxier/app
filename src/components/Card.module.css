@@ -1,0 +1,27 @@
+.card {
+  display: block;
+  background: var(--color-card);
+  border-radius: var(--radius-card);
+  padding: var(--space-4) 17px;
+  color: var(--color-ink);
+  text-decoration: none;
+}
+
+.accent {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+.accent :global(.meta) {
+  color: var(--color-accent-soft);
+}
+
+.flush {
+  padding: 0;
+  overflow: hidden;
+}
+
+/* Cards that are links lift slightly on hover so they read as tappable. */
+a.card:hover {
+  filter: brightness(0.985);
+}

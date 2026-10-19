@@ -1,0 +1,15 @@
+.fab {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  box-shadow: var(--shadow-float);
+}
+
+.fab:hover {
+  filter: brightness(0.94);
+}

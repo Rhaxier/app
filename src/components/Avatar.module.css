@@ -1,0 +1,34 @@
+.avatar {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  border-radius: 50%;
+  font-weight: 600;
+}
+
+.normal {
+  width: 40px;
+  height: 40px;
+  font-size: var(--text-meta);
+}
+
+.small {
+  width: 32px;
+  height: 32px;
+  font-size: var(--text-label);
+}
+
+.accent {
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
+.quiet {
+  background: var(--color-quiet);
+  color: var(--color-muted);
+}
+
+.ink {
+  background: var(--color-ink);
+  color: var(--color-on-accent);
+}

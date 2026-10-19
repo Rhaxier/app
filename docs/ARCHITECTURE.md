@@ -1,0 +1,101 @@
+# Architecture
+
+A one-page map of how the school app fits together. Read this first, then
+`docs/features/announcements.md`.
+
+## The big idea
+
+One web app (React) talks to one Supabase project. **The database decides who
+may do what.** Every table has Row Level Security (RLS) policies, and every
+workflow rule (who can approve, when a post becomes full, who gets told) lives
+in SQL: policies, triggers and functions. The React app only _asks_; it hides
+buttons a user can't use, but that is a convenience, never the protection.
+
+```
+ React app (Vite)                       Supabase
+ ┌───────────────────────┐            ┌──────────────────────────────────────┐
+ │ pages/components      │            │ Auth (dev password, Google, Microsoft)│
+ │   └─ hooks.ts (Query) │──supabase──▶ Postgres                              │
+ │        └─ api.ts      │    -js     │   tables + RLS policies               │
+ │                       │◀─Realtime──│   triggers ─▶ notify() ─▶ notifications│
+ └───────────────────────┘            │                        ├▶ email_outbox │
+   Capacitor wraps the same            │                        └▶ push_outbox  │
+   build for iOS / Android             │ Storage (private buckets)             │
+                                       │ Edge Functions (send-emails/send-push)│
+                                       └──────────────────────────────────────┘
+```
+
+## Layers, top to bottom
+
+| Layer                 | Where                                                        | Job                                                                                         |
+| --------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------- |
+| Pages and components  | `src/features/<feature>/pages`, `components`                 | Render data, collect input. Only call hooks.                                                |
+| Hooks                 | `src/features/<feature>/hooks.ts`                            | TanStack Query: caching, loading/error state, refetch after changes.                        |
+| API                   | `src/features/<feature>/api.ts`                              | The raw `supabase.from(...)` and `supabase.rpc(...)` calls. Nothing else talks to Supabase. |
+| Types                 | `src/types/database.ts`                                      | Generated from the database with `npm run db:types`.                                        |
+| Policies and triggers | `supabase/migrations/*.sql`                                  | Permissions, workflow rules, notifications, audit log.                                      |
+| Tests                 | `supabase/tests/*.sql` (pgTAP), `src/**/*.test.tsx` (Vitest) | Prove the rules hold.                                                                       |
+
+## Roles and responsibilities
+
+- **Role** (`profiles.role`): `student`, `teacher` or `admin`. Nobody can change
+  their own role. Admins change roles through `admin_set_role()`, which writes to
+  `audit_log`.
+- **Responsibility** (`responsibilities.kind`): `facilities`, `it`, `venues`,
+  `supw`. Tags a staff member with a job. Fix-it routing, venue approvals and
+  staff emails follow responsibilities, so no extra roles are needed.
+- Helper functions used by every policy: `auth_role()`, `is_staff()`,
+  `is_admin()`, `has_responsibility(kind)`.
+
+## Notifications
+
+Triggers call one function, `notify(recipient, type, title, body, link, urgent)`.
+It checks the recipient's mutes, inserts a `notifications` row (the in-app inbox,
+pushed live over Realtime), queues a `push_outbox` row, and for staff with
+responsibilities queues an `email_outbox` row (`immediate` if urgent, else
+`digest`). Nothing is actually sent yet; the Edge Function stubs show where
+Resend and push delivery plug in.
+
+## Tables by feature
+
+| Feature                | Tables, views and buckets                                                                       | Migration                  |
+| ---------------------- | ----------------------------------------------------------------------------------------------- | -------------------------- |
+| Identity and roles     | `profiles`, `staff_emails`, `responsibilities`, `app_settings`, `audit_log`                     | `..._01_identity.sql`      |
+| Notifications          | `notifications`, `notification_prefs`, `email_outbox`, `push_outbox`                            | `..._02_notifications.sql` |
+| School map             | `floors`, `rooms`                                                                               | `..._03_map.sql`           |
+| Announcements          | `announcements`                                                                                 | `..._04_announcements.sql` |
+| SUPW volunteering      | `volunteer_events`, `event_roles`, `role_signups`                                               | `..._05_volunteering.sql`  |
+| Projects with teachers | `projects`, `project_shares`, `project_feedback`, bucket `project-files`                        | `..._06_projects.sql`      |
+| Collab finder          | `collab_posts`, `join_requests`, `content_reports`                                              | `..._07_collab.sql`        |
+| Venue booking          | `venues`, `bookings`, view `booking_details`                                                    | `..._08_venues.sql`        |
+| Fix-it reports         | `reports`, `report_votes`, `report_category_routes`, view `report_feed`, bucket `report-photos` | `..._09_fixit.sql`         |
+| Staff approvals        | functions `approvals_*` over the tables above                                                   | `..._10_approvals.sql`     |
+| Realtime and cron      | publication for `notifications`, `bookings`, `reports`; `venue_reminders()` schedule            | `..._11_realtime_cron.sql` |
+
+## Screens (routes)
+
+| Route                                                                   | Screen                                                                                             | Who                           |
+| ----------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | ----------------------------- |
+| `/login`                                                                | Sign in                                                                                            | everyone                      |
+| `/`                                                                     | Home: greeting, tiles, today at school, announcements                                              | everyone                      |
+| `/announcements`, `/announcements/new`, `/announcements/:id/edit`       | Feed and editor                                                                                    | read: all; write: staff       |
+| `/notifications`, `/notifications/settings`                             | Inbox and mutes                                                                                    | everyone                      |
+| `/map`, `/map/report`                                                   | Campus map with fix-it pins; new report form                                                       | everyone                      |
+| `/reports/:id`                                                          | Fix-it report detail and staff actions                                                             | everyone (staff act)          |
+| `/volunteer`, `/volunteer/new`, `/volunteer/:id`, `/volunteer/:id/edit` | SUPW events, roles, sign-ups                                                                       | everyone                      |
+| `/projects`, `/projects/new`, `/projects/:id`                           | Projects and teacher feedback                                                                      | students own; teachers shared |
+| `/collab`, `/collab/new`, `/collab/:id`                                 | Collab posts, requests, team                                                                       | everyone                      |
+| `/book`, `/book/request`, `/book/mine`                                  | Venue calendar, request form, my bookings                                                          | everyone                      |
+| `/approvals`                                                            | Staff queue                                                                                        | teachers and admins           |
+| `/admin/*`                                                              | Users, responsibilities, staff emails, venues, map editor, routes, settings, moderation, audit log | admins                        |
+| `/me`                                                                   | Profile, SUPW hours, sign out                                                                      | everyone                      |
+
+## Decisions worth knowing
+
+- **Times** are stored as `timestamptz` and shown in `Asia/Dubai` (`src/lib/dates.ts`).
+- **Privacy through views and functions.** Where some people may see a column and
+  others may not (reporter of a fix-it report, contact emails, booking purpose),
+  the table hides the column from everyone and a view or function hands it out
+  only to the right people.
+- **Unknowns are data.** Anything the school hasn't decided lives in
+  `app_settings`, a table, or an env var. See `docs/OPEN_QUESTIONS.md`.

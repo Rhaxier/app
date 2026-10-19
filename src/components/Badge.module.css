@@ -1,0 +1,26 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  height: var(--height-badge);
+  padding: 0 10px;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-label);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Contrast checked against 4.5:1: teal 5.5, orange ink 6.8, muted 5.0. */
+.good {
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
+.attention {
+  background: var(--color-alert-soft);
+  color: var(--color-alert-ink);
+}
+
+.quiet {
+  background: var(--color-quiet);
+  color: var(--color-muted);
+}
