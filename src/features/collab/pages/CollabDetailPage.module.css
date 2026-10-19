@@ -1,0 +1,37 @@
+.who {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.whoText {
+  flex: 1;
+  min-width: 0;
+}
+
+.name {
+  font-weight: 600;
+}
+
+.description {
+  white-space: pre-wrap;
+}
+
+.muted {
+  color: var(--color-muted);
+}
+
+.hidden {
+  background: var(--color-alert-soft);
+  color: var(--color-alert-ink);
+}
+
+.hiddenTitle {
+  font-weight: 600;
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}

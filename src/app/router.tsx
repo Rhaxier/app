@@ -18,6 +18,9 @@ import { VolunteerPage } from '@/features/volunteering/pages/VolunteerPage';
 import { ProjectDetailPage } from '@/features/projects/pages/ProjectDetailPage';
 import { EditProjectPage, NewProjectPage } from '@/features/projects/pages/ProjectFormPage';
 import { ProjectsPage } from '@/features/projects/pages/ProjectsPage';
+import { CollabDetailPage } from '@/features/collab/pages/CollabDetailPage';
+import { EditCollabPage, NewCollabPage } from '@/features/collab/pages/CollabFormPage';
+import { CollabPage } from '@/features/collab/pages/CollabPage';
 import { AppLayout } from './AppLayout';
 import { RequireAuth, RequireRole } from './guards';
 import { NotFoundPage } from './NotFoundPage';
@@ -46,6 +49,10 @@ export const router = createBrowserRouter([
               { path: '/projects/new', element: <NewProjectPage /> },
               { path: '/projects/:id', element: <ProjectDetailPage /> },
               { path: '/projects/:id/edit', element: <EditProjectPage /> },
+              { path: '/collab', element: <CollabPage /> },
+              { path: '/collab/new', element: <NewCollabPage /> },
+              { path: '/collab/:id', element: <CollabDetailPage /> },
+              { path: '/collab/:id/edit', element: <EditCollabPage /> },
               { path: '/announcements', element: <AnnouncementsPage /> },
               { path: '/announcements/:id', element: <AnnouncementDetailPage /> },
               {
