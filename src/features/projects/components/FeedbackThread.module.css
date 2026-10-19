@@ -1,0 +1,13 @@
+.item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: 12px;
+  background: var(--color-card);
+}
+
+.body {
+  margin-top: 2px;
+  white-space: pre-wrap;
+}
