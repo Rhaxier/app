@@ -24,6 +24,8 @@ import { CollabPage } from '@/features/collab/pages/CollabPage';
 import { BookingRequestPage } from '@/features/venues/pages/BookingRequestPage';
 import { BookPage } from '@/features/venues/pages/BookPage';
 import { MyBookingsPage } from '@/features/venues/pages/MyBookingsPage';
+import { ReportDetailPage } from '@/features/fixit/pages/ReportDetailPage';
+import { ReportFormPage } from '@/features/fixit/pages/ReportFormPage';
 import { MapPage } from '@/features/map/pages/MapPage';
 import { AppLayout } from './AppLayout';
 import { RequireAuth, RequireRole } from './guards';
@@ -58,6 +60,8 @@ export const router = createBrowserRouter([
               { path: '/collab/:id', element: <CollabDetailPage /> },
               { path: '/collab/:id/edit', element: <EditCollabPage /> },
               { path: '/map', element: <MapPage /> },
+              { path: '/map/report', element: <ReportFormPage /> },
+              { path: '/reports/:id', element: <ReportDetailPage /> },
               { path: '/book', element: <BookPage /> },
               { path: '/book/request', element: <BookingRequestPage /> },
               { path: '/book/mine', element: <MyBookingsPage /> },

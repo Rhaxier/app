@@ -1,0 +1,26 @@
+.description {
+  white-space: pre-wrap;
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px var(--space-4);
+  margin: 0;
+  font-size: var(--text-small);
+}
+
+.facts dt {
+  color: var(--color-muted);
+}
+
+.facts dd {
+  margin: 0;
+}
+
+.note {
+  padding: var(--space-3);
+  border-radius: var(--radius-small);
+  background: var(--color-bg);
+  font-size: var(--text-small);
+}

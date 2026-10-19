@@ -8,6 +8,8 @@ problems are. Same shape as announcements; read [`announcements.md`](announcemen
 - One floor plan image per floor (G, 1, 2), switched with the G / 1 / 2 control.
 - **Room pins** (teal) for every room; tap one for its details, a **Book** shortcut if a
   venue is in that room, and **Report issue**.
+- **Fix-it reports** (orange squares) for every open report; tap one for the card with
+  **Me too** and **Report new** (see [`fixit.md`](fixit.md)).
 - **In use now** pins (dark with a ring) come from approved bookings happening right now.
   They refresh every minute and whenever a booking changes (Realtime).
 - **Find a room** searches room codes and names across all floors.

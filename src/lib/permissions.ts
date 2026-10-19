@@ -54,3 +54,11 @@ export function canEditEvent(user: CurrentUser, event: EventLike): boolean {
 }
 
 export const canDeleteEvent = canEditEvent;
+
+/** Change a fix-it report's status, assign it, mark duplicates: the routed team or admins. */
+export function canManageReport(
+  user: CurrentUser,
+  routedTo: Enums<'responsibility_kind'>,
+): boolean {
+  return isAdmin(user) || hasResponsibility(user, routedTo);
+}

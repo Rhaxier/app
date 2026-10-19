@@ -335,9 +335,21 @@ on public.report_category_routes for all to authenticated
 using (public.is_admin())
 with check (public.is_admin());
 
+-- The same rule as can_see_report(), written out here on purpose. A policy
+-- that calls a function which looks the row up again can't see a row being
+-- inserted (the function sees the table as it was before the insert), so
+-- `insert ... returning id`, which the app uses, would be refused.
 create policy "Read reports you may see"
 on public.reports for select to authenticated
-using (public.can_see_report(id));
+using (
+  public.is_staff()
+  or status in ('open', 'acknowledged', 'in_progress')
+  or reporter_id = (select auth.uid())
+  or exists (
+    select 1 from public.report_votes v
+    where v.report_id = reports.id and v.user_id = (select auth.uid())
+  )
+);
 
 create policy "Report as yourself"
 on public.reports for insert to authenticated

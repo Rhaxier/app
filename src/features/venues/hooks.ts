@@ -45,7 +45,10 @@ export function useBookingsNow() {
     queryKey: venueKeys.now(),
     queryFn: () => {
       const now = new Date();
-      return fetchApprovedBookings(now.toISOString(), new Date(now.getTime() + 60_000).toISOString());
+      return fetchApprovedBookings(
+        now.toISOString(),
+        new Date(now.getTime() + 60_000).toISOString(),
+      );
     },
     refetchInterval: 60_000,
   });

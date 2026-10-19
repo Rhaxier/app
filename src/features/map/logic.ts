@@ -45,3 +45,16 @@ export function roomsInUse(
   }
   return inUse;
 }
+
+/**
+ * Where to draw the n-th fix-it pin in a room. Reports share their room's
+ * position, so they're nudged to the right (and along, if there are several)
+ * to keep the room pin visible.
+ */
+export function reportPinPosition(
+  x: number,
+  y: number,
+  indexInRoom: number,
+): { x: number; y: number } {
+  return { x: x + 45 + indexInRoom * 35, y: y - 30 };
+}

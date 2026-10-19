@@ -8,24 +8,34 @@ import { FilterChip } from '@/components/Chip';
 import { PageHeader } from '@/components/PageHeader';
 import { SegmentedControl } from '@/components/SegmentedControl';
 import { EmptyState, ErrorState, LoadingState } from '@/components/States';
+import { OPEN_STATUSES } from '@/features/fixit/api';
+import { ReportCard } from '@/features/fixit/components/ReportCard';
+import { useLiveReports, useReports } from '@/features/fixit/hooks';
+import { reportTitle } from '@/features/fixit/logic';
 import { useBookingsNow, useLiveBookings, useVenues } from '@/features/venues/hooks';
 import { MapView } from '../components/MapView';
-import { BusyPin, RoomPin } from '../components/Pins';
+import { BusyPin, ReportPin, RoomPin } from '../components/Pins';
 import { RoomCard } from '../components/RoomCard';
 import { RoomSearch } from '../components/RoomSearch';
 import { useFloors, useRooms } from '../hooks';
-import { roomsInUse } from '../logic';
+import { reportPinPosition, roomsInUse } from '../logic';
 
-type Layer = 'rooms' | 'inUse';
+type Layer = 'rooms' | 'inUse' | 'reports';
 
 export function MapPage() {
   const floors = useFloors();
   const rooms = useRooms();
   const venues = useVenues();
   const bookingsNow = useBookingsNow();
+  const reports = useReports();
   useLiveBookings();
+  useLiveReports();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [layers, setLayers] = useState<Record<Layer, boolean>>({ rooms: true, inUse: true });
+  const [layers, setLayers] = useState<Record<Layer, boolean>>({
+    rooms: true,
+    inUse: true,
+    reports: true,
+  });
 
   if (floors.isPending || rooms.isPending) return <LoadingState />;
   if (floors.isError) return <ErrorState error={floors.error} onRetry={() => floors.refetch()} />;
@@ -41,18 +51,29 @@ export function MapPage() {
     );
   }
 
-  // The address remembers what's open (?room=G.14 or ?floor=1), so links from
-  // other screens (an event's "Where") can open the map on the right room.
+  // The address remembers what's open (?room=G.14, ?report=<id> or ?floor=1),
+  // so links from other screens can open the map on the right thing.
+  const openReports = (reports.data ?? []).filter((report) =>
+    OPEN_STATUSES.includes(report.status),
+  );
+  const selectedReport = openReports.find((report) => report.id === searchParams.get('report'));
   const selectedRoom = rooms.data.find((room) => room.code === searchParams.get('room'));
   const floor =
-    floors.data.find((f) => f.id === selectedRoom?.floor_id) ??
+    floors.data.find((f) => f.id === (selectedReport?.floor_id ?? selectedRoom?.floor_id)) ??
     floors.data.find((f) => f.name === searchParams.get('floor')) ??
     floors.data[0];
   const floorRooms = rooms.data.filter((room) => room.floor_id === floor.id);
+  const floorReports = openReports.filter(
+    (report) => report.floor_id === floor.id && report.x !== null,
+  );
   const busy = roomsInUse(bookingsNow.data ?? [], venues.data ?? []);
 
-  function selectRoom(code: string | null) {
-    setSearchParams(code ? { room: code } : { floor: floor.name }, { replace: true });
+  function selectRoom(code: string) {
+    setSearchParams({ room: code }, { replace: true });
+  }
+
+  function selectReport(id: string) {
+    setSearchParams({ report: id }, { replace: true });
   }
 
   function toggle(layer: Layer) {
@@ -83,6 +104,9 @@ export function MapPage() {
       <div className="row-wrap" role="group" aria-label="Show on the map">
         <FilterChip marker="room" selected={layers.rooms} onClick={() => toggle('rooms')}>
           Rooms
+        </FilterChip>
+        <FilterChip marker="report" selected={layers.reports} onClick={() => toggle('reports')}>
+          Fix-it reports
         </FilterChip>
         <FilterChip marker="busy" selected={layers.inUse} onClick={() => toggle('inUse')}>
           In use now
@@ -118,16 +142,34 @@ export function MapPage() {
             />
           );
         })}
+        {layers.reports &&
+          floorReports.map((report) => {
+            const sameRoom = floorReports.filter((r) => r.room_id === report.room_id);
+            const position = reportPinPosition(report.x!, report.y!, sameRoom.indexOf(report));
+            return (
+              <ReportPin
+                key={report.id}
+                floor={floor}
+                x={position.x}
+                y={position.y}
+                title={`Fix-it report${report.room_code ? ` in ${report.room_code}` : ''}: ${reportTitle(report.description)}`}
+                selected={report.id === selectedReport?.id}
+                onSelect={() => selectReport(report.id)}
+              />
+            );
+          })}
       </MapView>
 
-      {selectedRoom ? (
+      {selectedReport && <ReportCard report={selectedReport} />}
+      {selectedRoom && !selectedReport && (
         <RoomCard
           room={selectedRoom}
           inUse={busy.get(selectedRoom.id)}
           venue={venues.data?.find((venue) => venue.room_id === selectedRoom.id)}
-          openReports={0}
+          openReports={openReports.filter((report) => report.room_id === selectedRoom.id).length}
         />
-      ) : (
+      )}
+      {!selectedRoom && !selectedReport && (
         <p className="meta">Tap a pin, or search, to see a room.</p>
       )}
     </div>

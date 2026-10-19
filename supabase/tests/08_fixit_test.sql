@@ -4,7 +4,7 @@
 --   14. a new report in category `it` notifies only `it` responsibility holders
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(15);
+select plan(16);
 
 -- ---------------------------------------------------------------------------
 -- Test helpers (temporary: they vanish when this transaction ends)
@@ -87,6 +87,15 @@ select throws_ok(
      values ((select id from public.rooms where code = 'G.04'), 'electrical', 'Sparks from socket', true) $$,
   'P0001', 'Only teachers can mark a report as urgent.',
   'A student cannot create an urgent report'
+);
+
+-- The app creates reports with `insert ... returning id` (supabase-js
+-- .select('id')), which also has to pass the read policy for the new row.
+select lives_ok(
+  $$ insert into public.reports (room_id, category, description)
+     values ((select id from public.rooms where code = 'G.04'), 'electrical', 'Socket loose (sample)')
+     returning id $$,
+  'A student can create a report and read its id back, as the app does'
 );
 
 update public.reports set urgent = true where description like 'Projector%';

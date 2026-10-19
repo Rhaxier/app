@@ -3,7 +3,7 @@
 import { describe, expect, it } from 'vitest';
 import type { CalendarBooking } from '@/features/venues/api';
 import type { Room } from './api';
-import { fromLatLng, roomsInUse, searchRooms, toLatLng } from './logic';
+import { fromLatLng, reportPinPosition, roomsInUse, searchRooms, toLatLng } from './logic';
 
 const floor = { width: 1000, height: 700 };
 
@@ -68,5 +68,12 @@ describe('roomsInUse', () => {
     );
     expect(inUse.get('G.01')?.title).toBe('Assembly');
     expect(inUse.size).toBe(1);
+  });
+});
+
+describe('reportPinPosition', () => {
+  it('nudges fix-it pins off the room pin, one after another', () => {
+    expect(reportPinPosition(500, 485, 0)).toEqual({ x: 545, y: 455 });
+    expect(reportPinPosition(500, 485, 1)).toEqual({ x: 580, y: 455 });
   });
 });
