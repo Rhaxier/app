@@ -2,7 +2,6 @@ dist
 coverage
 node_modules
 package-lock.json
-src/types/database.ts
 supabase/.temp
 docs/*.pdf
 CLAUDE.md

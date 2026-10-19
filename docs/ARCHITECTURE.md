@@ -58,19 +58,25 @@ Resend and push delivery plug in.
 
 ## Tables by feature
 
-| Feature                | Tables, views and buckets                                                                       | Migration                  |
-| ---------------------- | ----------------------------------------------------------------------------------------------- | -------------------------- |
-| Identity and roles     | `profiles`, `staff_emails`, `responsibilities`, `app_settings`, `audit_log`                     | `..._01_identity.sql`      |
-| Notifications          | `notifications`, `notification_prefs`, `email_outbox`, `push_outbox`                            | `..._02_notifications.sql` |
-| School map             | `floors`, `rooms`                                                                               | `..._03_map.sql`           |
-| Announcements          | `announcements`                                                                                 | `..._04_announcements.sql` |
-| SUPW volunteering      | `volunteer_events`, `event_roles`, `role_signups`                                               | `..._05_volunteering.sql`  |
-| Projects with teachers | `projects`, `project_shares`, `project_feedback`, bucket `project-files`                        | `..._06_projects.sql`      |
-| Collab finder          | `collab_posts`, `join_requests`, `content_reports`                                              | `..._07_collab.sql`        |
-| Venue booking          | `venues`, `bookings`, view `booking_details`                                                    | `..._08_venues.sql`        |
-| Fix-it reports         | `reports`, `report_votes`, `report_category_routes`, view `report_feed`, bucket `report-photos` | `..._09_fixit.sql`         |
-| Staff approvals        | functions `approvals_*` over the tables above                                                   | `..._10_approvals.sql`     |
-| Realtime and cron      | publication for `notifications`, `bookings`, `reports`; `venue_reminders()` schedule            | `..._11_realtime_cron.sql` |
+Migrations live in `supabase/migrations/` and run in filename order.
+
+| Feature                | Tables, buckets and read functions                                                                                                           | Migration                              |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| Defaults               | locks signed-out access and new functions down                                                                                               | `20261019120000_lockdown_defaults.sql` |
+| Identity and roles     | `profiles`, `staff_emails`, `responsibilities`, `app_settings`, `audit_log`; `admin_list_users()`                                            | `20261019120100_identity.sql`          |
+| Notifications          | `notifications`, `notification_prefs`, `email_outbox`, `push_outbox`; `notify()`                                                             | `20261019120200_notifications.sql`     |
+| School map             | `floors`, `rooms`                                                                                                                            | `20261019120300_map.sql`               |
+| Announcements          | `announcements`                                                                                                                              | `20261019120400_announcements.sql`     |
+| SUPW volunteering      | `volunteer_events`, `event_roles`, `role_signups`; `volunteer_role_counts()`, `event_signups()`, `hours_to_confirm()`, `supw_hours_report()` | `20261019120500_volunteering.sql`      |
+| Projects with teachers | `projects`, `project_shares`, `project_feedback`; bucket `project-files`                                                                     | `20261019120600_projects.sql`          |
+| Collab finder          | `collab_posts`, `join_requests`, `content_reports`; `collab_post_counts()`, `collab_requests()`, `collab_team()`                             | `20261019120700_collab.sql`            |
+| Venue booking          | `venues`, `bookings`; `booking_details()`, `venue_reminders()`                                                                               | `20261019120800_venues.sql`            |
+| Fix-it reports         | `reports`, `report_votes`, `report_category_routes`; `report_feed()`, `open_reports_in_room()`; bucket `report-photos`                       | `20261019120900_fixit.sql`             |
+| Realtime and cron      | Realtime on `notifications`, `bookings`, `reports`; hourly `venue_reminders()`                                                               | `20261019121000_realtime_and_cron.sql` |
+
+The staff **Approvals** tab has no tables of its own: it reads the feature tables and
+functions above (events awaiting approval, `booking_details()`, `report_feed()`,
+`hours_to_confirm()`, `content_reports`).
 
 ## Screens (routes)
 
@@ -93,9 +99,11 @@ Resend and push delivery plug in.
 ## Decisions worth knowing
 
 - **Times** are stored as `timestamptz` and shown in `Asia/Dubai` (`src/lib/dates.ts`).
-- **Privacy through views and functions.** Where some people may see a column and
-  others may not (reporter of a fix-it report, contact emails, booking purpose),
-  the table hides the column from everyone and a view or function hands it out
-  only to the right people.
+- **Privacy through column grants and functions.** Where some people may see a
+  column and others may not (who reported a fix-it problem, contact emails, a
+  booking's purpose), the table doesn't grant that column to anyone, and a
+  `security definer` function hands it out only to the right people. We use
+  functions rather than views because the permission check is written out
+  explicitly inside them.
 - **Unknowns are data.** Anything the school hasn't decided lives in
   `app_settings`, a table, or an env var. See `docs/OPEN_QUESTIONS.md`.
