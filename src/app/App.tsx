@@ -1,14 +1,20 @@
-// Temporary M0 screen: proves the build, tokens and fonts work.
-// Replaced by the router and app shell in M2.
-import { Card } from '@/components/Card';
-import { PageHeader } from '@/components/PageHeader';
-import { school } from '@/config/school';
+// The root of the app: data caching (TanStack Query), who's signed in
+// (AuthProvider) and the screens (router).
+import { QueryClientProvider } from '@tanstack/react-query';
+import { RouterProvider } from 'react-router-dom';
+import { AuthProvider } from '@/features/auth/AuthProvider';
+import { isSupabaseConfigured } from '@/lib/env';
+import { queryClient } from '@/lib/queryClient';
+import { router } from './router';
+import { SetupScreen } from './SetupScreen';
 
 export function App() {
+  if (!isSupabaseConfigured) return <SetupScreen />;
   return (
-    <main style={{ maxWidth: 'var(--content-max)', margin: '0 auto', padding: 'var(--space-5)' }}>
-      <PageHeader eyebrow={school.name} title={school.appName} />
-      <Card>Project skeleton is running.</Card>
-    </main>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <RouterProvider router={router} />
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }

@@ -1,8 +1,9 @@
 // The top of every screen: optional back link, small eyebrow text, the page
 // title (Bricolage Grotesque), a subtitle, and an optional action on the right
 // (e.g. the round "+" button or the floor switcher).
-import type { ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
+import { school } from '@/config/school';
 import { Icon } from './Icon';
 import styles from './PageHeader.module.css';
 
@@ -15,6 +16,11 @@ interface PageHeaderProps {
 }
 
 export function PageHeader({ title, eyebrow, subtitle, back, action }: PageHeaderProps) {
+  // The browser tab (and screen readers on page change) name the screen.
+  useEffect(() => {
+    document.title = `${title} · ${school.appName}`;
+  }, [title]);
+
   return (
     <header className={styles.header}>
       {back && (

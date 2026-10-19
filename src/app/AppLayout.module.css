@@ -1,0 +1,26 @@
+.shell {
+  min-height: 100vh;
+}
+
+.main {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  /* Room at the bottom so the last card isn't hidden behind the tab bar. */
+  padding: var(--space-6) var(--space-5) calc(var(--height-tabbar) + var(--space-8));
+}
+
+/* Keyboard users can jump past the header straight to the content. */
+.skip {
+  position: absolute;
+  left: var(--space-4);
+  top: -60px;
+  z-index: 1000;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-small);
+  background: var(--color-ink);
+  color: var(--color-on-accent);
+}
+
+.skip:focus {
+  top: var(--space-4);
+}

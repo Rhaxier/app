@@ -1,0 +1,82 @@
+.trigger {
+  position: fixed;
+  right: max(var(--space-4), calc((100vw - var(--content-max)) / 2 + var(--space-4)));
+  bottom: calc(var(--space-4) + env(safe-area-inset-bottom));
+  z-index: 900;
+  min-width: var(--touch-min);
+  height: var(--touch-min);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--color-ink);
+  color: var(--color-on-accent);
+  font-size: var(--text-meta);
+  font-weight: 600;
+  letter-spacing: var(--tracking-label);
+  box-shadow: var(--shadow-float);
+  cursor: pointer;
+  opacity: 0.85;
+}
+
+.trigger:hover {
+  opacity: 1;
+}
+
+/* Signed in: sit above the tab bar instead of covering it. */
+.aboveTabs {
+  bottom: calc(var(--height-tabbar) + var(--space-3) + env(safe-area-inset-bottom));
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.group h3 {
+  color: var(--color-muted);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+}
+
+.user {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 52px;
+  padding: var(--space-2);
+  border: 0;
+  border-radius: var(--radius-small);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.user:hover:not(:disabled) {
+  background: var(--color-bg);
+}
+
+.user[aria-current='true'] {
+  background: var(--color-accent-soft);
+}
+
+.userText {
+  display: flex;
+  flex-direction: column;
+}
+
+.name {
+  font-weight: 500;
+}
+
+.error {
+  padding: var(--space-3);
+  border-radius: var(--radius-small);
+  background: var(--color-alert-soft);
+  color: var(--color-alert-ink);
+  font-size: var(--text-small);
+}

@@ -1,0 +1,12 @@
+.person {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.name {
+  font-family: var(--font-body);
+  font-size: var(--text-card-title);
+  font-weight: 600;
+  letter-spacing: 0;
+}

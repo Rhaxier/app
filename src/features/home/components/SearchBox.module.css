@@ -1,0 +1,29 @@
+.box {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--touch-min);
+  padding: 0 var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-card);
+  color: var(--color-muted);
+}
+
+.box:focus-within {
+  box-shadow: var(--focus-ring);
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  min-height: 42px;
+  border: 0;
+  background: transparent;
+  color: var(--color-ink);
+  outline: none;
+}
+
+.input::placeholder {
+  color: var(--color-muted);
+}

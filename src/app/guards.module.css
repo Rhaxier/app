@@ -1,0 +1,10 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-4);
+  min-height: 100vh;
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--space-5);
+}
