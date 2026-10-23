@@ -53,6 +53,8 @@
   min-height: var(--height-button-small);
   padding: 0 var(--space-4);
   font-size: var(--text-small);
+  /* Small buttons sit beside titles; keep "New class" on one line. */
+  white-space: nowrap;
 }
 
 .full {

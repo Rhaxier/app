@@ -18,6 +18,8 @@ export function makeUser(overrides: Partial<CurrentUser> = {}): CurrentUser {
     section: 'A',
     avatar_initials: null,
     responsibilities: [],
+    posting_suspended_until: null,
+    suspension_reason: null,
     ...overrides,
   };
 }

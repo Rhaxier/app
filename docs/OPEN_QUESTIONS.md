@@ -155,13 +155,17 @@ on the **Admin > Settings** screen; you can also run SQL in Supabase Studio
 
 ## Q12: Which classes or grades does each teacher teach?
 
-- Default used: there is no teacher-to-class data, so a teacher may post
-  announcements to any grade(s), but never school-wide or pinned.
-- Where it lives: the "Staff post announcements" policy (`..._120400_announcements.sql`).
-- To change it: if the school wants teachers limited to their own grades, add a
-  `teacher_grades (teacher_id, grade)` table and add
-  `and grades <@ (select array_agg(grade) from teacher_grades where teacher_id = auth.uid())`
-  to that policy.
+**Configurable in Admin.**
+
+- Default used: teachers may still post announcements to any grade (never school-wide or
+  pinned) until the school enters its classes. Classes say who teaches whom; with the
+  switch off, a teacher may post only to the grades they teach as a whole (a class with no
+  section) and the sections they teach.
+- Where it lives: tables `classes`, `class_teachers`, `class_students`;
+  `app_settings.teachers_post_any_grade` (default `true`); `teaches_audience()` and the
+  announcement policies (`supabase/migrations/20261023120100_people_and_grades.sql`).
+- To change it: **Admin > People > Classes**: add the classes (or import them later),
+  then switch off "Teachers may announce to any grade" at the top of that screen.
 
 ## Q13: Who confirms SUPW hours on staff-run events?
 
@@ -269,10 +273,14 @@ on the **Admin > Settings** screen; you can also run SQL in Supabase Studio
 
 ## Q25: Which grades use the app?
 
-- Default used: grades 1 to 12 are offered when posting announcements and editing a
-  student's grade. Seed students are in grades 8, 10 and 12.
-- Where it lives: `app_settings.grades` (`..._120100_identity.sql`).
-- To change it: **Admin > Settings > Grades**.
+**Configurable in Admin.**
+
+- Default used: grades 1 to 12 for a new school (the seed keeps 8, 10 and 12, each with
+  sections A and B). The old `app_settings.grades` setting was moved into this table.
+- Where it lives: tables `grades` and `sections`
+  (`..._20261023120100_people_and_grades.sql`).
+- To change it: **Admin > People > Grades and sections**. Archive a grade (rather than
+  deleting it) when it's no longer offered; students and history keep pointing at it.
 
 ## Q26: What does search cover?
 
@@ -324,3 +332,36 @@ on the **Admin > Settings** screen; you can also run SQL in Supabase Studio
   (`..._20261023120000_admin_overview.sql`, replaced in later migrations).
 - To change it: change `venue_bookable_minutes()` in a new migration; every number that
   uses it follows.
+
+## Q31: What does suspending someone's posting block?
+
+- Default used: new announcements, collab posts, join requests, volunteering events and
+  fix-it reports. They can still read everything, sign up for volunteering roles, say
+  "me too", share projects and book venues. The person sees a banner saying until when,
+  and the reason if one was given.
+- Where it lives: `profiles.posting_suspended_until`, the `block_suspended_posting`
+  triggers and the "Suspended accounts can't post" restrictive policies
+  (`..._20261023120100_people_and_grades.sql`).
+- To change it: attach the same trigger and policy to more tables (or remove them) in a
+  new migration.
+
+## Q32: How does the year-end rollover move students?
+
+- Default used: each student moves to the next grade the school has in use (so with
+  grades 8, 10 and 12 only, 8 goes to 10). Students in the top grade are archived: their
+  records stay, they disappear from lists and notifications, and their sign-in is
+  blocked. Sections keep their letter. Class lists are left as they were.
+- Where it lives: `admin_rollover()` (`..._20261023120100_people_and_grades.sql`);
+  **Admin > People > Year-end rollover**.
+- To change it: edit `admin_rollover()` in a new migration (for example to clear class
+  lists, or to keep a "graduated" group signed in).
+
+## Q33: Who can be imported from a CSV file?
+
+- Default used: students and teachers. Admins are made one at a time on the Users screen,
+  so a spreadsheet can never create an admin. Imported people who have never signed in
+  wait on the `roster` and get their name, role, grade and section at first sign-in.
+- Where it lives: `admin_import_people()` and the `roster` table; `handle_new_user()`
+  reads the roster (`..._20261023120100_people_and_grades.sql`).
+- To change it: allow `admin` in the role check inside `admin_import_people()` and in the
+  `roster.role` constraint.

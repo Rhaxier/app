@@ -20,6 +20,8 @@ export interface AnnouncementFormValues {
   postedAs: string;
   audience: Enums<'announcement_audience'>;
   grades: number[];
+  /** Optional: only some sections (ids). Their grades are added automatically. */
+  sectionIds: string[];
   pinned: boolean;
 }
 
@@ -43,8 +45,12 @@ export function validateAnnouncement(
 
   if (values.postedAs.length > 60) errors.postedAs = 'Keep this under 60 characters.';
 
-  if (values.audience === 'grades' && values.grades.length === 0) {
-    errors.grades = 'Choose at least one grade.';
+  if (
+    values.audience === 'grades' &&
+    values.grades.length === 0 &&
+    values.sectionIds.length === 0
+  ) {
+    errors.grades = 'Choose at least one grade or section.';
   }
 
   // Mirrors the "Staff post announcements" policy.
@@ -66,6 +72,7 @@ export const emptyAnnouncementValues: AnnouncementFormValues = {
   postedAs: '',
   audience: 'grades',
   grades: [],
+  sectionIds: [],
   pinned: false,
 };
 
@@ -75,20 +82,29 @@ export function valuesFromAnnouncement(announcement: Announcement): Announcement
     body: announcement.body,
     postedAs: announcement.posted_as ?? '',
     audience: announcement.audience,
-    grades: announcement.grades ?? [],
+    // A section announcement stores its grades too; the form shows just the sections.
+    grades: announcement.section_ids ? [] : (announcement.grades ?? []),
+    sectionIds: announcement.section_ids ?? [],
     pinned: announcement.pinned,
   };
 }
 
-/** Tidies the form into exactly what the table expects. */
+/**
+ * Tidies the form into exactly what the table expects. When sections are
+ * chosen, the database works out their grades (announcements_check_audience),
+ * so the form only has to send the section ids.
+ */
 export function toAnnouncementInput(values: AnnouncementFormValues): AnnouncementInput {
+  const forGrades = values.audience === 'grades';
+  const sectionIds = forGrades ? values.sectionIds : [];
   return {
     title: values.title.trim(),
     body: values.body.trim(),
     posted_as: values.postedAs.trim() || null,
     audience: values.audience,
     // The table's CHECK constraint: school-wide posts have no grade list.
-    grades: values.audience === 'grades' ? values.grades : null,
+    grades: forGrades ? (sectionIds.length ? [] : values.grades) : null,
+    section_ids: sectionIds.length ? sectionIds : null,
     pinned: values.pinned,
   };
 }

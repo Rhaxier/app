@@ -8,6 +8,7 @@ import { PageHeader } from '@/components/PageHeader';
 import { Sheet } from '@/components/Sheet';
 import { EmptyState, ErrorState, LoadingState } from '@/components/States';
 import { useCurrentUser } from '@/features/auth/hooks';
+import { useSections } from '@/features/school/hooks';
 import { formatDateTime } from '@/lib/dates';
 import { errorMessage } from '@/lib/errors';
 import { canEditAnnouncement } from '@/lib/permissions';
@@ -21,6 +22,7 @@ export function AnnouncementDetailPage() {
   const navigate = useNavigate();
   const announcement = useAnnouncement(id);
   const remove = useDeleteAnnouncement();
+  const sections = useSections().data;
   const [confirming, setConfirming] = useState(false);
 
   const back = { to: '/announcements', label: 'Announcements' };
@@ -51,7 +53,7 @@ export function AnnouncementDetailPage() {
         <h2>{item.title}</h2>
         {item.body && <p className={styles.body}>{item.body}</p>}
         <p className="meta">
-          {formatDateTime(item.published_at)} · {audienceLabel(item)}
+          {formatDateTime(item.published_at)} · {audienceLabel(item, sections)}
         </p>
       </Card>
 

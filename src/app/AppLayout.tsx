@@ -7,6 +7,7 @@ import { useCurrentUser } from '@/features/auth/hooks';
 import { useLiveNotifications } from '@/features/notifications/hooks';
 import { registerForPush } from '@/features/notifications/push';
 import { motionMs } from '@/lib/motion';
+import { SuspensionNotice } from './SuspensionNotice';
 import { TabBar } from './TabBar';
 import styles from './AppLayout.module.css';
 
@@ -41,6 +42,7 @@ export function AppLayout() {
         ref={mainRef}
         className={[styles.main, wide && styles.wide].filter(Boolean).join(' ')}
       >
+        <SuspensionNotice />
         <Outlet />
       </main>
       <TabBar />

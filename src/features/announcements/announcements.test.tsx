@@ -31,9 +31,15 @@ const admin = makeUser({ id: 'admin-1', role: 'admin', grade: null });
 // The form reads the signed-in person; the test decides who that is.
 let signedIn: CurrentUser = teacher;
 vi.mock('@/features/auth/hooks', () => ({ useCurrentUser: () => signedIn }));
-// The grade chips come from app_settings; give the form the school's grades.
+// The grade and section chips come from the school's structure (Admin >
+// Grades and sections); give the form some. Teachers may post to any grade.
 vi.mock('@/features/settings/hooks', () => ({
-  useAppSettings: () => ({ data: { grades: [8, 9, 10] } }),
+  useAppSettings: () => ({ data: { teachers_post_any_grade: true } }),
+}));
+vi.mock('@/features/school/hooks', () => ({
+  useActiveGrades: () => [8, 9, 10],
+  useSections: () => ({ data: [{ id: 's-10a', grade: 10, name: 'A' }] }),
+  useClasses: () => ({ data: [] }),
 }));
 
 const valid: AnnouncementFormValues = {
@@ -50,7 +56,7 @@ describe('validateAnnouncement', () => {
   it('needs a title and, for grade posts, at least one grade', () => {
     const errors = validateAnnouncement(emptyAnnouncementValues, teacher);
     expect(errors.title).toBe('Add a title.');
-    expect(errors.grades).toBe('Choose at least one grade.');
+    expect(errors.grades).toBe('Choose at least one grade or section.');
   });
 
   it('stops teachers posting school-wide or pinning (the database refuses it too)', () => {
@@ -65,6 +71,12 @@ describe('validateAnnouncement', () => {
 });
 
 describe('toAnnouncementInput', () => {
+  it('sends sections on their own: the database adds their grades', () => {
+    const input = toAnnouncementInput({ ...valid, grades: [8], sectionIds: ['s-10a'] });
+    expect(input.section_ids).toEqual(['s-10a']);
+    expect(input.grades).toEqual([]);
+  });
+
   it('drops the grade list for school-wide posts (the table requires it)', () => {
     const input = toAnnouncementInput({ ...valid, audience: 'school', grades: [8, 9] });
     expect(input.grades).toBeNull();
@@ -97,7 +109,7 @@ describe('AnnouncementForm', () => {
     const onSubmit = renderForm();
     await userEvent.click(screen.getByRole('button', { name: 'Post' }));
     expect(screen.getByLabelText('Title')).toHaveAccessibleDescription('Add a title.');
-    expect(screen.getByText('Choose at least one grade.')).toBeInTheDocument();
+    expect(screen.getByText('Choose at least one grade or section.')).toBeInTheDocument();
     expect(onSubmit).not.toHaveBeenCalled();
   });
 
@@ -125,6 +137,15 @@ describe('AnnouncementForm', () => {
       expect.objectContaining({ title: 'Trip forms due', audience: 'grades', grades: [8] }),
     );
   });
+
+  it('can narrow a grade announcement to sections', async () => {
+    signedIn = teacher;
+    const onSubmit = renderForm();
+    await userEvent.type(screen.getByLabelText('Title'), 'Lab coats');
+    await userEvent.click(screen.getByRole('button', { name: '10A' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Post' }));
+    expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ sectionIds: ['s-10a'] }));
+  });
 });
 
 describe('AnnouncementCard', () => {
@@ -135,6 +156,7 @@ describe('AnnouncementCard', () => {
     posted_as: 'Admin office',
     audience: 'school',
     grades: null,
+    section_ids: null,
     pinned: true,
     published_at: new Date().toISOString(),
     author_id: 'admin-1',

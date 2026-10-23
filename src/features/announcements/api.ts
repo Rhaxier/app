@@ -22,7 +22,7 @@ import type { Enums, TablesInsert } from '@/types/database';
 // request ("embedding"). Only columns the signed-in role may read can be
 // embedded, which is why we never ask for the author's email.
 const ANNOUNCEMENT_COLUMNS =
-  'id, title, body, posted_as, audience, grades, pinned, published_at, author_id, author:profiles(full_name)';
+  'id, title, body, posted_as, audience, grades, section_ids, pinned, published_at, author_id, author:profiles(full_name)';
 
 // What a screen gets back. Written by hand (rather than inferred) so it's easy
 // to read; the generated Database types check that it matches the query.
@@ -33,6 +33,8 @@ export interface Announcement {
   posted_as: string | null;
   audience: Enums<'announcement_audience'>;
   grades: number[] | null;
+  /** Only these sections of those grades; null = the whole grades. */
+  section_ids: string[] | null;
   pinned: boolean;
   published_at: string;
   author_id: string;
@@ -42,7 +44,7 @@ export interface Announcement {
 // What the form sends. Pick<> keeps it in step with the real table columns.
 export type AnnouncementInput = Pick<
   TablesInsert<'announcements'>,
-  'title' | 'body' | 'posted_as' | 'audience' | 'grades' | 'pinned'
+  'title' | 'body' | 'posted_as' | 'audience' | 'grades' | 'section_ids' | 'pinned'
 >;
 
 /**

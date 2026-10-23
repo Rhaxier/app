@@ -20,6 +20,10 @@ interface SheetProps {
   children: ReactNode;
 }
 
+// Sheets can open on top of each other (a "Are you sure?" over an editor).
+// Only the top one answers Escape and keeps Tab inside it.
+const openSheets: HTMLElement[] = [];
+
 const FOCUSABLE =
   'button:not(:disabled), a[href], input:not(:disabled), select:not(:disabled), textarea:not(:disabled), [tabindex]:not([tabindex="-1"])';
 
@@ -45,11 +49,14 @@ export function Sheet({ open, title, onClose, children }: SheetProps) {
   });
 
   useEffect(() => {
-    if (!open) return;
+    if (!open || !panelRef.current) return;
+    const panel = panelRef.current;
     const previouslyFocused = document.activeElement as HTMLElement | null;
-    panelRef.current?.focus();
+    openSheets.push(panel);
+    panel.focus();
 
     const onKeyDown = (event: KeyboardEvent) => {
+      if (openSheets[openSheets.length - 1] !== panel) return;
       if (event.key === 'Escape') {
         onCloseRef.current();
         return;
@@ -72,6 +79,7 @@ export function Sheet({ open, title, onClose, children }: SheetProps) {
     document.addEventListener('keydown', onKeyDown);
     return () => {
       document.removeEventListener('keydown', onKeyDown);
+      openSheets.splice(openSheets.indexOf(panel), 1);
       previouslyFocused?.focus();
     };
   }, [open]);

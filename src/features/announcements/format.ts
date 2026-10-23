@@ -1,9 +1,20 @@
 // Small text helpers shared by the announcement card, detail page and tests.
+import type { Section } from '@/features/school/api';
+import { sectionLabel } from '@/features/school/logic';
 import type { Announcement } from './api';
 
-/** "Grades 10, 12" or "Whole school". */
-export function audienceLabel(announcement: Pick<Announcement, 'audience' | 'grades'>): string {
+/** "Grades 10, 12", "10A, 10B" or "Whole school". */
+export function audienceLabel(
+  announcement: Pick<Announcement, 'audience' | 'grades'> & { section_ids?: string[] | null },
+  sections: Section[] = [],
+): string {
   if (announcement.audience === 'school') return 'Whole school';
+  if (announcement.section_ids?.length) {
+    const names = sections
+      .filter((s) => announcement.section_ids!.includes(s.id))
+      .map(sectionLabel);
+    if (names.length) return `${names.length === 1 ? 'Section' : 'Sections'} ${names.join(', ')}`;
+  }
   const grades = announcement.grades ?? [];
   return `${grades.length === 1 ? 'Grade' : 'Grades'} ${grades.join(', ')}`;
 }

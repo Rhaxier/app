@@ -6,6 +6,7 @@
 // =============================================================================
 import { Link } from 'react-router-dom';
 import { Card } from '@/components/Card';
+import { useSections } from '@/features/school/hooks';
 import { relativeTime } from '@/lib/dates';
 import type { Announcement } from '../api';
 import { audienceLabel, bylineOf } from '../format';
@@ -19,6 +20,7 @@ interface AnnouncementCardProps {
 
 export function AnnouncementCard({ announcement, showAudience }: AnnouncementCardProps) {
   const byline = bylineOf(announcement);
+  const sections = useSections().data;
   return (
     <Card as="article" tone={announcement.pinned ? 'accent' : 'default'} className={styles.card}>
       <Link to={`/announcements/${announcement.id}`} className={styles.link}>
@@ -32,7 +34,7 @@ export function AnnouncementCard({ announcement, showAudience }: AnnouncementCar
         </div>
         <h3 className={styles.title}>{announcement.title}</h3>
         {announcement.body && <p className={styles.body}>{announcement.body}</p>}
-        {showAudience && <p className="meta">For: {audienceLabel(announcement)}</p>}
+        {showAudience && <p className="meta">For: {audienceLabel(announcement, sections)}</p>}
       </Link>
     </Card>
   );

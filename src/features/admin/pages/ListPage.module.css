@@ -50,3 +50,29 @@
   font-size: var(--text-meta);
   overflow-wrap: anywhere;
 }
+
+/* A removable pill, e.g. a section "10A ×". */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-height: var(--height-chip);
+  padding-left: 14px;
+  border-radius: var(--radius-pill);
+  background: var(--color-quiet);
+  font-size: var(--text-small);
+  font-weight: 500;
+}
+
+.pillRemove {
+  display: grid;
+  place-items: center;
+  width: var(--touch-min);
+  height: var(--touch-min);
+  margin: -5px 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-muted);
+  cursor: pointer;
+}

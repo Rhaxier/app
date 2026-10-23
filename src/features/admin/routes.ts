@@ -12,6 +12,10 @@ export const adminRoutes: RouteObject = {
     { path: 'overview', lazy: lazyPage(() => import('./pages/OverviewPage'), 'OverviewPage') },
     // People
     { path: 'users', lazy: lazyPage(() => import('./pages/UsersPage'), 'UsersPage') },
+    { path: 'grades', lazy: lazyPage(() => import('./pages/GradesPage'), 'GradesPage') },
+    { path: 'classes', lazy: lazyPage(() => import('./pages/ClassesPage'), 'ClassesPage') },
+    { path: 'import', lazy: lazyPage(() => import('./pages/ImportPage'), 'ImportPage') },
+    { path: 'rollover', lazy: lazyPage(() => import('./pages/RolloverPage'), 'RolloverPage') },
     {
       path: 'staff-emails',
       lazy: lazyPage(() => import('./pages/StaffEmailsPage'), 'StaffEmailsPage'),

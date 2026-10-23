@@ -139,6 +139,42 @@ insert into public.responsibilities (user_id, kind) values
   (pg_temp.u('admin.venues'), 'venues');
 
 -- -----------------------------------------------------------------------------
+-- School structure: three grades with two sections each, and a few classes.
+-- (The migration starts a school with grades 1 to 12; the sample has three.)
+-- -----------------------------------------------------------------------------
+delete from public.grades where grade not in (8, 10, 12);
+
+insert into public.sections (grade, name) values
+  (8, 'A'), (8, 'B'), (10, 'A'), (10, 'B'), (12, 'A'), (12, 'B')
+on conflict do nothing;
+
+insert into public.classes (name, subject, grade, section_id) values
+  ('10 A Physics (sample)', 'Physics', 10,
+   (select id from public.sections where grade = 10 and name = 'A')),
+  ('Grade 8 English (sample)', 'English', 8, null),
+  ('12 B Computer Science (sample)', 'Computer Science', 12,
+   (select id from public.sections where grade = 12 and name = 'B'));
+
+insert into public.class_teachers (class_id, teacher_id)
+select c.id, pg_temp.u(t.who)
+from (values
+  ('10 A Physics (sample)', 'teacher.a'),
+  ('Grade 8 English (sample)', 'teacher.b'),
+  ('12 B Computer Science (sample)', 'teacher.c')
+) as t(class_name, who)
+join public.classes c on c.name = t.class_name;
+
+insert into public.class_students (class_id, student_id)
+select c.id, pg_temp.u(t.who)
+from (values
+  ('10 A Physics (sample)', 'student.g10.a'),
+  ('Grade 8 English (sample)', 'student.g8.a'),
+  ('Grade 8 English (sample)', 'student.g8.b'),
+  ('12 B Computer Science (sample)', 'student.g12.b')
+) as t(class_name, who)
+join public.classes c on c.name = t.class_name;
+
+-- -----------------------------------------------------------------------------
 -- Map: three placeholder floors (images in public/floorplans/) and rooms.
 -- Coordinates are pixels on the 1000 x 700 placeholder images.
 -- -----------------------------------------------------------------------------

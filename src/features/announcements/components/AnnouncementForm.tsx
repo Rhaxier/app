@@ -5,6 +5,9 @@
 // validateAnnouncement(), and hands clean values to onSubmit. It doesn't know
 // whether it's creating or editing: the page decides that. Teachers don't see
 // the whole-school or pin options (UI hint); the database refuses them anyway.
+// When the school limits teachers to their own classes (Q12), the grade and
+// section chips show only what this teacher teaches; again, the database
+// enforces it.
 // =============================================================================
 import { useState, type FormEvent } from 'react';
 import { Button, ButtonLink } from '@/components/Button';
@@ -13,6 +16,8 @@ import { CheckboxField, FormError, TextArea, TextField } from '@/components/Inpu
 import { SegmentedControl } from '@/components/SegmentedControl';
 import { useCurrentUser } from '@/features/auth/hooks';
 import { useAppSettings } from '@/features/settings/hooks';
+import { useActiveGrades, useClasses, useSections } from '@/features/school/hooks';
+import { sectionLabel, teachableAudience } from '@/features/school/logic';
 import { canPostSchoolWide } from '@/lib/permissions';
 import {
   BODY_MAX,
@@ -43,8 +48,17 @@ export function AnnouncementForm({
 }: AnnouncementFormProps) {
   const user = useCurrentUser();
   const isAdmin = canPostSchoolWide(user);
-  // The school's grades come from app_settings (Admin > Settings).
-  const grades = useAppSettings().data?.grades ?? [];
+  // The school's grades and sections (Admin > Grades and sections).
+  const activeGrades = useActiveGrades();
+  const allSections = useSections().data ?? [];
+  const classes = useClasses().data ?? [];
+  const anyGrade = useAppSettings().data?.teachers_post_any_grade ?? true;
+  const limited = !isAdmin && !anyGrade;
+  const teachable = teachableAudience(user.id, classes, allSections);
+  const grades = limited ? teachable.grades : activeGrades;
+  const sections = allSections.filter(
+    (s) => activeGrades.includes(s.grade) && (!limited || teachable.sectionIds.includes(s.id)),
+  );
   const [values, setValues] = useState(initialValues);
   const [errors, setErrors] = useState<AnnouncementErrors>({});
 
@@ -62,6 +76,15 @@ export function AnnouncementForm({
       values.grades.includes(grade)
         ? values.grades.filter((g) => g !== grade)
         : [...values.grades, grade].sort((a, b) => a - b),
+    );
+  }
+
+  function toggleSection(id: string) {
+    update(
+      'sectionIds',
+      values.sectionIds.includes(id)
+        ? values.sectionIds.filter((s) => s !== id)
+        : [...values.sectionIds, id],
     );
   }
 
@@ -131,10 +154,33 @@ export function AnnouncementForm({
               </FilterChip>
             ))}
           </div>
+          {limited && grades.length === 0 && (
+            <p className="meta">You don't teach a whole grade. Choose your sections below.</p>
+          )}
           {errors.grades && (
             <p id="grades-error" className={styles.error} role="alert">
               {errors.grades}
             </p>
+          )}
+        </fieldset>
+      )}
+
+      {values.audience === 'grades' && sections.length > 0 && (
+        <fieldset className={styles.fieldset}>
+          <legend className={styles.legend}>Only some sections (optional)</legend>
+          <div className="row-wrap">
+            {sections.map((section) => (
+              <FilterChip
+                key={section.id}
+                selected={values.sectionIds.includes(section.id)}
+                onClick={() => toggleSection(section.id)}
+              >
+                {sectionLabel(section)}
+              </FilterChip>
+            ))}
+          </div>
+          {values.sectionIds.length > 0 && (
+            <p className="meta">Only students in these sections will see it.</p>
           )}
         </fieldset>
       )}

@@ -13,6 +13,7 @@ import type { AttentionRow, Metrics } from './api';
 import { percent, waitingFor } from './logic';
 import { OverviewPage } from './pages/OverviewPage';
 import { adminRoutes } from './routes';
+import { adminGroups } from './sections';
 
 let signedIn: CurrentUser = makeUser();
 vi.mock('@/features/auth/hooks', () => ({ useCurrentUser: () => signedIn }));
@@ -82,6 +83,13 @@ describe('admin routes', () => {
       openAdmin('/admin/users');
       expect(await screen.findByText('Admins only')).toBeInTheDocument();
       document.body.innerHTML = '';
+    }
+  });
+
+  it('include every section in the menu', () => {
+    const routed = adminRoutes.children?.map((route) => route.path);
+    for (const group of adminGroups) {
+      for (const section of group.sections) expect(routed).toContain(section.path);
     }
   });
 

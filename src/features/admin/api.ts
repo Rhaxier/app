@@ -3,7 +3,7 @@
 // admin_* functions. Nothing on these screens can grant more than the
 // database already allows an admin to do.
 import { supabase } from '@/lib/supabase';
-import type { Enums, Tables, TablesInsert, TablesUpdate } from '@/types/database';
+import type { Enums, Json, Tables, TablesInsert, TablesUpdate } from '@/types/database';
 
 export type Role = Enums<'user_role'>;
 export type Responsibility = Enums<'responsibility_kind'>;
@@ -95,13 +95,84 @@ export interface AdminUser {
   grade: number | null;
   section: string | null;
   responsibilities: Responsibility[];
+  /** Set while posting is paused (only future dates come back). */
+  posting_suspended_until: string | null;
+  suspension_reason: string | null;
+  /** Set when the year-end rollover archived them (left the school). */
+  archived_at: string | null;
   created_at: string;
 }
 
 export async function fetchUsers(): Promise<AdminUser[]> {
   const { data, error } = await supabase.rpc('admin_list_users');
   if (error) throw error;
-  return data;
+  return data as AdminUser[];
+}
+
+/** Pause someone's posting until a date (audited). They see why in the app. */
+export async function suspendPosting(userId: string, until: string, reason: string): Promise<void> {
+  const { error } = await supabase.rpc('admin_suspend_posting', {
+    p_user_id: userId,
+    p_until: until,
+    p_reason: reason,
+  });
+  if (error) throw error;
+}
+
+export async function liftSuspension(userId: string): Promise<void> {
+  const { error } = await supabase.rpc('admin_lift_suspension', { p_user_id: userId });
+  if (error) throw error;
+}
+
+// ---------------------------------------------------------------------------
+// Bulk import (CSV) and year-end rollover
+// ---------------------------------------------------------------------------
+
+/** One person from the CSV file, as typed (the database checks everything). */
+export interface ImportRow {
+  name: string;
+  email: string;
+  role: string;
+  grade: string;
+  section: string;
+}
+
+export interface ImportResult {
+  row_number: number;
+  email: string;
+  full_name: string;
+  /** create = set up at first sign-in, update = account changed, error = not imported. */
+  outcome: 'create' | 'update' | 'error';
+  message: string;
+}
+
+/**
+ * dryRun = true is the preview: every row checked, nothing saved. Then the
+ * real import saves the good rows in one transaction and skips the bad ones.
+ */
+export async function importPeople(rows: ImportRow[], dryRun: boolean): Promise<ImportResult[]> {
+  const { data, error } = await supabase.rpc('admin_import_people', {
+    p_rows: rows as unknown as Json,
+    p_dry_run: dryRun,
+  });
+  if (error) throw error;
+  return data as ImportResult[];
+}
+
+export interface RolloverStep {
+  from_grade: number;
+  /** null = this grade leaves the school (archived). */
+  to_grade: number | null;
+  students: number;
+}
+
+export async function rollover(dryRun: boolean, confirm?: string): Promise<RolloverStep[]> {
+  const { data, error } = await supabase.rpc('admin_rollover', {
+    p_dry_run: dryRun,
+    p_confirm: confirm as string,
+  });
+  if (error) throw error;
+  return data as RolloverStep[];
 }
 
 /** The only way roles change. Refuses to remove the last admin; audited. */

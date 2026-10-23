@@ -8,6 +8,11 @@ import {
   fetchMetrics,
   fetchSupwByGrade,
   fetchVenueUtilisation,
+  importPeople,
+  liftSuspension,
+  rollover,
+  suspendPosting,
+  type ImportRow,
   addStaffEmail,
   createVenue,
   fetchAuditLog,
@@ -76,11 +81,60 @@ export function useUsers() {
   return useQuery({ queryKey: adminKeys.users(), queryFn: fetchUsers });
 }
 
+export function useSuspendPosting() {
+  const invalidate = useInvalidate();
+  return useMutation({
+    mutationFn: ({ userId, until, reason }: { userId: string; until: string; reason: string }) =>
+      suspendPosting(userId, until, reason),
+    onSuccess: invalidate,
+    meta: { successMessage: 'Posting paused' },
+  });
+}
+
+export function useLiftSuspension() {
+  const invalidate = useInvalidate();
+  return useMutation({
+    mutationFn: liftSuspension,
+    onSuccess: invalidate,
+    meta: { successMessage: 'Suspension lifted', errorToast: true },
+  });
+}
+
+/** The preview: checks every row, saves nothing. */
+export function useImportPreview() {
+  return useMutation({ mutationFn: (rows: ImportRow[]) => importPeople(rows, true) });
+}
+
+export function useImportPeople() {
+  const invalidate = useInvalidate(['people'], ['school']);
+  return useMutation({
+    mutationFn: (rows: ImportRow[]) => importPeople(rows, false),
+    onSuccess: invalidate,
+  });
+}
+
+export function useRolloverPreview() {
+  return useQuery({
+    queryKey: [...adminKeys.all, 'rollover-preview'],
+    queryFn: () => rollover(true),
+  });
+}
+
+export function useRollover() {
+  const invalidate = useInvalidate(['people'], ['current-user']);
+  return useMutation({
+    mutationFn: (confirm: string) => rollover(false, confirm),
+    onSuccess: invalidate,
+    meta: { successMessage: 'Rollover done. Everyone has moved up a grade.' },
+  });
+}
+
 export function useSetRole() {
   const invalidate = useInvalidate(['people'], ['current-user']);
   return useMutation({
     mutationFn: ({ userId, role }: { userId: string; role: Role }) => setRole(userId, role),
     onSuccess: invalidate,
+    meta: { successMessage: 'Role changed' },
   });
 }
 
@@ -99,6 +153,7 @@ export function useUpdateProfile() {
       section: string;
     }) => updateProfile(userId, { fullName, grade, section }),
     onSuccess: invalidate,
+    meta: { successMessage: 'Saved' },
   });
 }
 
@@ -115,6 +170,7 @@ export function useToggleResponsibility() {
       holds: boolean;
     }) => (holds ? removeResponsibility(userId, kind) : addResponsibility(userId, kind)),
     onSuccess: invalidate,
+    meta: { errorToast: true },
   });
 }
 

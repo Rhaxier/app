@@ -38,6 +38,30 @@ export const adminGroups: AdminGroup[] = [
         icon: 'users',
       },
       {
+        path: 'grades',
+        title: 'Grades and sections',
+        description: 'The grades in use and their sections',
+        icon: 'layers',
+      },
+      {
+        path: 'classes',
+        title: 'Classes',
+        description: 'Who teaches whom',
+        icon: 'folder',
+      },
+      {
+        path: 'import',
+        title: 'Import people',
+        description: 'Add or update people from a CSV file',
+        icon: 'download',
+      },
+      {
+        path: 'rollover',
+        title: 'Year-end rollover',
+        description: 'Move every student up a grade',
+        icon: 'chevronRight',
+      },
+      {
         path: 'staff-emails',
         title: 'Staff emails',
         description: 'Who becomes a teacher at sign-in',

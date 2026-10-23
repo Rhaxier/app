@@ -14,6 +14,7 @@ export type Database = {
           pinned: boolean;
           posted_as: string | null;
           published_at: string;
+          section_ids: string[] | null;
           title: string;
           updated_at: string;
         };
@@ -28,6 +29,7 @@ export type Database = {
           pinned?: boolean;
           posted_as?: string | null;
           published_at?: string;
+          section_ids?: string[] | null;
           title: string;
           updated_at?: string;
         };
@@ -41,6 +43,7 @@ export type Database = {
           pinned?: boolean;
           posted_as?: string | null;
           published_at?: string;
+          section_ids?: string[] | null;
           title?: string;
           updated_at?: string;
         };
@@ -62,7 +65,6 @@ export type Database = {
           booking_slots_per_day: number;
           collab_requires_teacher: boolean;
           created_at: string;
-          grades: number[];
           id: boolean;
           school_days: number[];
           school_email_domain: string | null;
@@ -70,6 +72,7 @@ export type Database = {
           staff_email_pattern: string | null;
           students_can_request_venues: boolean;
           supw_hours_target: number | null;
+          teachers_post_any_grade: boolean;
           updated_at: string;
           venue_reminder_days_before: number;
           venue_reminder_hours: number;
@@ -82,7 +85,6 @@ export type Database = {
           booking_slots_per_day?: number;
           collab_requires_teacher?: boolean;
           created_at?: string;
-          grades?: number[];
           id?: boolean;
           school_days?: number[];
           school_email_domain?: string | null;
@@ -90,6 +92,7 @@ export type Database = {
           staff_email_pattern?: string | null;
           students_can_request_venues?: boolean;
           supw_hours_target?: number | null;
+          teachers_post_any_grade?: boolean;
           updated_at?: string;
           venue_reminder_days_before?: number;
           venue_reminder_hours?: number;
@@ -101,7 +104,6 @@ export type Database = {
           booking_slots_per_day?: number;
           collab_requires_teacher?: boolean;
           created_at?: string;
-          grades?: number[];
           id?: boolean;
           school_days?: number[];
           school_email_domain?: string | null;
@@ -109,6 +111,7 @@ export type Database = {
           staff_email_pattern?: string | null;
           students_can_request_venues?: boolean;
           supw_hours_target?: number | null;
+          teachers_post_any_grade?: boolean;
           updated_at?: string;
           venue_reminder_days_before?: number;
           venue_reminder_hours?: number;
@@ -247,6 +250,129 @@ export type Database = {
             columns: ['venue_id'];
             isOneToOne: false;
             referencedRelation: 'venues';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      class_students: {
+        Row: {
+          class_id: string;
+          created_at: string;
+          id: string;
+          student_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          class_id: string;
+          created_at?: string;
+          id?: string;
+          student_id: string;
+        };
+        Update: {
+          class_id?: string;
+          created_at?: string;
+          id?: string;
+          student_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'class_students_class_id_fkey';
+            columns: ['class_id'];
+            isOneToOne: false;
+            referencedRelation: 'classes';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'class_students_student_id_fkey';
+            columns: ['student_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      class_teachers: {
+        Row: {
+          class_id: string;
+          created_at: string;
+          id: string;
+          teacher_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          class_id: string;
+          created_at?: string;
+          id?: string;
+          teacher_id: string;
+        };
+        Update: {
+          class_id?: string;
+          created_at?: string;
+          id?: string;
+          teacher_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'class_teachers_class_id_fkey';
+            columns: ['class_id'];
+            isOneToOne: false;
+            referencedRelation: 'classes';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'class_teachers_teacher_id_fkey';
+            columns: ['teacher_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      classes: {
+        Row: {
+          archived_at: string | null;
+          created_at: string;
+          grade: number;
+          id: string;
+          name: string;
+          section_id: string | null;
+          subject: string | null;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          archived_at?: string | null;
+          created_at?: string;
+          grade: number;
+          id?: string;
+          name: string;
+          section_id?: string | null;
+          subject?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          archived_at?: string | null;
+          created_at?: string;
+          grade?: number;
+          id?: string;
+          name?: string;
+          section_id?: string | null;
+          subject?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'classes_grade_fkey';
+            columns: ['grade'];
+            isOneToOne: false;
+            referencedRelation: 'grades';
+            referencedColumns: ['grade'];
+          },
+          {
+            foreignKeyName: 'classes_section_id_fkey';
+            columns: ['section_id'];
+            isOneToOne: false;
+            referencedRelation: 'sections';
             referencedColumns: ['id'];
           },
         ];
@@ -505,6 +631,34 @@ export type Database = {
         };
         Relationships: [];
       };
+      grades: {
+        Row: {
+          active: boolean;
+          created_at: string;
+          grade: number;
+          id: string;
+          name: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          active?: boolean;
+          created_at?: string;
+          grade: number;
+          id?: string;
+          name: string;
+          updated_at?: string;
+        };
+        Update: {
+          active?: boolean;
+          created_at?: string;
+          grade?: number;
+          id?: string;
+          name?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       join_requests: {
         Row: {
           created_at: string;
@@ -634,37 +788,46 @@ export type Database = {
       };
       profiles: {
         Row: {
+          archived_at: string | null;
           avatar_initials: string | null;
           created_at: string;
           email: string;
           full_name: string;
           grade: number | null;
           id: string;
+          posting_suspended_until: string | null;
           role: Database['public']['Enums']['user_role'];
           section: string | null;
+          suspension_reason: string | null;
           updated_at: string;
         };
         ComputedFields: never;
         Insert: {
+          archived_at?: string | null;
           avatar_initials?: string | null;
           created_at?: string;
           email: string;
           full_name?: string;
           grade?: number | null;
           id: string;
+          posting_suspended_until?: string | null;
           role?: Database['public']['Enums']['user_role'];
           section?: string | null;
+          suspension_reason?: string | null;
           updated_at?: string;
         };
         Update: {
+          archived_at?: string | null;
           avatar_initials?: string | null;
           created_at?: string;
           email?: string;
           full_name?: string;
           grade?: number | null;
           id?: string;
+          posting_suspended_until?: string | null;
           role?: Database['public']['Enums']['user_role'];
           section?: string | null;
+          suspension_reason?: string | null;
           updated_at?: string;
         };
         Relationships: [];
@@ -1159,6 +1322,84 @@ export type Database = {
           },
         ];
       };
+      roster: {
+        Row: {
+          claimed_at: string | null;
+          created_at: string;
+          email: string;
+          full_name: string;
+          grade: number | null;
+          id: string;
+          imported_by: string | null;
+          role: Database['public']['Enums']['user_role'];
+          section: string | null;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          claimed_at?: string | null;
+          created_at?: string;
+          email: string;
+          full_name: string;
+          grade?: number | null;
+          id?: string;
+          imported_by?: string | null;
+          role?: Database['public']['Enums']['user_role'];
+          section?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          claimed_at?: string | null;
+          created_at?: string;
+          email?: string;
+          full_name?: string;
+          grade?: number | null;
+          id?: string;
+          imported_by?: string | null;
+          role?: Database['public']['Enums']['user_role'];
+          section?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'roster_imported_by_fkey';
+            columns: ['imported_by'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      sections: {
+        Row: {
+          created_at: string;
+          grade: number;
+          id: string;
+          name: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          grade: number;
+          id?: string;
+          name: string;
+        };
+        Update: {
+          created_at?: string;
+          grade?: number;
+          id?: string;
+          name?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'sections_grade_fkey';
+            columns: ['grade'];
+            isOneToOne: false;
+            referencedRelation: 'grades';
+            referencedColumns: ['grade'];
+          },
+        ];
+      };
       staff_emails: {
         Row: {
           added_by: string | null;
@@ -1329,17 +1570,31 @@ export type Database = {
           urgent_count: number;
         }[];
       };
+      admin_import_people: {
+        Args: { p_dry_run?: boolean; p_rows: Json };
+        Returns: {
+          email: string;
+          full_name: string;
+          message: string;
+          outcome: string;
+          row_number: number;
+        }[];
+      };
+      admin_lift_suspension: { Args: { p_user_id: string }; Returns: undefined };
       admin_list_users: {
         Args: Record<PropertyKey, never>;
         Returns: {
+          archived_at: string;
           created_at: string;
           email: string;
           full_name: string;
           grade: number;
           id: string;
+          posting_suspended_until: string;
           responsibilities: Database['public']['Enums']['responsibility_kind'][];
           role: Database['public']['Enums']['user_role'];
           section: string;
+          suspension_reason: string;
         }[];
       };
       admin_metrics: {
@@ -1357,6 +1612,26 @@ export type Database = {
           supw_hours_confirmed: number;
         }[];
       };
+      admin_rollover: {
+        Args: { p_confirm?: string; p_dry_run?: boolean };
+        Returns: {
+          from_grade: number;
+          students: number;
+          to_grade: number;
+        }[];
+      };
+      admin_save_class: {
+        Args: {
+          p_grade: number;
+          p_id: string;
+          p_name: string;
+          p_section_id: string;
+          p_student_ids: string[];
+          p_subject: string;
+          p_teacher_ids: string[];
+        };
+        Returns: string;
+      };
       admin_set_role: {
         Args: { p_role: Database['public']['Enums']['user_role']; p_user_id: string };
         Returns: undefined;
@@ -1368,6 +1643,10 @@ export type Database = {
           hours: number;
           students: number;
         }[];
+      };
+      admin_suspend_posting: {
+        Args: { p_reason: string; p_until: string; p_user_id: string };
+        Returns: undefined;
       };
       admin_update_profile: {
         Args: { p_full_name: string; p_grade: number; p_section: string; p_user_id: string };
@@ -1545,11 +1824,20 @@ export type Database = {
       is_collab_owner: { Args: { p_post_id: string }; Returns: boolean };
       is_event_organiser: { Args: { p_event_id: string }; Returns: boolean };
       is_my_report: { Args: { p_report_id: string }; Returns: boolean };
+      is_posting_suspended: { Args: Record<PropertyKey, never>; Returns: boolean };
       is_project_owner: { Args: { p_project_id: string }; Returns: boolean };
       is_project_shared_with_me: { Args: { p_project_id: string }; Returns: boolean };
       is_staff: { Args: Record<PropertyKey, never>; Returns: boolean };
       is_staff_member: { Args: { p_user_id: string }; Returns: boolean };
+      my_account_status: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          posting_suspended_until: string;
+          suspension_reason: string;
+        }[];
+      };
       my_grade: { Args: Record<PropertyKey, never>; Returns: number };
+      my_section_id: { Args: Record<PropertyKey, never>; Returns: string };
       notification_type_is_unmutable: {
         Args: { p_type: Database['public']['Enums']['notification_type'] };
         Returns: boolean;
@@ -1651,6 +1939,8 @@ export type Database = {
           student_id: string;
         }[];
       };
+      teachers_post_any_grade: { Args: Record<PropertyKey, never>; Returns: boolean };
+      teaches_audience: { Args: { p_grades: number[]; p_section_ids: string[] }; Returns: boolean };
       uuid_or_null: { Args: { p_text: string }; Returns: string };
       venue_bookable_minutes: { Args: { p_day: string; p_venue_id: string }; Returns: number };
       venue_reminders: { Args: Record<PropertyKey, never>; Returns: number };

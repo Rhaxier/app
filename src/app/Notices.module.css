@@ -1,0 +1,17 @@
+/* Messages shown above every screen (suspension, maintenance). */
+.notice {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin-bottom: var(--gap-block);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-input);
+  background: var(--color-alert-soft);
+  color: var(--color-alert-ink);
+  font-size: var(--text-small);
+}
+
+.notice svg {
+  flex: none;
+  margin-top: 1px;
+}
