@@ -63,7 +63,18 @@ export const adminRoutes: RouteObject = {
     },
     { path: 'outbox', lazy: lazyPage(() => import('./pages/OutboxPage'), 'OutboxPage') },
     // System
-    { path: 'settings', lazy: lazyPage(() => import('./pages/SettingsPage'), 'SettingsPage') },
+    {
+      path: 'features',
+      lazy: lazyPage(() => import('./pages/FeatureSwitchesPage'), 'FeatureSwitchesPage'),
+    },
+    { path: 'branding', lazy: lazyPage(() => import('./pages/BrandingPage'), 'BrandingPage') },
+    {
+      path: 'maintenance',
+      lazy: lazyPage(() => import('./pages/MaintenancePage'), 'MaintenancePage'),
+    },
+    { path: 'sign-in', lazy: lazyPage(() => import('./pages/SettingsPage'), 'SettingsPage') },
+    { path: 'export', lazy: lazyPage(() => import('./pages/ExportPage'), 'ExportPage') },
+    { path: 'deletion', lazy: lazyPage(() => import('./pages/DeletionPage'), 'DeletionPage') },
     { path: 'audit', lazy: lazyPage(() => import('./pages/AuditLogPage'), 'AuditLogPage') },
   ],
 };

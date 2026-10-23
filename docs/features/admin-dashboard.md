@@ -149,6 +149,30 @@ policies hide the row from everyone but admins.
   day after that time.
 - **Outbox:** what would be emailed or pushed (nothing is sent until Q7 and Q8).
 
+## System (B7)
+
+| Section            | What it does                                                                              | Database                                                           |
+| ------------------ | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| Feature switches   | Each feature on or off (Q43): hidden for non-admins, new content refused, nothing deleted | `feature_flags`, `feature_enabled()`, `block_disabled_feature`     |
+| Branding           | Name, logo upload, accent colour with a live 4.5:1 contrast check and preview (Q44)       | `app_settings`, bucket `branding`, `app_settings_check_branding()` |
+| Maintenance banner | A message on every screen, sign-in included, with an optional end time (Q46)              | `app_settings.maintenance_*`, `public_status()`                    |
+| Sign-in            | School email domain, staff email pattern, dev accounts (Q3, Q5)                           | `app_settings`                                                     |
+| Data export        | CSV of users, SUPW hours, bookings and fix-it reports (dates for the last two)            | `admin_list_users()`, `supw_hours_report()`, `admin_export_*()`    |
+| Data deletion      | Find a person, type their email, and their personal data goes; records stay (Q45)         | `admin_user_files()`, `admin_anonymise_user()`                     |
+| Audit log          | Filter by person, action, table and dates; filtered in the database                       | `audit_log`, `admin_audit_filters()`                               |
+
+**How branding reaches the screen.** `public_status()` returns the name, logo, colour and
+any maintenance message, and works signed out. `src/app/Branding.tsx` sets
+`--color-accent` (and a pale tint for badges, kept readable by `accentSoftFor()`) on
+`<html>`, and draws the maintenance banner. Both sit in `RootLayout`, so every screen has
+them.
+
+**Every admin function refuses everyone else.** `supabase/tests/16_admin_lockdown_test.sql`
+finds every function named `admin_*` in the database and calls it as a teacher and as a
+student; each must refuse. It also checks no non-admin can change any admin table. A new
+admin function is covered automatically, as long as its name starts with `admin_` and
+its first line checks `is_admin()`.
+
 ## Files to read
 
 - `supabase/migrations/20261023120000_admin_overview.sql`
@@ -160,6 +184,8 @@ policies hide the row from everyone but admins.
 - `supabase/migrations/20261023120400_moderation.sql`; `src/features/admin/pages/ModerationPage.tsx`
 - `supabase/migrations/20261023120500_emergency_type.sql`, `20261023120510_admin_notifications.sql`;
   `src/features/admin/pages/EmergencyPage.tsx`, `StaffEmailPage.tsx`
+- `supabase/migrations/20261023120600_system.sql`; `src/app/Branding.tsx`,
+  `src/lib/contrast.ts`, `src/features/settings/` (status and feature switches)
 - `src/features/admin/components/SettingControls.tsx` (one setting, edited in place) and
   `NameListEditor.tsx` (add, rename, retire)
 - `src/features/school/` (grades, sections, classes, periods, terms, holidays, blackouts:
@@ -168,5 +194,6 @@ policies hide the row from everyone but admins.
   `ClassesPage.tsx`, `GradesPage.tsx`; `src/components/ConfirmDialog.tsx`
 - Tests: `supabase/tests/09_admin_overview_test.sql`, `10_people_test.sql`,
   `11_calendar_test.sql`, `12_feature_settings_test.sql`, `13_moderation_test.sql`,
-  `14_admin_notifications_test.sql`; `src/features/school/school.test.ts`;
+  `14_admin_notifications_test.sql`, `15_system_test.sql`, `16_admin_lockdown_test.sql`;
+  `src/lib/contrast.test.ts`; `src/features/school/school.test.ts`;
   `src/features/admin/overview.test.tsx`, `people.test.tsx`

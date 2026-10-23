@@ -84,6 +84,7 @@ export type Database = {
       };
       app_settings: {
         Row: {
+          accent_color: string;
           allow_dev_accounts: boolean;
           announcement_default_expiry_days: number | null;
           collab_max_team_size: number;
@@ -92,6 +93,10 @@ export type Database = {
           digest_last_sent_on: string | null;
           digest_time: string;
           id: boolean;
+          logo_url: string | null;
+          maintenance_enabled: boolean;
+          maintenance_message: string | null;
+          maintenance_until: string | null;
           report_auto_urgent_votes: number | null;
           school_days: number[];
           school_email_domain: string | null;
@@ -106,6 +111,7 @@ export type Database = {
         };
         ComputedFields: never;
         Insert: {
+          accent_color?: string;
           allow_dev_accounts?: boolean;
           announcement_default_expiry_days?: number | null;
           collab_max_team_size?: number;
@@ -114,6 +120,10 @@ export type Database = {
           digest_last_sent_on?: string | null;
           digest_time?: string;
           id?: boolean;
+          logo_url?: string | null;
+          maintenance_enabled?: boolean;
+          maintenance_message?: string | null;
+          maintenance_until?: string | null;
           report_auto_urgent_votes?: number | null;
           school_days?: number[];
           school_email_domain?: string | null;
@@ -127,6 +137,7 @@ export type Database = {
           venue_reminder_hours?: number;
         };
         Update: {
+          accent_color?: string;
           allow_dev_accounts?: boolean;
           announcement_default_expiry_days?: number | null;
           collab_max_team_size?: number;
@@ -135,6 +146,10 @@ export type Database = {
           digest_last_sent_on?: string | null;
           digest_time?: string;
           id?: boolean;
+          logo_url?: string | null;
+          maintenance_enabled?: boolean;
+          maintenance_message?: string | null;
+          maintenance_until?: string | null;
           report_auto_urgent_votes?: number | null;
           school_days?: number[];
           school_email_domain?: string | null;
@@ -690,6 +705,31 @@ export type Database = {
           },
         ];
       };
+      feature_flags: {
+        Row: {
+          created_at: string;
+          enabled: boolean;
+          feature: string;
+          id: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          enabled?: boolean;
+          feature: string;
+          id?: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          enabled?: boolean;
+          feature?: string;
+          id?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       floors: {
         Row: {
           created_at: string;
@@ -943,6 +983,7 @@ export type Database = {
       };
       profiles: {
         Row: {
+          anonymised_at: string | null;
           archived_at: string | null;
           avatar_initials: string | null;
           created_at: string;
@@ -958,6 +999,7 @@ export type Database = {
         };
         ComputedFields: never;
         Insert: {
+          anonymised_at?: string | null;
           archived_at?: string | null;
           avatar_initials?: string | null;
           created_at?: string;
@@ -972,6 +1014,7 @@ export type Database = {
           updated_at?: string;
         };
         Update: {
+          anonymised_at?: string | null;
           archived_at?: string | null;
           avatar_initials?: string | null;
           created_at?: string;
@@ -2018,6 +2061,7 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      admin_anonymise_user: { Args: { p_confirm: string; p_user_id: string }; Returns: undefined };
       admin_attention: {
         Args: Record<PropertyKey, never>;
         Returns: {
@@ -2027,7 +2071,45 @@ export type Database = {
           urgent_count: number;
         }[];
       };
+      admin_audit_filters: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          kind: string;
+          value: string;
+        }[];
+      };
       admin_emergency_broadcast: { Args: { p_message: string; p_title: string }; Returns: number };
+      admin_export_bookings: {
+        Args: { p_from: string; p_to: string };
+        Returns: {
+          ends_at: string;
+          requested_at: string;
+          requested_by: string;
+          requester_role: Database['public']['Enums']['user_role'];
+          review_note: string;
+          reviewed_by: string;
+          starts_at: string;
+          status: Database['public']['Enums']['booking_status'];
+          supervising_teacher: string;
+          title: string;
+          venue: string;
+        }[];
+      };
+      admin_export_reports: {
+        Args: { p_from: string; p_to: string };
+        Returns: {
+          assigned_to: string;
+          category: string;
+          description: string;
+          me_too: number;
+          reported_at: string;
+          reported_by: string;
+          resolved_at: string;
+          room: string;
+          status: Database['public']['Enums']['report_status'];
+          urgent: boolean;
+        }[];
+      };
       admin_import_people: {
         Args: { p_dry_run?: boolean; p_rows: Json };
         Returns: {
@@ -2155,6 +2237,13 @@ export type Database = {
         Args: { p_full_name: string; p_grade: number; p_section: string; p_user_id: string };
         Returns: undefined;
       };
+      admin_user_files: {
+        Args: { p_user_id: string };
+        Returns: {
+          bucket: string;
+          path: string;
+        }[];
+      };
       admin_venue_utilisation: {
         Args: { p_days: number };
         Returns: {
@@ -2279,6 +2368,7 @@ export type Database = {
           user_id: string;
         }[];
       };
+      contrast_with_white: { Args: { p_hex: string }; Returns: number };
       email_digest_due: { Args: Record<PropertyKey, never>; Returns: boolean };
       event_signups: {
         Args: { p_event_id: string };
@@ -2308,11 +2398,13 @@ export type Database = {
         };
         Returns: string;
       };
+      feature_enabled: { Args: { p_feature: string }; Returns: boolean };
       format_school_time: { Args: { p_time: string }; Returns: string };
       has_responsibility: {
         Args: { p_kind: Database['public']['Enums']['responsibility_kind'] };
         Returns: boolean;
       };
+      hex_luminance: { Args: { p_hex: string }; Returns: number };
       hours_to_confirm: {
         Args: Record<PropertyKey, never>;
         Returns: {
@@ -2388,6 +2480,16 @@ export type Database = {
           urgent: boolean;
           vote_count: number;
           voted_by_me: boolean;
+        }[];
+      };
+      public_status: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          accent_color: string;
+          logo_url: string;
+          maintenance_message: string;
+          maintenance_until: string;
+          school_name: string;
         }[];
       };
       publish_due_announcements: { Args: Record<PropertyKey, never>; Returns: number };

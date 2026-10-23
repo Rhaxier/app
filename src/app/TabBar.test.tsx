@@ -53,3 +53,15 @@ describe('isTabActive', () => {
     expect(isTabActive(map, '/mapping')).toBe(false);
   });
 });
+
+describe('tabsFor with feature switches', () => {
+  it('leaves out the tabs of switched-off features', () => {
+    const collabOff = (feature: string) => feature !== 'collab';
+    expect(tabsFor(makeUser(), collabOff).map((tab) => tab.label)).toEqual([
+      'Home',
+      'Map',
+      'Volunteer',
+      'Book',
+    ]);
+  });
+});

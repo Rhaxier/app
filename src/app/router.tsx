@@ -14,7 +14,7 @@ import { InboxPage } from '@/features/notifications/pages/InboxPage';
 import { NotificationSettingsPage } from '@/features/notifications/pages/NotificationSettingsPage';
 import { adminRoutes } from '@/features/admin/routes';
 import { AppLayout } from './AppLayout';
-import { RequireAuth, RequireRole } from './guards';
+import { RequireAuth, RequireFeature, RequireRole } from './guards';
 import { lazyPage } from './lazyPage';
 import { NotFoundPage } from './NotFoundPage';
 import { RootLayout } from './RootLayout';
@@ -59,42 +59,80 @@ export const router = createBrowserRouter([
               { path: '/notifications', element: <InboxPage /> },
               { path: '/notifications/settings', element: <NotificationSettingsPage /> },
               { path: '/search', lazy: lazyPage(search, 'SearchPage') },
-              { path: '/volunteer', lazy: lazyPage(volunteer, 'VolunteerPage') },
-              { path: '/volunteer/new', lazy: lazyPage(eventForm, 'NewEventPage') },
-              { path: '/volunteer/:id', lazy: lazyPage(event, 'EventDetailPage') },
-              { path: '/volunteer/:id/edit', lazy: lazyPage(eventForm, 'EditEventPage') },
-              { path: '/projects', lazy: lazyPage(projects, 'ProjectsPage') },
-              { path: '/projects/new', lazy: lazyPage(projectForm, 'NewProjectPage') },
-              { path: '/projects/:id', lazy: lazyPage(project, 'ProjectDetailPage') },
-              { path: '/projects/:id/edit', lazy: lazyPage(projectForm, 'EditProjectPage') },
-              { path: '/collab', lazy: lazyPage(collab, 'CollabPage') },
-              { path: '/collab/new', lazy: lazyPage(collabForm, 'NewCollabPage') },
-              { path: '/collab/:id', lazy: lazyPage(collabPost, 'CollabDetailPage') },
-              { path: '/collab/:id/edit', lazy: lazyPage(collabForm, 'EditCollabPage') },
-              { path: '/map', lazy: lazyPage(map, 'MapPage') },
-              { path: '/map/report', lazy: lazyPage(reportForm, 'ReportFormPage') },
-              { path: '/reports/:id', lazy: lazyPage(report, 'ReportDetailPage') },
-              { path: '/book', lazy: lazyPage(book, 'BookPage') },
-              { path: '/book/request', lazy: lazyPage(bookingRequest, 'BookingRequestPage') },
-              { path: '/book/mine', lazy: lazyPage(myBookings, 'MyBookingsPage') },
-              { path: '/announcements', lazy: lazyPage(announcements, 'AnnouncementsPage') },
+              // Each feature's screens sit inside RequireFeature: while an admin
+              // has switched the feature off, everyone else gets a short note.
               {
-                path: '/announcements/:id',
-                lazy: lazyPage(announcement, 'AnnouncementDetailPage'),
+                element: <RequireFeature feature="volunteering" />,
+                children: [
+                  { path: '/volunteer', lazy: lazyPage(volunteer, 'VolunteerPage') },
+                  { path: '/volunteer/new', lazy: lazyPage(eventForm, 'NewEventPage') },
+                  { path: '/volunteer/:id', lazy: lazyPage(event, 'EventDetailPage') },
+                  { path: '/volunteer/:id/edit', lazy: lazyPage(eventForm, 'EditEventPage') },
+                ],
+              },
+              {
+                element: <RequireFeature feature="projects" />,
+                children: [
+                  { path: '/projects', lazy: lazyPage(projects, 'ProjectsPage') },
+                  { path: '/projects/new', lazy: lazyPage(projectForm, 'NewProjectPage') },
+                  { path: '/projects/:id', lazy: lazyPage(project, 'ProjectDetailPage') },
+                  { path: '/projects/:id/edit', lazy: lazyPage(projectForm, 'EditProjectPage') },
+                ],
+              },
+              {
+                element: <RequireFeature feature="collab" />,
+                children: [
+                  { path: '/collab', lazy: lazyPage(collab, 'CollabPage') },
+                  { path: '/collab/new', lazy: lazyPage(collabForm, 'NewCollabPage') },
+                  { path: '/collab/:id', lazy: lazyPage(collabPost, 'CollabDetailPage') },
+                  { path: '/collab/:id/edit', lazy: lazyPage(collabForm, 'EditCollabPage') },
+                ],
+              },
+              {
+                element: <RequireFeature feature="map" />,
+                children: [{ path: '/map', lazy: lazyPage(map, 'MapPage') }],
+              },
+              {
+                element: <RequireFeature feature="fixit" />,
+                children: [
+                  { path: '/map/report', lazy: lazyPage(reportForm, 'ReportFormPage') },
+                  { path: '/reports/:id', lazy: lazyPage(report, 'ReportDetailPage') },
+                ],
+              },
+              {
+                element: <RequireFeature feature="venues" />,
+                children: [
+                  { path: '/book', lazy: lazyPage(book, 'BookPage') },
+                  { path: '/book/request', lazy: lazyPage(bookingRequest, 'BookingRequestPage') },
+                  { path: '/book/mine', lazy: lazyPage(myBookings, 'MyBookingsPage') },
+                ],
+              },
+              {
+                element: <RequireFeature feature="announcements" />,
+                children: [
+                  { path: '/announcements', lazy: lazyPage(announcements, 'AnnouncementsPage') },
+                  {
+                    path: '/announcements/:id',
+                    lazy: lazyPage(announcement, 'AnnouncementDetailPage'),
+                  },
+                  {
+                    element: <RequireRole role="staff" />,
+                    children: [
+                      {
+                        path: '/announcements/new',
+                        lazy: lazyPage(announcementForm, 'NewAnnouncementPage'),
+                      },
+                      {
+                        path: '/announcements/:id/edit',
+                        lazy: lazyPage(announcementForm, 'EditAnnouncementPage'),
+                      },
+                    ],
+                  },
+                ],
               },
               {
                 element: <RequireRole role="staff" />,
-                children: [
-                  {
-                    path: '/announcements/new',
-                    lazy: lazyPage(announcementForm, 'NewAnnouncementPage'),
-                  },
-                  {
-                    path: '/announcements/:id/edit',
-                    lazy: lazyPage(announcementForm, 'EditAnnouncementPage'),
-                  },
-                  { path: '/approvals', lazy: lazyPage(approvals, 'ApprovalsPage') },
-                ],
+                children: [{ path: '/approvals', lazy: lazyPage(approvals, 'ApprovalsPage') }],
               },
               {
                 element: <RequireRole role="admin" />,

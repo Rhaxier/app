@@ -183,10 +183,40 @@ export const adminGroups: AdminGroup[] = [
     title: 'System',
     sections: [
       {
-        path: 'settings',
-        title: 'Settings',
-        description: 'School name, sign-in, booking slots',
+        path: 'features',
+        title: 'Feature switches',
+        description: 'Turn whole features off and on',
         icon: 'settings',
+      },
+      {
+        path: 'branding',
+        title: 'Branding',
+        description: 'School name, logo and colour',
+        icon: 'image',
+      },
+      {
+        path: 'maintenance',
+        title: 'Maintenance banner',
+        description: 'A notice on every screen',
+        icon: 'alert',
+      },
+      {
+        path: 'sign-in',
+        title: 'Sign-in',
+        description: 'School email domain, staff pattern, dev accounts',
+        icon: 'user',
+      },
+      {
+        path: 'export',
+        title: 'Data export',
+        description: 'CSV files of users, hours, bookings, reports',
+        icon: 'download',
+      },
+      {
+        path: 'deletion',
+        title: 'Data deletion',
+        description: 'Delete someone’s personal data on request',
+        icon: 'trash',
       },
       { path: 'audit', title: 'Audit log', description: 'Who changed what', icon: 'layers' },
     ],

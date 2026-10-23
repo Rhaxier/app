@@ -1,19 +1,24 @@
 // Home (reference screen 1): greeting, search, the six tools, and the
-// sections other features add (today's bookings, announcements).
+// sections other features add (today's bookings, announcements). Sections of
+// a switched-off feature are left out (Admin > System > Feature switches).
 import { HomeAnnouncements } from '@/features/announcements/components/HomeAnnouncements';
+import { useCurrentUser } from '@/features/auth/hooks';
+import { useFeatureVisible } from '@/features/settings/hooks';
 import { TodayAtSchool } from '@/features/venues/components/TodayAtSchool';
+import { isAdmin } from '@/lib/permissions';
 import { HomeHeader } from '../components/HomeHeader';
 import { QuickTiles } from '../components/QuickTiles';
 import { SearchBox } from '../components/SearchBox';
 
 export function HomePage() {
+  const visible = useFeatureVisible(isAdmin(useCurrentUser()));
   return (
     <div className="stack">
       <HomeHeader />
       <SearchBox />
       <QuickTiles />
-      <TodayAtSchool />
-      <HomeAnnouncements />
+      {visible('venues') && <TodayAtSchool />}
+      {visible('announcements') && <HomeAnnouncements />}
     </div>
   );
 }

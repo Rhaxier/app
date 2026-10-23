@@ -3,9 +3,11 @@
 Things the school hasn't decided yet, and every assumption made while building.
 Each one is a **data, settings or env change**, never a code rewrite.
 
-Most settings live in the single row of the `app_settings` table. Admins change them
-on the **Admin > Settings** screen; you can also run SQL in Supabase Studio
-(local: http://127.0.0.1:54323) or the cloud dashboard's SQL editor.
+Most settings live in the single row of the `app_settings` table or in small tables
+next to it. Admins change them in the **admin dashboard** (`/admin`, or the Admin button
+on the Approvals tab), on the screen of the area they affect; each entry below names the
+screen. You can also run SQL in Supabase Studio (local: http://127.0.0.1:54323) or the
+cloud dashboard's SQL editor.
 
 ---
 
@@ -40,10 +42,11 @@ on the **Admin > Settings** screen; you can also run SQL in Supabase Studio
   Optionally, a regex can mark staff by address.
 - Where it lives: table `staff_emails`; `app_settings.staff_email_pattern` (null = off);
   checked in `handle_new_user()` (`..._120100_identity.sql`).
-- To change it: **Admin > Staff emails** to add addresses. If staff addresses follow
-  a pattern (e.g. `first.last@` for staff, digits for students), set **Admin >
-  Settings > Staff email pattern** to a regex such as `^[a-z]+\.[a-z]+@`. It applies
-  to new sign-ins only; use **Admin > Users** to fix existing accounts.
+- To change it: **Admin > People > Staff emails** to add addresses. If staff addresses follow
+  a pattern (e.g. `first.last@` for staff, digits for students), set **Admin > System >
+  Sign-in > Staff email pattern** to a regex such as `^[a-z]+\.[a-z]+@`. It applies to new
+  sign-ins only; use **Admin > People > Users** to fix existing accounts, or import a CSV
+  (**Admin > People > Import people**).
 
 ## Q4: Must cross-grade collabs have a supervising teacher?
 
@@ -78,10 +81,10 @@ on the **Admin > Settings** screen; you can also run SQL in Supabase Studio
      (`npm run db:stop && npm run db:start`).
      Cloud: dashboard > Authentication > Sign In / Providers, enable Google or Azure
      and paste the same values.
-  3. Admin > Settings: set "School email domain" (e.g. `school.example`).
+  3. Admin > System > Sign-in: set "School email domain" (e.g. `school.example`).
   4. `.env`: `VITE_AUTH_PROVIDER=google` (or `azure`) and
      `VITE_SCHOOL_EMAIL_DOMAIN=school.example`.
-  5. Before launch: Admin > Settings, untick "Allow dev accounts".
+  5. Before launch: Admin > System > Sign-in, untick "Allow dev accounts".
 
 ## Q6: Real floor plans, rooms and venue list
 
@@ -89,13 +92,13 @@ on the **Admin > Settings** screen; you can also run SQL in Supabase Studio
   rectangles, 1000 × 700 px. 15 placeholder rooms and 4 placeholder venues (seed).
 - Where it lives: tables `floors`, `rooms`, `venues`; images in `public/floorplans/`.
 - To change it:
-  1. Export each floor plan as SVG or PNG (any size). Put it in `public/floorplans/`.
-  2. **Admin > Map**: edit the floor's image path, width and height (the image's
-     pixel size).
+  1. Export each floor plan as SVG, PNG, JPEG or WebP (up to 5 MB).
+  2. **Admin > Features > Map**: "Upload a plan image" for the floor (it fills in the
+     image's address and pixel size), then save.
   3. On the same screen, pick a room and click the plan to place its pin; add,
      rename or delete rooms there.
-  4. **Admin > Venues**: add the real venues, link each to its room, set capacity and
-     whether it needs approval.
+  4. **Admin > Features > Venues**: add the real venues, link each to its room, set
+     capacity, whether it needs approval and its booking limits (Q40).
 
 ## Q7: Email provider for staff emails
 
@@ -129,7 +132,8 @@ on the **Admin > Settings** screen; you can also run SQL in Supabase Studio
   `public/favicon.svg`.
 - To change it: **Admin > Features > Volunteering** for each grade's SUPW target
   (students see their progress on the Volunteer tab); **Admin > School calendar > Terms
-  and holidays** for term dates. School name and logo: see Branding below.
+  and holidays** for term dates; **Admin > System > Branding** for the school's name,
+  logo and colour (Q44). `src/config/school.ts` keeps only the app's own name.
 
 ## Q10: Reminder timing for venue approvals
 
@@ -481,3 +485,54 @@ on the **Admin > Settings** screen; you can also run SQL in Supabase Studio
   (`..._20261023120500_emergency_type.sql`).
 - To change it: the 10 minutes is `interval '10 minutes'` in that function; change it in
   a new migration. Nothing is actually pushed or emailed until Q7 and Q8 are done.
+
+## Q43: What does switching a feature off do?
+
+- Default used: every feature is on. Switching one off (Admin > System > Feature switches)
+  hides its tab, Home tile and Home section for everyone but admins, shows a short note
+  on its screens, and the database refuses new content for it (posts, requests, events,
+  sign-ups, projects, bookings, reports, "me too"). Nothing is deleted, and it all comes
+  back when switched on. Admins always see everything, so they can check and switch back.
+- Where it lives: table `feature_flags`; `feature_enabled()`, the `block_disabled_feature`
+  triggers and "Only while the feature is on" policies
+  (`supabase/migrations/20261023120600_system.sql`); `RequireFeature` in
+  `src/app/guards.tsx`.
+- To change it: **Admin > System > Feature switches**.
+
+## Q44: School branding, and what signed-out visitors can see
+
+- Default used: `[SCHOOL NAME]`, no logo, the design's teal. Admins set the name, upload a
+  logo (public `branding` bucket, images up to 1 MB) and pick an accent colour, which
+  must keep white text at 4.5:1 contrast (checked as they type and by the database). The
+  app reads these at start-up through `public_status()`, which is the one thing signed-out
+  visitors can call: the sign-in screen needs the name, logo and any maintenance notice.
+  Nothing personal is in it.
+- Where it lives: `app_settings.school_name`, `logo_url`, `accent_color`;
+  `app_settings_check_branding()`, `public_status()` (`..._20261023120600_system.sql`);
+  `src/app/Branding.tsx`, `src/lib/contrast.ts`.
+- To change it: **Admin > System > Branding**.
+
+## Q45: What does "data deletion" delete, and what does it keep?
+
+- Default used: for a request to delete someone's data, an admin types the person's email
+  to confirm. Their name becomes "Deleted user", their email is replaced, the photos and
+  files they uploaded are deleted, their notifications, settings, responsibilities and
+  class lists are removed, and their sign-in is blocked for good (a new Google or
+  Microsoft sign-in would start a fresh, empty account). Kept, under "Deleted user":
+  confirmed SUPW hours, reports, posts, requests and bookings, so the school's records
+  still add up. The audit log can't be edited by anyone, so earlier entries (for example
+  a name change) may still show their old name.
+- Where it lives: `admin_user_files()`, `admin_anonymise_user()`, `profiles.anonymised_at`
+  (`..._20261023120600_system.sql`); `anonymiseUser()` in `src/features/admin/api.ts`
+  removes the files through Storage first.
+- To change it: to also blank what they wrote (post descriptions, messages), add those
+  updates to `admin_anonymise_user()` in a new migration. Ask the school's data
+  protection lead what they need.
+
+## Q46: The maintenance banner
+
+- Default used: off. When on, its message shows at the top of every screen, including the
+  sign-in screen, until it's switched off or its end time passes.
+- Where it lives: `app_settings.maintenance_enabled`, `maintenance_message`,
+  `maintenance_until`; `public_status()`; `MaintenanceBanner` in `src/app/Branding.tsx`.
+- To change it: **Admin > System > Maintenance banner**.

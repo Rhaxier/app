@@ -1,6 +1,7 @@
 // Admin screens: TanStack Query hooks. Changes invalidate ['admin'] (and the
 // shared caches they affect, like settings or the people list).
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import type { AppSettings } from '@/features/settings/api';
 import { settingsKeys } from '@/features/settings/hooks';
 import { showToast } from '@/lib/toast';
 import {
@@ -24,7 +25,11 @@ import {
   type ImportRow,
   addStaffEmail,
   createVenue,
+  anonymiseUser,
+  fetchAuditFilterChoices,
   fetchAuditLog,
+  uploadLogo,
+  type AuditFilters,
   fetchContentReports,
   fetchOutbox,
   fetchStaffEmails,
@@ -51,7 +56,7 @@ export const adminKeys = {
   users: () => [...adminKeys.all, 'users'] as const,
   staffEmails: () => [...adminKeys.all, 'staff-emails'] as const,
   contentReports: () => [...adminKeys.all, 'content-reports'] as const,
-  audit: (table: string | null) => [...adminKeys.all, 'audit', table ?? 'all'] as const,
+  audit: (filters: AuditFilters) => [...adminKeys.all, 'audit', filters] as const,
   outbox: (table: string) => [...adminKeys.all, 'outbox', table] as const,
 };
 
@@ -197,11 +202,25 @@ export function useRemoveStaffEmail() {
   return useMutation({ mutationFn: removeStaffEmail, onSuccess: invalidate });
 }
 
+/**
+ * Optimistic: switches and fields show the new value at once. If the database
+ * refuses (say, an accent colour that's too light), the old value comes back
+ * and a toast gives the reason.
+ */
 export function useUpdateSettings() {
-  const invalidate = useInvalidate(settingsKeys.all);
+  const queryClient = useQueryClient();
+  const invalidate = useInvalidate(settingsKeys.all, settingsKeys.status);
   return useMutation({
     mutationFn: (changes: SettingsChanges) => updateSettings(changes),
-    onSuccess: invalidate,
+    onMutate: async (changes) => {
+      await queryClient.cancelQueries({ queryKey: settingsKeys.all });
+      const before = queryClient.getQueryData<AppSettings>(settingsKeys.all);
+      if (before) queryClient.setQueryData(settingsKeys.all, { ...before, ...changes });
+      return { before };
+    },
+    onError: (_error, _changes, context) =>
+      queryClient.setQueryData(settingsKeys.all, context?.before),
+    onSettled: invalidate,
     meta: { successMessage: 'Saved', errorToast: true },
   });
 }
@@ -308,8 +327,34 @@ export function useSetContentReportStatus(reviewerId: string) {
   });
 }
 
-export function useAuditLog(table: string | null) {
-  return useQuery({ queryKey: adminKeys.audit(table), queryFn: () => fetchAuditLog(table) });
+export function useAuditLog(filters: AuditFilters) {
+  return useQuery({ queryKey: adminKeys.audit(filters), queryFn: () => fetchAuditLog(filters) });
+}
+
+export function useAuditFilterChoices() {
+  return useQuery({
+    queryKey: [...adminKeys.all, 'audit-filters'],
+    queryFn: fetchAuditFilterChoices,
+  });
+}
+
+// System -------------------------------------------------------------------------
+
+export function useAnonymiseUser() {
+  const invalidate = useInvalidate(['people']);
+  return useMutation({
+    mutationFn: ({ userId, confirm }: { userId: string; confirm: string }) =>
+      anonymiseUser(userId, confirm),
+    onSuccess: invalidate,
+    meta: { successMessage: 'Their personal data has been deleted' },
+  });
+}
+
+export function useUploadLogo() {
+  return useMutation({
+    mutationFn: uploadLogo,
+    meta: { successMessage: 'Uploaded. Save to use it.', errorToast: true },
+  });
 }
 
 export function useOutbox(table: 'email_outbox' | 'push_outbox') {

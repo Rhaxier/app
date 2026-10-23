@@ -1,6 +1,7 @@
-// Admin > Settings: the school's name and how people sign in (Q3, Q5). The
-// other settings in app_settings sit with the feature they change (Admin >
-// Features, School calendar, Notifications).
+// Admin > System > Sign-in: who can sign in (Q3, Q5): the school's email
+// domain, an optional staff email pattern, and the dev test accounts. The
+// other settings in app_settings sit with what they change (Branding, the
+// feature pages, School calendar, Notifications).
 import { useState, type FormEvent } from 'react';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
@@ -23,7 +24,7 @@ import { AdminPage } from '../components/AdminPage';
 export function SettingsPage() {
   const settings = useAppSettings();
   return (
-    <AdminPage title="Settings">
+    <AdminPage title="Sign-in" description="Who can sign in, and who becomes staff.">
       {settings.isPending && <LoadingState />}
       {settings.isError && <ErrorState error={settings.error} onRetry={() => settings.refetch()} />}
       {settings.data && <SettingsForm key={settings.data.updated_at} settings={settings.data} />}
@@ -50,17 +51,6 @@ function SettingsForm({ settings }: { settings: AppSettings }) {
   return (
     <form className="stack" onSubmit={handleSubmit} noValidate>
       <Card className="stack-tight">
-        <h2 className={styles.heading}>School</h2>
-        <TextField
-          label="School name"
-          value={values.schoolName}
-          onChange={(e) => update('schoolName', e.target.value)}
-          error={errors.schoolName}
-        />
-      </Card>
-
-      <Card className="stack-tight">
-        <h2 className={styles.heading}>Sign-in</h2>
         <TextField
           label="School email domain"
           placeholder="school.example"
@@ -88,7 +78,7 @@ function SettingsForm({ settings }: { settings: AppSettings }) {
       <FormError message={save.isError ? errorMessage(save.error) : null} />
       {save.isSuccess && <p className={styles.saved}>Saved.</p>}
       <Button type="submit" fullWidth loading={save.isPending}>
-        Save settings
+        Save
       </Button>
     </form>
   );

@@ -49,3 +49,11 @@
   padding-top: var(--space-5);
   border-top: 1px solid var(--color-border);
 }
+
+.logoImage {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  object-fit: contain;
+  background: var(--color-card);
+}

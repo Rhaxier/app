@@ -9,6 +9,7 @@ import { Card } from '@/components/Card';
 import { Icon } from '@/components/Icon';
 import { FormError, TextField } from '@/components/Input';
 import { school } from '@/config/school';
+import { usePublicStatus } from '@/features/settings/hooks';
 import { env } from '@/lib/env';
 import { errorMessage } from '@/lib/errors';
 import { useAuth, usePasswordSignIn, useSchoolSignIn } from '../hooks';
@@ -43,6 +44,9 @@ export function LoginPage() {
   );
 
   // Already signed in: go where they were heading, or Home.
+  // The school's name and logo (Admin > System > Branding); works signed out.
+  const status = usePublicStatus().data;
+
   if (ready && session) {
     const from = (location.state as { from?: string } | null)?.from ?? '/';
     return <Navigate to={from} replace />;
@@ -71,10 +75,15 @@ export function LoginPage() {
   return (
     <main className={styles.page}>
       <div className={styles.brand}>
-        <span className={styles.logo} aria-hidden="true">
-          <Icon name="home" size={28} />
-        </span>
-        <p className="meta">{school.name}</p>
+        {/* The school's logo and name from Admin > System > Branding, once set. */}
+        {status?.logo_url ? (
+          <img className={styles.logoImage} src={status.logo_url} alt="" />
+        ) : (
+          <span className={styles.logo} aria-hidden="true">
+            <Icon name="home" size={28} />
+          </span>
+        )}
+        <p className="meta">{status?.school_name ?? school.name}</p>
         <h1>{school.appName}</h1>
       </div>
 

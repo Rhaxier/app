@@ -1,10 +1,14 @@
 // Route guards. RequireAuth sends signed-out people to /login and waits for
 // the profile to load. RequireRole shows a friendly "staff only" message.
+// RequireFeature shows a note while an admin has switched a feature off.
 // These are conveniences: the database refuses the data anyway (RLS).
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { Button } from '@/components/Button';
 import { EmptyState, ErrorState, LoadingState } from '@/components/States';
 import { useAuth, useCurrentUser, useCurrentUserQuery, useSignOut } from '@/features/auth/hooks';
+import type { FeatureName } from '@/features/settings/api';
+import { useFeatureVisible } from '@/features/settings/hooks';
+import { featureLabel } from '@/features/settings/logic';
 import { isAdmin, isStaff } from '@/lib/permissions';
 import styles from './guards.module.css';
 
@@ -40,6 +44,19 @@ export function RequireRole({ role }: { role: 'staff' | 'admin' }) {
       <EmptyState icon="shield" title={role === 'admin' ? 'Admins only' : 'Staff only'}>
         This screen is for {role === 'admin' ? 'admins' : 'teachers and admins'}. If you think you
         should have access, ask an admin.
+      </EmptyState>
+    );
+  }
+  return <Outlet />;
+}
+
+export function RequireFeature({ feature }: { feature: FeatureName }) {
+  const user = useCurrentUser();
+  const visible = useFeatureVisible(isAdmin(user));
+  if (!visible(feature)) {
+    return (
+      <EmptyState icon="eyeOff" title={`${featureLabel[feature]} is switched off`}>
+        The school has switched this off for now. Anything already here is kept.
       </EmptyState>
     );
   }

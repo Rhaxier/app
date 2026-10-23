@@ -2,6 +2,7 @@
 // every change is written to the audit log by a database trigger or by the
 // admin_* functions. Nothing on these screens can grant more than the
 // database already allows an admin to do.
+import { dayRange } from '@/lib/dates';
 import { supabase } from '@/lib/supabase';
 import type { Enums, Json, Tables, TablesInsert, TablesUpdate } from '@/types/database';
 
@@ -432,16 +433,92 @@ export type AuditEntry = Pick<
   'id' | 'actor_id' | 'action' | 'table_name' | 'row_id' | 'details' | 'created_at'
 >;
 
-export async function fetchAuditLog(tableName: string | null): Promise<AuditEntry[]> {
+export interface AuditFilters {
+  actorId: string;
+  action: string;
+  table: string;
+  /** Day keys ('2026-10-01'), Dubai time; '' = no limit. */
+  from: string;
+  to: string;
+}
+
+/** The latest 200 entries matching the filters, filtered in the database. */
+export async function fetchAuditLog(filters: AuditFilters): Promise<AuditEntry[]> {
   let query = supabase
     .from('audit_log')
     .select('id, actor_id, action, table_name, row_id, details, created_at')
     .order('created_at', { ascending: false })
     .limit(200);
-  if (tableName) query = query.eq('table_name', tableName);
+  if (filters.actorId) query = query.eq('actor_id', filters.actorId);
+  if (filters.action) query = query.eq('action', filters.action);
+  if (filters.table) query = query.eq('table_name', filters.table);
+  if (filters.from) query = query.gte('created_at', dayRange(filters.from).start);
+  if (filters.to) query = query.lt('created_at', dayRange(filters.to).end);
   const { data, error } = await query;
   if (error) throw error;
   return data;
+}
+
+/** The actions and tables that appear in the log, for the filter menus. */
+export async function fetchAuditFilterChoices(): Promise<{ actions: string[]; tables: string[] }> {
+  const { data, error } = await supabase.rpc('admin_audit_filters');
+  if (error) throw error;
+  return {
+    actions: data.filter((row) => row.kind === 'action').map((row) => row.value),
+    tables: data.filter((row) => row.kind === 'table').map((row) => row.value),
+  };
+}
+
+// ---------------------------------------------------------------------------
+// System (B7): exports, data deletion, branding
+// ---------------------------------------------------------------------------
+
+export async function exportBookings(from: string, to: string) {
+  const { data, error } = await supabase.rpc('admin_export_bookings', { p_from: from, p_to: to });
+  if (error) throw error;
+  return data;
+}
+
+export async function exportReports(from: string, to: string) {
+  const { data, error } = await supabase.rpc('admin_export_reports', { p_from: from, p_to: to });
+  if (error) throw error;
+  return data;
+}
+
+/**
+ * Deletes someone's personal data (Admin > System > Data deletion):
+ *   1. removes the files they uploaded through Storage (which deletes the files),
+ *   2. then admin_anonymise_user() replaces their name and email, clears their
+ *      settings, and blocks their sign-in. Their records (hours, reports) stay.
+ * `confirm` must be their current email, typed in full.
+ */
+export async function anonymiseUser(userId: string, confirm: string): Promise<void> {
+  const files = await supabase.rpc('admin_user_files', { p_user_id: userId });
+  if (files.error) throw files.error;
+  for (const bucket of ['report-photos', 'project-files']) {
+    const paths = files.data.filter((f) => f.bucket === bucket).map((f) => f.path);
+    if (paths.length > 0) {
+      const removed = await supabase.storage.from(bucket).remove(paths);
+      if (removed.error) throw removed.error;
+    }
+  }
+  const { error } = await supabase.rpc('admin_anonymise_user', {
+    p_user_id: userId,
+    p_confirm: confirm,
+  });
+  if (error) throw error;
+}
+
+/** Uploads a logo to the public `branding` bucket and returns its address. */
+export async function uploadLogo(file: File): Promise<string> {
+  const extension = file.name.split('.').pop()?.toLowerCase() || 'png';
+  // A new name each time, so browsers don't keep showing the old logo.
+  const path = `logo-${Date.now()}.${extension}`;
+  const upload = await supabase.storage
+    .from('branding')
+    .upload(path, file, { contentType: file.type });
+  if (upload.error) throw upload.error;
+  return supabase.storage.from('branding').getPublicUrl(path).data.publicUrl;
 }
 
 export interface OutboxRow {

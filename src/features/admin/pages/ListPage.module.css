@@ -138,3 +138,17 @@
 .staffRow > :last-child {
   flex: 1 1 200px;
 }
+
+/* A card of filters: one column on a phone, three across on a laptop. */
+.filters {
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: end;
+  gap: var(--space-3);
+}
+
+@media (min-width: 600px) {
+  .filters {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

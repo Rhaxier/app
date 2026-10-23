@@ -1,0 +1,63 @@
+.heading {
+  font-family: var(--font-body);
+  font-size: var(--text-card-title);
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.logoRow {
+  display: flex;
+  align-items: center;
+  min-height: 64px;
+}
+
+.logo {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  object-fit: contain;
+  background: var(--color-bg);
+}
+
+.colourRow {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: end;
+  gap: var(--space-3);
+}
+
+.picker {
+  width: var(--height-input);
+  height: var(--height-input);
+  padding: 4px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-input);
+  background: var(--color-card);
+  cursor: pointer;
+}
+
+.preview {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.previewButton {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--height-button-small);
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-button);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.previewBadge {
+  display: inline-flex;
+  align-items: center;
+  height: var(--height-badge);
+  padding: 0 10px;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-label);
+  font-weight: 600;
+}

@@ -239,7 +239,6 @@ export function importSummary(results: ImportResult[]): string {
 // ---------------------------------------------------------------------------
 
 export interface SettingsFormValues {
-  schoolName: string;
   schoolEmailDomain: string;
   allowDevAccounts: boolean;
   staffEmailPattern: string;
@@ -249,7 +248,6 @@ export type SettingsFormErrors = Partial<Record<keyof SettingsFormValues, string
 
 export function valuesFromSettings(settings: AppSettings): SettingsFormValues {
   return {
-    schoolName: settings.school_name,
     schoolEmailDomain: settings.school_email_domain ?? '',
     allowDevAccounts: settings.allow_dev_accounts,
     staffEmailPattern: settings.staff_email_pattern ?? '',
@@ -263,7 +261,6 @@ export function isWhole(value: string, min: number, max: number): boolean {
 
 export function validateSettings(values: SettingsFormValues): SettingsFormErrors {
   const errors: SettingsFormErrors = {};
-  if (!values.schoolName.trim()) errors.schoolName = 'Enter the school name.';
   const domain = values.schoolEmailDomain.trim();
   if (domain && !/^[a-z0-9-]+(\.[a-z0-9-]+)+$/i.test(domain)) {
     errors.schoolEmailDomain = 'Just the domain, e.g. school.example (no @).';
@@ -280,7 +277,6 @@ export function validateSettings(values: SettingsFormValues): SettingsFormErrors
 
 export function toSettingsChanges(values: SettingsFormValues) {
   return {
-    school_name: values.schoolName.trim(),
     school_email_domain: values.schoolEmailDomain.trim().toLowerCase() || null,
     allow_dev_accounts: values.allowDevAccounts,
     staff_email_pattern: values.staffEmailPattern.trim() || null,
