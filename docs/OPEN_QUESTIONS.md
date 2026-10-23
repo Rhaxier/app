@@ -254,8 +254,9 @@ on the **Admin > Settings** screen; you can also run SQL in Supabase Studio
 
 ## Q22: Content reports (the Report button) don't notify anyone
 
-- Default used: there is no notification type for them in the agreed list, so staff
-  check **Admin > Moderation** (teachers see it through the Approvals tab link).
+- Default used: there is no notification type for them in the agreed list. Admins see
+  them in **Admin > Moderation** (and the count on the Overview's "Reported posts" card);
+  teachers see them in the Approvals tab.
 - To change it: add a value to the `notification_type` enum in a new migration and
   call `notify()` from a trigger on `content_reports`.
 
@@ -449,3 +450,16 @@ on the **Admin > Settings** screen; you can also run SQL in Supabase Studio
 - Where it lives: `venues.bookable_from`, `bookable_until`, `max_booking_minutes`,
   `max_days_ahead`; `bookings_check_rules()` (`..._20261023120300_feature_settings.sql`).
 - To change it: **Admin > Features > Venues**, edit the venue.
+
+## Q41: What does removing content do?
+
+- Default used: a "soft delete". The post, announcement or event stays in the database
+  with `removed_at`, `removed_by` and a reason, but disappears for everyone except
+  admins, including its author, and nobody can join or sign up for it. An admin can
+  restore it. Removing (or hiding) marks its open reports as dealt with. Owners can still
+  delete their own posts for good, as before.
+- Where it lives: `removed_*` columns and the "Removed … are for admins only" policies,
+  `admin_moderate()` and `admin_moderation_queue()`
+  (`supabase/migrations/20261023120400_moderation.sql`).
+- To change it: to let authors see their removed content (with a notice), add
+  `or author_id = auth.uid()` (or `owner_id`, `creator_id`) to those policies.

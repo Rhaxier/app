@@ -316,6 +316,54 @@ export async function setContentReportStatus(
 }
 
 // ---------------------------------------------------------------------------
+// The admin moderation queue (B5): reported, hidden and removed content in one
+// list, and one function for every action. Removing is a "soft delete": the
+// content disappears for everyone but admins and can be restored.
+// ---------------------------------------------------------------------------
+
+export type ModeratedTable = 'collab_posts' | 'announcements' | 'volunteer_events';
+
+export interface ModerationItem {
+  kind: 'reported' | 'hidden' | 'removed';
+  /** Set for 'reported' items. */
+  report_id: string | null;
+  target_table: ModeratedTable;
+  target_id: string;
+  title: string | null;
+  excerpt: string | null;
+  author_id: string | null;
+  author_name: string | null;
+  reporter_name: string | null;
+  /** The report's reason, the hiding reason or the removal reason. */
+  reason: string | null;
+  happened_at: string;
+  is_hidden: boolean;
+  is_removed: boolean;
+}
+
+export async function fetchModerationQueue(): Promise<ModerationItem[]> {
+  const { data, error } = await supabase.rpc('admin_moderation_queue');
+  if (error) throw error;
+  return data as ModerationItem[];
+}
+
+export type ModerationAction = 'hide' | 'unhide' | 'remove' | 'restore' | 'dismiss';
+
+export async function moderate(
+  action: ModerationAction,
+  target: { table?: ModeratedTable; id?: string; reason?: string; reportId?: string },
+): Promise<void> {
+  const { error } = await supabase.rpc('admin_moderate', {
+    p_action: action,
+    p_target_table: target.table,
+    p_target_id: target.id,
+    p_reason: target.reason,
+    p_report_id: target.reportId,
+  });
+  if (error) throw error;
+}
+
+// ---------------------------------------------------------------------------
 // Audit log and outboxes (read-only)
 // ---------------------------------------------------------------------------
 

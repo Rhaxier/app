@@ -16,6 +16,9 @@ export type Database = {
           pinned: boolean;
           posted_as: string | null;
           publish_at: string;
+          removed_at: string | null;
+          removed_by: string | null;
+          removed_reason: string | null;
           section_ids: string[] | null;
           title: string;
           updated_at: string;
@@ -33,6 +36,9 @@ export type Database = {
           pinned?: boolean;
           posted_as?: string | null;
           publish_at?: string;
+          removed_at?: string | null;
+          removed_by?: string | null;
+          removed_reason?: string | null;
           section_ids?: string[] | null;
           title: string;
           updated_at?: string;
@@ -49,6 +55,9 @@ export type Database = {
           pinned?: boolean;
           posted_as?: string | null;
           publish_at?: string;
+          removed_at?: string | null;
+          removed_by?: string | null;
+          removed_reason?: string | null;
           section_ids?: string[] | null;
           title?: string;
           updated_at?: string;
@@ -57,6 +66,13 @@ export type Database = {
           {
             foreignKeyName: 'announcements_author_id_fkey';
             columns: ['author_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'announcements_removed_by_fkey';
+            columns: ['removed_by'];
             isOneToOne: false;
             referencedRelation: 'profiles';
             referencedColumns: ['id'];
@@ -392,6 +408,9 @@ export type Database = {
           hidden_reason: string | null;
           id: string;
           owner_id: string;
+          removed_at: string | null;
+          removed_by: string | null;
+          removed_reason: string | null;
           skills: string[];
           spots_wanted: number;
           status: Database['public']['Enums']['collab_status'];
@@ -408,6 +427,9 @@ export type Database = {
           hidden_reason?: string | null;
           id?: string;
           owner_id?: string;
+          removed_at?: string | null;
+          removed_by?: string | null;
+          removed_reason?: string | null;
           skills?: string[];
           spots_wanted: number;
           status?: Database['public']['Enums']['collab_status'];
@@ -423,6 +445,9 @@ export type Database = {
           hidden_reason?: string | null;
           id?: string;
           owner_id?: string;
+          removed_at?: string | null;
+          removed_by?: string | null;
+          removed_reason?: string | null;
           skills?: string[];
           spots_wanted?: number;
           status?: Database['public']['Enums']['collab_status'];
@@ -441,6 +466,13 @@ export type Database = {
           {
             foreignKeyName: 'collab_posts_owner_id_fkey';
             columns: ['owner_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'collab_posts_removed_by_fkey';
+            columns: ['removed_by'];
             isOneToOne: false;
             referencedRelation: 'profiles';
             referencedColumns: ['id'];
@@ -1793,6 +1825,9 @@ export type Database = {
           id: string;
           organiser_label: string | null;
           place_text: string | null;
+          removed_at: string | null;
+          removed_by: string | null;
+          removed_reason: string | null;
           room_id: string | null;
           signup_deadline: string | null;
           starts_at: string;
@@ -1815,6 +1850,9 @@ export type Database = {
           id?: string;
           organiser_label?: string | null;
           place_text?: string | null;
+          removed_at?: string | null;
+          removed_by?: string | null;
+          removed_reason?: string | null;
           room_id?: string | null;
           signup_deadline?: string | null;
           starts_at: string;
@@ -1835,6 +1873,9 @@ export type Database = {
           id?: string;
           organiser_label?: string | null;
           place_text?: string | null;
+          removed_at?: string | null;
+          removed_by?: string | null;
+          removed_reason?: string | null;
           room_id?: string | null;
           signup_deadline?: string | null;
           starts_at?: string;
@@ -1861,6 +1902,13 @@ export type Database = {
           {
             foreignKeyName: 'volunteer_events_creator_id_fkey';
             columns: ['creator_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'volunteer_events_removed_by_fkey';
+            columns: ['removed_by'];
             isOneToOne: false;
             referencedRelation: 'profiles';
             referencedColumns: ['id'];
@@ -1928,6 +1976,34 @@ export type Database = {
           new_reports: number;
           resolved_reports: number;
           supw_hours_confirmed: number;
+        }[];
+      };
+      admin_moderate: {
+        Args: {
+          p_action: string;
+          p_reason?: string;
+          p_report_id?: string;
+          p_target_id?: string;
+          p_target_table?: string;
+        };
+        Returns: undefined;
+      };
+      admin_moderation_queue: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          author_id: string;
+          author_name: string;
+          excerpt: string;
+          happened_at: string;
+          is_hidden: boolean;
+          is_removed: boolean;
+          kind: string;
+          reason: string;
+          report_id: string;
+          reporter_name: string;
+          target_id: string;
+          target_table: string;
+          title: string;
         }[];
       };
       admin_review_tag_suggestion: {

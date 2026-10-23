@@ -121,6 +121,21 @@ pg_cron every five minutes). Expired ones disappear the same way.
 skill rewrites posts that used it). They call `begin_trusted_change()` first, and the
 feature triggers let those changes through. Nobody can call it from the app.
 
+## Moderation (B5)
+
+One queue with three tabs:
+
+- **Reported:** every open report, with the reported content shown inline (title, a
+  passage, its author), who reported it and why.
+- **Hidden:** collab posts a teacher has hidden pending review.
+- **Removed:** anything an admin removed, so it can be restored.
+
+Actions: **Dismiss report**, **Hide / Unhide** (collab posts), **Remove** (with a reason,
+after a confirmation), **Restore**, and **Suspend the author…**, which opens that person on
+the Users screen. All of them go through one function, `admin_moderate(action, …)`, which
+writes the audit log. Removing is a soft delete (Q41): `removed_at` is set, and restrictive
+policies hide the row from everyone but admins.
+
 ## Files to read
 
 - `supabase/migrations/20261023120000_admin_overview.sql`
@@ -129,6 +144,7 @@ feature triggers let those changes through. Nobody can call it from the app.
 - `supabase/migrations/20261023120100_people_and_grades.sql`
 - `supabase/migrations/20261023120200_school_calendar.sql`
 - `supabase/migrations/20261023120300_feature_settings.sql`
+- `supabase/migrations/20261023120400_moderation.sql`; `src/features/admin/pages/ModerationPage.tsx`
 - `src/features/admin/components/SettingControls.tsx` (one setting, edited in place) and
   `NameListEditor.tsx` (add, rename, retire)
 - `src/features/school/` (grades, sections, classes, periods, terms, holidays, blackouts:
@@ -136,5 +152,5 @@ feature triggers let those changes through. Nobody can call it from the app.
 - `src/features/admin/pages/UsersPage.tsx`, `ImportPage.tsx`, `RolloverPage.tsx`,
   `ClassesPage.tsx`, `GradesPage.tsx`; `src/components/ConfirmDialog.tsx`
 - Tests: `supabase/tests/09_admin_overview_test.sql`, `10_people_test.sql`,
-  `11_calendar_test.sql`, `12_feature_settings_test.sql`; `src/features/school/school.test.ts`;
+  `11_calendar_test.sql`, `12_feature_settings_test.sql`, `13_moderation_test.sql`; `src/features/school/school.test.ts`;
   `src/features/admin/overview.test.tsx`, `people.test.tsx`

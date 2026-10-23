@@ -2,13 +2,18 @@
 // shared caches they affect, like settings or the people list).
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { settingsKeys } from '@/features/settings/hooks';
+import { showToast } from '@/lib/toast';
 import {
   addResponsibility,
   fetchAttention,
   fetchMetrics,
   fetchSupwByGrade,
   fetchVenueUtilisation,
+  fetchModerationQueue,
   importPeople,
+  moderate,
+  type ModerationAction,
+  type ModeratedTable,
   liftSuspension,
   rollover,
   suspendPosting,
@@ -204,6 +209,45 @@ export function useSaveVenue() {
       id ? updateVenue(id, fields) : createVenue(fields),
     onSuccess: invalidate,
     meta: { successMessage: 'Venue saved' },
+  });
+}
+
+// Moderation -------------------------------------------------------------------
+
+export function useModerationQueue() {
+  return useQuery({ queryKey: [...adminKeys.all, 'moderation'], queryFn: fetchModerationQueue });
+}
+
+const moderationToast: Record<ModerationAction, string> = {
+  hide: 'Hidden while it is reviewed',
+  unhide: 'Visible again',
+  remove: 'Removed',
+  restore: 'Restored',
+  dismiss: 'Report dismissed',
+};
+
+export function useModerate() {
+  // Moderation changes what everyone sees, so refresh the features too.
+  const invalidate = useInvalidate(['collab'], ['announcements'], ['volunteering']);
+  return useMutation({
+    mutationFn: ({
+      action,
+      table,
+      id,
+      reason,
+      reportId,
+    }: {
+      action: ModerationAction;
+      table?: ModeratedTable;
+      id?: string;
+      reason?: string;
+      reportId?: string;
+    }) => moderate(action, { table, id, reason, reportId }),
+    onSuccess: (_data, { action }) => {
+      invalidate();
+      showToast(moderationToast[action]);
+    },
+    meta: { errorToast: true },
   });
 }
 

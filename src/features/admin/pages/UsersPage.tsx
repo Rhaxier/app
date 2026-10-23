@@ -3,6 +3,7 @@
 // Roles change only through admin_set_role() (audited, refuses to remove the
 // last admin); suspensions through admin_suspend_posting().
 import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Badge } from '@/components/Badge';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
@@ -38,7 +39,9 @@ export function UsersPage() {
   const users = useUsers();
   const grades = useActiveGrades();
   const [filters, setFilters] = useState<UserFilters>(noUserFilters);
-  const [editingId, setEditingId] = useState<string | null>(null);
+  // ?open=<id> opens that person straight away (e.g. "Suspend the author" in Moderation).
+  const [searchParams] = useSearchParams();
+  const [editingId, setEditingId] = useState<string | null>(searchParams.get('open'));
 
   const shown = filterUsers(users.data ?? [], filters);
   const editing = users.data?.find((user) => user.id === editingId) ?? null;

@@ -17,12 +17,14 @@
 import { supabase } from '@/lib/supabase';
 import type { Enums, TablesInsert } from '@/types/database';
 
-// The columns we ask for, written once and reused. `author:profiles(full_name)`
+// The columns we ask for, written once and reused. `author:profiles!…(full_name)`
 // follows the author_id foreign key and fetches the author's name in the same
-// request ("embedding"). Only columns the signed-in role may read can be
-// embedded, which is why we never ask for the author's email.
+// request ("embedding"). Two columns point at profiles (author_id and
+// removed_by), so `!announcements_author_id_fkey` says which one to follow.
+// Only columns the signed-in role may read can be embedded, which is why we
+// never ask for the author's email.
 const ANNOUNCEMENT_COLUMNS =
-  'id, title, body, posted_as, audience, grades, section_ids, pinned, publish_at, expires_at, author_id, author:profiles(full_name)';
+  'id, title, body, posted_as, audience, grades, section_ids, pinned, publish_at, expires_at, author_id, author:profiles!announcements_author_id_fkey(full_name)';
 
 // What a screen gets back. Written by hand (rather than inferred) so it's easy
 // to read; the generated Database types check that it matches the query.

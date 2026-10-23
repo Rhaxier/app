@@ -1,0 +1,37 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.top :global(.label) {
+  color: var(--color-muted);
+}
+
+/* The reported content, set apart like a quotation. */
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: var(--space-3);
+  border-left: 3px solid var(--color-border);
+  border-radius: var(--radius-small);
+  background: var(--color-bg);
+}
+
+.title {
+  font-weight: 600;
+}
+
+.excerpt {
+  font-size: var(--text-small);
+  white-space: pre-line;
+}
