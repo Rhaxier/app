@@ -1,8 +1,32 @@
 // Admin screens: form checks (tested in admin.test.tsx). The database repeats
 // the important ones (unique emails and codes, number ranges).
+import { differenceInHours } from 'date-fns';
 import type { AppSettings } from '@/features/settings/api';
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// ---------------------------------------------------------------------------
+// Overview
+// ---------------------------------------------------------------------------
+
+/** "waiting 3 days", "waiting 5 hours", "waiting under an hour". */
+export function waitingFor(since: string | null, now: Date = new Date()): string {
+  if (!since) return '';
+  const hours = differenceInHours(now, new Date(since));
+  if (hours < 1) return 'waiting under an hour';
+  if (hours < 48) return `waiting ${hours} ${hours === 1 ? 'hour' : 'hours'}`;
+  return `waiting ${Math.floor(hours / 24)} days`;
+}
+
+/** 0.4236 → "42%"; null (nothing bookable) → "–". */
+export function percent(share: number | null): string {
+  return share === null ? '–' : `${Math.round(share * 100)}%`;
+}
+
+/** Hours with at most one decimal, without a trailing ".0": 12.5, 3. */
+export function hours(value: number): string {
+  return String(Math.round(value * 10) / 10);
+}
 
 export function validateStaffEmail(email: string, existing: string[]): string | null {
   const value = email.trim().toLowerCase();

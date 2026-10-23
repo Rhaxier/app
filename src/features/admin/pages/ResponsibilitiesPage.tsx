@@ -5,7 +5,6 @@ import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Icon } from '@/components/Icon';
 import { FormError, SelectField } from '@/components/Input';
-import { PageHeader } from '@/components/PageHeader';
 import { ErrorState, LoadingState } from '@/components/States';
 import { errorMessage } from '@/lib/errors';
 import { responsibilityLabel } from '@/lib/status';
@@ -13,6 +12,7 @@ import { Constants } from '@/types/database';
 import type { AdminUser, Responsibility } from '../api';
 import { useToggleResponsibility, useUsers } from '../hooks';
 import styles from './ListPage.module.css';
+import { AdminPage } from '../components/AdminPage';
 
 const kinds = Constants.public.Enums.responsibility_kind as readonly Responsibility[];
 
@@ -28,8 +28,7 @@ export function ResponsibilitiesPage() {
   const toggle = useToggleResponsibility();
 
   return (
-    <div className="stack">
-      <PageHeader back={{ to: '/admin', label: 'Admin' }} title="Responsibilities" />
+    <AdminPage title="Responsibilities">
       {users.isPending && <LoadingState />}
       {users.isError && <ErrorState error={users.error} onRetry={() => users.refetch()} />}
       <FormError message={toggle.isError ? errorMessage(toggle.error) : null} />
@@ -43,7 +42,7 @@ export function ResponsibilitiesPage() {
             onToggle={(userId, holds) => toggle.mutate({ userId, kind, holds })}
           />
         ))}
-    </div>
+    </AdminPage>
   );
 }
 

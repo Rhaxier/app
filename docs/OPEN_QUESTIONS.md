@@ -301,3 +301,26 @@ on the **Admin > Settings** screen; you can also run SQL in Supabase Studio
   in `src/features/venues/api.ts`.
 - To change it: to show everyone that a slot is contested (without saying by whom), add a
   function returning only the times of pending requests and draw them as "Requested".
+
+## Q29: What counts as an "active" person on the admin overview?
+
+- Default used: someone who signed in, or did anything in the app (reported, said "me
+  too", signed up, created an event, post, request, booking, announcement or project, or
+  read a notification) within the period. Supabase only keeps each person's _last_
+  sign-in time, so someone who stays signed in for weeks still counts through what they
+  do.
+- Where it lives: `admin_metrics()`
+  (`supabase/migrations/20261023120000_admin_overview.sql`).
+- To change it: add or remove a line in the `union all` list inside `admin_metrics()`,
+  in a new migration (`create or replace function`).
+
+## Q30: How is venue utilisation measured?
+
+- Default used: approved booked hours ÷ bookable hours over the last 7 or 30 full days
+  (today not included). Bookable hours come from `venue_bookable_minutes()`, which
+  counts the school's bookable periods on school days, minus holidays and blackouts, and
+  within each venue's own bookable hours (see B3 and B4 below).
+- Where it lives: `admin_venue_utilisation()` and `venue_bookable_minutes()`
+  (`..._20261023120000_admin_overview.sql`, replaced in later migrations).
+- To change it: change `venue_bookable_minutes()` in a new migration; every number that
+  uses it follows.

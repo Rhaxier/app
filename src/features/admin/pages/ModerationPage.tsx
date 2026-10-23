@@ -2,11 +2,12 @@
 // teacher has hidden for review.
 import { Link } from 'react-router-dom';
 import { Card } from '@/components/Card';
-import { PageHeader, SectionHeader } from '@/components/PageHeader';
+import { SectionHeader } from '@/components/PageHeader';
 import { EmptyState, ErrorState, LoadingState } from '@/components/States';
 import { ContentReportCard } from '@/features/approvals/components/ContentReportCard';
 import { usePosts } from '@/features/collab/hooks';
 import { useContentReports } from '../hooks';
+import { AdminPage } from '../components/AdminPage';
 
 export function ModerationPage() {
   const reports = useContentReports();
@@ -14,8 +15,7 @@ export function ModerationPage() {
   const hidden = (posts.data ?? []).filter((post) => post.hidden_by);
 
   return (
-    <div className="stack">
-      <PageHeader back={{ to: '/admin', label: 'Admin' }} title="Moderation" />
+    <AdminPage title="Moderation">
       <section className="stack-tight" aria-labelledby="mod-reports">
         <SectionHeader id="mod-reports" title="Reported content" />
         {reports.isPending && <LoadingState />}
@@ -38,6 +38,6 @@ export function ModerationPage() {
           </Card>
         ))}
       </section>
-    </div>
+    </AdminPage>
   );
 }

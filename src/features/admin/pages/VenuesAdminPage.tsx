@@ -4,7 +4,6 @@ import { useState, type FormEvent } from 'react';
 import { Badge } from '@/components/Badge';
 import { Button } from '@/components/Button';
 import { CheckboxField, FormError, SelectField, TextField } from '@/components/Input';
-import { PageHeader } from '@/components/PageHeader';
 import { Sheet } from '@/components/Sheet';
 import { ErrorState, LoadingState } from '@/components/States';
 import { useRooms } from '@/features/map/hooks';
@@ -14,6 +13,7 @@ import { errorMessage } from '@/lib/errors';
 import { useSaveVenue } from '../hooks';
 import { validateVenue, type VenueFormValues } from '../logic';
 import styles from './VenuesAdminPage.module.css';
+import { AdminPage } from '../components/AdminPage';
 
 export function VenuesAdminPage() {
   const venues = useVenues();
@@ -21,16 +21,14 @@ export function VenuesAdminPage() {
   const [editing, setEditing] = useState<Venue | null | undefined>(undefined);
 
   return (
-    <div className="stack">
-      <PageHeader
-        back={{ to: '/admin', label: 'Admin' }}
-        title="Venues"
-        action={
-          <Button size="small" icon="plus" onClick={() => setEditing(null)}>
-            Add
-          </Button>
-        }
-      />
+    <AdminPage
+      title="Venues"
+      actions={
+        <Button size="small" icon="plus" onClick={() => setEditing(null)}>
+          Add
+        </Button>
+      }
+    >
       {venues.isPending && <LoadingState />}
       {venues.isError && <ErrorState error={venues.error} onRetry={() => venues.refetch()} />}
       <ul className="stack-tight">
@@ -59,7 +57,7 @@ export function VenuesAdminPage() {
           onClose={() => setEditing(undefined)}
         />
       )}
-    </div>
+    </AdminPage>
   );
 }
 

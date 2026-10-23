@@ -4,7 +4,6 @@ import { useState, type FormEvent } from 'react';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { FormError, SelectField, TextField } from '@/components/Input';
-import { PageHeader } from '@/components/PageHeader';
 import { SegmentedControl } from '@/components/SegmentedControl';
 import { ErrorState, LoadingState } from '@/components/States';
 import type { Floor, Room } from '@/features/map/api';
@@ -23,6 +22,7 @@ import { roomKindLabel } from '@/lib/status';
 import { Constants, type Enums } from '@/types/database';
 import { validateRoom } from '../logic';
 import styles from './MapAdminPage.module.css';
+import { AdminPage } from '../components/AdminPage';
 
 type RoomKind = Enums<'room_kind'>;
 const roomKinds = Constants.public.Enums.room_kind as readonly RoomKind[];
@@ -43,8 +43,7 @@ export function MapAdminPage() {
   const selected = floorRooms.find((room) => room.id === selectedId) ?? null;
 
   return (
-    <div className="stack">
-      <PageHeader back={{ to: '/admin', label: 'Admin' }} title="Map" />
+    <AdminPage title="Map">
       {!floor ? (
         <p className="meta">No floors yet.</p>
       ) : (
@@ -114,7 +113,7 @@ export function MapAdminPage() {
           <FloorEditor key={floor.id} floor={floor} />
         </>
       )}
-    </div>
+    </AdminPage>
   );
 }
 

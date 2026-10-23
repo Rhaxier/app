@@ -4,6 +4,10 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { settingsKeys } from '@/features/settings/hooks';
 import {
   addResponsibility,
+  fetchAttention,
+  fetchMetrics,
+  fetchSupwByGrade,
+  fetchVenueUtilisation,
   addStaffEmail,
   createVenue,
   fetchAuditLog,
@@ -26,6 +30,10 @@ import {
 
 export const adminKeys = {
   all: ['admin'] as const,
+  attention: () => [...adminKeys.all, 'attention'] as const,
+  metrics: () => [...adminKeys.all, 'metrics'] as const,
+  utilisation: (days: number) => [...adminKeys.all, 'utilisation', days] as const,
+  supwByGrade: (days: number) => [...adminKeys.all, 'supw-by-grade', days] as const,
   users: () => [...adminKeys.all, 'users'] as const,
   staffEmails: () => [...adminKeys.all, 'staff-emails'] as const,
   contentReports: () => [...adminKeys.all, 'content-reports'] as const,
@@ -40,6 +48,29 @@ function useInvalidate(...extraKeys: (readonly string[])[]) {
     for (const key of extraKeys) queryClient.invalidateQueries({ queryKey: key });
   };
 }
+
+// Overview -------------------------------------------------------------------
+
+export function useAttention() {
+  return useQuery({ queryKey: adminKeys.attention(), queryFn: fetchAttention });
+}
+
+export function useMetrics() {
+  return useQuery({ queryKey: adminKeys.metrics(), queryFn: fetchMetrics });
+}
+
+export function useVenueUtilisation(days: number) {
+  return useQuery({
+    queryKey: adminKeys.utilisation(days),
+    queryFn: () => fetchVenueUtilisation(days),
+  });
+}
+
+export function useSupwByGrade(days: number) {
+  return useQuery({ queryKey: adminKeys.supwByGrade(days), queryFn: () => fetchSupwByGrade(days) });
+}
+
+// Users ----------------------------------------------------------------------
 
 export function useUsers() {
   return useQuery({ queryKey: adminKeys.users(), queryFn: fetchUsers });

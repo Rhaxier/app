@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import {
   addVote,
   createReport,
+  fetchOpenReports,
   fetchOpenReportsInRoom,
   fetchReport,
   fetchReports,
@@ -23,6 +24,7 @@ import { withVote } from './logic';
 export const fixitKeys = {
   all: ['fixit'] as const,
   reports: () => [...fixitKeys.all, 'reports'] as const,
+  open: (limit?: number) => [...fixitKeys.all, 'open', limit ?? 'all'] as const,
   report: (id: string) => [...fixitKeys.all, 'report', id] as const,
   inRoom: (roomId: string) => [...fixitKeys.all, 'room', roomId] as const,
   photo: (path: string) => [...fixitKeys.all, 'photo', path] as const,
@@ -31,6 +33,11 @@ export const fixitKeys = {
 
 export function useReports() {
   return useQuery({ queryKey: fixitKeys.reports(), queryFn: fetchReports });
+}
+
+/** Open reports, urgent first (filtered and sorted in the database). */
+export function useOpenReports(limit?: number) {
+  return useQuery({ queryKey: fixitKeys.open(limit), queryFn: () => fetchOpenReports(limit) });
 }
 
 export function useReport(id: string) {

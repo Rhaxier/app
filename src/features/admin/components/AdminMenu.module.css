@@ -1,0 +1,94 @@
+.full,
+.compact {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.compact {
+  gap: var(--space-4);
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.groupTitle {
+  color: var(--color-muted);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.compact .list {
+  gap: 2px;
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 64px;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--color-card);
+  color: var(--color-ink);
+  text-decoration: none;
+}
+
+.compact .link {
+  min-height: var(--touch-min);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-small);
+  background: transparent;
+  font-size: var(--text-small);
+}
+
+.compact .link:hover {
+  background: var(--color-card);
+}
+
+/* NavLink marks the current section with aria-current="page". */
+.compact .link[aria-current='page'] {
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
+.compact .icon {
+  width: auto;
+  height: auto;
+  background: transparent;
+  color: inherit;
+}
+
+.text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.title {
+  font-weight: 600;
+}
+
+.compact .title {
+  font-weight: inherit;
+}

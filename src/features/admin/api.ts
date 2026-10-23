@@ -9,6 +9,81 @@ export type Role = Enums<'user_role'>;
 export type Responsibility = Enums<'responsibility_kind'>;
 
 // ---------------------------------------------------------------------------
+// Overview (B1). Admin-only functions that count in the database; the browser
+// only ever receives the totals.
+// ---------------------------------------------------------------------------
+
+export type AttentionKind =
+  | 'events_to_approve'
+  | 'venue_requests'
+  | 'bookings_awaiting_teacher'
+  | 'hours_to_confirm'
+  | 'open_reports'
+  | 'reported_content'
+  | 'hidden_posts';
+
+export interface AttentionRow {
+  kind: AttentionKind;
+  item_count: number;
+  urgent_count: number;
+  /** When the longest-waiting item started waiting; null when nothing is. */
+  oldest_at: string | null;
+}
+
+export async function fetchAttention(): Promise<AttentionRow[]> {
+  const { data, error } = await supabase.rpc('admin_attention');
+  if (error) throw error;
+  return data as AttentionRow[];
+}
+
+export interface Metrics {
+  days: number;
+  active_users: number;
+  new_reports: number;
+  resolved_reports: number;
+  avg_days_to_resolve: number | null;
+  bookings_requested: number;
+  bookings_held: number;
+  supw_hours_confirmed: number;
+  collab_posts_created: number;
+  collab_posts_filled: number;
+}
+
+/** Two rows: the last 7 days and the last 30 days. */
+export async function fetchMetrics(): Promise<Metrics[]> {
+  const { data, error } = await supabase.rpc('admin_metrics');
+  if (error) throw error;
+  return data as Metrics[];
+}
+
+export interface VenueUtilisation {
+  venue_id: string;
+  venue_name: string;
+  booked_hours: number;
+  bookable_hours: number;
+  /** 0 to 1; null when the venue had no bookable time in the window. */
+  utilisation: number | null;
+}
+
+export async function fetchVenueUtilisation(days: number): Promise<VenueUtilisation[]> {
+  const { data, error } = await supabase.rpc('admin_venue_utilisation', { p_days: days });
+  if (error) throw error;
+  return data as VenueUtilisation[];
+}
+
+export interface SupwByGrade {
+  grade: number | null;
+  students: number;
+  hours: number;
+}
+
+export async function fetchSupwByGrade(days: number): Promise<SupwByGrade[]> {
+  const { data, error } = await supabase.rpc('admin_supw_by_grade', { p_days: days });
+  if (error) throw error;
+  return data as SupwByGrade[];
+}
+
+// ---------------------------------------------------------------------------
 // Users, roles and responsibilities
 // ---------------------------------------------------------------------------
 

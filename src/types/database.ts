@@ -1320,6 +1320,15 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      admin_attention: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          item_count: number;
+          kind: string;
+          oldest_at: string;
+          urgent_count: number;
+        }[];
+      };
       admin_list_users: {
         Args: Record<PropertyKey, never>;
         Returns: {
@@ -1333,13 +1342,46 @@ export type Database = {
           section: string;
         }[];
       };
+      admin_metrics: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          active_users: number;
+          avg_days_to_resolve: number;
+          bookings_held: number;
+          bookings_requested: number;
+          collab_posts_created: number;
+          collab_posts_filled: number;
+          days: number;
+          new_reports: number;
+          resolved_reports: number;
+          supw_hours_confirmed: number;
+        }[];
+      };
       admin_set_role: {
         Args: { p_role: Database['public']['Enums']['user_role']; p_user_id: string };
         Returns: undefined;
       };
+      admin_supw_by_grade: {
+        Args: { p_days: number };
+        Returns: {
+          grade: number;
+          hours: number;
+          students: number;
+        }[];
+      };
       admin_update_profile: {
         Args: { p_full_name: string; p_grade: number; p_section: string; p_user_id: string };
         Returns: undefined;
+      };
+      admin_venue_utilisation: {
+        Args: { p_days: number };
+        Returns: {
+          bookable_hours: number;
+          booked_hours: number;
+          utilisation: number;
+          venue_id: string;
+          venue_name: string;
+        }[];
       };
       assert_role_has_space: {
         Args: { p_role_id: string; p_signup_id: string };
@@ -1610,6 +1652,7 @@ export type Database = {
         }[];
       };
       uuid_or_null: { Args: { p_text: string }; Returns: string };
+      venue_bookable_minutes: { Args: { p_day: string; p_venue_id: string }; Returns: number };
       venue_reminders: { Args: Record<PropertyKey, never>; Returns: number };
       volunteer_role_counts: {
         Args: Record<PropertyKey, never>;

@@ -6,7 +6,6 @@ import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Tag } from '@/components/Chip';
 import { FormError, SelectField, TextField } from '@/components/Input';
-import { PageHeader } from '@/components/PageHeader';
 import { Sheet } from '@/components/Sheet';
 import { EmptyState, ErrorState, LoadingState } from '@/components/States';
 import { Switch } from '@/components/Switch';
@@ -17,6 +16,7 @@ import { Constants } from '@/types/database';
 import type { AdminUser, Responsibility, Role } from '../api';
 import { useSetRole, useToggleResponsibility, useUpdateProfile, useUsers } from '../hooks';
 import styles from './UsersPage.module.css';
+import { AdminPage } from '../components/AdminPage';
 
 const roles = Constants.public.Enums.user_role as readonly Role[];
 const kinds = Constants.public.Enums.responsibility_kind as readonly Responsibility[];
@@ -34,8 +34,7 @@ export function UsersPage() {
   const editing = users.data?.find((user) => user.id === editingId) ?? null;
 
   return (
-    <div className="stack">
-      <PageHeader back={{ to: '/admin', label: 'Admin' }} title="Users and roles" />
+    <AdminPage title="Users and roles">
       <TextField
         label="Search by name or email"
         type="search"
@@ -76,7 +75,7 @@ export function UsersPage() {
         ))}
       </ul>
       {editing && <UserEditor key={editing.id} user={editing} onClose={() => setEditingId(null)} />}
-    </div>
+    </AdminPage>
   );
 }
 

@@ -6,12 +6,12 @@ import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Icon } from '@/components/Icon';
 import { FormError, TextField } from '@/components/Input';
-import { PageHeader } from '@/components/PageHeader';
 import { EmptyState, ErrorState, LoadingState } from '@/components/States';
 import { errorMessage } from '@/lib/errors';
 import { useAddStaffEmail, useRemoveStaffEmail, useStaffEmails } from '../hooks';
 import { validateStaffEmail } from '../logic';
 import styles from './ListPage.module.css';
+import { AdminPage } from '../components/AdminPage';
 
 export function StaffEmailsPage() {
   const emails = useStaffEmails();
@@ -31,12 +31,7 @@ export function StaffEmailsPage() {
   }
 
   return (
-    <div className="stack">
-      <PageHeader
-        back={{ to: '/admin', label: 'Admin' }}
-        title="Staff emails"
-        subtitle="These people become teachers when they sign in."
-      />
+    <AdminPage title="Staff emails" description="These people become teachers when they sign in.">
       <form className={styles.addRow} onSubmit={handleSubmit} noValidate>
         <TextField
           label="Add an email"
@@ -79,6 +74,6 @@ export function StaffEmailsPage() {
       <p className="meta">
         Removing an email doesn't change anyone's role. Use Users and roles for that.
       </p>
-    </div>
+    </AdminPage>
   );
 }

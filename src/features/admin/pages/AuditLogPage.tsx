@@ -3,11 +3,11 @@
 import { useState } from 'react';
 import { Card } from '@/components/Card';
 import { SelectField } from '@/components/Input';
-import { PageHeader } from '@/components/PageHeader';
 import { EmptyState, ErrorState, LoadingState } from '@/components/States';
 import { formatDateTime } from '@/lib/dates';
 import { useAuditLog, useUsers } from '../hooks';
 import styles from './ListPage.module.css';
+import { AdminPage } from '../components/AdminPage';
 
 const tables = [
   'profiles',
@@ -29,12 +29,7 @@ export function AuditLogPage() {
     users.data?.find((user) => user.id === id)?.full_name ?? 'Unknown';
 
   return (
-    <div className="stack">
-      <PageHeader
-        back={{ to: '/admin', label: 'Admin' }}
-        title="Audit log"
-        subtitle="The latest 200 changes"
-      />
+    <AdminPage title="Audit log" description="The latest 200 changes">
       <SelectField label="Show changes to" value={table} onChange={(e) => setTable(e.target.value)}>
         <option value="">Everything</option>
         {tables.map((name) => (
@@ -61,6 +56,6 @@ export function AuditLogPage() {
           </Card>
         ))}
       </ul>
-    </div>
+    </AdminPage>
   );
 }

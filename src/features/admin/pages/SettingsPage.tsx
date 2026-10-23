@@ -5,7 +5,6 @@ import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { FilterChip } from '@/components/Chip';
 import { CheckboxField, FormError, TextField } from '@/components/Input';
-import { PageHeader } from '@/components/PageHeader';
 import { ErrorState, LoadingState } from '@/components/States';
 import type { AppSettings } from '@/features/settings/api';
 import { useAppSettings } from '@/features/settings/hooks';
@@ -19,6 +18,7 @@ import {
   type SettingsFormValues,
 } from '../logic';
 import styles from './SettingsPage.module.css';
+import { AdminPage } from '../components/AdminPage';
 
 const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 // Every grade the database accepts (profiles.grade is 1 to 13).
@@ -27,12 +27,11 @@ const allGrades = Array.from({ length: 13 }, (_, i) => i + 1);
 export function SettingsPage() {
   const settings = useAppSettings();
   return (
-    <div className="stack">
-      <PageHeader back={{ to: '/admin', label: 'Admin' }} title="Settings" />
+    <AdminPage title="Settings">
       {settings.isPending && <LoadingState />}
       {settings.isError && <ErrorState error={settings.error} onRetry={() => settings.refetch()} />}
       {settings.data && <SettingsForm key={settings.data.updated_at} settings={settings.data} />}
-    </div>
+    </AdminPage>
   );
 }
 

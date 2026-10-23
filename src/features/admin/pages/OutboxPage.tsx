@@ -3,11 +3,11 @@
 import { useState } from 'react';
 import { Badge } from '@/components/Badge';
 import { Card } from '@/components/Card';
-import { PageHeader } from '@/components/PageHeader';
 import { SegmentedControl } from '@/components/SegmentedControl';
 import { EmptyState, ErrorState, LoadingState } from '@/components/States';
 import { relativeTime } from '@/lib/dates';
 import { useOutbox } from '../hooks';
+import { AdminPage } from '../components/AdminPage';
 
 type OutboxTable = 'email_outbox' | 'push_outbox';
 
@@ -15,12 +15,10 @@ export function OutboxPage() {
   const [table, setTable] = useState<OutboxTable>('email_outbox');
   const rows = useOutbox(table);
   return (
-    <div className="stack">
-      <PageHeader
-        back={{ to: '/admin', label: 'Admin' }}
-        title="Outbox"
-        subtitle="Queued, not sent: no email or push provider is set up yet."
-      />
+    <AdminPage
+      title="Outbox"
+      description="Queued, not sent: no email or push provider is set up yet."
+    >
       <SegmentedControl
         label="Outbox"
         value={table}
@@ -52,6 +50,6 @@ export function OutboxPage() {
           );
         })}
       </ul>
-    </div>
+    </AdminPage>
   );
 }

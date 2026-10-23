@@ -52,6 +52,19 @@ export async function fetchReports(): Promise<Report[]> {
   return data;
 }
 
+/** Open reports, urgent first then oldest first (the admin queue and overview). */
+export async function fetchOpenReports(limit?: number): Promise<Report[]> {
+  let query = supabase
+    .rpc('report_feed')
+    .in('status', OPEN_STATUSES)
+    .order('urgent', { ascending: false })
+    .order('created_at');
+  if (limit) query = query.limit(limit);
+  const { data, error } = await query;
+  if (error) throw error;
+  return data;
+}
+
 export async function fetchReport(id: string): Promise<Report | null> {
   const { data, error } = await supabase.rpc('report_feed').eq('id', id).maybeSingle();
   if (error) throw error;

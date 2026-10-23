@@ -1,0 +1,94 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* Name | bar | value. On a phone the name sits above the bar. */
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'label value'
+    'track track';
+  align-items: center;
+  gap: 4px var(--space-3);
+}
+
+@media (min-width: 600px) {
+  .row {
+    grid-template-columns: minmax(120px, 30%) minmax(0, 1fr) minmax(96px, auto);
+    grid-template-areas: 'label track value';
+  }
+}
+
+.label {
+  grid-area: label;
+  overflow: hidden;
+  font-size: var(--text-small);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.track {
+  grid-area: track;
+  display: block;
+  height: 12px;
+}
+
+/* A share (0–100%) shows its whole track, a lighter step of the same hue. */
+.meter {
+  border-radius: var(--radius-pill);
+  background: var(--color-accent-soft);
+}
+
+.bar {
+  display: block;
+  height: 100%;
+  min-width: 2px;
+  /* Square where it grows from, rounded at the data end. */
+  border-radius: 0 4px 4px 0;
+  background: var(--color-accent);
+}
+
+.meter .bar {
+  border-radius: var(--radius-pill);
+}
+
+.value {
+  grid-area: value;
+  color: var(--color-muted);
+  font-size: var(--text-meta);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.details summary {
+  min-height: var(--touch-min);
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-small);
+}
+
+.table th,
+.table td {
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+}
+
+.table td {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.table thead th:last-child {
+  text-align: right;
+}

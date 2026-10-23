@@ -5,7 +5,6 @@
 // someone opens them, so the app starts faster on a phone. (The map library
 // and the admin screens, for example, are only needed by some people.)
 // Home, sign-in, Me and the inbox are needed straight away, so they're not.
-import type { ComponentType } from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 import { LoadingState } from '@/components/States';
 import { LoginPage } from '@/features/auth/pages/LoginPage';
@@ -13,23 +12,13 @@ import { ProfilePage } from '@/features/auth/pages/ProfilePage';
 import { HomePage } from '@/features/home/pages/HomePage';
 import { InboxPage } from '@/features/notifications/pages/InboxPage';
 import { NotificationSettingsPage } from '@/features/notifications/pages/NotificationSettingsPage';
+import { adminRoutes } from '@/features/admin/routes';
 import { AppLayout } from './AppLayout';
 import { RequireAuth, RequireRole } from './guards';
+import { lazyPage } from './lazyPage';
 import { NotFoundPage } from './NotFoundPage';
 import { RootLayout } from './RootLayout';
 import { enableScreenTransitions } from './screenTransitions';
-
-/**
- * A route that loads its screen on first visit:
- *   lazyPage(() => import('@/features/map/pages/MapPage'), 'MapPage')
- * loads that file, then shows its exported MapPage component.
- */
-function lazyPage<M extends Record<string, unknown>>(
-  load: () => Promise<M>,
-  name: keyof M & string,
-) {
-  return async () => ({ Component: (await load())[name] as ComponentType });
-}
 
 const announcements = () => import('@/features/announcements/pages/AnnouncementsPage');
 const announcement = () => import('@/features/announcements/pages/AnnouncementDetailPage');
@@ -109,76 +98,7 @@ export const router = createBrowserRouter([
               },
               {
                 element: <RequireRole role="admin" />,
-                children: [
-                  {
-                    path: '/admin',
-                    lazy: lazyPage(
-                      () => import('@/features/admin/pages/AdminHomePage'),
-                      'AdminHomePage',
-                    ),
-                  },
-                  {
-                    path: '/admin/users',
-                    lazy: lazyPage(() => import('@/features/admin/pages/UsersPage'), 'UsersPage'),
-                  },
-                  {
-                    path: '/admin/responsibilities',
-                    lazy: lazyPage(
-                      () => import('@/features/admin/pages/ResponsibilitiesPage'),
-                      'ResponsibilitiesPage',
-                    ),
-                  },
-                  {
-                    path: '/admin/staff-emails',
-                    lazy: lazyPage(
-                      () => import('@/features/admin/pages/StaffEmailsPage'),
-                      'StaffEmailsPage',
-                    ),
-                  },
-                  {
-                    path: '/admin/venues',
-                    lazy: lazyPage(
-                      () => import('@/features/admin/pages/VenuesAdminPage'),
-                      'VenuesAdminPage',
-                    ),
-                  },
-                  {
-                    path: '/admin/map',
-                    lazy: lazyPage(
-                      () => import('@/features/admin/pages/MapAdminPage'),
-                      'MapAdminPage',
-                    ),
-                  },
-                  {
-                    path: '/admin/routes',
-                    lazy: lazyPage(() => import('@/features/admin/pages/RoutesPage'), 'RoutesPage'),
-                  },
-                  {
-                    path: '/admin/settings',
-                    lazy: lazyPage(
-                      () => import('@/features/admin/pages/SettingsPage'),
-                      'SettingsPage',
-                    ),
-                  },
-                  {
-                    path: '/admin/moderation',
-                    lazy: lazyPage(
-                      () => import('@/features/admin/pages/ModerationPage'),
-                      'ModerationPage',
-                    ),
-                  },
-                  {
-                    path: '/admin/audit',
-                    lazy: lazyPage(
-                      () => import('@/features/admin/pages/AuditLogPage'),
-                      'AuditLogPage',
-                    ),
-                  },
-                  {
-                    path: '/admin/outbox',
-                    lazy: lazyPage(() => import('@/features/admin/pages/OutboxPage'), 'OutboxPage'),
-                  },
-                ],
+                children: [adminRoutes],
               },
               { path: '*', element: <NotFoundPage /> },
             ],
