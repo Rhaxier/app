@@ -5,7 +5,14 @@ import { render, screen, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import type { AdminUser, ImportResult } from './api';
 import { ImportPreview } from './components/ImportPreview';
-import { filterUsers, noUserFilters, rowsFromCsv, validateClass } from './logic';
+import {
+  filterUsers,
+  noUserFilters,
+  rowsFromCsv,
+  validateClass,
+  validatePeriod,
+  validateRange,
+} from './logic';
 
 const results: ImportResult[] = [
   {
@@ -117,5 +124,25 @@ describe('validateClass (create form)', () => {
       grade: 'Choose the grade.',
       teacherIds: 'Choose at least one teacher.',
     });
+  });
+});
+
+describe('calendar forms', () => {
+  it('needs a period that ends after it starts, on some day', () => {
+    expect(
+      validatePeriod({ name: 'P1', startsAt: '09:00', endsAt: '08:00', weekdays: [] }),
+    ).toEqual({
+      endsAt: 'It has to end after it starts.',
+      weekdays: 'Choose at least one day.',
+    });
+  });
+
+  it("won't take a range that ends before it starts", () => {
+    expect(validateRange({ name: 'Break', startsOn: '2026-12-10', endsOn: '2026-12-01' })).toEqual({
+      endsOn: "The last day can't be before the first.",
+    });
+    expect(
+      validateRange({ name: 'Day off', startsOn: '2026-12-02', endsOn: '2026-12-02' }),
+    ).toEqual({});
   });
 });

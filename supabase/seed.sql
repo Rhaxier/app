@@ -94,6 +94,37 @@ begin
 end;
 $$;
 
+-- Like school_day, but skipping Fridays (the short day), for bookings that run
+-- into the afternoon.
+create function pg_temp.long_day(p_offset int)
+returns date
+language plpgsql
+as $$
+declare
+  v_date date := pg_temp.school_day(0);
+  v_left int := p_offset;
+begin
+  while extract(dow from v_date)::int = 5 loop
+    v_date := v_date + 1;
+  end loop;
+  while v_left > 0 loop
+    v_date := v_date + 1;
+    if extract(dow from v_date)::int = any (array[1, 2, 3, 4]) then
+      v_left := v_left - 1;
+    end if;
+  end loop;
+  return v_date;
+end;
+$$;
+
+-- pg_temp.at_long(1, '13:30') = 13:30 on the next Monday-to-Thursday school day.
+create function pg_temp.at_long(p_offset int, p_time text)
+returns timestamptz
+language sql
+as $$
+  select (pg_temp.long_day(p_offset) + p_time::time) at time zone 'Asia/Dubai';
+$$;
+
 -- pg_temp.at(1, '10:30') = 10:30 Dubai time on the next school day.
 create function pg_temp.at(p_offset int, p_time text)
 returns timestamptz
@@ -173,6 +204,43 @@ from (values
   ('12 B Computer Science (sample)', 'student.g12.b')
 ) as t(class_name, who)
 join public.classes c on c.name = t.class_name;
+
+-- -----------------------------------------------------------------------------
+-- School calendar: Monday to Friday with a shorter Friday, two terms, a few
+-- holidays and one exam blackout. Dates are relative to today, so the sample
+-- always has something coming up. Every name is a placeholder.
+-- -----------------------------------------------------------------------------
+update public.app_settings set school_days = '{1,2,3,4,5}';
+
+delete from public.periods;
+insert into public.periods (name, starts_at, ends_at, sort_order, weekdays) values
+  ('Period 1', '07:30', '09:00', 1, '{1,2,3,4,5}'),
+  ('Period 2', '09:00', '10:30', 2, '{1,2,3,4,5}'),
+  ('Period 3', '10:30', '12:00', 3, '{1,2,3,4}'),
+  ('Period 3 (short Friday)', '10:30', '11:30', 3, '{5}'),
+  ('Period 4', '12:00', '13:30', 4, '{1,2,3,4}'),
+  ('Period 5', '13:30', '15:00', 5, '{1,2,3,4}');
+
+insert into public.terms (name, starts_on, ends_on)
+select t.name, today + t.from_days, today + t.to_days
+from (select (now() at time zone 'Asia/Dubai')::date as today) d
+cross join (values
+  ('Term 1 (placeholder)', -50, 55),
+  ('Term 2 (placeholder)', 70, 180)
+) as t(name, from_days, to_days);
+
+insert into public.holidays (name, starts_on, ends_on)
+select h.name, today + h.from_days, today + h.to_days
+from (select (now() at time zone 'Asia/Dubai')::date as today) d
+cross join (values
+  ('Mid-term break (placeholder)', 21, 25),
+  ('Public holiday (placeholder)', 40, 40),
+  ('Winter break (placeholder)', 56, 69)
+) as h(name, from_days, to_days);
+
+insert into public.venue_blackouts (venue_id, starts_on, ends_on, reason)
+select null, today + 28, today + 32, 'Exams (placeholder)'
+from (select (now() at time zone 'Asia/Dubai')::date as today) d;
 
 -- -----------------------------------------------------------------------------
 -- Map: three placeholder floors (images in public/floorplans/) and rooms.
@@ -407,24 +475,24 @@ begin
   -- Approved (today, Auditorium).
   insert into public.bookings (venue_id, requester_id, title, purpose, expected_attendance, starts_at, ends_at)
   values (pg_temp.venue('Auditorium (placeholder)'), pg_temp.u('teacher.b'), 'Grade 10 assembly (sample)',
-          'Weekly assembly.', 150, pg_temp.at(0, '09:00'), pg_temp.at(0, '10:30'))
+          'Weekly assembly.', 150, pg_temp.at_long(0, '09:00'), pg_temp.at_long(0, '10:30'))
   returning id into v_booking;
   update public.bookings set status = 'approved', reviewed_by = pg_temp.u('admin.venues') where id = v_booking;
 
   -- Pending (today, Auditorium).
   insert into public.bookings (venue_id, requester_id, title, purpose, expected_attendance, starts_at, ends_at)
   values (pg_temp.venue('Auditorium (placeholder)'), pg_temp.u('teacher.c'), 'Drama rehearsal (sample)',
-          'Rehearsal for the end-of-term play.', 25, pg_temp.at(0, '12:00'), pg_temp.at(0, '13:30'));
+          'Rehearsal for the end-of-term play.', 25, pg_temp.at_long(0, '12:00'), pg_temp.at_long(0, '13:30'));
 
   -- Overlap case still open: two requests for the same slot. Approving one
   -- (as Admin Venues) automatically rejects the other.
   insert into public.bookings (venue_id, requester_id, title, purpose, expected_attendance, starts_at, ends_at)
   values (pg_temp.venue('Auditorium (placeholder)'), pg_temp.u('teacher.b'), 'Debate club practice (sample)',
-          'Practice round before the inter-school debate.', 20, pg_temp.at(1, '10:30'), pg_temp.at(1, '12:00'));
+          'Practice round before the inter-school debate.', 20, pg_temp.at_long(1, '10:30'), pg_temp.at_long(1, '12:00'));
   insert into public.bookings (venue_id, requester_id, supervising_teacher_id, title, purpose, expected_attendance, starts_at, ends_at)
   values (pg_temp.venue('Auditorium (placeholder)'), pg_temp.u('student.g12.a'), pg_temp.u('teacher.a'),
           'Robotics demo (sample)', 'Show the robotics project to younger grades.', 60,
-          pg_temp.at(1, '10:30'), pg_temp.at(1, '12:00'))
+          pg_temp.at_long(1, '10:30'), pg_temp.at_long(1, '12:00'))
   returning id into v_booking;
   -- Teacher A has confirmed the student's request, so it's now pending too.
   update public.bookings set status = 'pending' where id = v_booking;
@@ -433,10 +501,10 @@ begin
   -- "Basketball practice", which asked for the same slot.
   insert into public.bookings (venue_id, requester_id, title, purpose, expected_attendance, starts_at, ends_at)
   values (pg_temp.venue('MPH (placeholder)'), pg_temp.u('teacher.c'), 'Basketball practice (sample)',
-          'Team practice.', 15, pg_temp.at(2, '13:30'), pg_temp.at(2, '15:00'));
+          'Team practice.', 15, pg_temp.at_long(2, '13:30'), pg_temp.at_long(2, '15:00'));
   insert into public.bookings (venue_id, requester_id, title, purpose, expected_attendance, starts_at, ends_at)
   values (pg_temp.venue('MPH (placeholder)'), pg_temp.u('admin.plain'), 'Club fair setup (sample)',
-          'Set up tables for the club fair.', 30, pg_temp.at(2, '13:00'), pg_temp.at(2, '15:00'))
+          'Set up tables for the club fair.', 30, pg_temp.at_long(2, '13:00'), pg_temp.at_long(2, '15:00'))
   returning id into v_booking;
   update public.bookings set status = 'approved', reviewed_by = pg_temp.u('admin.venues') where id = v_booking;
 
@@ -444,12 +512,12 @@ begin
   insert into public.bookings (venue_id, requester_id, supervising_teacher_id, title, purpose, expected_attendance, starts_at, ends_at)
   values (pg_temp.venue('MPH (placeholder)'), pg_temp.u('student.g10.a'), pg_temp.u('teacher.a'),
           'Science club meeting (sample)', 'Plan the science fair stall.', 12,
-          pg_temp.at(3, '10:30'), pg_temp.at(3, '12:00'));
+          pg_temp.at_long(3, '10:30'), pg_temp.at_long(3, '12:00'));
 
   -- Rejected with a note.
   insert into public.bookings (venue_id, requester_id, title, purpose, expected_attendance, starts_at, ends_at)
   values (pg_temp.venue('Lab 1 (placeholder)'), pg_temp.u('teacher.c'), 'Extra lab session (sample)',
-          'Catch-up practicals.', 20, pg_temp.at(4, '13:30'), pg_temp.at(4, '15:00'))
+          'Catch-up practicals.', 20, pg_temp.at_long(4, '13:30'), pg_temp.at_long(4, '15:00'))
   returning id into v_booking;
   update public.bookings
   set status = 'rejected', reviewed_by = pg_temp.u('admin.venues'),
@@ -459,14 +527,14 @@ begin
   -- Cancelled by the requester.
   insert into public.bookings (venue_id, requester_id, title, purpose, starts_at, ends_at)
   values (pg_temp.venue('Lab 1 (placeholder)'), pg_temp.u('teacher.b'), 'Chemistry demo (sample)',
-          'Cancelled: moved to next term.', pg_temp.at(1, '07:30'), pg_temp.at(1, '09:00'))
+          'Cancelled: moved to next term.', pg_temp.at_long(1, '07:30'), pg_temp.at_long(1, '09:00'))
   returning id into v_booking;
   update public.bookings set status = 'cancelled' where id = v_booking;
 
   -- Auto-approved: the meeting room doesn't need approval.
   insert into public.bookings (venue_id, requester_id, title, purpose, expected_attendance, starts_at, ends_at)
   values (pg_temp.venue('Meeting room (placeholder)'), pg_temp.u('teacher.a'), 'SUPW planning meeting (sample)',
-          'Plan next month''s volunteering events.', 6, pg_temp.at(0, '13:30'), pg_temp.at(0, '15:00'));
+          'Plan next month''s volunteering events.', 6, pg_temp.at_long(0, '13:30'), pg_temp.at_long(0, '15:00'));
 
   -- ---------------------------------------------------------------------------
   -- Fix-it reports: five, with "me too" votes.

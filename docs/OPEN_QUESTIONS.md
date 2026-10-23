@@ -125,7 +125,7 @@ on the **Admin > Settings** screen; you can also run SQL in Supabase Studio
   `src/config/school.ts` (name shown before sign-in, app name); `public/favicon.svg`.
 - To change it: **Admin > Settings** for the name and SUPW target; edit
   `src/config/school.ts` and replace `public/favicon.svg` for the sign-in screen and
-  icon. Term dates aren't used by any feature yet.
+  icon. Term dates and holidays: **Admin > School calendar > Terms and holidays**.
 
 ## Q10: Reminder timing for venue approvals
 
@@ -146,12 +146,18 @@ on the **Admin > Settings** screen; you can also run SQL in Supabase Studio
 
 ## Q11: Which days are school days, and what are the bookable time slots?
 
-- Default used: Sunday–Thursday and 5 slots of 90 minutes from 07:30 (as drawn in the
-  mockup). Note: since 2022 most UAE schools run Monday–Friday, so please confirm.
-- Where it lives: `app_settings.school_days` (0 = Sunday … 6 = Saturday),
-  `booking_day_start`, `booking_slot_minutes`, `booking_slots_per_day`. The week in
-  date strips starts on `WEEK_STARTS_ON` in `src/lib/dates.ts` (Sunday).
-- To change it: **Admin > Settings** (e.g. school days `1,2,3,4,5` for Mon–Fri).
+**Configurable in Admin.**
+
+- Default used: Sunday to Thursday, with five 90-minute periods from 07:30, as drawn in
+  the mockup. (The sample data switches to Monday to Friday with a shorter Friday, as most
+  UAE schools have run since 2022. Please confirm.) The old slot settings were turned into
+  rows of the `periods` table by the migration, so nothing changed until an admin edits
+  them.
+- Where it lives: `app_settings.school_days` (0 = Sunday … 6 = Saturday); table `periods`
+  (name, start, end, weekdays) (`supabase/migrations/20261023120200_school_calendar.sql`).
+  The week in date strips starts on `WEEK_STARTS_ON` in `src/lib/dates.ts` (Sunday).
+- To change it: **Admin > School calendar > School week and periods**. Give a short day
+  its own periods (e.g. "Period 3 (short Friday)", Fridays only).
 
 ## Q12: Which classes or grades does each teacher teach?
 
@@ -365,3 +371,25 @@ on the **Admin > Settings** screen; you can also run SQL in Supabase Studio
   reads the roster (`..._20261023120100_people_and_grades.sql`).
 - To change it: allow `admin` in the role check inside `admin_import_people()` and in the
   `roster.role` constraint.
+
+## Q34: Can volunteering events happen on holidays or weekends?
+
+- Default used: yes. Volunteering often happens at weekends (a beach clean-up on a
+  Saturday), so the event form only warns ("Holiday: … Events can still run then; check
+  with the school first.") instead of refusing. A browser's own date picker can't grey
+  out particular days, so the warning appears under the Starts field once a day is
+  chosen.
+- Where it lives: `dayNote()` (`src/features/school/logic.ts`) used by
+  `src/features/volunteering/components/EventForm.tsx`.
+- To change it: to refuse them, add a check like `bookings_check_rules()` to
+  `volunteer_events` in a new migration, and show the note as an error in the form.
+
+## Q35: Can venues be booked on non-school days or outside term?
+
+- Default used: the booking calendar only offers school days that have periods, and the
+  database refuses holidays and blackouts. It doesn't refuse weekends or days outside
+  term: staff sometimes book the hall for a weekend event, and those requests still need
+  approval.
+- Where it lives: `bookings_check_rules()` and `booking_calendar_problem()`
+  (`..._20261023120200_school_calendar.sql`).
+- To change it: add a weekday check to `bookings_check_rules()` in a new migration.

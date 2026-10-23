@@ -72,14 +72,38 @@ sees a banner (`SuspensionNotice`) with the date and reason, read through
 **Sections on announcements.** `announcements.section_ids` narrows a grade announcement to
 some sections; a trigger fills in their grades. Students in other sections don't see it.
 
+## School calendar (B3)
+
+| Section                 | What it does                                                                   | Database                              |
+| ----------------------- | ------------------------------------------------------------------------------ | ------------------------------------- |
+| School week and periods | School days (Q11) and the periods of each weekday, e.g. a shorter Friday       | `app_settings.school_days`, `periods` |
+| Terms and holidays      | The school year and days off                                                   | `terms`, `holidays`                   |
+| Venue blackouts         | Days one venue (or every venue) can't be booked, with a reason such as "Exams" | `venue_blackouts`                     |
+
+**Where it shows up:**
+
+- **Book a venue:** the slots are that weekday's periods. Holidays, blackouts and days
+  without periods are greyed out in the date strip, with the reason read out and listed
+  underneath.
+- **The database** refuses any booking request that touches a holiday or a blackout
+  (`bookings_check_rules()`, a BEFORE INSERT trigger on `bookings`), with a message such
+  as "This venue can't be booked then: Mon 16 Nov is a holiday (Mid-term break)."
+- **Volunteering:** the event form warns when the start day is a holiday, a non-school
+  day or outside term (Q34).
+- **Overview:** utilisation counts bookable time from periods, skipping holidays and
+  blackouts (`venue_bookable_minutes()`).
+
 ## Files to read
 
 - `supabase/migrations/20261023120000_admin_overview.sql`
 - `src/features/admin/components/AdminLayout.tsx`, `AdminMenu.tsx`, `AdminPage.tsx`
 - `src/features/admin/pages/OverviewPage.tsx`, `components/BarList.tsx`, `StatTile.tsx`
 - `supabase/migrations/20261023120100_people_and_grades.sql`
-- `src/features/school/` (grades, sections, classes: read hooks used across the app)
+- `supabase/migrations/20261023120200_school_calendar.sql`
+- `src/features/school/` (grades, sections, classes, periods, terms, holidays, blackouts:
+  read hooks used across the app; `dayNote()` and `periodsOn()` in `logic.ts`)
 - `src/features/admin/pages/UsersPage.tsx`, `ImportPage.tsx`, `RolloverPage.tsx`,
   `ClassesPage.tsx`, `GradesPage.tsx`; `src/components/ConfirmDialog.tsx`
-- Tests: `supabase/tests/09_admin_overview_test.sql`, `10_people_test.sql`;
+- Tests: `supabase/tests/09_admin_overview_test.sql`, `10_people_test.sql`,
+  `11_calendar_test.sql`; `src/features/school/school.test.ts`;
   `src/features/admin/overview.test.tsx`, `people.test.tsx`

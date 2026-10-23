@@ -25,6 +25,12 @@ export const adminRoutes: RouteObject = {
       lazy: lazyPage(() => import('./pages/ResponsibilitiesPage'), 'ResponsibilitiesPage'),
     },
     // Features
+    {
+      path: 'school-week',
+      lazy: lazyPage(() => import('./pages/SchoolWeekPage'), 'SchoolWeekPage'),
+    },
+    { path: 'terms', lazy: lazyPage(() => import('./pages/TermsPage'), 'TermsPage') },
+    { path: 'blackouts', lazy: lazyPage(() => import('./pages/BlackoutsPage'), 'BlackoutsPage') },
     { path: 'venues', lazy: lazyPage(() => import('./pages/VenuesAdminPage'), 'VenuesAdminPage') },
     { path: 'map', lazy: lazyPage(() => import('./pages/MapAdminPage'), 'MapAdminPage') },
     {

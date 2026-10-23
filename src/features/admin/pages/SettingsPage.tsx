@@ -3,7 +3,6 @@
 import { useState, type FormEvent } from 'react';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
-import { FilterChip } from '@/components/Chip';
 import { CheckboxField, FormError, TextField } from '@/components/Input';
 import { ErrorState, LoadingState } from '@/components/States';
 import type { AppSettings } from '@/features/settings/api';
@@ -19,8 +18,6 @@ import {
 } from '../logic';
 import styles from './SettingsPage.module.css';
 import { AdminPage } from '../components/AdminPage';
-
-const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 export function SettingsPage() {
   const settings = useAppSettings();
@@ -40,15 +37,6 @@ function SettingsForm({ settings }: { settings: AppSettings }) {
 
   function update<K extends keyof SettingsFormValues>(key: K, value: SettingsFormValues[K]) {
     setValues((current) => ({ ...current, [key]: value }));
-  }
-
-  function toggleDay(day: number) {
-    update(
-      'schoolDays',
-      values.schoolDays.includes(day)
-        ? values.schoolDays.filter((d) => d !== day)
-        : [...values.schoolDays, day].sort(),
-    );
   }
 
   function handleSubmit(event: FormEvent) {
@@ -122,44 +110,6 @@ function SettingsForm({ settings }: { settings: AppSettings }) {
 
       <Card className="stack-tight">
         <h2 className={styles.heading}>Venue booking</h2>
-        <fieldset className={styles.fieldset}>
-          <legend className={styles.legend}>School days</legend>
-          <div className="row-wrap">
-            {weekdays.map((name, day) => (
-              <FilterChip
-                key={name}
-                selected={values.schoolDays.includes(day)}
-                onClick={() => toggleDay(day)}
-              >
-                {name}
-              </FilterChip>
-            ))}
-          </div>
-          {errors.schoolDays && <p className={styles.error}>{errors.schoolDays}</p>}
-        </fieldset>
-        <div className={styles.threeColumns}>
-          <TextField
-            label="Starts"
-            type="time"
-            value={values.bookingDayStart}
-            onChange={(e) => update('bookingDayStart', e.target.value)}
-            error={errors.bookingDayStart}
-          />
-          <TextField
-            label="Minutes"
-            type="number"
-            value={values.bookingSlotMinutes}
-            onChange={(e) => update('bookingSlotMinutes', e.target.value)}
-            error={errors.bookingSlotMinutes}
-          />
-          <TextField
-            label="Slots"
-            type="number"
-            value={values.bookingSlotsPerDay}
-            onChange={(e) => update('bookingSlotsPerDay', e.target.value)}
-            error={errors.bookingSlotsPerDay}
-          />
-        </div>
         <p className="meta">Remind venue staff about a waiting request when:</p>
         <div className={styles.twoColumns}>
           <TextField

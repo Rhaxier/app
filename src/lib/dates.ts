@@ -139,3 +139,10 @@ export function fromDateTimeInputValue(value: string): string | null {
   const [key, time] = value.split('T');
   return atSchoolTime(key, time).toISOString();
 }
+
+/** A range of day keys: "Mon 16 Nov", or "Mon 16 Nov – Fri 20 Nov". */
+export function formatDayRange(startKey: string, endKey: string): string {
+  const start = formatDate(atSchoolTime(startKey, '12:00'));
+  if (startKey === endKey) return start;
+  return `${start} – ${formatDate(atSchoolTime(endKey, '12:00'))}`;
+}

@@ -24,9 +24,6 @@ const settings: AppSettings = {
   venue_reminder_hours: 48,
   venue_reminder_days_before: 3,
   school_days: [0, 1, 2, 3, 4],
-  booking_day_start: '07:30:00',
-  booking_slot_minutes: 90,
-  booking_slots_per_day: 5,
   created_at: '',
   updated_at: '',
 };
@@ -45,7 +42,6 @@ describe('settings form', () => {
   const values = valuesFromSettings(settings);
 
   it('starts from the saved settings', () => {
-    expect(values.bookingDayStart).toBe('07:30');
     expect(values.supwHoursTarget).toBe('');
     expect(validateSettings(values)).toEqual({});
   });
@@ -55,13 +51,9 @@ describe('settings form', () => {
       ...values,
       schoolEmailDomain: '@school.example',
       staffEmailPattern: '([a-z]',
-      bookingSlotMinutes: '5',
-      schoolDays: [],
     });
     expect(errors.schoolEmailDomain).toBe('Just the domain, e.g. school.example (no @).');
     expect(errors.staffEmailPattern).toBe("That pattern isn't valid.");
-    expect(errors.bookingSlotMinutes).toBe('Between 15 and 480 minutes.');
-    expect(errors.schoolDays).toBe('Choose at least one school day.');
   });
 
   it('saves empty optional fields as null and numbers as numbers', () => {
@@ -73,7 +65,7 @@ describe('settings form', () => {
     expect(changes.school_email_domain).toBe('school.example');
     expect(changes.staff_email_pattern).toBeNull();
     expect(changes.supw_hours_target).toBe(60);
-    expect(changes.booking_slots_per_day).toBe(5);
+    expect(changes.venue_reminder_hours).toBe(48);
   });
 });
 

@@ -60,9 +60,6 @@ export type Database = {
       app_settings: {
         Row: {
           allow_dev_accounts: boolean;
-          booking_day_start: string;
-          booking_slot_minutes: number;
-          booking_slots_per_day: number;
           collab_requires_teacher: boolean;
           created_at: string;
           id: boolean;
@@ -80,9 +77,6 @@ export type Database = {
         ComputedFields: never;
         Insert: {
           allow_dev_accounts?: boolean;
-          booking_day_start?: string;
-          booking_slot_minutes?: number;
-          booking_slots_per_day?: number;
           collab_requires_teacher?: boolean;
           created_at?: string;
           id?: boolean;
@@ -99,9 +93,6 @@ export type Database = {
         };
         Update: {
           allow_dev_accounts?: boolean;
-          booking_day_start?: string;
-          booking_slot_minutes?: number;
-          booking_slots_per_day?: number;
           collab_requires_teacher?: boolean;
           created_at?: string;
           id?: boolean;
@@ -659,6 +650,34 @@ export type Database = {
         };
         Relationships: [];
       };
+      holidays: {
+        Row: {
+          created_at: string;
+          ends_on: string;
+          id: string;
+          name: string;
+          starts_on: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          ends_on: string;
+          id?: string;
+          name: string;
+          starts_on: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          ends_on?: string;
+          id?: string;
+          name?: string;
+          starts_on?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       join_requests: {
         Row: {
           created_at: string;
@@ -785,6 +804,40 @@ export type Database = {
             referencedColumns: ['id'];
           },
         ];
+      };
+      periods: {
+        Row: {
+          created_at: string;
+          ends_at: string;
+          id: string;
+          name: string;
+          sort_order: number;
+          starts_at: string;
+          updated_at: string;
+          weekdays: number[];
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          ends_at: string;
+          id?: string;
+          name: string;
+          sort_order?: number;
+          starts_at: string;
+          updated_at?: string;
+          weekdays: number[];
+        };
+        Update: {
+          created_at?: string;
+          ends_at?: string;
+          id?: string;
+          name?: string;
+          sort_order?: number;
+          starts_at?: string;
+          updated_at?: string;
+          weekdays?: number[];
+        };
+        Relationships: [];
       };
       profiles: {
         Row: {
@@ -1430,6 +1483,73 @@ export type Database = {
           },
         ];
       };
+      terms: {
+        Row: {
+          created_at: string;
+          ends_on: string;
+          id: string;
+          name: string;
+          starts_on: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          ends_on: string;
+          id?: string;
+          name: string;
+          starts_on: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          ends_on?: string;
+          id?: string;
+          name?: string;
+          starts_on?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      venue_blackouts: {
+        Row: {
+          created_at: string;
+          ends_on: string;
+          id: string;
+          reason: string;
+          starts_on: string;
+          updated_at: string;
+          venue_id: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          ends_on: string;
+          id?: string;
+          reason: string;
+          starts_on: string;
+          updated_at?: string;
+          venue_id?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          ends_on?: string;
+          id?: string;
+          reason?: string;
+          starts_on?: string;
+          updated_at?: string;
+          venue_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'venue_blackouts_venue_id_fkey';
+            columns: ['venue_id'];
+            isOneToOne: false;
+            referencedRelation: 'venues';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       venues: {
         Row: {
           active: boolean;
@@ -1703,6 +1823,10 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      booking_calendar_problem: {
+        Args: { p_ends: string; p_starts: string; p_venue_id: string };
+        Returns: string;
+      };
       booking_details: {
         Args: Record<PropertyKey, never>;
         Returns: {
@@ -1731,6 +1855,7 @@ export type Database = {
         Args: { p_ends: string; p_ignore: string; p_starts: string; p_venue_id: string };
         Returns: boolean;
       };
+      calendar_day_note: { Args: { p_day: string; p_venue_id: string }; Returns: string };
       can_confirm_hours: { Args: { p_event_id: string }; Returns: boolean };
       can_manage_report: {
         Args: { p_category: Database['public']['Enums']['report_category'] };

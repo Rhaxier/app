@@ -1,29 +1,31 @@
 // Venue booking: the calendar's maths, as plain functions (tested in
-// venues.test.tsx). The day is cut into slots from app_settings (Q11):
-// booking_day_start, booking_slot_minutes, booking_slots_per_day, school_days.
-import { addDaysToKey, atSchoolTime, dayKey, weekdayOfKey, WEEK_STARTS_ON } from '@/lib/dates';
+// venues.test.tsx). The week's days are app_settings.school_days (Q11), and
+// each day is cut into the school's periods that run that weekday (Admin >
+// School calendar). Holidays and blackouts are refused by the database; here
+// they're greyed out.
+import type { Period } from '@/features/school/api';
+import { periodsOn } from '@/features/school/logic';
 import type { AppSettings } from '@/features/settings/api';
+import { addDaysToKey, atSchoolTime, dayKey, weekdayOfKey, WEEK_STARTS_ON } from '@/lib/dates';
 import type { BookingDetails, CalendarBooking } from './api';
 
-export type SlotSettings = Pick<
-  AppSettings,
-  'school_days' | 'booking_day_start' | 'booking_slot_minutes' | 'booking_slots_per_day'
->;
+export type SlotSettings = Pick<AppSettings, 'school_days'>;
 
 export interface Slot {
   index: number;
+  /** The period's name, e.g. "Period 3". */
+  name: string;
   start: Date;
   end: Date;
 }
 
-/** The bookable slots of one school day, e.g. 7:30, 9:00, 10:30, 12:00, 13:30. */
-export function buildSlots(day: string, settings: SlotSettings): Slot[] {
-  const first = atSchoolTime(day, settings.booking_day_start.slice(0, 5));
-  const minutes = settings.booking_slot_minutes;
-  return Array.from({ length: settings.booking_slots_per_day }, (_, index) => ({
+/** The bookable slots of one day: that weekday's periods, e.g. 7:30, 9:00, 10:30… */
+export function buildSlots(day: string, periods: Period[]): Slot[] {
+  return periodsOn(day, periods).map((period, index) => ({
     index,
-    start: new Date(first.getTime() + index * minutes * 60_000),
-    end: new Date(first.getTime() + (index + 1) * minutes * 60_000),
+    name: period.name,
+    start: atSchoolTime(day, period.starts_at.slice(0, 5)),
+    end: atSchoolTime(day, period.ends_at.slice(0, 5)),
   }));
 }
 
@@ -41,18 +43,22 @@ export function schoolDaysOfWeek(
   );
 }
 
-/** The day to open on: today if a slot is still ahead, otherwise the next school day. */
+/**
+ * The day to open on: today if a slot is still ahead, otherwise the next day
+ * that has periods and isn't blocked (a holiday or blackout).
+ */
 export function firstBookableDay(
   days: string[],
-  settings: SlotSettings,
+  periods: Period[],
   now: Date = new Date(),
+  isBlocked: (day: string) => boolean = () => false,
 ): string | undefined {
   const today = dayKey(now);
   return days.find((day) => {
-    if (day > today) return true;
-    if (day < today) return false;
-    const slots = buildSlots(day, settings);
-    return slots[slots.length - 1].start > now;
+    if (day < today || isBlocked(day)) return false;
+    const slots = buildSlots(day, periods);
+    if (slots.length === 0) return false;
+    return day > today || slots[slots.length - 1].start > now;
   });
 }
 

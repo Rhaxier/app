@@ -111,3 +111,88 @@ export async function setClassArchived(id: string, archived: boolean): Promise<v
     .eq('id', id);
   if (error) throw error;
 }
+
+// ---------------------------------------------------------------------------
+// The school calendar (B3): periods, terms, holidays and venue blackouts.
+// Everyone reads them (booking and volunteering screens); admins change them.
+// Dates are plain calendar days in Dubai ('2026-10-25'); times are wall-clock
+// times ('07:30:00').
+// ---------------------------------------------------------------------------
+
+export type Period = Pick<
+  Tables<'periods'>,
+  'id' | 'name' | 'starts_at' | 'ends_at' | 'sort_order' | 'weekdays'
+>;
+export type Term = Pick<Tables<'terms'>, 'id' | 'name' | 'starts_on' | 'ends_on'>;
+export type Holiday = Pick<Tables<'holidays'>, 'id' | 'name' | 'starts_on' | 'ends_on'>;
+export type Blackout = Pick<
+  Tables<'venue_blackouts'>,
+  'id' | 'venue_id' | 'starts_on' | 'ends_on' | 'reason'
+>;
+
+export async function fetchPeriods(): Promise<Period[]> {
+  const { data, error } = await supabase
+    .from('periods')
+    .select('id, name, starts_at, ends_at, sort_order, weekdays')
+    .order('starts_at')
+    .order('sort_order');
+  if (error) throw error;
+  return data;
+}
+
+export async function fetchTerms(): Promise<Term[]> {
+  const { data, error } = await supabase
+    .from('terms')
+    .select('id, name, starts_on, ends_on')
+    .order('starts_on');
+  if (error) throw error;
+  return data;
+}
+
+export async function fetchHolidays(): Promise<Holiday[]> {
+  const { data, error } = await supabase
+    .from('holidays')
+    .select('id, name, starts_on, ends_on')
+    .order('starts_on');
+  if (error) throw error;
+  return data;
+}
+
+export async function fetchBlackouts(): Promise<Blackout[]> {
+  const { data, error } = await supabase
+    .from('venue_blackouts')
+    .select('id, venue_id, starts_on, ends_on, reason')
+    .order('starts_on');
+  if (error) throw error;
+  return data;
+}
+
+/** The four calendar tables, for the admin create / edit / delete calls below. */
+export type CalendarTable = 'periods' | 'terms' | 'holidays' | 'venue_blackouts';
+
+export type CalendarFields = {
+  periods: Omit<Period, 'id'>;
+  terms: Omit<Term, 'id'>;
+  holidays: Omit<Holiday, 'id'>;
+  venue_blackouts: Omit<Blackout, 'id'>;
+};
+
+/** Admin: add a row (id null) or change one. Audited by a database trigger. */
+export async function saveCalendarRow<T extends CalendarTable>(
+  table: T,
+  id: string | null,
+  fields: CalendarFields[T],
+): Promise<void> {
+  // One function for four tables: the cast tells TypeScript that `fields`
+  // matches `table`, which the CalendarFields type above guarantees.
+  const rows = supabase.from(table as 'terms');
+  const { error } = id
+    ? await rows.update(fields as CalendarFields['terms']).eq('id', id)
+    : await rows.insert(fields as CalendarFields['terms']);
+  if (error) throw error;
+}
+
+export async function deleteCalendarRow(table: CalendarTable, id: string): Promise<void> {
+  const { error } = await supabase.from(table).delete().eq('id', id);
+  if (error) throw error;
+}

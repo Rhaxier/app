@@ -108,6 +108,52 @@ export function validateClass(
 }
 
 // ---------------------------------------------------------------------------
+// School calendar
+// ---------------------------------------------------------------------------
+
+const TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
+
+export interface PeriodFormValues {
+  name: string;
+  startsAt: string; // '07:30'
+  endsAt: string;
+  weekdays: number[];
+}
+
+export function validatePeriod(
+  values: PeriodFormValues,
+): Partial<Record<keyof PeriodFormValues, string>> {
+  const errors: Partial<Record<keyof PeriodFormValues, string>> = {};
+  if (!values.name.trim()) errors.name = 'Name the period, e.g. Period 1.';
+  if (!TIME.test(values.startsAt)) errors.startsAt = 'A time like 07:30.';
+  if (!TIME.test(values.endsAt)) errors.endsAt = 'A time like 09:00.';
+  else if (!errors.startsAt && values.endsAt <= values.startsAt)
+    errors.endsAt = 'It has to end after it starts.';
+  if (values.weekdays.length === 0) errors.weekdays = 'Choose at least one day.';
+  return errors;
+}
+
+export interface RangeFormValues {
+  name: string;
+  startsOn: string; // '2026-12-02'
+  endsOn: string;
+}
+
+/** Terms, holidays and blackouts: a name and a date range, both days included. */
+export function validateRange(
+  values: RangeFormValues,
+): Partial<Record<keyof RangeFormValues, string>> {
+  const errors: Partial<Record<keyof RangeFormValues, string>> = {};
+  if (!values.name.trim()) errors.name = 'Give it a name.';
+  else if (values.name.trim().length > 60) errors.name = 'Keep it under 60 characters.';
+  if (!values.startsOn) errors.startsOn = 'Choose the first day.';
+  if (!values.endsOn) errors.endsOn = 'Choose the last day (the same day for one day).';
+  else if (values.startsOn && values.endsOn < values.startsOn)
+    errors.endsOn = "The last day can't be before the first.";
+  return errors;
+}
+
+// ---------------------------------------------------------------------------
 // Import
 // ---------------------------------------------------------------------------
 
@@ -152,10 +198,6 @@ export interface SettingsFormValues {
   supwHoursTarget: string;
   venueReminderHours: string;
   venueReminderDaysBefore: string;
-  schoolDays: number[];
-  bookingDayStart: string;
-  bookingSlotMinutes: string;
-  bookingSlotsPerDay: string;
 }
 
 export type SettingsFormErrors = Partial<Record<keyof SettingsFormValues, string>>;
@@ -171,10 +213,6 @@ export function valuesFromSettings(settings: AppSettings): SettingsFormValues {
     supwHoursTarget: settings.supw_hours_target === null ? '' : String(settings.supw_hours_target),
     venueReminderHours: String(settings.venue_reminder_hours),
     venueReminderDaysBefore: String(settings.venue_reminder_days_before),
-    schoolDays: [...settings.school_days].sort((a, b) => a - b),
-    bookingDayStart: settings.booking_day_start.slice(0, 5),
-    bookingSlotMinutes: String(settings.booking_slot_minutes),
-    bookingSlotsPerDay: String(settings.booking_slots_per_day),
   };
 }
 
@@ -204,13 +242,6 @@ export function validateSettings(values: SettingsFormValues): SettingsFormErrors
     errors.venueReminderHours = 'Between 1 and 720 hours.';
   if (!isWhole(values.venueReminderDaysBefore, 0, 60))
     errors.venueReminderDaysBefore = 'Between 0 and 60 days.';
-  if (values.schoolDays.length === 0) errors.schoolDays = 'Choose at least one school day.';
-  if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(values.bookingDayStart))
-    errors.bookingDayStart = 'A time like 07:30.';
-  if (!isWhole(values.bookingSlotMinutes, 15, 480))
-    errors.bookingSlotMinutes = 'Between 15 and 480 minutes.';
-  if (!isWhole(values.bookingSlotsPerDay, 1, 24))
-    errors.bookingSlotsPerDay = 'Between 1 and 24 slots.';
   return errors;
 }
 
@@ -225,10 +256,6 @@ export function toSettingsChanges(values: SettingsFormValues) {
     supw_hours_target: values.supwHoursTarget.trim() ? Number(values.supwHoursTarget) : null,
     venue_reminder_hours: Number(values.venueReminderHours),
     venue_reminder_days_before: Number(values.venueReminderDaysBefore),
-    school_days: values.schoolDays,
-    booking_day_start: values.bookingDayStart,
-    booking_slot_minutes: Number(values.bookingSlotMinutes),
-    booking_slots_per_day: Number(values.bookingSlotsPerDay),
   };
 }
 

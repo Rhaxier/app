@@ -6,6 +6,8 @@ import { Card } from '@/components/Card';
 import { CheckboxField, FormError, SelectField, TextArea, TextField } from '@/components/Input';
 import { SegmentedControl } from '@/components/SegmentedControl';
 import { useRooms } from '@/features/map/hooks';
+import { useCalendarData } from '@/features/school/hooks';
+import { dayNote } from '@/features/school/logic';
 import {
   emptyRole,
   hasErrors,
@@ -37,7 +39,12 @@ export function EventForm({
   onSubmit,
 }: EventFormProps) {
   const rooms = useRooms();
+  const calendar = useCalendarData();
   const [values, setValues] = useState(initialValues);
+  // Volunteering often happens at weekends, so a holiday or non-school day is
+  // a warning here, not a refusal (docs/OPEN_QUESTIONS.md, Q34).
+  const startNote =
+    calendar && values.startsAt ? dayNote(values.startsAt.slice(0, 10), calendar) : null;
   const [errors, setErrors] = useState<EventFormErrors>({});
   const [removedRoleIds, setRemovedRoleIds] = useState<string[]>([]);
 
@@ -96,6 +103,11 @@ export function EventForm({
       <div className={styles.twoColumns}>
         <TextField
           label="Starts"
+          hint={
+            startNote
+              ? `${startNote.text}. Events can still run then; check with the school first.`
+              : undefined
+          }
           type="datetime-local"
           value={values.startsAt}
           onChange={(e) => update('startsAt', e.target.value)}

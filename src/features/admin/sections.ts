@@ -76,6 +76,29 @@ export const adminGroups: AdminGroup[] = [
     ],
   },
   {
+    title: 'School calendar',
+    sections: [
+      {
+        path: 'school-week',
+        title: 'School week and periods',
+        description: 'School days and bookable periods',
+        icon: 'clock',
+      },
+      {
+        path: 'terms',
+        title: 'Terms and holidays',
+        description: 'The school year and days off',
+        icon: 'calendar',
+      },
+      {
+        path: 'blackouts',
+        title: 'Venue blackouts',
+        description: 'Days a venue can’t be booked',
+        icon: 'eyeOff',
+      },
+    ],
+  },
+  {
     title: 'Features',
     sections: [
       {

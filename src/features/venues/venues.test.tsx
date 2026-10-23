@@ -4,6 +4,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
+import type { Period } from '@/features/school/api';
 import type { BookingDetails, CalendarBooking } from './api';
 import { SlotList } from './components/SlotList';
 import {
@@ -18,15 +19,20 @@ import {
   type SlotSettings,
 } from './logic';
 
-const settings: SlotSettings = {
-  school_days: [0, 1, 2, 3, 4],
-  booking_day_start: '07:30:00',
-  booking_slot_minutes: 90,
-  booking_slots_per_day: 5,
-};
+const settings: SlotSettings = { school_days: [0, 1, 2, 3, 4] };
+
+// Five 90-minute periods from 7:30, Sunday to Thursday (as drawn in the mockup).
+const periods: Period[] = ['07:30', '09:00', '10:30', '12:00', '13:30'].map((start, i) => ({
+  id: `p${i + 1}`,
+  name: `Period ${i + 1}`,
+  starts_at: `${start}:00`,
+  ends_at: `${['09:00', '10:30', '12:00', '13:30', '15:00'][i]}:00`,
+  sort_order: i + 1,
+  weekdays: [0, 1, 2, 3, 4],
+}));
 
 const day = '2026-10-20'; // a Tuesday
-const slots = buildSlots(day, settings);
+const slots = buildSlots(day, periods);
 const morning = new Date('2026-10-20T02:00:00Z'); // 06:00 in Dubai, before any slot
 
 function approved(title: string, start: string, end: string): CalendarBooking {
@@ -58,7 +64,7 @@ function waiting(title: string, start: string, end: string): BookingDetails {
 }
 
 describe('buildSlots', () => {
-  it('cuts the day into the slots from app_settings, in Dubai time', () => {
+  it("cuts the day into that weekday's periods, in Dubai time", () => {
     expect(slots.map((slot) => slot.start.toISOString())).toEqual([
       '2026-10-20T03:30:00.000Z', // 7:30
       '2026-10-20T05:00:00.000Z', // 9:00
@@ -92,20 +98,35 @@ describe('schoolDaysOfWeek', () => {
   });
 });
 
+describe('buildSlots on a short day', () => {
+  it('uses only the periods that run that weekday', () => {
+    const shortFriday: Period = { ...periods[0], id: 'f1', weekdays: [5] };
+    expect(buildSlots('2026-10-23', [...periods, shortFriday]).map((s) => s.name)).toEqual([
+      'Period 1',
+    ]);
+    expect(buildSlots('2026-10-24', periods)).toEqual([]); // a Saturday: no periods
+  });
+});
+
 describe('firstBookableDay', () => {
   const week = ['2026-10-18', '2026-10-19', '2026-10-20', '2026-10-21', '2026-10-22'];
 
   it('opens on today while a slot is still ahead', () => {
-    expect(firstBookableDay(week, settings, morning)).toBe('2026-10-20');
+    expect(firstBookableDay(week, periods, morning)).toBe('2026-10-20');
   });
 
   it('moves to the next school day after the last slot has started', () => {
     const evening = new Date('2026-10-20T14:00:00Z'); // 18:00 in Dubai
-    expect(firstBookableDay(week, settings, evening)).toBe('2026-10-21');
+    expect(firstBookableDay(week, periods, evening)).toBe('2026-10-21');
+  });
+
+  it('skips holidays and blackouts', () => {
+    const blocked = (day: string) => day === '2026-10-20';
+    expect(firstBookableDay(week, periods, morning, blocked)).toBe('2026-10-21');
   });
 
   it('finds nothing once the week is over', () => {
-    expect(firstBookableDay(week, settings, new Date('2026-10-23T08:00:00Z'))).toBeUndefined();
+    expect(firstBookableDay(week, periods, new Date('2026-10-23T08:00:00Z'))).toBeUndefined();
   });
 });
 
