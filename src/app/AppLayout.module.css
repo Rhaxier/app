@@ -16,6 +16,9 @@
 
 /* Keyboard users can jump past the header straight to the content. */
 .skip {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-min);
   position: absolute;
   left: var(--space-4);
   top: -60px;

@@ -23,33 +23,19 @@ coordinator also get **Export SUPW hours (CSV)**.
 
 ## Admin (admins only)
 
-| Screen           | What it changes                                         | Table / function                                                 |
-| ---------------- | ------------------------------------------------------- | ---------------------------------------------------------------- |
-| Users and roles  | Role, name, grade, section, responsibilities            | `admin_set_role()`, `admin_update_profile()`, `responsibilities` |
-| Responsibilities | Who handles facilities, IT, venues, SUPW (Q1)           | `responsibilities`                                               |
-| Staff emails     | Who becomes a teacher at sign-in (Q3)                   | `staff_emails`                                                   |
-| Venues           | Bookable places, capacity, approval needed, active (Q6) | `venues`                                                         |
-| Map              | Floor images and sizes, rooms, pin positions (Q6)       | `floors`, `rooms`                                                |
-| Report routes    | Which team gets each fix-it category (Q1)               | `report_category_routes`                                         |
-| Settings         | Every open question that's a setting (Q2–Q5, Q9–Q11)    | `app_settings`                                                   |
-| Moderation       | Reported content, hidden collab posts                   | `content_reports`, `collab_posts`                                |
-| Audit log        | Who changed what (read-only, append-only)               | `audit_log`                                                      |
-| Outbox           | Emails and pushes queued but not sent (Q7, Q8)          | `email_outbox`, `push_outbox`                                    |
-
-Every change on these screens is recorded in the audit log, either by the `admin_*`
-functions or by the `audit_change()` trigger on admin-only tables. The routes sit inside
-`<RequireRole role="admin">`, but that is only a convenience: the tables' RLS policies
-refuse non-admins anyway.
+The admin screens are now the **admin dashboard**: see
+[`admin-dashboard.md`](admin-dashboard.md) for every section, the database behind it and
+the files to read. Admins reach it from the **Admin** button at the top of this tab.
 
 ## Files to read
 
 - `src/features/approvals/pages/ApprovalsPage.tsx` and `components/`.
-- `src/features/admin/api.ts`, `hooks.ts`, `logic.ts` (form checks), `pages/`.
-- Tests: `src/features/admin/admin.test.tsx`, `src/app/guards.test.tsx`.
+- The admin dashboard: [`admin-dashboard.md`](admin-dashboard.md).
+- Tests: `src/app/guards.test.tsx`, `src/app/TabBar.test.tsx`.
 
 ## Try it
 
-Sign in as **Admin Plain**, open Admin > Users and roles, make **Student Grade 8 B** a
-teacher, then look at Admin > Audit log. As **Admin Venues**, open Approvals and approve
+Sign in as **Admin Plain**, open Admin > People > Users, make **Student Grade 8 B** a
+teacher, then look at Admin > System > Audit log. As **Admin Venues**, open Approvals and approve
 "Debate club practice" with "Announce this": the clashing "Robotics demo" disappears from
 the queue and the booking appears in the announcements feed.

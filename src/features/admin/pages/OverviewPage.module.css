@@ -43,8 +43,14 @@
 .items {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
   font-size: var(--text-small);
+}
+
+/* Links in the breakdowns get a full 44px tap area. */
+.items a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-min);
 }
 
 /* Push the button to the bottom so the cards line up. */

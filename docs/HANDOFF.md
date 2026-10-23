@@ -3,6 +3,9 @@
 What's built, how to run it, how it was tested, what the school still has to decide,
 what you need to switch on, and where to start reading.
 
+**Round 2 (motion and the admin dashboard)** is summarised in section 1b; the rest of
+this document is updated for it.
+
 ## 1. What was built
 
 Every screen, the whole database, all permissions and the workflow logic, running end to
@@ -38,6 +41,48 @@ store builds, deployment, in-app chat (Contact opens the school email), calendar
 - Typing into a field inside a bottom sheet lost focus after one character, because the
   sheet's effect re-ran on every render. Fixed in `src/components/Sheet.tsx` with a test.
 
+## 1b. Round 2: motion and the admin dashboard
+
+| Step                 | What it contains                                                                                                                                                                                                                                                    |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Part A Motion        | Motion tokens; press feedback; View Transitions for screen changes (fade between tabs, rise when drilling in, reverse going back); sheets slide and reverse; list items arrive and leave; skeleton loading; toasts; optimistic toggles; reduced motion. No library. |
+| B1 Overview          | Admin dashboard shell (side menu on a laptop, menu screen on a phone); needs-attention cards; 7/30-day numbers and two bar charts, all counted in the database                                                                                                      |
+| B2 People and grades | Users (search, filters, roles, suspension), grades and sections, classes (teachers' audiences, Q12), CSV import with preview, year-end rollover                                                                                                                     |
+| B3 School calendar   | School week and periods (bookings use them), terms, holidays, venue blackouts, all enforced in the database                                                                                                                                                         |
+| B4 Feature settings  | Scheduled and expiring announcements; skill tags and suggestions; team size; volunteering categories and SUPW targets; report categories as a table; auto-urgent; venue booking limits; floor plan upload                                                           |
+| B5 Moderation        | One queue of reported, hidden and removed content; soft delete and restore                                                                                                                                                                                          |
+| B6 Notifications     | Emergency broadcast (rate-limited); digest time; per-staff email settings                                                                                                                                                                                           |
+| B7 System            | Feature switches, branding with a contrast check, maintenance banner, CSV exports, data deletion, audit log filters                                                                                                                                                 |
+| Final pass           | Every screen checked at 390px and 1280px for sideways overflow (none), page errors (none) and tap targets; reduced motion checked in a browser; docs                                                                                                                |
+
+The full guide is [`docs/features/admin-dashboard.md`](features/admin-dashboard.md); the
+motion rules are in [`docs/ARCHITECTURE.md`](ARCHITECTURE.md), "Motion".
+
+### Migrations to run on a cloud project
+
+```bash
+npx supabase db push --include-seed
+```
+
+It applies the eight new migrations (`20261023120000` to `20261023120600`) in order. Leave
+out `--include-seed` on a real school's project; with it, the seed only runs on an empty
+database (or after `npx supabase db reset --linked`, which wipes everything).
+
+**Which ones change existing data:**
+
+- `…120100_people_and_grades`: copies `app_settings.grades` into the new `grades` table
+  and existing profile sections into `sections`, then drops `app_settings.grades`.
+- `…120200_school_calendar`: turns the three booking-slot settings into rows of `periods`
+  on the school days, then drops those settings. Booking works as before.
+- `…120300_feature_settings`: **the report categories change.** It creates
+  `report_categories` from the old `report_category` enum and `report_category_routes`
+  (each old value becomes the row's `key`, with its team), changes `reports.category`
+  from the enum to text pointing at that key, then drops the enum and the routes table.
+  Every report keeps its category and routing. It also renames
+  `announcements.published_at` to `publish_at`, copies a single SUPW target (if set) to
+  every grade, and makes existing posts' skills the first skills list.
+- The others only add tables, columns and functions.
+
 ## 2. How to run it
 
 See the [README](../README.md):
@@ -51,12 +96,12 @@ See the [README](../README.md):
 
 ## 3. Test results
 
-| Suite                                        | Result                                                              |
-| -------------------------------------------- | ------------------------------------------------------------------- |
-| Database (pgTAP, `npm run db:test`)          | **119 passed, 0 failed** in 8 files, covering all 15 required rules |
-| UI (Vitest, `npm test`)                      | **111 passed, 0 failed** in 15 files                                |
-| Lint, type check, Prettier, production build | All clean                                                           |
-| Edge Functions                               | Type-check with Deno                                                |
+| Suite                                        | Result                                                    |
+| -------------------------------------------- | --------------------------------------------------------- |
+| Database (pgTAP, `npm run db:test`)          | **348 passed, 0 failed** in 16 files (round 1: 119 in 8)  |
+| UI (Vitest, `npm test`)                      | **159 passed, 0 failed** in 22 files (round 1: 111 in 15) |
+| Lint, type check, Prettier, production build | All clean                                                 |
+| Edge Functions                               | Type-check with Deno                                      |
 
 The 15 required database rules map to these files: roles and audit (1) →
 `01_identity_test.sql`; projects (2) → `05`; announcements (3) → `03`; volunteering (4–6)
@@ -64,6 +109,18 @@ The 15 required database rules map to these files: roles and audit (1) →
 (15) → `02`. Required UI tests: Approvals tab only for staff (`src/app/TabBar.test.tsx`),
 booking slot states (`venues.test.tsx`), "x of y filled" (`collab.test.tsx`), and form
 validation for every create form (each feature's test file).
+
+Round 2's 12 database rules: (1) admin-only → `16_admin_lockdown_test.sql` (every
+`admin_*` function and admin table, found automatically) plus checks in 09–15;
+(2) suspension, (5) teachers' audiences, (6) rollover, (11) CSV import → `10_people_test`;
+(3) blackouts and holidays → `11_calendar_test`, venue hours, length and days ahead →
+`12_feature_settings_test`; (4) scheduled and expired announcements, (9) auto-urgent,
+(10) report categories → `12`; (7) feature switches, (12) data deletion → `15_system_test`;
+(8) emergency broadcast → `14_admin_notifications_test`. UI: admin routes refuse
+non-admins and the overview shows counts (`src/features/admin/overview.test.tsx`), the
+import preview shows row errors (`people.test.tsx`), the accent validator
+(`src/lib/contrast.test.ts`), the toast (`src/components/Toaster.test.tsx`) and optimistic
+rollback (`src/features/fixit/optimistic.test.tsx`).
 
 ### How it was verified, and what wasn't
 
@@ -91,55 +148,98 @@ Docker wasn't available while building, so `supabase start` and `supabase test d
 - pg_cron scheduling of `venue_reminders()` (the fallback path was tested).
 - Google / Microsoft sign-in, Capacitor builds and push.
 
+**Round 2** was checked the same way (you then confirmed round 1 on a cloud project):
+the eight new migrations, seed and all 16 pgTAP files on Postgres 17, and these flows in
+Chromium against GoTrue + PostgREST: the admin overview at 390px and 1280px; importing a
+CSV (preview with row errors, then import); the user editor with its confirmation on top
+(Escape closes only the top one); booking weeks with a holiday and an exam blackout
+greyed out; a student reporting a post and an admin removing it; an emergency broadcast
+and its 10-minute refusal; switching collab off (tab, tile and screen hidden for a
+student); a light accent colour refused and a dark one applied; the maintenance banner
+on the sign-in screen; reduced motion (no animation, a sheet closes in 1ms instead of
+~300ms, focus returns). Every admin and main screen was checked at both widths for
+sideways overflow (none) and page errors (none).
+
+**Not verified in round 2** (please check on the cloud project):
+
+- **Storage**: floor plan and logo uploads (public buckets), and data deletion removing
+  someone's files through the Storage API.
+- **Realtime**: new items sliding into the inbox and Approvals while they're open.
+- **pg_cron**: `publish_due_announcements()` every five minutes (the function itself is
+  tested).
+- **View Transitions** look: checked in Chromium only; Safari and Firefox use the same
+  API where they support it, and the plain fade otherwise.
+- `npx supabase db push` itself, in particular the two notification migrations
+  (`…120500` adds an enum value that `…120510` uses; they're separate on purpose).
+
 ## 4. Open questions
 
-All 28 are in [`OPEN_QUESTIONS.md`](OPEN_QUESTIONS.md), each with the default used, where
-it lives and exact steps to change it. In short:
+All 46 are in [`OPEN_QUESTIONS.md`](OPEN_QUESTIONS.md), each with the default used, where
+it lives and exact steps to change it. Q1, Q11, Q12, Q15, Q25 and Q27 are now
+configurable in Admin. In short:
 
-| #   | Question                                       | Default used                                                                            |
-| --- | ---------------------------------------------- | --------------------------------------------------------------------------------------- |
-| Q1  | Who handles facilities/IT and approves venues? | Responsibilities + category routes; placeholder staff hold them                         |
-| Q2  | Can students request venues?                   | Yes, with a supervising teacher who confirms first                                      |
-| Q3  | Does the email format tell staff apart?        | No: a staff email list, plus an optional pattern                                        |
-| Q4  | Must collabs have a teacher?                   | No (setting can require one)                                                            |
-| Q5  | Google or Microsoft, and the domain?           | Neither yet; dev login; both wired, switched by env                                     |
-| Q6  | Real floor plans, rooms, venues?               | Placeholder plans, 15 rooms, 4 venues                                                   |
-| Q7  | Email provider?                                | Nothing sent; outbox + dry-run function                                                 |
-| Q8  | Push?                                          | Nothing sent; outbox + dry-run function; flag off                                       |
-| Q9  | Name, logo, term dates, SUPW rules?            | Placeholders; no SUPW target                                                            |
-| Q10 | Venue reminder timing?                         | 48 hours pending or event within 3 days, hourly                                         |
-| Q11 | School days and booking slots?                 | Sun–Thu, five 90-minute slots from 07:30 (please confirm: many UAE schools run Mon–Fri) |
-| Q12 | Which grades does each teacher teach?          | Unknown: teachers may post to any grades                                                |
-| Q13 | Who confirms hours on staff events?            | Organising teacher, approving teacher, SUPW coordinator, admins                         |
-| Q14 | Who sees approved booking details?             | Everyone sees title/venue/time; details only for those involved                         |
-| Q15 | Who gets email?                                | Staff with responsibilities                                                             |
-| Q16 | What can be muted?                             | Everything except approvals and urgent items                                            |
-| Q17 | Busy events' sign-up notifications?            | One per sign-up (mutable)                                                               |
-| Q18 | Can people edit their profile?                 | No; admins edit names and grades                                                        |
-| Q19 | Can a student edit an approved event?          | No; locked after approval                                                               |
-| Q20 | Can a booking's time change?                   | No; cancel and request again                                                            |
-| Q21 | Which reports can students see?                | Unresolved ones, plus their own and ones they backed                                    |
-| Q22 | Content reports notify anyone?                 | No; staff see them in Approvals and Admin > Moderation                                  |
-| Q23 | What does the audit log record?                | Admin-only tables, roles, moderation, by app users                                      |
-| Q24 | App id and name?                               | `com.placeholder.schoolapp`, "School App"                                               |
-| Q25 | Which grades use the app?                      | 1–12 (Admin > Settings)                                                                 |
-| Q26 | What does search cover?                        | Rooms, events, announcements, collab posts; not people                                  |
-| Q27 | Event categories (mockup's "Environment")?     | None; chips are All / This week / In school / Signed up                                 |
-| Q28 | Whose pending requests show on the calendar?   | Your own; venue staff see all                                                           |
+| #   | Question                                       | Default used                                                                           |
+| --- | ---------------------------------------------- | -------------------------------------------------------------------------------------- |
+| Q1  | Who handles facilities/IT and approves venues? | Configurable in Admin: responsibilities + report categories                            |
+| Q2  | Can students request venues?                   | Yes, with a supervising teacher who confirms first                                     |
+| Q3  | Does the email format tell staff apart?        | No: a staff email list, plus an optional pattern                                       |
+| Q4  | Must collabs have a teacher?                   | No (setting can require one)                                                           |
+| Q5  | Google or Microsoft, and the domain?           | Neither yet; dev login; both wired, switched by env                                    |
+| Q6  | Real floor plans, rooms, venues?               | Placeholder plans, 15 rooms, 4 venues                                                  |
+| Q7  | Email provider?                                | Nothing sent; outbox + dry-run function                                                |
+| Q8  | Push?                                          | Nothing sent; outbox + dry-run function; flag off                                      |
+| Q9  | Name, logo, term dates, SUPW rules?            | Placeholders; no SUPW target                                                           |
+| Q10 | Venue reminder timing?                         | 48 hours pending or event within 3 days, hourly                                        |
+| Q11 | School days and booking slots?                 | Configurable in Admin: Sun–Thu, five 90-minute periods (sample: Mon–Fri, short Friday) |
+| Q12 | Which grades does each teacher teach?          | Configurable in Admin: classes; teachers may post anywhere until switched off          |
+| Q13 | Who confirms hours on staff events?            | Organising teacher, approving teacher, SUPW coordinator, admins                        |
+| Q14 | Who sees approved booking details?             | Everyone sees title/venue/time; details only for those involved                        |
+| Q15 | Who gets email?                                | Configurable in Admin: responsibility holders, digest; per-person override             |
+| Q16 | What can be muted?                             | Everything except approvals and urgent items                                           |
+| Q17 | Busy events' sign-up notifications?            | One per sign-up (mutable)                                                              |
+| Q18 | Can people edit their profile?                 | No; admins edit names and grades                                                       |
+| Q19 | Can a student edit an approved event?          | No; locked after approval                                                              |
+| Q20 | Can a booking's time change?                   | No; cancel and request again                                                           |
+| Q21 | Which reports can students see?                | Unresolved ones, plus their own and ones they backed                                   |
+| Q22 | Content reports notify anyone?                 | No; staff see them in Approvals and Admin > Moderation                                 |
+| Q23 | What does the audit log record?                | Admin-only tables, roles, moderation, by app users                                     |
+| Q24 | App id and name?                               | `com.placeholder.schoolapp`, "School App"                                              |
+| Q25 | Which grades use the app?                      | Configurable in Admin: grades and sections tables                                      |
+| Q26 | What does search cover?                        | Rooms, events, announcements, collab posts; not people                                 |
+| Q27 | Event categories (mockup's "Environment")?     | Configurable in Admin: none for a new school, four sample ones                         |
+| Q28 | Whose pending requests show on the calendar?   | Your own; venue staff see all                                                          |
+| Q29 | What counts as an active person?               | Signed in or did anything in the period                                                |
+| Q30 | How is venue utilisation measured?             | Approved hours ÷ bookable hours (periods, minus holidays and blackouts)                |
+| Q31 | What does a posting suspension block?          | New announcements, posts, requests, events, reports                                    |
+| Q32 | How does the rollover move students?           | To the next grade in use; top grade archived, sign-in blocked                          |
+| Q33 | Who can be imported?                           | Students and teachers; admins one at a time                                            |
+| Q34 | Volunteering on holidays or weekends?          | Allowed, with a warning                                                                |
+| Q35 | Bookings on weekends or outside term?          | Not offered on the calendar, not refused by the database                               |
+| Q36 | Scheduled and expiring announcements?          | Hidden until published and after expiry; default expiry off                            |
+| Q37 | When does a report become urgent by itself?    | After 5 "me too"                                                                       |
+| Q38 | Team size and skills?                          | Up to 8 including the owner; skills from a list, suggestions reviewed                  |
+| Q39 | Must student events be approved?               | Yes (switchable)                                                                       |
+| Q40 | Venue booking limits?                          | None by default; sample Auditorium and MPH have some                                   |
+| Q41 | What does removing content do?                 | Soft delete: admins only, restorable                                                   |
+| Q42 | Emergency broadcast?                           | Pinned urgent announcement + urgent notification to all; 10-minute limit               |
+| Q43 | Feature switches?                              | All on; off hides and blocks new content, deletes nothing                              |
+| Q44 | Branding, and what signed-out visitors see?    | Placeholder name, no logo, teal; `public_status()` is the only signed-out call         |
+| Q45 | What does data deletion delete?                | Name, email, files, settings, sign-in; records stay as "Deleted user"                  |
+| Q46 | Maintenance banner?                            | Off; on shows on every screen until its end time                                       |
 
 ## 5. What you need to unlock
 
-| Item                     | Exact steps                                                                                                                                                                                                                                                                                               |
-| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Supabase project**     | Create a free project (README, option B) or run `npm run db:start` with Docker. Check the "Not verified yet" list above on first run.                                                                                                                                                                     |
-| **School answers**       | Take Q1–Q4 and Q11 to the school. Most answers are a change on **Admin > Settings**, **Responsibilities** or **Report routes**, no code.                                                                                                                                                                  |
-| **First real admin**     | After the first real sign-in, in the Supabase SQL editor: `update profiles set role = 'admin' where email = '<their email>';`. From then on use Admin > Users.                                                                                                                                            |
-| **School sign-in (SSO)** | Q5 steps 1–5: OAuth client from school IT (Google Cloud or Microsoft Entra), redirect URL `<SUPABASE_URL>/auth/v1/callback`, enable the provider in Supabase, set the school email domain in Admin > Settings, set `VITE_AUTH_PROVIDER` and `VITE_SCHOOL_EMAIL_DOMAIN`. Then untick "Allow dev accounts". |
-| **Email**                | Q7: choose a provider (e.g. Resend), set the secret, add the send call where `supabase/functions/send-emails/index.ts` says, deploy with `npx supabase functions deploy send-emails`, schedule it (README, "Email and push").                                                                             |
-| **Push**                 | Q8: Firebase project with the Android and iOS apps, a `device_tokens` table, the FCM call in `send-push`, then `VITE_ENABLE_PUSH=true`.                                                                                                                                                                   |
-| **Floor plans**          | Q6: export each floor as SVG/PNG into `public/floorplans/`, set path and size on Admin > Map, click to place each room; add real venues on Admin > Venues.                                                                                                                                                |
-| **Store builds**         | Q24: choose the real app id and name first. Then `npx cap add android` / `npx cap add ios`, `npm run cap:sync`, build in Android Studio / Xcode (needs a Mac). Store accounts belong to the school.                                                                                                       |
-| **Hosting**              | Import the repo in Vercel, set the four `VITE_` env vars, add the deployed URL to Supabase's redirect URLs.                                                                                                                                                                                               |
+| Item                     | Exact steps                                                                                                                                                                                                                                                                                                       |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Supabase project**     | Create a free project (README, option B) or run `npm run db:start` with Docker. Check the "Not verified yet" list above on first run.                                                                                                                                                                             |
+| **School answers**       | Take Q1–Q4, Q11, Q12 and Q29–Q46 to the school. Almost every answer is a change in the admin dashboard (`/admin`), no code.                                                                                                                                                                                       |
+| **First real admin**     | After the first real sign-in, in the Supabase SQL editor: `update profiles set role = 'admin' where email = '<their email>';`. From then on use Admin > People > Users (or import everyone from a CSV).                                                                                                           |
+| **School sign-in (SSO)** | Q5 steps 1–5: OAuth client from school IT (Google Cloud or Microsoft Entra), redirect URL `<SUPABASE_URL>/auth/v1/callback`, enable the provider in Supabase, set the school email domain in Admin > System > Sign-in, set `VITE_AUTH_PROVIDER` and `VITE_SCHOOL_EMAIL_DOMAIN`. Then untick "Allow dev accounts". |
+| **Email**                | Q7: choose a provider (e.g. Resend), set the secret, add the send call where `supabase/functions/send-emails/index.ts` says, deploy with `npx supabase functions deploy send-emails`, schedule it (README, "Email and push").                                                                                     |
+| **Push**                 | Q8: Firebase project with the Android and iOS apps, a `device_tokens` table, the FCM call in `send-push`, then `VITE_ENABLE_PUSH=true`.                                                                                                                                                                           |
+| **Floor plans**          | Q6: upload each floor's plan on Admin > Features > Map (size filled in), click to place each room; add real venues and their limits on Admin > Features > Venues.                                                                                                                                                 |
+| **Store builds**         | Q24: choose the real app id and name first. Then `npx cap add android` / `npx cap add ios`, `npm run cap:sync`, build in Android Studio / Xcode (needs a Mac). Store accounts belong to the school.                                                                                                               |
+| **Hosting**              | Import the repo in Vercel, set the four `VITE_` env vars, add the deployed URL to Supabase's redirect URLs.                                                                                                                                                                                                       |
 
 ## 6. Suggested reading order
 
@@ -152,7 +252,11 @@ it lives and exact steps to change it. In short:
 5. `src/app/` (router, guards, layout, tab bar) and `src/features/auth/`.
 6. One feature at a time, each with its guide in `docs/features/`: volunteering, projects,
    collab, venues, map, fixit, then approvals-and-admin.
-7. [`docs/OPEN_QUESTIONS.md`](OPEN_QUESTIONS.md) before talking to the school.
+7. "Motion" in [`docs/ARCHITECTURE.md`](ARCHITECTURE.md), then `src/lib/motion.ts`,
+   `usePresence.ts`, `useListMotion.ts`, `toast.ts` and `src/styles/motion.css`.
+8. [`docs/features/admin-dashboard.md`](features/admin-dashboard.md), section by section
+   with its migration (`20261023120000` to `…120600`) and pgTAP file (09 to 16).
+9. [`docs/OPEN_QUESTIONS.md`](OPEN_QUESTIONS.md) before talking to the school.
 
 For each feature the order is the same: migration → its pgTAP test → `api.ts` →
 `hooks.ts` → `logic.ts` → `components/` → `pages/` → `*.test.tsx`.

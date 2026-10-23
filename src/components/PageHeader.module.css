@@ -39,6 +39,10 @@
 }
 
 .section a {
+  /* A comfortable tap area (44px) around the short "See all" link. */
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-min);
   font-size: var(--text-body);
   font-weight: 600;
   text-decoration: none;

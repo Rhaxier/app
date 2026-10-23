@@ -104,19 +104,20 @@ Every seeded user has the password `devpass123` and an `@dev.local` email:
 | Admin Plain      | `admin.plain@dev.local`                                                                                               | Admin with no responsibilities                     |
 
 Dev accounts only work while `app_settings.allow_dev_accounts` is on
-(Admin > Settings). Turn it off before launch.
+(Admin > System > Sign-in). Turn it off before launch.
 
 ## What's in the app
 
-| Tab or screen               | What it does                                                           | Guide                                                        |
-| --------------------------- | ---------------------------------------------------------------------- | ------------------------------------------------------------ |
-| Home                        | Greeting, search, six tools, today's bookings, announcements, the bell | [announcements](docs/features/announcements.md)              |
-| Map                         | Floor plans with rooms, rooms in use, fix-it pins; report a problem    | [map](docs/features/map.md), [fixit](docs/features/fixit.md) |
-| Volunteer                   | SUPW events, roles, sign-ups, approvals, hours                         | [volunteering](docs/features/volunteering.md)                |
-| Collab                      | Find teammates, requests, auto-close, moderation                       | [collab](docs/features/collab.md)                            |
-| Book                        | Venue calendar, requests, approvals, no double bookings                | [venues](docs/features/venues.md)                            |
-| Projects (from Home)        | Share work with teachers for feedback                                  | [projects](docs/features/projects.md)                        |
-| Approvals (staff) and Admin | One queue of everything waiting on you; admin tools                    | [approvals and admin](docs/features/approvals-and-admin.md)  |
+| Tab or screen            | What it does                                                           | Guide                                                        |
+| ------------------------ | ---------------------------------------------------------------------- | ------------------------------------------------------------ |
+| Home                     | Greeting, search, six tools, today's bookings, announcements, the bell | [announcements](docs/features/announcements.md)              |
+| Map                      | Floor plans with rooms, rooms in use, fix-it pins; report a problem    | [map](docs/features/map.md), [fixit](docs/features/fixit.md) |
+| Volunteer                | SUPW events, roles, sign-ups, approvals, hours                         | [volunteering](docs/features/volunteering.md)                |
+| Collab                   | Find teammates, requests, auto-close, moderation                       | [collab](docs/features/collab.md)                            |
+| Book                     | Venue calendar, requests, approvals, no double bookings                | [venues](docs/features/venues.md)                            |
+| Projects (from Home)     | Share work with teachers for feedback                                  | [projects](docs/features/projects.md)                        |
+| Approvals (staff)        | One queue of everything waiting on you                                 | [approvals and admin](docs/features/approvals-and-admin.md)  |
+| Admin dashboard (admins) | Overview, people, calendar, feature settings, moderation, system       | [admin dashboard](docs/features/admin-dashboard.md)          |
 
 ## Project layout
 
@@ -157,8 +158,9 @@ npm run build         # production build into dist/
 
 ## Email and push (not switched on yet)
 
-Every notification already writes a row to `push_outbox`, and for staff with
-responsibilities to `email_outbox` (Admin > Outbox shows them). Nothing is sent: the
+Every notification already writes a row to `push_outbox`, and for staff who get email
+to `email_outbox` (Admin > Notifications > Outbox shows them; Staff email decides who
+gets email and when the digest goes). Nothing is sent: the
 Edge Functions `send-emails` and `send-push` are dry runs that report what they would
 send. The steps to switch each one on are at the top of
 `supabase/functions/send-emails/index.ts` and `supabase/functions/send-push/index.ts`
@@ -181,8 +183,9 @@ $$);
 -- Admin > Notifications > Staff email. And every minute for send-push.
 ```
 
-Venue reminders (`venue_reminders()`) are already scheduled hourly by a migration when
-pg_cron is available, which it is on Supabase.
+Venue reminders (`venue_reminders()`, hourly) and scheduled announcements
+(`publish_due_announcements()`, every five minutes) are already scheduled by migrations
+when pg_cron is available, which it is on Supabase.
 
 ## Phone apps (Capacitor)
 

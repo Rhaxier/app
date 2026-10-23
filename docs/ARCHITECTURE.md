@@ -73,6 +73,13 @@ Migrations live in `supabase/migrations/` and run in filename order.
 | Venue booking          | `venues`, `bookings`; `booking_details()`, `venue_reminders()`                                                                               | `20261019120800_venues.sql`            |
 | Fix-it reports         | `reports`, `report_votes`, `report_categories` (B4); `report_feed()`, `open_reports_in_room()`; bucket `report-photos`                       | `20261019120900_fixit.sql`             |
 | Realtime and cron      | Realtime on `notifications`, `bookings`, `reports`; hourly `venue_reminders()`                                                               | `20261019121000_realtime_and_cron.sql` |
+| Admin overview         | `admin_attention()`, `admin_metrics()`, `admin_venue_utilisation()`, `admin_supw_by_grade()`                                                 | `20261023120000_admin_overview.sql`    |
+| People and grades      | `grades`, `sections`, `classes`, `class_teachers`, `class_students`, `roster`; suspension; import; rollover                                  | `20261023120100_people_and_grades.sql` |
+| School calendar        | `periods`, `terms`, `holidays`, `venue_blackouts`; `bookings_check_rules()`                                                                  | `20261023120200_school_calendar.sql`   |
+| Feature settings       | `report_categories` (was an enum), `skill_tags`, `skill_tag_suggestions`, `volunteer_categories`, `supw_targets`; venue limits; scheduling   | `20261023120300_feature_settings.sql`  |
+| Moderation             | `removed_*` columns; `admin_moderation_queue()`, `admin_moderate()`                                                                          | `20261023120400_moderation.sql`        |
+| Notifications admin    | `emergency` type; `emergency_broadcasts`, `staff_email_prefs`; digest time                                                                   | `20261023120500…`, `…120510…`          |
+| System                 | `feature_flags`; branding, maintenance, `public_status()`; exports; `admin_anonymise_user()`                                                 | `20261023120600_system.sql`            |
 
 The staff **Approvals** tab has no tables of its own: it reads the feature tables and
 functions above (events awaiting approval, `booking_details()`, `report_feed()`,
@@ -83,22 +90,22 @@ functions above (events awaiting approval, `booking_details()`, `report_feed()`,
 All routes are in `src/app/router.tsx`. Most screens load lazily (their code downloads on
 first visit), so the app starts faster on phones.
 
-| Route                                                                   | Screen                                                                                                            | Who                     |
-| ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- | ----------------------- |
-| `/login`                                                                | Sign in (dev password; Google / Microsoft when configured)                                                        | everyone                |
-| `/`                                                                     | Home: greeting, search, six tools, today at school, announcements                                                 | everyone                |
-| `/search?q=`                                                            | Search rooms, events, announcements, collab posts                                                                 | everyone                |
-| `/announcements`, `/announcements/:id`                                  | Feed and one announcement                                                                                         | read: all               |
-| `/announcements/new`, `/announcements/:id/edit`                         | Announcement editor                                                                                               | staff                   |
-| `/notifications`, `/notifications/settings`                             | Inbox and mutes                                                                                                   | everyone                |
-| `/me`                                                                   | Who you are, your jobs, notification settings, sign out                                                           | everyone                |
-| `/map`, `/map/report`, `/reports/:id`                                   | Campus map with fix-it pins; report form; report detail                                                           | everyone (staff act)    |
-| `/volunteer`, `/volunteer/new`, `/volunteer/:id`, `/volunteer/:id/edit` | SUPW events, roles, sign-ups                                                                                      | everyone                |
-| `/projects`, `/projects/new`, `/projects/:id`, `/projects/:id/edit`     | Projects and teacher feedback                                                                                     | owners; shared teachers |
-| `/collab`, `/collab/new`, `/collab/:id`, `/collab/:id/edit`             | Collab posts, requests, team                                                                                      | everyone                |
-| `/book`, `/book/request`, `/book/mine`                                  | Venue calendar, request form, my bookings                                                                         | everyone                |
-| `/approvals`                                                            | Staff queue                                                                                                       | teachers and admins     |
-| `/admin/*`                                                              | Users, responsibilities, staff emails, venues, map editor, report routes, settings, moderation, audit log, outbox | admins                  |
+| Route                                                                   | Screen                                                                                                                                               | Who                     |
+| ----------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------- |
+| `/login`                                                                | Sign in (dev password; Google / Microsoft when configured)                                                                                           | everyone                |
+| `/`                                                                     | Home: greeting, search, six tools, today at school, announcements                                                                                    | everyone                |
+| `/search?q=`                                                            | Search rooms, events, announcements, collab posts                                                                                                    | everyone                |
+| `/announcements`, `/announcements/:id`                                  | Feed and one announcement                                                                                                                            | read: all               |
+| `/announcements/new`, `/announcements/:id/edit`                         | Announcement editor                                                                                                                                  | staff                   |
+| `/notifications`, `/notifications/settings`                             | Inbox and mutes                                                                                                                                      | everyone                |
+| `/me`                                                                   | Who you are, your jobs, notification settings, sign out                                                                                              | everyone                |
+| `/map`, `/map/report`, `/reports/:id`                                   | Campus map with fix-it pins; report form; report detail                                                                                              | everyone (staff act)    |
+| `/volunteer`, `/volunteer/new`, `/volunteer/:id`, `/volunteer/:id/edit` | SUPW events, roles, sign-ups                                                                                                                         | everyone                |
+| `/projects`, `/projects/new`, `/projects/:id`, `/projects/:id/edit`     | Projects and teacher feedback                                                                                                                        | owners; shared teachers |
+| `/collab`, `/collab/new`, `/collab/:id`, `/collab/:id/edit`             | Collab posts, requests, team                                                                                                                         | everyone                |
+| `/book`, `/book/request`, `/book/mine`                                  | Venue calendar, request form, my bookings                                                                                                            | everyone                |
+| `/approvals`                                                            | Staff queue                                                                                                                                          | teachers and admins     |
+| `/admin/*`                                                              | The admin dashboard: overview, people, school calendar, feature settings, moderation, notifications, system (see `docs/features/admin-dashboard.md`) | admins                  |
 
 ## Motion
 
@@ -149,3 +156,9 @@ waits for an exit animation doesn't wait.
   explicitly inside them.
 - **Unknowns are data.** Anything the school hasn't decided lives in
   `app_settings`, a table, or an env var. See `docs/OPEN_QUESTIONS.md`.
+- **Admin functions start with `admin_` and check `is_admin()` first.** A test finds every
+  one of them in the database and checks it refuses teachers and students
+  (`supabase/tests/16_admin_lockdown_test.sql`).
+- **Soft rules in triggers, hard rules in RLS.** Where a refusal needs a sentence a person
+  can act on ("Posting is paused until…", "Collab is switched off"), a BEFORE INSERT
+  trigger raises it; a restrictive RLS policy refuses the same thing underneath.
