@@ -243,6 +243,25 @@ select null, today + 28, today + 32, 'Exams (placeholder)'
 from (select (now() at time zone 'Asia/Dubai')::date as today) d;
 
 -- -----------------------------------------------------------------------------
+-- Feature settings: skill tags, volunteering categories, SUPW targets.
+-- The SUPW numbers are placeholders, not the school's rules (Q9).
+-- -----------------------------------------------------------------------------
+insert into public.skill_tags (name) values
+  ('Audio editing'), ('CAD'), ('Coding'), ('Design'), ('Painting'),
+  ('Public speaking'), ('Robotics'), ('Soldering'), ('Video'), ('Writing');
+
+insert into public.skill_tag_suggestions (name, suggested_by)
+values ('3D printing', 'a0000000-0000-4000-8000-000000000101');
+
+insert into public.volunteer_categories (name, sort_order) values
+  ('Environment (sample)', 1),
+  ('Community (sample)', 2),
+  ('Education (sample)', 3),
+  ('Fundraising (sample)', 4);
+
+insert into public.supw_targets (grade, hours) values (8, 20), (10, 30), (12, 40);
+
+-- -----------------------------------------------------------------------------
 -- Map: three placeholder floors (images in public/floorplans/) and rooms.
 -- Coordinates are pixels on the 1000 x 700 placeholder images.
 -- -----------------------------------------------------------------------------
@@ -272,16 +291,16 @@ from (values
 ) as r(floor, code, name, kind, x, y)
 join public.floors f on f.name = r.floor;
 
-insert into public.venues (name, room_id, capacity, needs_approval) values
-  ('Auditorium (placeholder)', pg_temp.room('G.01'), 300, true),
-  ('MPH (placeholder)', pg_temp.room('2.01'), 200, true),
-  ('Lab 1 (placeholder)', pg_temp.room('G.06'), 30, true),
-  ('Meeting room (placeholder)', pg_temp.room('1.04'), 12, false);
+insert into public.venues (name, room_id, capacity, needs_approval, bookable_from, bookable_until, max_booking_minutes, max_days_ahead) values
+  ('Auditorium (placeholder)', pg_temp.room('G.01'), 300, true, '07:00', '18:00', 240, 60),
+  ('MPH (placeholder)', pg_temp.room('2.01'), 200, true, '07:00', '20:00', 300, null),
+  ('Lab 1 (placeholder)', pg_temp.room('G.06'), 30, true, null, null, null, null),
+  ('Meeting room (placeholder)', pg_temp.room('1.04'), 12, false, null, null, null, null);
 
 -- -----------------------------------------------------------------------------
 -- Announcements: five, one pinned.
 -- -----------------------------------------------------------------------------
-insert into public.announcements (author_id, posted_as, title, body, audience, grades, pinned, published_at) values
+insert into public.announcements (author_id, posted_as, title, body, audience, grades, pinned, publish_at) values
   (pg_temp.u('admin.plain'), 'Admin office (placeholder)',
    'Welcome to the school app (sample)',
    'This is sample content for testing. Pinned announcements stay at the top of everyone''s feed.',
@@ -302,6 +321,18 @@ insert into public.announcements (author_id, posted_as, title, body, audience, g
    'Library opening hours (sample)',
    'Placeholder text: the school will confirm the real hours.',
    'school', null, false, now() - interval '6 days');
+
+-- One scheduled (appears in two days) and one that has expired: only their
+-- authors and admins can see them (Admin > Features > Announcements).
+insert into public.announcements (author_id, posted_as, title, body, audience, grades, pinned, publish_at, expires_at) values
+  (pg_temp.u('admin.plain'), 'Sports Department (placeholder)',
+   'Sports day sign-ups open (sample)',
+   'Scheduled sample: this appears two days after the seed runs.',
+   'school', null, false, now() + interval '2 days', now() + interval '30 days'),
+  (pg_temp.u('teacher.b'), null,
+   'Library books due back (sample)',
+   'Expired sample: students no longer see this one.',
+   'grades', '{8}', false, now() - interval '10 days', now() - interval '1 day');
 
 -- -----------------------------------------------------------------------------
 -- Content that needs ids from earlier inserts.
@@ -326,13 +357,14 @@ begin
   -- 1. Staff event, roles filling up, one role full (so a waitlist exists).
   insert into public.volunteer_events (
     creator_id, organiser_label, title, description, starts_at, ends_at, place_text,
-    supw_hours, signup_deadline, allow_multiple_roles
+    supw_hours, signup_deadline, allow_multiple_roles, category_id
   ) values (
     pg_temp.u('teacher.a'), 'Environment Club (placeholder)', 'Beach clean-up (sample)',
     'Help clean the beach. Bring a hat and water. Transport details are placeholders.',
     pg_temp.at(5, '07:00'), pg_temp.at(5, '10:00'), 'Bus leaves from main gate (placeholder)',
     3, pg_temp.at(4, '18:00'), false
-  ) returning id into v_event;
+  ,
+    (select id from public.volunteer_categories where name = 'Environment (sample)')) returning id into v_event;
 
   insert into public.event_roles (event_id, name, description, spots_wanted)
   values (v_event, 'Registration desk', 'Sign people in and hand out gloves.', 2)
@@ -359,13 +391,14 @@ begin
   -- 2. Staff event that allows more than one role per student.
   insert into public.volunteer_events (
     creator_id, organiser_label, title, description, starts_at, ends_at, room_id,
-    supw_hours, allow_multiple_roles
+    supw_hours, allow_multiple_roles, category_id
   ) values (
     pg_temp.u('teacher.b'), 'Community Service (placeholder)', 'Food drive packing (sample)',
     'Pack donated food into boxes for a partner charity (placeholder).',
     pg_temp.at(9, '09:00'), pg_temp.at(9, '12:00'), pg_temp.room('G.08'),
     3, true
-  ) returning id into v_event;
+  ,
+    (select id from public.volunteer_categories where name = 'Community (sample)')) returning id into v_event;
   insert into public.event_roles (event_id, name, description, spots_wanted)
   values (v_event, 'Packing', 'Sort and pack boxes.', 5)
   returning id into v_role;
@@ -379,12 +412,13 @@ begin
   -- 3. A past event: attendance marked, one student's hours confirmed and one
   --    waiting for Teacher A to confirm (shows in their Approvals tab).
   insert into public.volunteer_events (
-    creator_id, organiser_label, title, description, starts_at, ends_at, room_id, supw_hours
+    creator_id, organiser_label, title, description, starts_at, ends_at, room_id, supw_hours, category_id
   ) values (
     pg_temp.u('teacher.a'), 'Reading Buddies (placeholder)', 'Reading buddies (sample)',
     'Read with younger students during break.',
     pg_temp.at(-5, '10:00'), pg_temp.at(-5, '11:00'), pg_temp.room('G.05'), 1
-  ) returning id into v_event;
+  ,
+    (select id from public.volunteer_categories where name = 'Education (sample)')) returning id into v_event;
   insert into public.event_roles (event_id, name, description, spots_wanted)
   values (v_event, 'Reader', 'Read aloud with a small group.', 3)
   returning id into v_role;
@@ -395,12 +429,13 @@ begin
 
   -- 4. A student-created event waiting for a teacher to approve it.
   insert into public.volunteer_events (
-    creator_id, organiser_label, title, description, starts_at, ends_at, room_id, supw_hours
+    creator_id, organiser_label, title, description, starts_at, ends_at, room_id, supw_hours, category_id
   ) values (
     pg_temp.u('student.g12.a'), 'Grade 12 volunteers (placeholder)', 'Charity bake sale (sample)',
     'Sell baked goods at break to raise money for a charity (placeholder).',
     pg_temp.at(12, '12:00'), pg_temp.at(12, '13:30'), pg_temp.room('G.08'), 2
-  ) returning id into v_event;
+  ,
+    (select id from public.volunteer_categories where name = 'Fundraising (sample)')) returning id into v_event;
   insert into public.event_roles (event_id, name, description, spots_wanted) values
     (v_event, 'Baker', 'Bake something at home and bring it in.', 4),
     (v_event, 'Stall', 'Run the stall and handle the cash box.', 2);

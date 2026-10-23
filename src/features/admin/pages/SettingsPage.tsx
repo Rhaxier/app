@@ -1,5 +1,6 @@
-// Admin > Settings: everything the school hasn't decided yet, changeable
-// without touching code (docs/OPEN_QUESTIONS.md). One row in app_settings.
+// Admin > Settings: the school's name and how people sign in (Q3, Q5). The
+// other settings in app_settings sit with the feature they change (Admin >
+// Features, School calendar, Notifications).
 import { useState, type FormEvent } from 'react';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
@@ -56,15 +57,6 @@ function SettingsForm({ settings }: { settings: AppSettings }) {
           onChange={(e) => update('schoolName', e.target.value)}
           error={errors.schoolName}
         />
-        <TextField
-          label="SUPW hours target (optional)"
-          type="number"
-          min={0}
-          hint="Shown to students next to their hours. Empty = no target."
-          value={values.supwHoursTarget}
-          onChange={(e) => update('supwHoursTarget', e.target.value)}
-          error={errors.supwHoursTarget}
-        />
       </Card>
 
       <Card className="stack-tight">
@@ -91,42 +83,6 @@ function SettingsForm({ settings }: { settings: AppSettings }) {
           checked={values.allowDevAccounts}
           onChange={(e) => update('allowDevAccounts', e.target.checked)}
         />
-      </Card>
-
-      <Card className="stack-tight">
-        <h2 className={styles.heading}>Rules</h2>
-        <CheckboxField
-          label="Students can request venues"
-          hint="They must name a supervising teacher, who confirms first."
-          checked={values.studentsCanRequestVenues}
-          onChange={(e) => update('studentsCanRequestVenues', e.target.checked)}
-        />
-        <CheckboxField
-          label="Collab posts need a supervising teacher"
-          checked={values.collabRequiresTeacher}
-          onChange={(e) => update('collabRequiresTeacher', e.target.checked)}
-        />
-      </Card>
-
-      <Card className="stack-tight">
-        <h2 className={styles.heading}>Venue booking</h2>
-        <p className="meta">Remind venue staff about a waiting request when:</p>
-        <div className={styles.twoColumns}>
-          <TextField
-            label="Pending for (hours)"
-            type="number"
-            value={values.venueReminderHours}
-            onChange={(e) => update('venueReminderHours', e.target.value)}
-            error={errors.venueReminderHours}
-          />
-          <TextField
-            label="Event within (days)"
-            type="number"
-            value={values.venueReminderDaysBefore}
-            onChange={(e) => update('venueReminderDaysBefore', e.target.value)}
-            error={errors.venueReminderDaysBefore}
-          />
-        </div>
       </Card>
 
       <FormError message={save.isError ? errorMessage(save.error) : null} />

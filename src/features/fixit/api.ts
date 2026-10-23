@@ -8,9 +8,10 @@
 //    reports/<report id>/<file>. Students can't update a report, so after
 //    uploading, attach_report_photo() records the path.
 import { supabase } from '@/lib/supabase';
-import type { Enums, TablesInsert, TablesUpdate } from '@/types/database';
+import type { Enums, Tables, TablesInsert, TablesUpdate } from '@/types/database';
 
-export type ReportCategory = Enums<'report_category'>;
+/** A category's key, e.g. 'it' (report_categories.key). */
+export type ReportCategory = string;
 export type ReportStatus = Enums<'report_status'>;
 export type Responsibility = Enums<'responsibility_kind'>;
 
@@ -27,7 +28,9 @@ export interface Report {
   x: number | null;
   y: number | null;
   category: ReportCategory;
-  /** Which team it went to (facilities or it), from report_category_routes. */
+  /** The category's name, e.g. "Air conditioning" (report_categories). */
+  category_name: string;
+  /** Which team it went to (facilities or it), from report_categories. */
   routed_to: Responsibility;
   description: string;
   photo_path: string | null;
@@ -74,6 +77,7 @@ export async function fetchReport(id: string): Promise<Report | null> {
 export interface RoomReport {
   id: string;
   category: ReportCategory;
+  category_name: string;
   description: string;
   status: ReportStatus;
   urgent: boolean;
@@ -152,27 +156,34 @@ export async function updateReport(id: string, changes: ReportChanges): Promise<
   if (error) throw error;
 }
 
-export interface CategoryRoute {
-  id: string;
-  category: ReportCategory;
-  responsibility: Responsibility;
-}
+// ---------------------------------------------------------------------------
+// Categories (report_categories): which problems people can report, the icon
+// for each, and which team gets them. Everyone reads; admins change them.
+// ---------------------------------------------------------------------------
 
-export async function fetchRoutes(): Promise<CategoryRoute[]> {
+export type ReportCategoryRow = Pick<
+  Tables<'report_categories'>,
+  'id' | 'key' | 'name' | 'icon' | 'responsibility' | 'active' | 'sort_order'
+>;
+
+export async function fetchReportCategories(): Promise<ReportCategoryRow[]> {
   const { data, error } = await supabase
-    .from('report_category_routes')
-    .select('id, category, responsibility')
-    .order('category');
+    .from('report_categories')
+    .select('id, key, name, icon, responsibility, active, sort_order')
+    .order('sort_order')
+    .order('name');
   if (error) throw error;
   return data;
 }
 
-/** Admin: send a category to a different team (audited). */
-export async function updateRoute(id: string, responsibility: Responsibility): Promise<void> {
-  const { error } = await supabase
-    .from('report_category_routes')
-    .update({ responsibility })
-    .eq('id', id);
+/** Admin: add a category or change one (name, icon, team, active). Audited. */
+export async function saveReportCategory(
+  id: string | null,
+  fields: Omit<ReportCategoryRow, 'id'>,
+): Promise<void> {
+  const { error } = id
+    ? await supabase.from('report_categories').update(fields).eq('id', id)
+    : await supabase.from('report_categories').insert(fields);
   if (error) throw error;
 }
 

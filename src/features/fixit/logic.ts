@@ -1,6 +1,5 @@
 // Fix-it reports: plain functions for the screens (tested in fixit.test.tsx).
 import { relativeTime } from '@/lib/dates';
-import { reportCategoryLabel } from '@/lib/status';
 import type { Report, ReportCategory, ReportInput, ReportStatus } from './api';
 import { OPEN_STATUSES } from './api';
 
@@ -35,10 +34,10 @@ export function reportTitle(description: string, max = 60): string {
 }
 
 /** "FIX-IT · ROOM G.15" */
-export function reportLabel(report: Pick<Report, 'room_code' | 'category'>): string {
+export function reportLabel(report: Pick<Report, 'room_code' | 'category_name'>): string {
   return report.room_code
     ? `Fix-it · Room ${report.room_code}`
-    : `Fix-it · ${reportCategoryLabel[report.category]}`;
+    : `Fix-it · ${report.category_name}`;
 }
 
 export interface ReportFormValues {

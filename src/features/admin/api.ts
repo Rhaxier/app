@@ -257,7 +257,15 @@ export async function updateSettings(changes: SettingsChanges): Promise<void> {
 
 export type VenueFields = Pick<
   TablesInsert<'venues'>,
-  'name' | 'room_id' | 'capacity' | 'needs_approval' | 'active'
+  | 'name'
+  | 'room_id'
+  | 'capacity'
+  | 'needs_approval'
+  | 'active'
+  | 'bookable_from'
+  | 'bookable_until'
+  | 'max_booking_minutes'
+  | 'max_days_ahead'
 >;
 
 export async function createVenue(fields: VenueFields): Promise<void> {

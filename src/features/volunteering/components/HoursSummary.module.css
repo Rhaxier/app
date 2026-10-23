@@ -1,9 +1,15 @@
 .card {
   display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  background: var(--color-accent-soft);
+}
+
+.top {
+  display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
-  background: var(--color-accent-soft);
 }
 
 .card :global(.label) {
@@ -15,9 +21,25 @@
   font-size: 30px;
   font-weight: 700;
   color: var(--color-accent);
+  white-space: nowrap;
 }
 
 .target {
   font-size: var(--text-card-title);
   color: var(--color-accent);
+}
+
+/* The meter's track is a lighter step of the same teal; the fill is the accent. */
+.track {
+  height: 10px;
+  border-radius: var(--radius-pill);
+  background: var(--color-card);
+  overflow: hidden;
+}
+
+.fill {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: var(--color-accent);
 }

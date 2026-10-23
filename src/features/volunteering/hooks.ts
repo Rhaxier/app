@@ -6,6 +6,11 @@ import { showToast } from '@/lib/toast';
 import {
   createEvent,
   deleteEvent,
+  fetchCategories,
+  fetchSupwTargets,
+  saveCategory,
+  setSupwTarget,
+  type VolunteerCategory,
   fetchEvent,
   fetchEvents,
   fetchEventSignups,
@@ -176,4 +181,42 @@ function signupChangeToast(changes: SignupChanges): string {
   if (changes.status === 'waitlisted') return 'Moved to the waitlist';
   if (changes.role_id !== undefined) return 'Moved to another role';
   return 'Saved';
+}
+
+// Categories and SUPW targets ------------------------------------------------
+
+export function useVolunteerCategories() {
+  return useQuery({
+    queryKey: [...volunteerKeys.all, 'categories'],
+    queryFn: fetchCategories,
+    staleTime: 10 * 60_000,
+  });
+}
+
+export function useSupwTargets() {
+  return useQuery({
+    queryKey: [...volunteerKeys.all, 'targets'],
+    queryFn: fetchSupwTargets,
+    staleTime: 10 * 60_000,
+  });
+}
+
+export function useSaveCategory() {
+  const invalidate = useInvalidateVolunteering();
+  return useMutation({
+    mutationFn: ({ id, fields }: { id: string | null; fields: Omit<VolunteerCategory, 'id'> }) =>
+      saveCategory(id, fields),
+    onSuccess: invalidate,
+    meta: { successMessage: 'Category saved', errorToast: true },
+  });
+}
+
+export function useSetSupwTarget() {
+  const invalidate = useInvalidateVolunteering();
+  return useMutation({
+    mutationFn: ({ grade, hours }: { grade: number; hours: number | null }) =>
+      setSupwTarget(grade, hours),
+    onSuccess: invalidate,
+    meta: { successMessage: 'Target saved', errorToast: true },
+  });
 }

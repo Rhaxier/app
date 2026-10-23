@@ -110,3 +110,21 @@
   padding: 0;
   border: 0;
 }
+
+/* A square icon button in a picker; the chosen one has the ink fill. */
+.iconChoice {
+  display: grid;
+  place-items: center;
+  width: var(--touch-min);
+  height: var(--touch-min);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-small);
+  background: var(--color-card);
+  cursor: pointer;
+}
+
+.iconChoice[aria-pressed='true'] {
+  border-color: var(--color-ink);
+  background: var(--color-ink);
+  color: var(--color-on-accent);
+}

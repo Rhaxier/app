@@ -5,6 +5,11 @@ import { showToast } from '@/lib/toast';
 import {
   createPost,
   deletePost,
+  fetchPendingSuggestions,
+  fetchSkillTags,
+  reviewSuggestion,
+  saveSkillTag,
+  suggestSkill,
   fetchMyRequests,
   fetchPost,
   fetchPostRequests,
@@ -161,5 +166,72 @@ export function useReportPost(id: string) {
   return useMutation({
     mutationFn: (reason: string) => reportPost(id, reason),
     meta: { successMessage: 'Thanks. Staff will review it.' },
+  });
+}
+
+// Skill tags -----------------------------------------------------------------
+
+export function useSkillTags() {
+  return useQuery({
+    queryKey: [...collabKeys.all, 'tags'],
+    queryFn: fetchSkillTags,
+    staleTime: 10 * 60_000,
+  });
+}
+
+export function usePendingSuggestions() {
+  return useQuery({
+    queryKey: [...collabKeys.all, 'suggestions'],
+    queryFn: fetchPendingSuggestions,
+  });
+}
+
+export function useSuggestSkill() {
+  const invalidate = useInvalidateCollab();
+  return useMutation({
+    mutationFn: suggestSkill,
+    onSuccess: invalidate,
+    meta: { successMessage: 'Suggested. You can use it while an admin reviews it.' },
+  });
+}
+
+export function useSaveSkillTag() {
+  const invalidate = useInvalidateCollab();
+  return useMutation({
+    mutationFn: ({
+      id,
+      fields,
+    }: {
+      id: string | null;
+      fields: { name: string; active: boolean };
+    }) => saveSkillTag(id, fields),
+    onSuccess: invalidate,
+    meta: { successMessage: 'Skill saved', errorToast: true },
+  });
+}
+
+export function useReviewSuggestion() {
+  const invalidate = useInvalidateCollab();
+  return useMutation({
+    mutationFn: ({
+      id,
+      action,
+      mergeInto,
+    }: {
+      id: string;
+      action: 'approve' | 'merge' | 'reject';
+      mergeInto?: string;
+    }) => reviewSuggestion(id, action, mergeInto),
+    onSuccess: (_data, { action }) => {
+      invalidate();
+      showToast(
+        action === 'approve'
+          ? 'Added to the list'
+          : action === 'merge'
+            ? 'Merged'
+            : 'Suggestion rejected',
+      );
+    },
+    meta: { errorToast: true },
   });
 }

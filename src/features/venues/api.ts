@@ -14,7 +14,16 @@ export type BookingStatus = Enums<'booking_status'>;
 
 export type Venue = Pick<
   Tables<'venues'>,
-  'id' | 'name' | 'capacity' | 'needs_approval' | 'active' | 'room_id'
+  | 'id'
+  | 'name'
+  | 'capacity'
+  | 'needs_approval'
+  | 'active'
+  | 'room_id'
+  | 'bookable_from'
+  | 'bookable_until'
+  | 'max_booking_minutes'
+  | 'max_days_ahead'
 > & {
   room: { code: string; floor_id: string } | null;
 };
@@ -22,7 +31,9 @@ export type Venue = Pick<
 export async function fetchVenues(): Promise<Venue[]> {
   const { data, error } = await supabase
     .from('venues')
-    .select('id, name, capacity, needs_approval, active, room_id, room:rooms(code, floor_id)')
+    .select(
+      'id, name, capacity, needs_approval, active, room_id, bookable_from, bookable_until, max_booking_minutes, max_days_ahead, room:rooms(code, floor_id)',
+    )
     .order('name');
   if (error) throw error;
   return data;

@@ -7,8 +7,9 @@ import { EmptyState, ErrorState, LoadingState } from '@/components/States';
 import { errorMessage } from '@/lib/errors';
 import { AnnouncementForm } from '../components/AnnouncementForm';
 import { useAnnouncement, useCreateAnnouncement, useUpdateAnnouncement } from '../hooks';
+import { useAppSettings } from '@/features/settings/hooks';
 import {
-  emptyAnnouncementValues,
+  newAnnouncementValues,
   toAnnouncementInput,
   valuesFromAnnouncement,
   type AnnouncementFormValues,
@@ -17,12 +18,16 @@ import {
 export function NewAnnouncementPage() {
   const navigate = useNavigate();
   const create = useCreateAnnouncement();
+  const settings = useAppSettings();
 
   function handleSubmit(values: AnnouncementFormValues) {
     create.mutate(toAnnouncementInput(values), {
       onSuccess: (id) => navigate(`/announcements/${id}`, { replace: true }),
     });
   }
+
+  // Wait for the settings: they decide the default expiry date.
+  if (settings.isPending) return <LoadingState />;
 
   return (
     <div className="stack">
@@ -31,7 +36,7 @@ export function NewAnnouncementPage() {
         title="New announcement"
       />
       <AnnouncementForm
-        initialValues={emptyAnnouncementValues}
+        initialValues={newAnnouncementValues(settings.data?.announcement_default_expiry_days)}
         submitLabel="Post"
         cancelTo="/announcements"
         submitting={create.isPending}

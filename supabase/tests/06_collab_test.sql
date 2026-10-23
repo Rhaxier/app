@@ -44,7 +44,7 @@ grant execute on function pg_temp.act_as(text), pg_temp.act_as_owner(), pg_temp.
 -- A fresh post wanting two people, and three requests for it.
 select pg_temp.act_as('student.g10.b');
 insert into public.collab_posts (title, skills, spots_wanted)
-values ('Test team (sample)', '{Testing}', 2);
+values ('Test team (sample)', '{Coding}', 2);
 
 select throws_ok(
   $$ insert into public.join_requests (post_id)

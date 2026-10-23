@@ -9,11 +9,13 @@ export type Database = {
           author_id: string;
           body: string;
           created_at: string;
+          expires_at: string | null;
           grades: number[] | null;
           id: string;
+          notified_at: string | null;
           pinned: boolean;
           posted_as: string | null;
-          published_at: string;
+          publish_at: string;
           section_ids: string[] | null;
           title: string;
           updated_at: string;
@@ -24,11 +26,13 @@ export type Database = {
           author_id?: string;
           body?: string;
           created_at?: string;
+          expires_at?: string | null;
           grades?: number[] | null;
           id?: string;
+          notified_at?: string | null;
           pinned?: boolean;
           posted_as?: string | null;
-          published_at?: string;
+          publish_at?: string;
           section_ids?: string[] | null;
           title: string;
           updated_at?: string;
@@ -38,11 +42,13 @@ export type Database = {
           author_id?: string;
           body?: string;
           created_at?: string;
+          expires_at?: string | null;
           grades?: number[] | null;
           id?: string;
+          notified_at?: string | null;
           pinned?: boolean;
           posted_as?: string | null;
-          published_at?: string;
+          publish_at?: string;
           section_ids?: string[] | null;
           title?: string;
           updated_at?: string;
@@ -60,15 +66,18 @@ export type Database = {
       app_settings: {
         Row: {
           allow_dev_accounts: boolean;
+          announcement_default_expiry_days: number | null;
+          collab_max_team_size: number;
           collab_requires_teacher: boolean;
           created_at: string;
           id: boolean;
+          report_auto_urgent_votes: number | null;
           school_days: number[];
           school_email_domain: string | null;
           school_name: string;
           staff_email_pattern: string | null;
+          student_events_need_approval: boolean;
           students_can_request_venues: boolean;
-          supw_hours_target: number | null;
           teachers_post_any_grade: boolean;
           updated_at: string;
           venue_reminder_days_before: number;
@@ -77,15 +86,18 @@ export type Database = {
         ComputedFields: never;
         Insert: {
           allow_dev_accounts?: boolean;
+          announcement_default_expiry_days?: number | null;
+          collab_max_team_size?: number;
           collab_requires_teacher?: boolean;
           created_at?: string;
           id?: boolean;
+          report_auto_urgent_votes?: number | null;
           school_days?: number[];
           school_email_domain?: string | null;
           school_name?: string;
           staff_email_pattern?: string | null;
+          student_events_need_approval?: boolean;
           students_can_request_venues?: boolean;
-          supw_hours_target?: number | null;
           teachers_post_any_grade?: boolean;
           updated_at?: string;
           venue_reminder_days_before?: number;
@@ -93,15 +105,18 @@ export type Database = {
         };
         Update: {
           allow_dev_accounts?: boolean;
+          announcement_default_expiry_days?: number | null;
+          collab_max_team_size?: number;
           collab_requires_teacher?: boolean;
           created_at?: string;
           id?: boolean;
+          report_auto_urgent_votes?: number | null;
           school_days?: number[];
           school_email_domain?: string | null;
           school_name?: string;
           staff_email_pattern?: string | null;
+          student_events_need_approval?: boolean;
           students_can_request_venues?: boolean;
-          supw_hours_target?: number | null;
           teachers_post_any_grade?: boolean;
           updated_at?: string;
           venue_reminder_days_before?: number;
@@ -1065,27 +1080,39 @@ export type Database = {
           },
         ];
       };
-      report_category_routes: {
+      report_categories: {
         Row: {
-          category: Database['public']['Enums']['report_category'];
+          active: boolean;
           created_at: string;
+          icon: string;
           id: string;
+          key: string;
+          name: string;
           responsibility: Database['public']['Enums']['responsibility_kind'];
+          sort_order: number;
           updated_at: string;
         };
         ComputedFields: never;
         Insert: {
-          category: Database['public']['Enums']['report_category'];
+          active?: boolean;
           created_at?: string;
+          icon?: string;
           id?: string;
-          responsibility: Database['public']['Enums']['responsibility_kind'];
+          key: string;
+          name: string;
+          responsibility?: Database['public']['Enums']['responsibility_kind'];
+          sort_order?: number;
           updated_at?: string;
         };
         Update: {
-          category?: Database['public']['Enums']['report_category'];
+          active?: boolean;
           created_at?: string;
+          icon?: string;
           id?: string;
+          key?: string;
+          name?: string;
           responsibility?: Database['public']['Enums']['responsibility_kind'];
+          sort_order?: number;
           updated_at?: string;
         };
         Relationships: [];
@@ -1130,7 +1157,7 @@ export type Database = {
       reports: {
         Row: {
           assigned_to: string | null;
-          category: Database['public']['Enums']['report_category'];
+          category: string;
           created_at: string;
           description: string;
           duplicate_of: string | null;
@@ -1151,7 +1178,7 @@ export type Database = {
         ComputedFields: 'report_headline';
         Insert: {
           assigned_to?: string | null;
-          category: Database['public']['Enums']['report_category'];
+          category: string;
           created_at?: string;
           description: string;
           duplicate_of?: string | null;
@@ -1170,7 +1197,7 @@ export type Database = {
         };
         Update: {
           assigned_to?: string | null;
-          category?: Database['public']['Enums']['report_category'];
+          category?: string;
           created_at?: string;
           description?: string;
           duplicate_of?: string | null;
@@ -1194,6 +1221,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'profiles';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'reports_category_fkey';
+            columns: ['category'];
+            isOneToOne: false;
+            referencedRelation: 'report_categories';
+            referencedColumns: ['key'];
           },
           {
             foreignKeyName: 'reports_duplicate_of_fkey';
@@ -1453,6 +1487,87 @@ export type Database = {
           },
         ];
       };
+      skill_tag_suggestions: {
+        Row: {
+          created_at: string;
+          id: string;
+          name: string;
+          reviewed_by: string | null;
+          status: Database['public']['Enums']['tag_suggestion_status'];
+          suggested_by: string;
+          tag_id: string | null;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          id?: string;
+          name: string;
+          reviewed_by?: string | null;
+          status?: Database['public']['Enums']['tag_suggestion_status'];
+          suggested_by?: string;
+          tag_id?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          name?: string;
+          reviewed_by?: string | null;
+          status?: Database['public']['Enums']['tag_suggestion_status'];
+          suggested_by?: string;
+          tag_id?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'skill_tag_suggestions_reviewed_by_fkey';
+            columns: ['reviewed_by'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'skill_tag_suggestions_suggested_by_fkey';
+            columns: ['suggested_by'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'skill_tag_suggestions_tag_id_fkey';
+            columns: ['tag_id'];
+            isOneToOne: false;
+            referencedRelation: 'skill_tags';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      skill_tags: {
+        Row: {
+          active: boolean;
+          created_at: string;
+          id: string;
+          name: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          active?: boolean;
+          created_at?: string;
+          id?: string;
+          name: string;
+          updated_at?: string;
+        };
+        Update: {
+          active?: boolean;
+          created_at?: string;
+          id?: string;
+          name?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       staff_emails: {
         Row: {
           added_by: string | null;
@@ -1480,6 +1595,39 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'profiles';
             referencedColumns: ['id'];
+          },
+        ];
+      };
+      supw_targets: {
+        Row: {
+          created_at: string;
+          grade: number;
+          hours: number;
+          id: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          grade: number;
+          hours: number;
+          id?: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          grade?: number;
+          hours?: number;
+          id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'supw_targets_grade_fkey';
+            columns: ['grade'];
+            isOneToOne: true;
+            referencedRelation: 'grades';
+            referencedColumns: ['grade'];
           },
         ];
       };
@@ -1553,9 +1701,13 @@ export type Database = {
       venues: {
         Row: {
           active: boolean;
+          bookable_from: string | null;
+          bookable_until: string | null;
           capacity: number | null;
           created_at: string;
           id: string;
+          max_booking_minutes: number | null;
+          max_days_ahead: number | null;
           name: string;
           needs_approval: boolean;
           room_id: string | null;
@@ -1564,9 +1716,13 @@ export type Database = {
         ComputedFields: never;
         Insert: {
           active?: boolean;
+          bookable_from?: string | null;
+          bookable_until?: string | null;
           capacity?: number | null;
           created_at?: string;
           id?: string;
+          max_booking_minutes?: number | null;
+          max_days_ahead?: number | null;
           name: string;
           needs_approval?: boolean;
           room_id?: string | null;
@@ -1574,9 +1730,13 @@ export type Database = {
         };
         Update: {
           active?: boolean;
+          bookable_from?: string | null;
+          bookable_until?: string | null;
           capacity?: number | null;
           created_at?: string;
           id?: string;
+          max_booking_minutes?: number | null;
+          max_days_ahead?: number | null;
           name?: string;
           needs_approval?: boolean;
           room_id?: string | null;
@@ -1592,11 +1752,40 @@ export type Database = {
           },
         ];
       };
+      volunteer_categories: {
+        Row: {
+          active: boolean;
+          created_at: string;
+          id: string;
+          name: string;
+          sort_order: number;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          active?: boolean;
+          created_at?: string;
+          id?: string;
+          name: string;
+          sort_order?: number;
+          updated_at?: string;
+        };
+        Update: {
+          active?: boolean;
+          created_at?: string;
+          id?: string;
+          name?: string;
+          sort_order?: number;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       volunteer_events: {
         Row: {
           allow_multiple_roles: boolean;
           approval_note: string | null;
           approved_by: string | null;
+          category_id: string | null;
           created_at: string;
           creator_id: string;
           description: string;
@@ -1618,6 +1807,7 @@ export type Database = {
           allow_multiple_roles?: boolean;
           approval_note?: string | null;
           approved_by?: string | null;
+          category_id?: string | null;
           created_at?: string;
           creator_id?: string;
           description?: string;
@@ -1637,6 +1827,7 @@ export type Database = {
           allow_multiple_roles?: boolean;
           approval_note?: string | null;
           approved_by?: string | null;
+          category_id?: string | null;
           created_at?: string;
           creator_id?: string;
           description?: string;
@@ -1658,6 +1849,13 @@ export type Database = {
             columns: ['approved_by'];
             isOneToOne: false;
             referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'volunteer_events_category_id_fkey';
+            columns: ['category_id'];
+            isOneToOne: false;
+            referencedRelation: 'volunteer_categories';
             referencedColumns: ['id'];
           },
           {
@@ -1732,6 +1930,10 @@ export type Database = {
           supw_hours_confirmed: number;
         }[];
       };
+      admin_review_tag_suggestion: {
+        Args: { p_action: string; p_merge_into?: string; p_suggestion_id: string };
+        Returns: undefined;
+      };
       admin_rollover: {
         Args: { p_confirm?: string; p_dry_run?: boolean };
         Returns: {
@@ -1791,6 +1993,7 @@ export type Database = {
         Args: Record<PropertyKey, never>;
         Returns: Database['public']['Enums']['user_role'];
       };
+      begin_trusted_change: { Args: Record<PropertyKey, never>; Returns: undefined };
       booking_auto_approve: {
         Args: {
           p_booking: Omit<
@@ -1857,10 +2060,7 @@ export type Database = {
       };
       calendar_day_note: { Args: { p_day: string; p_venue_id: string }; Returns: string };
       can_confirm_hours: { Args: { p_event_id: string }; Returns: boolean };
-      can_manage_report: {
-        Args: { p_category: Database['public']['Enums']['report_category'] };
-        Returns: boolean;
-      };
+      can_manage_report: { Args: { p_category: string }; Returns: boolean };
       can_read_project: { Args: { p_project_id: string }; Returns: boolean };
       can_review_venues: { Args: Record<PropertyKey, never>; Returns: boolean };
       can_see_report: { Args: { p_report_id: string }; Returns: boolean };
@@ -1954,6 +2154,7 @@ export type Database = {
       is_project_shared_with_me: { Args: { p_project_id: string }; Returns: boolean };
       is_staff: { Args: Record<PropertyKey, never>; Returns: boolean };
       is_staff_member: { Args: { p_user_id: string }; Returns: boolean };
+      is_trusted_change: { Args: Record<PropertyKey, never>; Returns: boolean };
       my_account_status: {
         Args: Record<PropertyKey, never>;
         Returns: {
@@ -1994,7 +2195,8 @@ export type Database = {
       open_reports_in_room: {
         Args: { p_room_id: string };
         Returns: {
-          category: Database['public']['Enums']['report_category'];
+          category: string;
+          category_name: string;
           created_at: string;
           description: string;
           id: string;
@@ -2005,12 +2207,14 @@ export type Database = {
           voted_by_me: boolean;
         }[];
       };
+      publish_due_announcements: { Args: Record<PropertyKey, never>; Returns: number };
       report_feed: {
         Args: Record<PropertyKey, never>;
         Returns: {
           assigned_to: string;
           assigned_to_name: string;
-          category: Database['public']['Enums']['report_category'];
+          category: string;
+          category_name: string;
           created_at: string;
           description: string;
           duplicate_of: string;
@@ -2044,10 +2248,11 @@ export type Database = {
         Returns: string;
       };
       report_route: {
-        Args: { p_category: Database['public']['Enums']['report_category'] };
+        Args: { p_category: string };
         Returns: Database['public']['Enums']['responsibility_kind'];
       };
       role_selected_count: { Args: { p_role_id: string }; Returns: number };
+      send_announcement_notifications: { Args: { p_id: string }; Returns: undefined };
       signup_conflicts: {
         Args: { p_event_id: string; p_ignore_signup: string; p_student_id: string };
         Returns: boolean;
@@ -2111,13 +2316,12 @@ export type Database = {
       outbox_kind: 'immediate' | 'digest';
       outbox_status: 'queued' | 'sent' | 'failed';
       project_status: 'draft' | 'shared' | 'in_review' | 'feedback_given' | 'complete';
-      report_category:
-        'electrical' | 'ac' | 'plumbing' | 'furniture' | 'it' | 'cleanliness' | 'other';
       report_status:
         'open' | 'acknowledged' | 'in_progress' | 'resolved' | 'duplicate' | 'wont_fix';
       responsibility_kind: 'facilities' | 'it' | 'venues' | 'supw';
       room_kind: 'classroom' | 'lab' | 'office' | 'hall' | 'library' | 'cafeteria' | 'other';
       signup_status: 'applied' | 'selected' | 'waitlisted' | 'not_selected' | 'withdrawn';
+      tag_suggestion_status: 'pending' | 'approved' | 'merged' | 'rejected';
       user_role: 'student' | 'teacher' | 'admin';
       volunteer_event_status: 'awaiting_approval' | 'published' | 'sent_back' | 'closed';
     };
@@ -2261,11 +2465,11 @@ export const Constants = {
       outbox_kind: ['immediate', 'digest'],
       outbox_status: ['queued', 'sent', 'failed'],
       project_status: ['draft', 'shared', 'in_review', 'feedback_given', 'complete'],
-      report_category: ['electrical', 'ac', 'plumbing', 'furniture', 'it', 'cleanliness', 'other'],
       report_status: ['open', 'acknowledged', 'in_progress', 'resolved', 'duplicate', 'wont_fix'],
       responsibility_kind: ['facilities', 'it', 'venues', 'supw'],
       room_kind: ['classroom', 'lab', 'office', 'hall', 'library', 'cafeteria', 'other'],
       signup_status: ['applied', 'selected', 'waitlisted', 'not_selected', 'withdrawn'],
+      tag_suggestion_status: ['pending', 'approved', 'merged', 'rejected'],
       user_role: ['student', 'teacher', 'admin'],
       volunteer_event_status: ['awaiting_approval', 'published', 'sent_back', 'closed'],
     },

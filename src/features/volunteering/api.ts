@@ -3,13 +3,14 @@
 // which events, the one-role-per-event rule, the cap per role, who confirms
 // hours. This file only reads and writes.
 import { supabase } from '@/lib/supabase';
-import type { Enums, TablesInsert, TablesUpdate } from '@/types/database';
+import type { Enums, Tables, TablesInsert, TablesUpdate } from '@/types/database';
 
 // Two foreign keys point from volunteer_events to profiles (creator and
 // approver), so `!volunteer_events_creator_id_fkey` says which one to follow.
 const EVENT_COLUMNS = `
   id, creator_id, organiser_label, title, description, starts_at, ends_at, room_id, place_text,
   supw_hours, signup_deadline, allow_multiple_roles, status, approved_by, approval_note, created_at,
+  category_id,
   creator:profiles!volunteer_events_creator_id_fkey(full_name),
   room:rooms(code, name),
   roles:event_roles(id, name, description, spots_wanted, created_at)
@@ -45,6 +46,8 @@ export interface VolunteerEvent {
   approved_by: string | null;
   approval_note: string | null;
   created_at: string;
+  /** Optional, from the admin's list (volunteer_categories). */
+  category_id: string | null;
   creator: { full_name: string } | null;
   room: { code: string; name: string } | null;
   roles: EventRole[];
@@ -145,6 +148,7 @@ export type EventInput = Pick<
   | 'supw_hours'
   | 'signup_deadline'
   | 'allow_multiple_roles'
+  | 'category_id'
 >;
 
 export interface RoleInput {
@@ -315,4 +319,53 @@ export async function fetchSupwHoursReport(): Promise<SupwHoursRow[]> {
   const { data, error } = await supabase.rpc('supw_hours_report');
   if (error) throw error;
   return data;
+}
+
+// ---------------------------------------------------------------------------
+// Categories and SUPW targets (Admin > Features > Volunteering). Everyone
+// reads them; only admins change them (RLS).
+// ---------------------------------------------------------------------------
+
+export type VolunteerCategory = Pick<
+  Tables<'volunteer_categories'>,
+  'id' | 'name' | 'active' | 'sort_order'
+>;
+export type SupwTarget = Pick<Tables<'supw_targets'>, 'id' | 'grade' | 'hours'>;
+
+export async function fetchCategories(): Promise<VolunteerCategory[]> {
+  const { data, error } = await supabase
+    .from('volunteer_categories')
+    .select('id, name, active, sort_order')
+    .order('sort_order')
+    .order('name');
+  if (error) throw error;
+  return data;
+}
+
+export async function saveCategory(
+  id: string | null,
+  fields: Omit<VolunteerCategory, 'id'>,
+): Promise<void> {
+  const { error } = id
+    ? await supabase.from('volunteer_categories').update(fields).eq('id', id)
+    : await supabase.from('volunteer_categories').insert(fields);
+  if (error) throw error;
+}
+
+export async function fetchSupwTargets(): Promise<SupwTarget[]> {
+  const { data, error } = await supabase
+    .from('supw_targets')
+    .select('id, grade, hours')
+    .order('grade');
+  if (error) throw error;
+  return data;
+}
+
+/** Admin: set a grade's target (hours = null removes it). */
+export async function setSupwTarget(grade: number, hours: number | null): Promise<void> {
+  const { error } =
+    hours === null
+      ? await supabase.from('supw_targets').delete().eq('grade', grade)
+      : await supabase.from('supw_targets').upsert({ grade, hours }, { onConflict: 'grade' });
+  if (error) throw error;
 }

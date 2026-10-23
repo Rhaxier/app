@@ -48,3 +48,33 @@ export async function updateFloor(id: string, changes: TablesUpdate<'floors'>): 
   const { error } = await supabase.from('floors').update(changes).eq('id', id);
   if (error) throw error;
 }
+
+/**
+ * Admin: upload a new floor plan image to the public `floor-plans` bucket and
+ * return its address plus its size in pixels (pins are placed in pixels).
+ * Saving the floor with these values is a separate step (updateFloor).
+ */
+export async function uploadFloorPlan(
+  floorId: string,
+  file: File,
+): Promise<{ url: string; width: number; height: number }> {
+  const extension = file.name.split('.').pop()?.toLowerCase() || 'png';
+  // A new name each time, so browsers don't keep showing a cached old plan.
+  const path = `floors/${floorId}/plan-${Date.now()}.${extension}`;
+  const upload = await supabase.storage
+    .from('floor-plans')
+    .upload(path, file, { contentType: file.type });
+  if (upload.error) throw upload.error;
+  const { data } = supabase.storage.from('floor-plans').getPublicUrl(path);
+  const size = await imageSize(data.publicUrl);
+  return { url: data.publicUrl, ...size };
+}
+
+function imageSize(url: string): Promise<{ width: number; height: number }> {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve({ width: image.naturalWidth, height: image.naturalHeight });
+    image.onerror = () => reject(new Error("The image uploaded but couldn't be opened."));
+    image.src = url;
+  });
+}

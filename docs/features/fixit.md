@@ -10,7 +10,7 @@ and everyone who cares hears back. Same shape as announcements; read
   now, don't use the app."
 - **Duplicates first.** Pick the room and the form lists what's already open there, each with
   **Me too**. A "me too" is a vote, counted once per person, not a second report.
-- **Routing.** The category picks the team through `report_category_routes` (seeded: IT →
+- **Routing.** The category picks the team through `report_categories` (seeded: IT →
   `it`, everything else → `facilities`). Everyone holding that responsibility is notified;
   urgent reports email immediately, the rest go in the daily digest.
 - **Urgent** can only be set by teachers and admins.
@@ -29,7 +29,7 @@ and everyone who cares hears back. Same shape as announcements; read
 | ----------------------------------- | -------------------------------------------------------------------- |
 | `reports`                           | The problem, where it is, status, note, assignee, urgent flag        |
 | `report_votes`                      | One row per "me too" (unique per person per report)                  |
-| `report_category_routes`            | Category → responsibility (editable on Admin > Report routes)        |
+| `report_categories`                 | Categories: name, icon, team, active (Admin > Fix-it categories)     |
 | `report_feed()`                     | The only way the app reads reports; adds the reporter for staff only |
 | `open_reports_in_room(room)`        | The duplicate check                                                  |
 | `attach_report_photo(report, path)` | Records the photo after upload (students can't update reports)       |

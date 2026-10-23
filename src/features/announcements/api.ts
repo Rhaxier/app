@@ -22,7 +22,7 @@ import type { Enums, TablesInsert } from '@/types/database';
 // request ("embedding"). Only columns the signed-in role may read can be
 // embedded, which is why we never ask for the author's email.
 const ANNOUNCEMENT_COLUMNS =
-  'id, title, body, posted_as, audience, grades, section_ids, pinned, published_at, author_id, author:profiles(full_name)';
+  'id, title, body, posted_as, audience, grades, section_ids, pinned, publish_at, expires_at, author_id, author:profiles(full_name)';
 
 // What a screen gets back. Written by hand (rather than inferred) so it's easy
 // to read; the generated Database types check that it matches the query.
@@ -36,7 +36,10 @@ export interface Announcement {
   /** Only these sections of those grades; null = the whole grades. */
   section_ids: string[] | null;
   pinned: boolean;
-  published_at: string;
+  /** When it appears. In the future = scheduled (only its author and admins see it). */
+  publish_at: string;
+  /** When it disappears; null = it stays. */
+  expires_at: string | null;
   author_id: string;
   author: { full_name: string } | null;
 }
@@ -44,7 +47,15 @@ export interface Announcement {
 // What the form sends. Pick<> keeps it in step with the real table columns.
 export type AnnouncementInput = Pick<
   TablesInsert<'announcements'>,
-  'title' | 'body' | 'posted_as' | 'audience' | 'grades' | 'section_ids' | 'pinned'
+  | 'title'
+  | 'body'
+  | 'posted_as'
+  | 'audience'
+  | 'grades'
+  | 'section_ids'
+  | 'pinned'
+  | 'publish_at'
+  | 'expires_at'
 >;
 
 /**
@@ -57,7 +68,7 @@ export async function fetchAnnouncements(limit?: number): Promise<Announcement[]
     .from('announcements')
     .select(ANNOUNCEMENT_COLUMNS)
     .order('pinned', { ascending: false })
-    .order('published_at', { ascending: false });
+    .order('publish_at', { ascending: false });
   if (limit) query = query.limit(limit);
 
   const { data, error } = await query;
@@ -93,5 +104,11 @@ export async function updateAnnouncement(id: string, input: AnnouncementInput): 
 
 export async function deleteAnnouncement(id: string): Promise<void> {
   const { error } = await supabase.from('announcements').delete().eq('id', id);
+  if (error) throw error;
+}
+
+/** Admin: pin to the top of everyone's feed, or unpin (the database checks it's an admin). */
+export async function setPinned(id: string, pinned: boolean): Promise<void> {
+  const { error } = await supabase.from('announcements').update({ pinned }).eq('id', id);
   if (error) throw error;
 }

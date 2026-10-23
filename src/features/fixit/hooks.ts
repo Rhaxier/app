@@ -9,15 +9,15 @@ import {
   fetchOpenReportsInRoom,
   fetchReport,
   fetchReports,
-  fetchRoutes,
+  fetchReportCategories,
   photoUrl,
   removeVote,
   subscribeToReports,
   updateReport,
-  updateRoute,
+  saveReportCategory,
+  type ReportCategoryRow,
   type ReportChanges,
   type ReportInput,
-  type Responsibility,
 } from './api';
 import { withVote } from './logic';
 
@@ -28,7 +28,7 @@ export const fixitKeys = {
   report: (id: string) => [...fixitKeys.all, 'report', id] as const,
   inRoom: (roomId: string) => [...fixitKeys.all, 'room', roomId] as const,
   photo: (path: string) => [...fixitKeys.all, 'photo', path] as const,
-  routes: () => [...fixitKeys.all, 'routes'] as const,
+  categories: () => [...fixitKeys.all, 'categories'] as const,
 };
 
 export function useReports() {
@@ -62,8 +62,12 @@ export function usePhotoUrl(path: string | null) {
   });
 }
 
-export function useRoutes() {
-  return useQuery({ queryKey: fixitKeys.routes(), queryFn: fetchRoutes, staleTime: 10 * 60_000 });
+export function useReportCategories() {
+  return useQuery({
+    queryKey: fixitKeys.categories(),
+    queryFn: fetchReportCategories,
+    staleTime: 10 * 60_000,
+  });
 }
 
 export function useLiveReports() {
@@ -126,11 +130,12 @@ export function useUpdateReport(id: string) {
   });
 }
 
-export function useUpdateRoute() {
+export function useSaveReportCategory() {
   const invalidate = useInvalidateFixit();
   return useMutation({
-    mutationFn: ({ id, responsibility }: { id: string; responsibility: Responsibility }) =>
-      updateRoute(id, responsibility),
+    mutationFn: ({ id, fields }: { id: string | null; fields: Omit<ReportCategoryRow, 'id'> }) =>
+      saveReportCategory(id, fields),
     onSuccess: invalidate,
+    meta: { successMessage: 'Category saved' },
   });
 }

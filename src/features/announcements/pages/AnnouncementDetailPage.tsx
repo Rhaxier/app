@@ -53,7 +53,7 @@ export function AnnouncementDetailPage() {
         <h2>{item.title}</h2>
         {item.body && <p className={styles.body}>{item.body}</p>}
         <p className="meta">
-          {formatDateTime(item.published_at)} · {audienceLabel(item, sections)}
+          {formatDateTime(item.publish_at)} · {audienceLabel(item, sections)}
         </p>
       </Card>
 

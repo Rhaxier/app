@@ -154,6 +154,40 @@ export function validateRange(
 }
 
 // ---------------------------------------------------------------------------
+// Fix-it categories
+// ---------------------------------------------------------------------------
+
+export function validateReportCategory(
+  name: string,
+  existing: { id: string; name: string }[],
+  ignoreId: string | null,
+): string | null {
+  const value = name.trim();
+  if (!value) return 'Name the category.';
+  if (value.length > 40) return 'Keep it under 40 characters.';
+  if (existing.some((c) => c.id !== ignoreId && c.name.toLowerCase() === value.toLowerCase()))
+    return 'There is already a category with that name.';
+  return null;
+}
+
+/**
+ * The permanent key stored on each report: "Projector screen" → "projector_screen",
+ * with _2, _3… if that key is taken. Keys never change after creation.
+ */
+export function categoryKey(name: string, takenKeys: string[]): string {
+  const base =
+    name
+      .toLowerCase()
+      .normalize('NFKD')
+      .replace(/[^a-z0-9]+/g, '_')
+      .replace(/^_+|_+$/g, '')
+      .slice(0, 36) || 'category';
+  let key = base;
+  for (let n = 2; takenKeys.includes(key); n++) key = `${base}_${n}`;
+  return key;
+}
+
+// ---------------------------------------------------------------------------
 // Import
 // ---------------------------------------------------------------------------
 
@@ -193,11 +227,6 @@ export interface SettingsFormValues {
   schoolEmailDomain: string;
   allowDevAccounts: boolean;
   staffEmailPattern: string;
-  studentsCanRequestVenues: boolean;
-  collabRequiresTeacher: boolean;
-  supwHoursTarget: string;
-  venueReminderHours: string;
-  venueReminderDaysBefore: string;
 }
 
 export type SettingsFormErrors = Partial<Record<keyof SettingsFormValues, string>>;
@@ -208,15 +237,10 @@ export function valuesFromSettings(settings: AppSettings): SettingsFormValues {
     schoolEmailDomain: settings.school_email_domain ?? '',
     allowDevAccounts: settings.allow_dev_accounts,
     staffEmailPattern: settings.staff_email_pattern ?? '',
-    studentsCanRequestVenues: settings.students_can_request_venues,
-    collabRequiresTeacher: settings.collab_requires_teacher,
-    supwHoursTarget: settings.supw_hours_target === null ? '' : String(settings.supw_hours_target),
-    venueReminderHours: String(settings.venue_reminder_hours),
-    venueReminderDaysBefore: String(settings.venue_reminder_days_before),
   };
 }
 
-function isWhole(value: string, min: number, max: number): boolean {
+export function isWhole(value: string, min: number, max: number): boolean {
   const n = Number(value);
   return value.trim() !== '' && Number.isInteger(n) && n >= min && n <= max;
 }
@@ -235,13 +259,6 @@ export function validateSettings(values: SettingsFormValues): SettingsFormErrors
       errors.staffEmailPattern = "That pattern isn't valid.";
     }
   }
-  if (values.supwHoursTarget.trim() && !(Number(values.supwHoursTarget) >= 0)) {
-    errors.supwHoursTarget = 'Enter a number of hours, or leave it empty.';
-  }
-  if (!isWhole(values.venueReminderHours, 1, 720))
-    errors.venueReminderHours = 'Between 1 and 720 hours.';
-  if (!isWhole(values.venueReminderDaysBefore, 0, 60))
-    errors.venueReminderDaysBefore = 'Between 0 and 60 days.';
   return errors;
 }
 
@@ -251,11 +268,6 @@ export function toSettingsChanges(values: SettingsFormValues) {
     school_email_domain: values.schoolEmailDomain.trim().toLowerCase() || null,
     allow_dev_accounts: values.allowDevAccounts,
     staff_email_pattern: values.staffEmailPattern.trim() || null,
-    students_can_request_venues: values.studentsCanRequestVenues,
-    collab_requires_teacher: values.collabRequiresTeacher,
-    supw_hours_target: values.supwHoursTarget.trim() ? Number(values.supwHoursTarget) : null,
-    venue_reminder_hours: Number(values.venueReminderHours),
-    venue_reminder_days_before: Number(values.venueReminderDaysBefore),
   };
 }
 
@@ -269,6 +281,12 @@ export interface VenueFormValues {
   capacity: string;
   needsApproval: boolean;
   active: boolean;
+  /** '07:00' or '' for no limit. */
+  bookableFrom: string;
+  bookableUntil: string;
+  /** Whole minutes, or '' for no limit. */
+  maxMinutes: string;
+  maxDaysAhead: string;
 }
 
 export function validateVenue(
@@ -278,6 +296,20 @@ export function validateVenue(
   if (!values.name.trim()) errors.name = 'Name the venue.';
   if (values.capacity.trim() && !isWhole(values.capacity, 1, 100000))
     errors.capacity = 'A whole number of people.';
+  if (values.bookableFrom && !TIME.test(values.bookableFrom))
+    errors.bookableFrom = 'A time like 07:00.';
+  if (values.bookableUntil && !TIME.test(values.bookableUntil))
+    errors.bookableUntil = 'A time like 18:00.';
+  else if (
+    values.bookableFrom &&
+    values.bookableUntil &&
+    values.bookableUntil <= values.bookableFrom
+  )
+    errors.bookableUntil = 'It has to be after the earliest start.';
+  if (values.maxMinutes.trim() && !isWhole(values.maxMinutes, 15, 1440))
+    errors.maxMinutes = 'From 15 to 1440 minutes, or empty for no limit.';
+  if (values.maxDaysAhead.trim() && !isWhole(values.maxDaysAhead, 0, 730))
+    errors.maxDaysAhead = 'From 0 to 730 days, or empty for no limit.';
   return errors;
 }
 

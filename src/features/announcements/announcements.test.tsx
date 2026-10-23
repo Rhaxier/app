@@ -20,7 +20,9 @@ import { AnnouncementCard } from './components/AnnouncementCard';
 import { AnnouncementForm } from './components/AnnouncementForm';
 import { audienceLabel } from './format';
 import {
+  announcementState,
   emptyAnnouncementValues,
+  newAnnouncementValues,
   toAnnouncementInput,
   validateAnnouncement,
   type AnnouncementFormValues,
@@ -148,6 +150,43 @@ describe('AnnouncementForm', () => {
   });
 });
 
+describe('scheduling and expiry', () => {
+  const now = new Date('2026-10-20T08:00:00Z'); // 12:00 in Dubai
+
+  it("won't expire before it's published", () => {
+    const errors = validateAnnouncement(
+      { ...valid, publishAt: '2026-10-25T09:00', expiresAt: '2026-10-24T09:00' },
+      teacher,
+      now,
+    );
+    expect(errors.expiresAt).toBe('It has to expire after it is published.');
+  });
+
+  it('starts new ones with the default expiry, and sends "now" as no date', () => {
+    const values = newAnnouncementValues(30, now);
+    expect(values.expiresAt).toBe('2026-11-19T12:00');
+    expect(toAnnouncementInput({ ...valid, ...values }).publish_at).toBeUndefined();
+    expect(toAnnouncementInput({ ...valid, publishAt: '2026-10-21T07:00' }).publish_at).toBe(
+      '2026-10-21T03:00:00.000Z',
+    );
+  });
+
+  it('knows which are scheduled, live or expired', () => {
+    expect(announcementState({ publish_at: '2026-10-21T00:00:00Z', expires_at: null }, now)).toBe(
+      'scheduled',
+    );
+    expect(announcementState({ publish_at: '2026-10-01T00:00:00Z', expires_at: null }, now)).toBe(
+      'live',
+    );
+    expect(
+      announcementState(
+        { publish_at: '2026-10-01T00:00:00Z', expires_at: '2026-10-19T00:00:00Z' },
+        now,
+      ),
+    ).toBe('expired');
+  });
+});
+
 describe('AnnouncementCard', () => {
   const pinned: Announcement = {
     id: 'a1',
@@ -158,7 +197,8 @@ describe('AnnouncementCard', () => {
     grades: null,
     section_ids: null,
     pinned: true,
-    published_at: new Date().toISOString(),
+    publish_at: new Date().toISOString(),
+    expires_at: null,
     author_id: 'admin-1',
     author: { full_name: 'Admin Plain' },
   };

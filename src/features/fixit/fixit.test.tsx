@@ -57,7 +57,10 @@ describe('the map card text', () => {
   const now = new Date('2026-10-19T08:00:00Z');
 
   it('reads like the mockup', () => {
-    expect(reportLabel({ room_code: 'G.15', category: 'it' })).toBe('Fix-it · Room G.15');
+    expect(reportLabel({ room_code: 'G.15', category_name: 'IT' })).toBe('Fix-it · Room G.15');
+    expect(reportLabel({ room_code: null, category_name: 'Air conditioning' })).toBe(
+      'Fix-it · Air conditioning',
+    );
     expect(
       reportSummary({ created_at: '2026-10-19T05:00:00Z', routed_to: 'facilities' }, now),
     ).toBe('Reported today · Sent to facilities');

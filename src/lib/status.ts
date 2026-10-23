@@ -70,16 +70,6 @@ export const contentReportStatus: StatusMap<Enums<'content_report_status'>> = {
   dismissed: { label: 'Dismissed', tone: 'quiet' },
 };
 
-export const reportCategoryLabel: Record<Enums<'report_category'>, string> = {
-  electrical: 'Electrical',
-  ac: 'Air conditioning',
-  plumbing: 'Plumbing',
-  furniture: 'Furniture',
-  it: 'IT',
-  cleanliness: 'Cleanliness',
-  other: 'Other',
-};
-
 export const responsibilityLabel: Record<Enums<'responsibility_kind'>, string> = {
   facilities: 'Facilities',
   it: 'IT',

@@ -7,6 +7,7 @@ import { CheckboxField, FormError, SelectField, TextArea, TextField } from '@/co
 import { SegmentedControl } from '@/components/SegmentedControl';
 import { useRooms } from '@/features/map/hooks';
 import { useCalendarData } from '@/features/school/hooks';
+import { useVolunteerCategories } from '../hooks';
 import { dayNote } from '@/features/school/logic';
 import {
   emptyRole,
@@ -40,6 +41,10 @@ export function EventForm({
 }: EventFormProps) {
   const rooms = useRooms();
   const calendar = useCalendarData();
+  // Retired categories are still shown for events that already use them.
+  const categories = (useVolunteerCategories().data ?? []).filter(
+    (c) => c.active || c.id === initialValues.categoryId,
+  );
   const [values, setValues] = useState(initialValues);
   // Volunteering often happens at weekends, so a holiday or non-school day is
   // a warning here, not a refusal (docs/OPEN_QUESTIONS.md, Q34).
@@ -94,6 +99,20 @@ export function EventForm({
         value={values.organiserLabel}
         onChange={(e) => update('organiserLabel', e.target.value)}
       />
+      {categories.length > 0 && (
+        <SelectField
+          label="Category (optional)"
+          value={values.categoryId}
+          onChange={(e) => update('categoryId', e.target.value)}
+        >
+          <option value="">None</option>
+          {categories.map((category) => (
+            <option key={category.id} value={category.id}>
+              {category.name}
+            </option>
+          ))}
+        </SelectField>
+      )}
       <TextArea
         label="What's it about?"
         rows={4}

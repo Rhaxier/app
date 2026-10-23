@@ -3,7 +3,7 @@
 // post, owners decide, the post fills and closes itself, requester emails are
 // visible only to the owner and staff.
 import { supabase } from '@/lib/supabase';
-import type { Enums, TablesInsert } from '@/types/database';
+import type { Enums, Tables, TablesInsert } from '@/types/database';
 
 // Three foreign keys point at profiles (owner, supervising teacher, the
 // teacher who hid it), so each embed names the key it follows.
@@ -198,5 +198,72 @@ export async function reportPost(postId: string, reason: string): Promise<void> 
   const { error } = await supabase
     .from('content_reports')
     .insert({ target_table: 'collab_posts', target_id: postId, reason: reason.trim() });
+  if (error) throw error;
+}
+
+// ---------------------------------------------------------------------------
+// Skill tags. Posts pick skills from this list (the database checks). Anyone
+// can suggest a new one, which posts can use while an admin reviews it.
+// ---------------------------------------------------------------------------
+
+export type SkillTag = Pick<Tables<'skill_tags'>, 'id' | 'name' | 'active'>;
+
+export interface SkillSuggestion {
+  id: string;
+  name: string;
+  status: Enums<'tag_suggestion_status'>;
+  created_at: string;
+  suggester: { full_name: string } | null;
+}
+
+export async function fetchSkillTags(): Promise<SkillTag[]> {
+  const { data, error } = await supabase
+    .from('skill_tags')
+    .select('id, name, active')
+    .order('name');
+  if (error) throw error;
+  return data;
+}
+
+/** Suggestions waiting for an admin (everyone can see them, so posts can use them). */
+export async function fetchPendingSuggestions(): Promise<SkillSuggestion[]> {
+  const { data, error } = await supabase
+    .from('skill_tag_suggestions')
+    .select(
+      'id, name, status, created_at, suggester:profiles!skill_tag_suggestions_suggested_by_fkey(full_name)',
+    )
+    .eq('status', 'pending')
+    .order('created_at');
+  if (error) throw error;
+  return data;
+}
+
+export async function suggestSkill(name: string): Promise<void> {
+  const { error } = await supabase.from('skill_tag_suggestions').insert({ name: name.trim() });
+  if (error) throw error;
+}
+
+/** Admin: add a tag, rename it or retire it. */
+export async function saveSkillTag(
+  id: string | null,
+  fields: { name: string; active: boolean },
+): Promise<void> {
+  const { error } = id
+    ? await supabase.from('skill_tags').update(fields).eq('id', id)
+    : await supabase.from('skill_tags').insert(fields);
+  if (error) throw error;
+}
+
+/** Admin: approve a suggestion, merge it into an existing tag, or reject it. */
+export async function reviewSuggestion(
+  id: string,
+  action: 'approve' | 'merge' | 'reject',
+  mergeInto?: string,
+): Promise<void> {
+  const { error } = await supabase.rpc('admin_review_tag_suggestion', {
+    p_suggestion_id: id,
+    p_action: action,
+    p_merge_into: mergeInto,
+  });
   if (error) throw error;
 }

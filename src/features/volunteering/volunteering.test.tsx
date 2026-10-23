@@ -35,6 +35,7 @@ function makeEvent(overrides: Partial<VolunteerEvent> = {}): VolunteerEvent {
     approved_by: null,
     approval_note: null,
     created_at: '2026-10-01T00:00:00Z',
+    category_id: null,
     creator: { full_name: 'Teacher A' },
     room: null,
     roles: [

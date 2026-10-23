@@ -112,12 +112,17 @@ describe('collab form validation', () => {
   const valid = { ...emptyCollabValues, title: 'Podcast', skills: 'Audio editing' };
 
   it('needs a title, a skill and a sensible number of people', () => {
-    const errors = validateCollab({ ...emptyCollabValues, spotsWanted: '0' }, false);
+    const errors = validateCollab({ ...emptyCollabValues, spotsWanted: '0' }, false, 0, 8);
     expect(errors).toEqual({
       title: 'Add a title.',
-      skills: 'List at least one skill you need.',
-      spotsWanted: 'Between 1 and 50 people.',
+      skills: 'Choose at least one skill you need.',
+      spotsWanted: 'Between 1 and 7 people (teams are up to 8, including you).',
     });
+  });
+
+  it("keeps teams within the school's maximum size", () => {
+    expect(validateCollab({ ...valid, spotsWanted: '8' }, false, 0, 8).spotsWanted).toBeDefined();
+    expect(validateCollab({ ...valid, spotsWanted: '7' }, false, 0, 8)).toEqual({});
   });
 
   it('cannot shrink below the people already accepted', () => {

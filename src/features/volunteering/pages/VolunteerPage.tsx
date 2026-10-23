@@ -8,17 +8,27 @@ import { EmptyState, ErrorState, LoadingState } from '@/components/States';
 import { useCurrentUser } from '@/features/auth/hooks';
 import { EventCard } from '../components/EventCard';
 import { HoursSummary } from '../components/HoursSummary';
-import { useEvents, useMySignups } from '../hooks';
-import { filterEvents, isActiveSignup, volunteerFilters, type VolunteerFilter } from '../logic';
+import { useEvents, useMySignups, useVolunteerCategories } from '../hooks';
+import {
+  filterByCategory,
+  filterEvents,
+  isActiveSignup,
+  volunteerFilters,
+  type VolunteerFilter,
+} from '../logic';
 
 export function VolunteerPage() {
   const user = useCurrentUser();
   const events = useEvents();
   const mySignups = useMySignups(user.id);
+  const categories = (useVolunteerCategories().data ?? []).filter((c) => c.active);
   const [filter, setFilter] = useState<VolunteerFilter>('all');
+  const [categoryId, setCategoryId] = useState('');
 
   const signups = mySignups.data ?? [];
-  const visible = events.data ? filterEvents(events.data, filter, signups, user.id) : [];
+  const visible = events.data
+    ? filterByCategory(filterEvents(events.data, filter, signups, user.id), categoryId)
+    : [];
   const signedUpFor = new Set(signups.filter(isActiveSignup).map((signup) => signup.event_id));
 
   return (
@@ -42,6 +52,23 @@ export function VolunteerPage() {
           </FilterChip>
         ))}
       </div>
+
+      {categories.length > 0 && (
+        <div className="row-wrap" role="group" aria-label="Category">
+          <FilterChip selected={categoryId === ''} onClick={() => setCategoryId('')}>
+            Every category
+          </FilterChip>
+          {categories.map((category) => (
+            <FilterChip
+              key={category.id}
+              selected={categoryId === category.id}
+              onClick={() => setCategoryId(categoryId === category.id ? '' : category.id)}
+            >
+              {category.name}
+            </FilterChip>
+          ))}
+        </div>
+      )}
 
       {events.isPending && <LoadingState />}
       {events.isError && <ErrorState error={events.error} onRetry={() => events.refetch()} />}

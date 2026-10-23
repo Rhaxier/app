@@ -1,6 +1,6 @@
 // Admin > Map (Q6). Choose a room, then click the plan to move its pin.
 // Also: edit or add rooms, and point a floor at a new plan image.
-import { useState, type FormEvent } from 'react';
+import { useRef, useState, type FormEvent } from 'react';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { FormError, SelectField, TextField } from '@/components/Input';
@@ -16,6 +16,7 @@ import {
   useRooms,
   useUpdateFloor,
   useUpdateRoom,
+  useUploadFloorPlan,
 } from '@/features/map/hooks';
 import { errorMessage } from '@/lib/errors';
 import { roomKindLabel } from '@/lib/status';
@@ -270,6 +271,8 @@ function NewRoom({
 
 function FloorEditor({ floor }: { floor: Floor }) {
   const update = useUpdateFloor();
+  const upload = useUploadFloorPlan();
+  const fileInput = useRef<HTMLInputElement>(null);
   const [imagePath, setImagePath] = useState(floor.image_path);
   const [width, setWidth] = useState(String(floor.width));
   const [height, setHeight] = useState(String(floor.height));
@@ -279,8 +282,39 @@ function FloorEditor({ floor }: { floor: Floor }) {
     <Card as="section" className="stack-tight" aria-label={`Floor ${floor.name} image`}>
       <h2 className={styles.heading}>Floor {floor.name} plan image</h2>
       <p className="meta">
-        Put the file in public/floorplans/, then enter its path and pixel size.
+        Upload the plan (SVG, PNG, JPEG or WebP, up to 5 MB): its address and pixel size are filled
+        in for you. Then save. Pins keep their pixel positions, so move them if the new plan is a
+        different size.
       </p>
+      <input
+        ref={fileInput}
+        type="file"
+        accept="image/svg+xml,image/png,image/jpeg,image/webp"
+        className="visually-hidden"
+        aria-label={`Floor ${floor.name} plan image`}
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (!file) return;
+          upload.mutate(
+            { floorId: floor.id, file },
+            {
+              onSuccess: (result) => {
+                setImagePath(result.url);
+                setWidth(String(result.width));
+                setHeight(String(result.height));
+              },
+            },
+          );
+        }}
+      />
+      <Button
+        variant="secondary"
+        icon="image"
+        loading={upload.isPending}
+        onClick={() => fileInput.current?.click()}
+      >
+        Upload a plan image
+      </Button>
       <TextField
         label="Image path"
         value={imagePath}

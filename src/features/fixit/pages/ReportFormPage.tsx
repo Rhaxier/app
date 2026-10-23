@@ -1,11 +1,12 @@
 // Report an issue: safety notice first, then pick the room, check what's
 // already reported there, and describe the problem (photo optional).
-// The database sends it to the right team (report_category_routes).
+// The database sends it to the right team (report_categories, which admins
+// edit in Admin > Fix-it categories).
 import { useRef, useState, type FormEvent } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/Button';
 import { FilterChip } from '@/components/Chip';
-import { Icon } from '@/components/Icon';
+import { Icon, ICON_NAMES, type IconName } from '@/components/Icon';
 import { CheckboxField, FormError, SelectField, TextArea } from '@/components/Input';
 import { PageHeader } from '@/components/PageHeader';
 import { LoadingState } from '@/components/States';
@@ -14,11 +15,8 @@ import { useCurrentUser } from '@/features/auth/hooks';
 import { useRooms } from '@/features/map/hooks';
 import { errorMessage } from '@/lib/errors';
 import { isStaff } from '@/lib/permissions';
-import { reportCategoryLabel } from '@/lib/status';
-import { Constants } from '@/types/database';
-import type { ReportCategory } from '../api';
 import { DuplicateCheck } from '../components/DuplicateCheck';
-import { useCreateReport } from '../hooks';
+import { useCreateReport, useReportCategories } from '../hooks';
 import {
   toReportInput,
   validateReport,
@@ -27,7 +25,10 @@ import {
 } from '../logic';
 import styles from './ReportFormPage.module.css';
 
-const categories = Constants.public.Enums.report_category as readonly ReportCategory[];
+/** The category's icon, or a plain alert icon if the name isn't one we have. */
+function iconName(name: string): IconName {
+  return (ICON_NAMES as string[]).includes(name) ? (name as IconName) : 'alert';
+}
 
 export function ReportFormPage() {
   const [params] = useSearchParams();
@@ -35,6 +36,7 @@ export function ReportFormPage() {
   const navigate = useNavigate();
   const rooms = useRooms();
   const create = useCreateReport();
+  const categories = (useReportCategories().data ?? []).filter((c) => c.active);
   const photoInput = useRef<HTMLInputElement>(null);
   const [values, setValues] = useState<ReportFormValues>({
     roomId: params.get('room') ?? '',
@@ -93,11 +95,12 @@ export function ReportFormPage() {
           <div className="row-wrap">
             {categories.map((category) => (
               <FilterChip
-                key={category}
-                selected={values.category === category}
-                onClick={() => update('category', category)}
+                key={category.key}
+                selected={values.category === category.key}
+                onClick={() => update('category', category.key)}
               >
-                {reportCategoryLabel[category]}
+                <Icon name={iconName(category.icon)} size={18} />
+                {category.name}
               </FilterChip>
             ))}
           </div>

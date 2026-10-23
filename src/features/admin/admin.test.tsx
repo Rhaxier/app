@@ -3,7 +3,9 @@
 import { describe, expect, it } from 'vitest';
 import type { AppSettings } from '@/features/settings/api';
 import {
+  categoryKey,
   toSettingsChanges,
+  validateReportCategory,
   validateRoom,
   validateSettings,
   validateStaffEmail,
@@ -19,8 +21,11 @@ const settings: AppSettings = {
   staff_email_pattern: null,
   students_can_request_venues: true,
   collab_requires_teacher: false,
-  supw_hours_target: null,
   teachers_post_any_grade: true,
+  announcement_default_expiry_days: null,
+  collab_max_team_size: 8,
+  report_auto_urgent_votes: 5,
+  student_events_need_approval: true,
   venue_reminder_hours: 48,
   venue_reminder_days_before: 3,
   school_days: [0, 1, 2, 3, 4],
@@ -42,11 +47,11 @@ describe('settings form', () => {
   const values = valuesFromSettings(settings);
 
   it('starts from the saved settings', () => {
-    expect(values.supwHoursTarget).toBe('');
+    expect(values.schoolEmailDomain).toBe('');
     expect(validateSettings(values)).toEqual({});
   });
 
-  it('catches a domain with an @, a broken pattern and odd numbers', () => {
+  it('catches a domain with an @ and a broken pattern', () => {
     const errors = validateSettings({
       ...values,
       schoolEmailDomain: '@school.example',
@@ -56,24 +61,43 @@ describe('settings form', () => {
     expect(errors.staffEmailPattern).toBe("That pattern isn't valid.");
   });
 
-  it('saves empty optional fields as null and numbers as numbers', () => {
-    const changes = toSettingsChanges({
-      ...values,
-      schoolEmailDomain: ' School.Example ',
-      supwHoursTarget: '60',
-    });
+  it('saves the domain in lower case and empty optional fields as null', () => {
+    const changes = toSettingsChanges({ ...values, schoolEmailDomain: ' School.Example ' });
     expect(changes.school_email_domain).toBe('school.example');
     expect(changes.staff_email_pattern).toBeNull();
-    expect(changes.supw_hours_target).toBe(60);
-    expect(changes.venue_reminder_hours).toBe(48);
   });
 });
 
+const noLimits = {
+  name: 'Hall',
+  roomId: '',
+  capacity: '',
+  needsApproval: true,
+  active: true,
+  bookableFrom: '',
+  bookableUntil: '',
+  maxMinutes: '',
+  maxDaysAhead: '',
+};
+
 describe('venue and room forms', () => {
-  it('needs a venue name and a whole-number capacity', () => {
+  it('checks the booking limits make sense, and allows none', () => {
+    expect(validateVenue(noLimits)).toEqual({});
     expect(
-      validateVenue({ name: '', roomId: '', capacity: '2.5', needsApproval: true, active: true }),
+      validateVenue({
+        ...noLimits,
+        bookableFrom: '18:00',
+        bookableUntil: '07:00',
+        maxMinutes: '5',
+      }),
     ).toEqual({
+      bookableUntil: 'It has to be after the earliest start.',
+      maxMinutes: 'From 15 to 1440 minutes, or empty for no limit.',
+    });
+  });
+
+  it('needs a venue name and a whole-number capacity', () => {
+    expect(validateVenue({ ...noLimits, name: '', capacity: '2.5' })).toEqual({
       name: 'Name the venue.',
       capacity: 'A whole number of people.',
     });
@@ -87,5 +111,15 @@ describe('venue and room forms', () => {
       code: 'Give the room a code, e.g. G.14.',
       name: 'Name the room.',
     });
+  });
+});
+
+describe('fix-it category keys', () => {
+  it('turns the name into a lasting key, never reusing one', () => {
+    expect(categoryKey('Projector screen', [])).toBe('projector_screen');
+    expect(categoryKey('IT', ['it'])).toBe('it_2');
+    expect(validateReportCategory('it', [{ id: 'x', name: 'IT' }], null)).toBe(
+      'There is already a category with that name.',
+    );
   });
 });

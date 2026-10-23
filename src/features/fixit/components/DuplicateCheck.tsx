@@ -2,7 +2,7 @@
 // vote instead of a second report (plan: "Check for duplicates first").
 import { Card } from '@/components/Card';
 import { StatusBadge } from '@/components/StatusBadge';
-import { reportCategoryLabel, reportStatus } from '@/lib/status';
+import { reportStatus } from '@/lib/status';
 import { useOpenReportsInRoom } from '../hooks';
 import { reportTitle } from '../logic';
 import { MeTooButton } from './MeTooButton';
@@ -23,7 +23,7 @@ export function DuplicateCheck({ roomId }: { roomId: string }) {
           <div className={styles.top}>
             <div>
               <p className={styles.title}>{reportTitle(report.description)}</p>
-              <p className="meta">{reportCategoryLabel[report.category]}</p>
+              <p className="meta">{report.category_name}</p>
             </div>
             <StatusBadge map={reportStatus} status={report.status} />
           </div>

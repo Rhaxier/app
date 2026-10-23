@@ -93,6 +93,34 @@ some sections; a trigger fills in their grades. Students in other sections don't
 - **Overview:** utilisation counts bookable time from periods, skipping holidays and
   blackouts (`venue_bookable_minutes()`).
 
+## Feature settings (B4)
+
+| Section           | What it changes                                                                                                                      | Database                                                                                  |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- |
+| Announcements     | Default expiry; every post (live, scheduled, expired) with Pin, Edit, Delete                                                         | `announcements.publish_at`, `expires_at`; `app_settings.announcement_default_expiry_days` |
+| Collab            | Supervising teacher required (Q4), biggest team, the skills list, suggested skills (approve, merge, reject)                          | `skill_tags`, `skill_tag_suggestions`, `admin_review_tag_suggestion()`                    |
+| Volunteering      | Student events need approval, categories (Q27), SUPW target per grade                                                                | `volunteer_categories`, `supw_targets`, `app_settings.student_events_need_approval`       |
+| Venues            | Students may request (Q2), reminder timing (Q10); per venue: capacity, approval, bookable hours, longest booking, days ahead, retire | `venues`, `bookings_check_rules()`                                                        |
+| Map               | Floors (upload a plan image), rooms and pins                                                                                         | `floors`, `rooms`, bucket `floor-plans`                                                   |
+| Fix-it categories | Categories with icon and team, retire instead of delete; auto-urgent threshold (Q37)                                                 | `report_categories`, `app_settings.report_auto_urgent_votes`                              |
+| Fix-it reports    | Every open report, urgent first                                                                                                      | `report_feed()`                                                                           |
+
+**The report categories migration changes existing data.** Fix-it categories used to be a
+fixed list inside the database (the `report_category` enum) plus a `report_category_routes`
+table saying which team got each one. The migration creates `report_categories`, copies
+every old category into it (its old value becomes the row's `key`, so `'it'` stays `'it'`)
+with its team from the routes table, turns `reports.category` into plain text pointing at
+that key, then drops the enum and the routes table. Every existing report keeps its
+category and its routing.
+
+**Scheduled announcements** are hidden from everyone but their author and admins until
+`publish_at`, and their notifications go out then (`publish_due_announcements()`, run by
+pg_cron every five minutes). Expired ones disappear the same way.
+
+**Trusted changes.** Some admin functions edit other people's rows on purpose (merging a
+skill rewrites posts that used it). They call `begin_trusted_change()` first, and the
+feature triggers let those changes through. Nobody can call it from the app.
+
 ## Files to read
 
 - `supabase/migrations/20261023120000_admin_overview.sql`
@@ -100,10 +128,13 @@ some sections; a trigger fills in their grades. Students in other sections don't
 - `src/features/admin/pages/OverviewPage.tsx`, `components/BarList.tsx`, `StatTile.tsx`
 - `supabase/migrations/20261023120100_people_and_grades.sql`
 - `supabase/migrations/20261023120200_school_calendar.sql`
+- `supabase/migrations/20261023120300_feature_settings.sql`
+- `src/features/admin/components/SettingControls.tsx` (one setting, edited in place) and
+  `NameListEditor.tsx` (add, rename, retire)
 - `src/features/school/` (grades, sections, classes, periods, terms, holidays, blackouts:
   read hooks used across the app; `dayNote()` and `periodsOn()` in `logic.ts`)
 - `src/features/admin/pages/UsersPage.tsx`, `ImportPage.tsx`, `RolloverPage.tsx`,
   `ClassesPage.tsx`, `GradesPage.tsx`; `src/components/ConfirmDialog.tsx`
 - Tests: `supabase/tests/09_admin_overview_test.sql`, `10_people_test.sql`,
-  `11_calendar_test.sql`; `src/features/school/school.test.ts`;
+  `11_calendar_test.sql`, `12_feature_settings_test.sql`; `src/features/school/school.test.ts`;
   `src/features/admin/overview.test.tsx`, `people.test.tsx`

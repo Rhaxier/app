@@ -185,6 +185,25 @@ export function AnnouncementForm({
         </fieldset>
       )}
 
+      <div className={styles.twoColumns}>
+        <TextField
+          label="Publish (optional)"
+          type="datetime-local"
+          hint="Leave empty to post now."
+          value={values.publishAt}
+          onChange={(event) => update('publishAt', event.target.value)}
+          error={errors.publishAt}
+        />
+        <TextField
+          label="Expires (optional)"
+          type="datetime-local"
+          hint="It disappears after this."
+          value={values.expiresAt}
+          onChange={(event) => update('expiresAt', event.target.value)}
+          error={errors.expiresAt}
+        />
+      </div>
+
       {isAdmin && (
         <CheckboxField
           label="Pin to the top of everyone's feed"

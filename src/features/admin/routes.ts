@@ -31,13 +31,25 @@ export const adminRoutes: RouteObject = {
     },
     { path: 'terms', lazy: lazyPage(() => import('./pages/TermsPage'), 'TermsPage') },
     { path: 'blackouts', lazy: lazyPage(() => import('./pages/BlackoutsPage'), 'BlackoutsPage') },
+    {
+      path: 'announcements',
+      lazy: lazyPage(() => import('./pages/AnnouncementsAdminPage'), 'AnnouncementsAdminPage'),
+    },
+    { path: 'collab', lazy: lazyPage(() => import('./pages/CollabAdminPage'), 'CollabAdminPage') },
+    {
+      path: 'volunteering',
+      lazy: lazyPage(() => import('./pages/VolunteeringAdminPage'), 'VolunteeringAdminPage'),
+    },
+    {
+      path: 'report-categories',
+      lazy: lazyPage(() => import('./pages/ReportCategoriesPage'), 'ReportCategoriesPage'),
+    },
     { path: 'venues', lazy: lazyPage(() => import('./pages/VenuesAdminPage'), 'VenuesAdminPage') },
     { path: 'map', lazy: lazyPage(() => import('./pages/MapAdminPage'), 'MapAdminPage') },
     {
       path: 'reports',
       lazy: lazyPage(() => import('./pages/ReportsQueuePage'), 'ReportsQueuePage'),
     },
-    { path: 'routes', lazy: lazyPage(() => import('./pages/RoutesPage'), 'RoutesPage') },
     // Moderation
     {
       path: 'moderation',

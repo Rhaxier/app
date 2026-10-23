@@ -11,16 +11,18 @@ on the **Admin > Settings** screen; you can also run SQL in Supabase Studio
 
 ## Q1: Who handles facilities and IT problems, and who approves venue bookings?
 
-- Default used: four responsibilities, `facilities`, `it`, `venues`, `supw`. Fix-it
-  categories route to a responsibility through `report_category_routes` (seeded:
-  `it` → `it`, everything else → `facilities`). Seed data gives placeholder staff each
-  one: Admin Facilities holds `facilities` + `it`, Admin Venues holds `venues`,
-  Teacher A holds `supw`.
-- Where it lives: tables `responsibilities` and `report_category_routes`
-  (`supabase/migrations/20261019120100_identity.sql`, `..._120900_fixit.sql`).
-- To change it: **Admin > Responsibilities** to give or remove a job;
-  **Admin > Report routes** to send a category to a different team. Both are logged
-  in the audit log.
+**Configurable in Admin.**
+
+- Default used: four responsibilities, `facilities`, `it`, `venues`, `supw`. Each fix-it
+  category is sent to one responsibility (seeded: IT → `it`, everything else →
+  `facilities`). Seed data gives placeholder staff each one: Admin Facilities holds
+  `facilities` + `it`, Admin Venues holds `venues`, Teacher A holds `supw`.
+- Where it lives: tables `responsibilities` and `report_categories` (which replaced the
+  `report_category` enum and `report_category_routes` table in
+  `supabase/migrations/20261023120300_feature_settings.sql`).
+- To change it: **Admin > People > Responsibilities** to give or remove a job;
+  **Admin > Features > Fix-it categories** to add a category, retire one, or send it to
+  a different team. All of it is logged in the audit log.
 
 ## Q2: Can students request venues, and must a teacher supervise?
 
@@ -28,8 +30,8 @@ on the **Admin > Settings** screen; you can also run SQL in Supabase Studio
   the request starts as `awaiting_teacher` until that teacher confirms it.
 - Where it lives: `app_settings.students_can_request_venues` (default `true`);
   enforced in `bookings_before_insert()` (`..._120800_venues.sql`).
-- To change it: **Admin > Settings**, untick "Students can request venues". Students
-  then see a message asking them to ask a teacher.
+- To change it: **Admin > Features > Venues**, switch off "Students can request
+  venues". Students then see a message asking them to ask a teacher.
 
 ## Q3: Does the school email format distinguish students from staff?
 
@@ -50,8 +52,8 @@ on the **Admin > Settings** screen; you can also run SQL in Supabase Studio
 - Where it lives: `app_settings.collab_requires_teacher` (default `false`); enforced in
   `collab_posts_before_insert()` (`..._120700_collab.sql`). The post form shows the
   teacher picker as required when it's on.
-- To change it: **Admin > Settings**, tick "Collab posts need a supervising teacher".
-  Existing posts are unaffected.
+- To change it: **Admin > Features > Collab**, switch on "Posts need a supervising
+  teacher". Existing posts are unaffected.
 
 ## Q5: Google or Microsoft login, and the school email domain
 
@@ -118,14 +120,16 @@ on the **Admin > Settings** screen; you can also run SQL in Supabase Studio
 
 ## Q9: School name, logo, term dates, SUPW hour rules
 
-- Default used: `[SCHOOL NAME]` placeholder, a generic icon, no term dates, no SUPW
-  hours target (the Volunteer screen shows hours so far without a target).
-- Where it lives: `app_settings.school_name`, `app_settings.supw_hours_target`,
-  `app_settings.grades` (see Q25);
-  `src/config/school.ts` (name shown before sign-in, app name); `public/favicon.svg`.
-- To change it: **Admin > Settings** for the name and SUPW target; edit
-  `src/config/school.ts` and replace `public/favicon.svg` for the sign-in screen and
-  icon. Term dates and holidays: **Admin > School calendar > Terms and holidays**.
+- Default used: `[SCHOOL NAME]` placeholder, a generic icon, no SUPW target. The sample
+  data sets placeholder targets of 20, 30 and 40 hours for grades 8, 10 and 12; they are
+  not the school's rules.
+- Where it lives: `app_settings.school_name`; table `supw_targets` (one row per grade,
+  replacing the old single `app_settings.supw_hours_target`, which the migration copied
+  to every grade); `src/config/school.ts` (name shown before sign-in, app name);
+  `public/favicon.svg`.
+- To change it: **Admin > Features > Volunteering** for each grade's SUPW target
+  (students see their progress on the Volunteer tab); **Admin > School calendar > Terms
+  and holidays** for term dates. School name and logo: see Branding below.
 
 ## Q10: Reminder timing for venue approvals
 
@@ -135,14 +139,10 @@ on the **Admin > Settings** screen; you can also run SQL in Supabase Studio
   `app_settings.venue_reminder_days_before` (3); SQL function `venue_reminders()`
   (`..._120800_venues.sql`). Scheduled hourly by pg_cron in
   `..._121000_realtime_and_cron.sql` when pg_cron is available (it is on Supabase).
-- To change it: **Admin > Settings** for the timings. If pg_cron isn't available
-  (the migration prints a notice), run `select public.venue_reminders();` from any
-  scheduler, or enable pg_cron in the dashboard (Database > Extensions) and run
+- To change it: **Admin > Features > Venues** for the timings. If pg_cron isn't
+  available (the migration prints a notice), run `select public.venue_reminders();` from
+  any scheduler, or enable pg_cron in the dashboard (Database > Extensions) and run
   `select cron.schedule('venue-reminders', '0 * * * *', 'select public.venue_reminders();');`.
-
----
-
-## Further assumptions made while building
 
 ## Q11: Which days are school days, and what are the bookable time slots?
 
@@ -299,12 +299,15 @@ on the **Admin > Settings** screen; you can also run SQL in Supabase Studio
 
 ## Q27: Volunteering categories (the mockup's "Environment" chip)
 
-- Default used: the plan has no event categories, so the filter chips are All, This week,
-  In school (events in a room on the map) and Signed up.
-- Where it lives: `volunteerFilters` and `filterEvents()` in
-  `src/features/volunteering/logic.ts`.
-- To change it: add a `category` column to `volunteer_events` in a new migration, a field
-  on the event form, and a chip per category.
+**Configurable in Admin.**
+
+- Default used: no categories for a new school (the filter chips are All, This week, In
+  school and Signed up). The sample data has four placeholder categories. Events can have
+  one category, and the Volunteer tab shows a chip per category.
+- Where it lives: table `volunteer_categories` and `volunteer_events.category_id`
+  (`..._20261023120300_feature_settings.sql`).
+- To change it: **Admin > Features > Volunteering**: add, rename or retire categories.
+  Retired ones stay on old events but can't be chosen.
 
 ## Q28: Whose pending venue requests appear on the calendar?
 
@@ -393,3 +396,56 @@ on the **Admin > Settings** screen; you can also run SQL in Supabase Studio
 - Where it lives: `bookings_check_rules()` and `booking_calendar_problem()`
   (`..._20261023120200_school_calendar.sql`).
 - To change it: add a weekday check to `bookings_check_rules()` in a new migration.
+
+## Q36: How do scheduled and expiring announcements work?
+
+- Default used: an announcement can be scheduled (`publish_at` in the future) and can
+  expire (`expires_at`). Until it's published and after it expires, only its author and
+  admins see it. Its notifications go out when it's published: straight away, or from
+  `publish_due_announcements()`, which pg_cron runs every five minutes. The default
+  expiry (`app_settings.announcement_default_expiry_days`, off by default) only fills in
+  the form's "Expires" field; the author can change or clear it.
+- Where it lives: `..._20261023120300_feature_settings.sql` (the column was renamed from
+  `published_at` to `publish_at`).
+- To change it: **Admin > Features > Announcements** for the default expiry. To make it
+  a hard rule, set `expires_at` in a BEFORE INSERT trigger instead.
+
+## Q37: When does a fix-it report become urgent by itself?
+
+- Default used: when 5 people have said "me too" (the reporter not counted). It then
+  emails the responsible team immediately, as a teacher marking it urgent would.
+- Where it lives: `app_settings.report_auto_urgent_votes` (null = never) and the
+  `report_votes_auto_urgent` trigger (`..._20261023120300_feature_settings.sql`).
+- To change it: **Admin > Features > Fix-it categories**, "Make urgent after this many
+  me too".
+
+## Q38: How big can a collab team be, and which skills can posts list?
+
+- Default used: up to 8 people including the owner (so a post asks for at most 7).
+  Skills come from an admin-managed list; anyone can suggest a new skill, and posts can
+  use a suggestion while it waits. Admins approve it, merge it into an existing skill
+  (posts switch over) or reject it (posts drop it). Existing posts' skills became the
+  first list when the migration ran.
+- Where it lives: `app_settings.collab_max_team_size`; tables `skill_tags` and
+  `skill_tag_suggestions`; `collab_posts_check_rules()`
+  (`..._20261023120300_feature_settings.sql`).
+- To change it: **Admin > Features > Collab**.
+
+## Q39: Must student volunteering events be approved?
+
+- Default used: yes (the plan). Switching it off publishes students' events straight
+  away; their SUPW hours are then confirmed by the SUPW coordinator or an admin, since no
+  teacher approved the event.
+- Where it lives: `app_settings.student_events_need_approval`;
+  `volunteer_events_before_insert()` (`..._20261023120300_feature_settings.sql`).
+- To change it: **Admin > Features > Volunteering**.
+
+## Q40: When, for how long and how far ahead can each venue be booked?
+
+- Default used: no limits for a new venue. The sample Auditorium can be booked 07:00 to
+  18:00, for up to 240 minutes, up to 60 days ahead; the MPH 07:00 to 20:00 for up to
+  300 minutes. Requests that break a limit are refused by the database with a sentence
+  saying which limit.
+- Where it lives: `venues.bookable_from`, `bookable_until`, `max_booking_minutes`,
+  `max_days_ahead`; `bookings_check_rules()` (`..._20261023120300_feature_settings.sql`).
+- To change it: **Admin > Features > Venues**, edit the venue.

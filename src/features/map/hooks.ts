@@ -1,7 +1,15 @@
 // School map hooks. The map changes rarely, so it's cached for ten minutes.
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { TablesInsert, TablesUpdate } from '@/types/database';
-import { createRoom, deleteRoom, fetchFloors, fetchRooms, updateFloor, updateRoom } from './api';
+import {
+  createRoom,
+  deleteRoom,
+  fetchFloors,
+  fetchRooms,
+  updateFloor,
+  updateRoom,
+  uploadFloorPlan,
+} from './api';
 
 export const mapKeys = {
   all: ['map'] as const,
@@ -57,5 +65,14 @@ export function useUpdateFloor() {
       updateFloor(id, changes),
     onSuccess: invalidate,
     meta: { successMessage: 'Floor saved' },
+  });
+}
+
+/** Admin: upload a plan image (the floor is saved separately, after checking). */
+export function useUploadFloorPlan() {
+  return useMutation({
+    mutationFn: ({ floorId, file }: { floorId: string; file: File }) =>
+      uploadFloorPlan(floorId, file),
+    meta: { successMessage: 'Uploaded. Check the size, then save the floor.', errorToast: true },
   });
 }

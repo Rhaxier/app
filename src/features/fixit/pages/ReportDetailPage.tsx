@@ -10,7 +10,7 @@ import { EmptyState, ErrorState, LoadingState } from '@/components/States';
 import { useCurrentUser } from '@/features/auth/hooks';
 import { formatDateTime } from '@/lib/dates';
 import { isStaff } from '@/lib/permissions';
-import { reportCategoryLabel, reportStatus } from '@/lib/status';
+import { reportStatus } from '@/lib/status';
 import { MeTooButton } from '../components/MeTooButton';
 import { ReportPhoto } from '../components/ReportPhoto';
 import { StaffReportPanel } from '../components/StaffReportPanel';
@@ -46,7 +46,7 @@ export function ReportDetailPage() {
         <div className="row-wrap">
           <StatusBadge map={reportStatus} status={item.status} />
           {item.urgent && <Badge tone="attention">Urgent</Badge>}
-          <Badge tone="quiet">{reportCategoryLabel[item.category]}</Badge>
+          <Badge tone="quiet">{item.category_name}</Badge>
         </div>
         {/* The title is the first line; show the rest only if there is more. */}
         {item.description.trim() !== reportTitle(item.description) && (

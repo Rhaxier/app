@@ -10,6 +10,7 @@
 // real protection: these mirror them, they don't replace them.
 // =============================================================================
 import type { CurrentUser } from '@/features/auth/api';
+import { fromDateTimeInputValue, toDateTimeInputValue } from '@/lib/dates';
 import { canPostSchoolWide } from '@/lib/permissions';
 import type { Enums } from '@/types/database';
 import type { Announcement, AnnouncementInput } from './api';
@@ -23,6 +24,10 @@ export interface AnnouncementFormValues {
   /** Optional: only some sections (ids). Their grades are added automatically. */
   sectionIds: string[];
   pinned: boolean;
+  /** datetime-local value (Dubai time); '' = publish now. */
+  publishAt: string;
+  /** datetime-local value; '' = never expires. */
+  expiresAt: string;
 }
 
 export type AnnouncementErrors = Partial<Record<keyof AnnouncementFormValues, string>>;
@@ -33,6 +38,7 @@ export const BODY_MAX = 4000;
 export function validateAnnouncement(
   values: AnnouncementFormValues,
   user: CurrentUser,
+  now: Date = new Date(),
 ): AnnouncementErrors {
   const errors: AnnouncementErrors = {};
 
@@ -51,6 +57,14 @@ export function validateAnnouncement(
     values.sectionIds.length === 0
   ) {
     errors.grades = 'Choose at least one grade or section.';
+  }
+
+  if (values.expiresAt) {
+    const publish = values.publishAt
+      ? fromDateTimeInputValue(values.publishAt)!
+      : now.toISOString();
+    if (fromDateTimeInputValue(values.expiresAt)! <= publish)
+      errors.expiresAt = 'It has to expire after it is published.';
   }
 
   // Mirrors the "Staff post announcements" policy.
@@ -74,7 +88,22 @@ export const emptyAnnouncementValues: AnnouncementFormValues = {
   grades: [],
   sectionIds: [],
   pinned: false,
+  publishAt: '',
+  expiresAt: '',
 };
+
+/**
+ * A new announcement's starting values: expiring after the school's default
+ * number of days, if one is set (Admin > Features > Announcements).
+ */
+export function newAnnouncementValues(
+  defaultExpiryDays: number | null | undefined,
+  now: Date = new Date(),
+): AnnouncementFormValues {
+  if (!defaultExpiryDays) return emptyAnnouncementValues;
+  const expires = new Date(now.getTime() + defaultExpiryDays * 86_400_000);
+  return { ...emptyAnnouncementValues, expiresAt: toDateTimeInputValue(expires) };
+}
 
 export function valuesFromAnnouncement(announcement: Announcement): AnnouncementFormValues {
   return {
@@ -86,6 +115,8 @@ export function valuesFromAnnouncement(announcement: Announcement): Announcement
     grades: announcement.section_ids ? [] : (announcement.grades ?? []),
     sectionIds: announcement.section_ids ?? [],
     pinned: announcement.pinned,
+    publishAt: toDateTimeInputValue(announcement.publish_at),
+    expiresAt: toDateTimeInputValue(announcement.expires_at),
   };
 }
 
@@ -106,5 +137,18 @@ export function toAnnouncementInput(values: AnnouncementFormValues): Announcemen
     grades: forGrades ? (sectionIds.length ? [] : values.grades) : null,
     section_ids: sectionIds.length ? sectionIds : null,
     pinned: values.pinned,
+    // Left out when empty, so the database uses "now".
+    ...(values.publishAt ? { publish_at: fromDateTimeInputValue(values.publishAt)! } : {}),
+    expires_at: fromDateTimeInputValue(values.expiresAt),
   };
+}
+
+/** 'scheduled' (not out yet), 'expired', or 'live'. */
+export function announcementState(
+  announcement: Pick<Announcement, 'publish_at' | 'expires_at'>,
+  now: Date = new Date(),
+): 'scheduled' | 'expired' | 'live' {
+  if (new Date(announcement.publish_at) > now) return 'scheduled';
+  if (announcement.expires_at && new Date(announcement.expires_at) <= now) return 'expired';
+  return 'live';
 }

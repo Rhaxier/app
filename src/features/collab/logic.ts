@@ -80,18 +80,25 @@ export const emptyCollabValues: CollabFormValues = {
   supervisingTeacherId: '',
 };
 
+/**
+ * maxTeamSize counts the owner too (app_settings.collab_max_team_size), so the
+ * most people a post can ask for is one less.
+ */
 export function validateCollab(
   values: CollabFormValues,
   teacherRequired: boolean,
   acceptedCount = 0,
+  maxTeamSize = 51,
 ): CollabFormErrors {
   const errors: CollabFormErrors = {};
+  const maxWanted = maxTeamSize - 1;
   if (!values.title.trim()) errors.title = 'Add a title.';
   else if (values.title.trim().length > 120) errors.title = 'Keep the title under 120 characters.';
-  if (parseSkills(values.skills).length === 0) errors.skills = 'List at least one skill you need.';
+  if (parseSkills(values.skills).length === 0)
+    errors.skills = 'Choose at least one skill you need.';
   const spots = Number(values.spotsWanted);
-  if (!Number.isInteger(spots) || spots < 1 || spots > 50)
-    errors.spotsWanted = 'Between 1 and 50 people.';
+  if (!Number.isInteger(spots) || spots < 1 || spots > maxWanted)
+    errors.spotsWanted = `Between 1 and ${maxWanted} people (teams are up to ${maxTeamSize}, including you).`;
   else if (spots < acceptedCount)
     errors.spotsWanted = `${acceptedCount} people are already on the team.`;
   if (teacherRequired && !values.supervisingTeacherId)

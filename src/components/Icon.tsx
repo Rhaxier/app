@@ -155,7 +155,28 @@ const paths = {
   sparkle: (
     <path d="M12 3.5v4M12 16.5v4M3.5 12h4M16.5 12h4M6 6l2.5 2.5M15.5 15.5 18 18M18 6l-2.5 2.5M8.5 15.5 6 18" />
   ),
+  // Fix-it categories (report_categories.icon names one of these).
+  bolt: <path d="M13 3.5 5.5 13.5h6l-1 7 7.5-10h-6z" />,
+  wind: (
+    <path d="M3.5 9h11a2.75 2.75 0 1 0-2.75-2.75M3.5 13h15a2.75 2.75 0 1 1-2.75 2.75M3.5 17h7" />
+  ),
+  droplet: <path d="M12 3.5s-6 6.6-6 10.8a6 6 0 0 0 12 0C18 10.1 12 3.5 12 3.5z" />,
+  box: (
+    <>
+      <path d="m12 3.5 8 4v9l-8 4-8-4v-9z" />
+      <path d="m4 7.5 8 4 8-4M12 11.5v9" />
+    </>
+  ),
+  monitor: (
+    <>
+      <rect x="3.5" y="4.5" width="17" height="11.5" rx="2" />
+      <path d="M8.5 20h7M12 16v4" />
+    </>
+  ),
 } as const;
+
+/** Every icon name, e.g. for the admin's icon picker. */
+export const ICON_NAMES = Object.keys(paths) as IconName[];
 
 export type IconName = keyof typeof paths;
 

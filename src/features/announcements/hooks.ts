@@ -10,11 +10,13 @@
 // delete) we "invalidate" the announcement keys so every screen refetches.
 // =============================================================================
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { showToast } from '@/lib/toast';
 import {
   createAnnouncement,
   deleteAnnouncement,
   fetchAnnouncement,
   fetchAnnouncements,
+  setPinned,
   updateAnnouncement,
   type AnnouncementInput,
 } from './api';
@@ -64,5 +66,17 @@ export function useDeleteAnnouncement() {
     mutationFn: (id: string) => deleteAnnouncement(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: announcementKeys.all }),
     meta: { successMessage: 'Announcement deleted', errorToast: true },
+  });
+}
+
+export function useSetPinned() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, pinned }: { id: string; pinned: boolean }) => setPinned(id, pinned),
+    onSuccess: (_data, { pinned }) => {
+      queryClient.invalidateQueries({ queryKey: announcementKeys.all });
+      showToast(pinned ? 'Pinned' : 'Unpinned');
+    },
+    meta: { errorToast: true },
   });
 }

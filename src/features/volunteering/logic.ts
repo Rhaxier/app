@@ -88,6 +88,14 @@ export function filterEvents(
   }
 }
 
+/** The category chips (Q27): '' = every category. */
+export function filterByCategory<T extends Pick<VolunteerEvent, 'category_id'>>(
+  events: T[],
+  categoryId: string,
+): T[] {
+  return categoryId ? events.filter((event) => event.category_id === categoryId) : events;
+}
+
 // ---------------------------------------------------------------------------
 // The create / edit form
 // ---------------------------------------------------------------------------
@@ -113,6 +121,8 @@ export interface EventFormValues {
   supwHours: string;
   signupDeadline: string;
   allowMultipleRoles: boolean;
+  /** A volunteer_categories id, or '' for none. */
+  categoryId: string;
   roles: RoleFormValues[];
 }
 
@@ -187,6 +197,7 @@ export const emptyEventValues: EventFormValues = {
   supwHours: '1',
   signupDeadline: '',
   allowMultipleRoles: false,
+  categoryId: '',
   roles: [{ ...emptyRole }],
 };
 
@@ -203,6 +214,7 @@ export function valuesFromEvent(event: VolunteerEvent): EventFormValues {
     supwHours: String(event.supw_hours),
     signupDeadline: toDateTimeInputValue(event.signup_deadline),
     allowMultipleRoles: event.allow_multiple_roles,
+    categoryId: event.category_id ?? '',
     roles: event.roles.map((role) => ({
       id: role.id,
       name: role.name,
@@ -225,6 +237,7 @@ export function toEventInput(values: EventFormValues): EventInput {
     supw_hours: Number(values.supwHours),
     signup_deadline: fromDateTimeInputValue(values.signupDeadline),
     allow_multiple_roles: values.allowMultipleRoles,
+    category_id: values.categoryId || null,
   };
 }
 

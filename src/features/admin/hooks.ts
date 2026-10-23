@@ -193,6 +193,7 @@ export function useUpdateSettings() {
   return useMutation({
     mutationFn: (changes: SettingsChanges) => updateSettings(changes),
     onSuccess: invalidate,
+    meta: { successMessage: 'Saved', errorToast: true },
   });
 }
 
@@ -202,6 +203,7 @@ export function useSaveVenue() {
     mutationFn: ({ id, fields }: { id: string | null; fields: VenueFields }) =>
       id ? updateVenue(id, fields) : createVenue(fields),
     onSuccess: invalidate,
+    meta: { successMessage: 'Venue saved' },
   });
 }
 

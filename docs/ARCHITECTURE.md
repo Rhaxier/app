@@ -71,7 +71,7 @@ Migrations live in `supabase/migrations/` and run in filename order.
 | Projects with teachers | `projects`, `project_shares`, `project_feedback`; bucket `project-files`                                                                     | `20261019120600_projects.sql`          |
 | Collab finder          | `collab_posts`, `join_requests`, `content_reports`; `collab_post_counts()`, `collab_requests()`, `collab_team()`                             | `20261019120700_collab.sql`            |
 | Venue booking          | `venues`, `bookings`; `booking_details()`, `venue_reminders()`                                                                               | `20261019120800_venues.sql`            |
-| Fix-it reports         | `reports`, `report_votes`, `report_category_routes`; `report_feed()`, `open_reports_in_room()`; bucket `report-photos`                       | `20261019120900_fixit.sql`             |
+| Fix-it reports         | `reports`, `report_votes`, `report_categories` (B4); `report_feed()`, `open_reports_in_room()`; bucket `report-photos`                       | `20261019120900_fixit.sql`             |
 | Realtime and cron      | Realtime on `notifications`, `bookings`, `reports`; hourly `venue_reminders()`                                                               | `20261019121000_realtime_and_cron.sql` |
 
 The staff **Approvals** tab has no tables of its own: it reads the feature tables and
