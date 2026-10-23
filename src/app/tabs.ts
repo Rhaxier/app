@@ -38,6 +38,11 @@ export function tabsFor(user: CurrentUser): Tab[] {
   return isStaff(user) ? [...everyoneTabs, approvalsTab] : everyoneTabs;
 }
 
+/** The tab a screen belongs to, whoever is looking (used for screen transitions). */
+export function tabOf(pathname: string): Tab | undefined {
+  return [...everyoneTabs, approvalsTab].find((tab) => isTabActive(tab, pathname));
+}
+
 export function isTabActive(tab: Tab, pathname: string): boolean {
   if (tab.to === '/' && pathname === '/') return true;
   return tab.sections.some((section) => pathname === section || pathname.startsWith(`${section}/`));

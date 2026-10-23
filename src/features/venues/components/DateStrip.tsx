@@ -32,7 +32,7 @@ export function DateStrip({
         <span className={styles.arrows}>
           <button
             type="button"
-            className={styles.arrow}
+            className={`${styles.arrow} pressable`}
             onClick={onPreviousWeek}
             disabled={!canGoBack}
             aria-label="Previous week"
@@ -41,7 +41,7 @@ export function DateStrip({
           </button>
           <button
             type="button"
-            className={styles.arrow}
+            className={`${styles.arrow} pressable`}
             onClick={onNextWeek}
             aria-label="Next week"
           >
@@ -56,7 +56,7 @@ export function DateStrip({
             <button
               key={day}
               type="button"
-              className={styles.day}
+              className={`${styles.day} pressable`}
               aria-pressed={day === selected}
               aria-label={labels.long}
               disabled={day < today}

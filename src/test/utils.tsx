@@ -1,10 +1,12 @@
 // Helpers for UI tests: render a component inside the providers it needs
-// (router + TanStack Query), and build fake signed-in users.
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+// (router + TanStack Query + toasts), and build fake signed-in users.
+import { QueryClientProvider, type QueryClient } from '@tanstack/react-query';
 import { render } from '@testing-library/react';
 import type { ReactElement } from 'react';
 import { MemoryRouter } from 'react-router-dom';
+import { Toaster } from '@/components/Toaster';
 import type { CurrentUser } from '@/features/auth/api';
+import { createQueryClient } from '@/lib/queryClient';
 
 export function makeUser(overrides: Partial<CurrentUser> = {}): CurrentUser {
   return {
@@ -30,12 +32,17 @@ export const teacher = makeUser({
   responsibilities: ['supw'],
 });
 
-export function renderWithProviders(ui: ReactElement, { route = '/' }: { route?: string } = {}) {
-  // A fresh cache per test, with no retries, so failures show up immediately.
-  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+export function renderWithProviders(
+  ui: ReactElement,
+  { route = '/', queryClient }: { route?: string; queryClient?: QueryClient } = {},
+) {
+  // A fresh cache per test (unless the test brings one to fill in first), with
+  // no retries, so failures show up immediately. Same toast handling as the app.
+  const client = queryClient ?? createQueryClient({ retry: false });
   return render(
-    <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={client}>
       <MemoryRouter initialEntries={[route]}>{ui}</MemoryRouter>
+      <Toaster />
     </QueryClientProvider>,
   );
 }

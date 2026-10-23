@@ -1,6 +1,7 @@
 // "Me too · 3": adds (or removes) your vote, so a problem is counted once per
 // person instead of being reported again. The reporter's own report already
-// counts them.
+// counts them. The count changes the moment you tap (an optimistic update,
+// see useToggleVote) and goes back if the database refuses.
 import { Button } from '@/components/Button';
 import { useCurrentUser } from '@/features/auth/hooks';
 import { useToggleVote } from '../hooks';
@@ -26,10 +27,11 @@ export function MeTooButton({
     <Button
       variant={votedByMe ? 'quiet' : 'secondary'}
       fullWidth={fullWidth}
-      disabled={reportedByMe || toggle.isPending}
+      disabled={reportedByMe}
       aria-pressed={votedByMe}
       title={reportedByMe ? 'You reported this one' : undefined}
-      onClick={() => toggle.mutate({ reportId, voted: votedByMe })}
+      // One tap at a time: a second tap waits for the first to finish.
+      onClick={() => !toggle.isPending && toggle.mutate({ reportId, voted: votedByMe })}
     >
       {votedByMe ? 'You said me too' : 'Me too'} · {count}
     </Button>

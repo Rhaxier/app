@@ -1,6 +1,7 @@
 // Venue booking: TanStack Query hooks. useLiveBookings() keeps any screen
 // showing bookings up to date through Realtime.
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { showToast } from '@/lib/toast';
 import { useEffect } from 'react';
 import {
   decideBooking,
@@ -97,6 +98,7 @@ export function useRequestBooking() {
   return useMutation({
     mutationFn: (input: BookingInput) => requestBooking(input),
     onSuccess: invalidate,
+    meta: { successMessage: 'Booking requested' },
   });
 }
 
@@ -115,10 +117,19 @@ export function useDecideBooking() {
       note?: string;
       announce?: boolean;
     }) => decideBooking(id, status, { note, announce }),
-    onSuccess: () => {
+    onSuccess: (_data, { status }) => {
       invalidate();
       // "Announce this" posts to the feed.
       queryClient.invalidateQueries({ queryKey: ['announcements'] });
+      showToast(bookingDecisionToast[status]);
     },
+    meta: { errorToast: true },
   });
 }
+
+const bookingDecisionToast: Record<'pending' | 'approved' | 'rejected' | 'cancelled', string> = {
+  pending: 'Confirmed. Venue staff will decide next.',
+  approved: 'Booking approved',
+  rejected: 'Booking not approved',
+  cancelled: 'Booking cancelled',
+};

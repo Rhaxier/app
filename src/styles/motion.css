@@ -1,0 +1,145 @@
+/*
+ * Motion shared by the whole app (see "Motion" in docs/ARCHITECTURE.md).
+ *
+ * Components with their own animation (Sheet, Toast, skeletons) keep their
+ * keyframes in their CSS module. This file holds what many components share:
+ *   .pressable      press feedback for anything tappable
+ *   .reveal         content fading in (e.g. replacing a loading skeleton)
+ *   .enter, .leave  a list item arriving or leaving (src/lib/useListMotion.ts)
+ *   screen changes  the View Transitions API (src/app/screenTransitions.ts)
+ * Every duration and curve comes from the motion tokens in tokens.css.
+ */
+
+/* ---------------------------------------------------------------------------
+   Press feedback. Add className="pressable" to buttons, chips, tiles and tabs:
+   they shrink a touch and darken while pressed, and colours change smoothly.
+   The focus ring (box-shadow) is left out of the transition on purpose, so it
+   appears at once instead of sliding in.
+   --------------------------------------------------------------------------- */
+.pressable {
+  transition:
+    transform var(--motion-fast) var(--ease-out),
+    filter var(--motion-fast) var(--ease-out),
+    background-color var(--motion-fast) var(--ease-out),
+    border-color var(--motion-fast) var(--ease-out),
+    color var(--motion-fast) var(--ease-out);
+}
+
+.pressable:active:not(:disabled):not([aria-disabled='true']) {
+  transform: scale(0.97);
+  filter: brightness(0.92);
+}
+
+/* ---------------------------------------------------------------------------
+   Content arriving and leaving.
+   --------------------------------------------------------------------------- */
+@keyframes motion-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes motion-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes motion-leave {
+  to {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+/* Loaded content fades in over its skeleton's place. */
+.reveal {
+  animation: motion-fade-in var(--motion-base) var(--ease-out);
+}
+
+/* A new list item (a fresh notification, a booking approved elsewhere). */
+.enter {
+  animation: motion-enter var(--motion-base) var(--ease-out);
+}
+
+/* A list item on its way out. It can't be clicked while it fades. */
+.leave {
+  animation: motion-leave var(--motion-base) var(--ease-in-out) forwards;
+  pointer-events: none;
+}
+
+/* ---------------------------------------------------------------------------
+   Screen changes (View Transitions API).
+   The browser takes a picture of the old screen, the app draws the new one,
+   and these rules animate between the two pictures. src/app/screenTransitions.ts
+   sets data-nav on <html> so we know which way the person is going:
+     fade     another tab or an unrelated screen: a quick cross-fade
+     forward  drilling into a detail page: the new screen fades in, rising 8px
+     back     going back: the old screen fades out, sinking 8px
+   The tab bar has its own name (see TabBar.module.css), so it stays put.
+   --------------------------------------------------------------------------- */
+
+/* The pictures sit on top of the page; let taps go through to the real page. */
+::view-transition {
+  pointer-events: none;
+}
+
+::view-transition-old(root) {
+  animation: motion-vt-out var(--motion-base) var(--ease-in-out) both;
+}
+
+::view-transition-new(root) {
+  animation: motion-vt-in var(--motion-base) var(--ease-out) both;
+}
+
+html[data-nav='forward']::view-transition-new(root) {
+  animation-name: motion-vt-rise-in;
+}
+
+html[data-nav='back']::view-transition-old(root) {
+  animation-name: motion-vt-sink-out;
+}
+
+::view-transition-group(tab-bar) {
+  animation-duration: var(--motion-fast);
+}
+
+@keyframes motion-vt-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes motion-vt-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes motion-vt-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes motion-vt-sink-out {
+  to {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Reduced motion: when someone asks their device for less motion, every
+   animation and transition becomes instant. globals.css already does this for
+   normal elements; the screen-change pictures need saying separately.
+   --------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

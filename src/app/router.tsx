@@ -17,6 +17,7 @@ import { AppLayout } from './AppLayout';
 import { RequireAuth, RequireRole } from './guards';
 import { NotFoundPage } from './NotFoundPage';
 import { RootLayout } from './RootLayout';
+import { enableScreenTransitions } from './screenTransitions';
 
 /**
  * A route that loads its screen on first visit:
@@ -187,3 +188,6 @@ export const router = createBrowserRouter([
     ],
   },
 ]);
+
+// Every screen change animates (see src/app/screenTransitions.ts).
+enableScreenTransitions(router);

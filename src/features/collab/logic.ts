@@ -1,5 +1,5 @@
 // Collab finder: plain functions for the screens (tested in collab.test.tsx).
-import type { CollabPost, MyRequest, PostInput } from './api';
+import type { CollabPost, MyRequest, PostInput, RequestStatus } from './api';
 
 /** "2 of 3 spots filled" (plan: "The card shows progress"). */
 export function filledLabel(post: Pick<CollabPost, 'accepted_count' | 'spots_wanted'>): string {
@@ -117,4 +117,19 @@ export function toPostInput(values: CollabFormValues): PostInput {
     spots_wanted: Number(values.spotsWanted),
     supervising_teacher_id: values.supervisingTeacherId || null,
   };
+}
+
+/**
+ * A copy of cached collab data with one join request's status changed, for the
+ * optimistic update in useSetRequestStatus. The owner's list calls it
+ * `request_id`, the requester's own list `id`; anything else is returned untouched.
+ */
+export function withRequestStatus<T>(data: T, requestId: string, status: RequestStatus): T {
+  const change = (item: unknown) => {
+    if (typeof item !== 'object' || item === null || !('status' in item)) return item;
+    const id =
+      'request_id' in item ? item.request_id : 'post_id' in item && 'id' in item ? item.id : null;
+    return id === requestId ? { ...item, status } : item;
+  };
+  return (Array.isArray(data) ? data.map(change) : data) as T;
 }

@@ -6,6 +6,7 @@ import '@fontsource/dm-sans/600.css';
 import 'leaflet/dist/leaflet.css';
 import './styles/tokens.css';
 import './styles/globals.css';
+import './styles/motion.css';
 
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';

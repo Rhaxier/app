@@ -9,6 +9,11 @@
   padding: var(--space-6) var(--space-5) calc(var(--height-tabbar) + var(--space-8));
 }
 
+/* The admin dashboard is desktop-first: a side menu plus content needs room. */
+.wide {
+  max-width: var(--content-max-wide);
+}
+
 /* Keyboard users can jump past the header straight to the content. */
 .skip {
   position: absolute;

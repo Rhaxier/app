@@ -33,7 +33,7 @@ export function SegmentedControl<T extends string>({
         <button
           key={option.value}
           type="button"
-          className={styles.option}
+          className={`${styles.option} pressable`}
           aria-pressed={option.value === value}
           onClick={() => onChange(option.value)}
         >

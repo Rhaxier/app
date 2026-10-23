@@ -16,7 +16,7 @@ export function HomeHeader() {
         <h1 className={styles.greeting}>{greeting(now)}</h1>
       </div>
       <div className={styles.actions}>
-        <Link to="/me" className={styles.me} aria-label={`Me: ${user.full_name}`}>
+        <Link to="/me" className={`${styles.me} pressable`} aria-label={`Me: ${user.full_name}`}>
           <Avatar name={user.full_name} initials={user.avatar_initials} tone="quiet" />
         </Link>
         <NotificationBell />

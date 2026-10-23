@@ -7,6 +7,9 @@
   background: var(--color-card);
   border-top: 1px solid var(--color-border);
   padding-bottom: env(safe-area-inset-bottom);
+  /* Its own layer in screen transitions, so it stays put while the screen
+     above it changes (see motion.css). */
+  view-transition-name: tab-bar;
 }
 
 .list {

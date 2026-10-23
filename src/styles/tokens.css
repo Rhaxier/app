@@ -63,8 +63,20 @@
   /* Layout */
   --phone-width: 390px;
   --content-max: 480px; /* desktop: centred column */
+  --content-max-wide: 1180px; /* admin dashboard on a laptop: menu + content */
 
   /* Elevation (only for floating things: sheets, the map card, FAB) */
   --shadow-float: 0 8px 28px rgba(21, 32, 43, 0.12);
   --focus-ring: 0 0 0 3px rgba(14, 104, 87, 0.35);
+
+  /*
+   * Motion (see "Motion" in docs/ARCHITECTURE.md). Quick and calm: nothing
+   * bounces and nothing takes longer than 300ms. Only opacity and transform
+   * ever animate. src/lib/motion.ts reads these, so JS waits exactly as long.
+   */
+  --motion-fast: 120ms; /* press feedback, hovers */
+  --motion-base: 200ms; /* fades, small movements */
+  --motion-slow: 280ms; /* sheets, screen transitions */
+  --ease-out: cubic-bezier(0.2, 0, 0, 1); /* things arriving */
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1); /* things leaving or moving */
 }

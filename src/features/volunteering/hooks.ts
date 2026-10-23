@@ -2,6 +2,7 @@
 // ['volunteering'] key: lists, counts and sign-ups are all connected, and the
 // data is small, so refetching all of it is simplest and always correct.
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { showToast } from '@/lib/toast';
 import {
   createEvent,
   deleteEvent,
@@ -74,6 +75,7 @@ export function useCreateEvent() {
     mutationFn: ({ input, roles }: { input: EventInput; roles: RoleInput[] }) =>
       createEvent(input, roles),
     onSuccess: invalidate,
+    meta: { successMessage: 'Event created' },
   });
 }
 
@@ -90,6 +92,7 @@ export function useUpdateEvent(id: string) {
       removedRoleIds: string[];
     }) => updateEvent(id, input, roles, removedRoleIds),
     onSuccess: invalidate,
+    meta: { successMessage: 'Event saved' },
   });
 }
 
@@ -98,13 +101,21 @@ export function useSetEventStatus(id: string) {
   return useMutation({
     mutationFn: ({ status, note }: { status: EventStatus; note?: string }) =>
       setEventStatus(id, status, note),
-    onSuccess: invalidate,
+    onSuccess: (_data, { status }) => {
+      invalidate();
+      showToast(eventStatusToast[status]);
+    },
+    meta: { errorToast: true },
   });
 }
 
 export function useDeleteEvent() {
   const invalidate = useInvalidateVolunteering();
-  return useMutation({ mutationFn: deleteEvent, onSuccess: invalidate });
+  return useMutation({
+    mutationFn: deleteEvent,
+    onSuccess: invalidate,
+    meta: { successMessage: 'Event deleted', errorToast: true },
+  });
 }
 
 export function useSignUp(eventId: string) {
@@ -113,6 +124,7 @@ export function useSignUp(eventId: string) {
     mutationFn: ({ roleId, note }: { roleId: string; note: string }) =>
       signUp(eventId, roleId, note),
     onSuccess: invalidate,
+    meta: { successMessage: "You're signed up" },
   });
 }
 
@@ -121,7 +133,11 @@ export function useSetMySignupStatus() {
   return useMutation({
     mutationFn: ({ signupId, status }: { signupId: string; status: 'withdrawn' | 'applied' }) =>
       setMySignupStatus(signupId, status),
-    onSuccess: invalidate,
+    onSuccess: (_data, { status }) => {
+      invalidate();
+      showToast(status === 'withdrawn' ? "You've withdrawn" : "You're signed up again");
+    },
+    meta: { errorToast: true },
   });
 }
 
@@ -130,10 +146,34 @@ export function useUpdateSignup() {
   return useMutation({
     mutationFn: ({ signupId, changes }: { signupId: string; changes: SignupChanges }) =>
       updateSignup(signupId, changes),
-    onSuccess: invalidate,
+    onSuccess: (_data, { changes }) => {
+      invalidate();
+      showToast(signupChangeToast(changes));
+    },
+    meta: { errorToast: true },
   });
 }
 
 export function useSupwHoursReport() {
-  return useMutation({ mutationFn: fetchSupwHoursReport });
+  return useMutation({
+    mutationFn: fetchSupwHoursReport,
+    meta: { successMessage: 'SUPW hours exported' },
+  });
+}
+
+// What the toast says after each kind of change.
+const eventStatusToast: Record<EventStatus, string> = {
+  awaiting_approval: 'Sent to a teacher for approval',
+  published: 'Event published',
+  sent_back: 'Sent back with your note',
+  closed: 'Event closed',
+};
+
+function signupChangeToast(changes: SignupChanges): string {
+  if (changes.hours_confirmed !== undefined) return 'Hours confirmed';
+  if (changes.attended !== undefined) return 'Attendance saved';
+  if (changes.status === 'selected') return 'Selected. They have been told.';
+  if (changes.status === 'waitlisted') return 'Moved to the waitlist';
+  if (changes.role_id !== undefined) return 'Moved to another role';
+  return 'Saved';
 }

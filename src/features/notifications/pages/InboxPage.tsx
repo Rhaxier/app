@@ -1,11 +1,13 @@
 // The inbox: every notification, newest first. Tapping one marks it read and
-// opens the screen it's about.
+// opens the screen it's about. New ones arriving over Realtime slide in
+// (useListMotion); the list doesn't animate when it first loads.
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/Badge';
 import { Button, ButtonLink } from '@/components/Button';
 import { PageHeader } from '@/components/PageHeader';
 import { EmptyState, ErrorState, LoadingState } from '@/components/States';
 import { relativeTime } from '@/lib/dates';
+import { useListMotion } from '@/lib/useListMotion';
 import type { Notification } from '../api';
 import { useMarkAllRead, useMarkRead, useNotifications } from '../hooks';
 import styles from './InboxPage.module.css';
@@ -22,6 +24,7 @@ export function InboxPage() {
   }
 
   const hasUnread = notifications.data?.some((item) => !item.read_at) ?? false;
+  const rows = useListMotion(notifications.data, (item) => item.id);
 
   return (
     <div className="stack">
@@ -57,13 +60,15 @@ export function InboxPage() {
         </EmptyState>
       )}
 
-      {notifications.data && notifications.data.length > 0 && (
-        <ul className={styles.list}>
-          {notifications.data.map((item) => (
-            <li key={item.id}>
+      {rows.length > 0 && (
+        <ul className={`${styles.list} reveal`}>
+          {rows.map(({ item, key, motion }) => (
+            <li key={key} className={motion}>
               <button
                 type="button"
-                className={[styles.item, !item.read_at && styles.unread].filter(Boolean).join(' ')}
+                className={['pressable', styles.item, !item.read_at && styles.unread]
+                  .filter(Boolean)
+                  .join(' ')}
                 onClick={() => open(item)}
               >
                 <span className={styles.dot} aria-hidden="true" />

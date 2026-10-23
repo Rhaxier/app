@@ -71,7 +71,7 @@ export function AdminHomePage() {
       <ul className="stack-tight">
         {tools.map((tool) => (
           <li key={tool.to}>
-            <Link to={tool.to} className={styles.tool}>
+            <Link to={tool.to} className={`${styles.tool} pressable`}>
               <span className={styles.icon}>
                 <Icon name={tool.icon} size={20} />
               </span>

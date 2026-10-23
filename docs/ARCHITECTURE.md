@@ -100,6 +100,44 @@ first visit), so the app starts faster on phones.
 | `/approvals`                                                            | Staff queue                                                                                                       | teachers and admins     |
 | `/admin/*`                                                              | Users, responsibilities, staff emails, venues, map editor, report routes, settings, moderation, audit log, outbox | admins                  |
 
+## Motion
+
+Interactions should feel quick and calm: presses respond at once, screens and sheets
+glide, nothing bounces, nothing takes over 300ms. Everything is plain CSS (no
+animation library) and only `opacity` and `transform` ever animate.
+
+**Tokens** (`src/styles/tokens.css`):
+
+| Token           | Value                          | Used for                                  |
+| --------------- | ------------------------------ | ----------------------------------------- |
+| `--motion-fast` | `120ms`                        | press feedback, hovers, colour changes    |
+| `--motion-base` | `200ms`                        | fades, list items, toasts, screen changes |
+| `--motion-slow` | `280ms`                        | bottom sheets                             |
+| `--ease-out`    | `cubic-bezier(0.2, 0, 0, 1)`   | things arriving                           |
+| `--ease-in-out` | `cubic-bezier(0.4, 0, 0.2, 1)` | things leaving or moving                  |
+
+**What to use:**
+
+| You want…                                | Use                                                                                                  |
+| ---------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| A tappable thing that presses in         | `className="pressable"` (Button, chips, tiles and tabs already have it)                              |
+| Feedback after an action                 | `meta: { successMessage: 'Saved' }` on the mutation, or `showToast()` (`src/lib/toast.ts`)           |
+| Errors from a button with nowhere to say | `meta: { errorToast: true }` on the mutation                                                         |
+| A loading list                           | `<LoadingState />` (skeleton cards; `shape="row"`, `"slot"` or `"block"` for other shapes)           |
+| Items that arrive or leave while open    | `<MotionList>` or `useListMotion()` (new items slide in, removed ones fade out; first load is still) |
+| A pop-up panel                           | `<Sheet open={…}>` (slides up, reverses on close, moves focus in and back)                           |
+| An instant response to a small toggle    | An optimistic mutation: see `useToggleVote` (fix-it), `useMarkRead`, `useSetRequestStatus`           |
+
+**Screen changes** use the browser's View Transitions API. `src/app/screenTransitions.ts`
+turns it on for every navigation and marks the direction on `<html data-nav>`: switching
+tabs cross-fades, drilling into a detail page fades in rising 8px, and going back
+reverses it. The tab bar stays still. Taps pass straight through during a transition.
+Browsers without the API get a plain fade (`AppLayout`).
+
+**Reduced motion.** When the device asks for less motion, every animation and transition
+becomes instant (`globals.css` and `motion.css`), and `motionMs()` returns 0 so code that
+waits for an exit animation doesn't wait.
+
 ## Decisions worth knowing
 
 - **Times** are stored as `timestamptz` and shown in `Asia/Dubai` (`src/lib/dates.ts`).

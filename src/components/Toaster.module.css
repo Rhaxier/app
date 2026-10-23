@@ -1,0 +1,79 @@
+/* Sits just above the tab bar, centred in the app's column. */
+.stack {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--height-tabbar) + var(--space-3) + env(safe-area-inset-bottom));
+  z-index: 1100;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: min(calc(100% - 2 * var(--space-4)), var(--content-max));
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 52px;
+  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-4);
+  border-radius: var(--radius-input);
+  background: var(--color-ink);
+  color: var(--color-on-accent);
+  box-shadow: var(--shadow-float);
+  pointer-events: auto;
+  animation: toast-in var(--motion-base) var(--ease-out);
+}
+
+/* Errors keep the dark background (good contrast) with an orange marker. */
+.error {
+  box-shadow:
+    inset 4px 0 0 var(--color-alert),
+    var(--shadow-float);
+}
+
+.success svg:first-child {
+  color: var(--color-accent-soft);
+}
+
+.error svg:first-child {
+  color: var(--color-alert-soft);
+}
+
+.message {
+  flex: 1;
+  font-size: var(--text-small);
+  font-weight: 500;
+}
+
+.dismiss {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: var(--touch-min);
+  height: var(--touch-min);
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.leaving {
+  animation: toast-out var(--motion-base) var(--ease-in-out) forwards;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+@keyframes toast-out {
+  to {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}

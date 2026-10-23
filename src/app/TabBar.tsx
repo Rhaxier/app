@@ -16,7 +16,7 @@ export function TabBar() {
           <li key={tab.to}>
             <Link
               to={tab.to}
-              className={styles.tab}
+              className={`${styles.tab} pressable`}
               aria-current={isTabActive(tab, pathname) ? 'page' : undefined}
             >
               <Icon name={tab.icon} />

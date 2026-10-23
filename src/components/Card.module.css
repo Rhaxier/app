@@ -5,6 +5,14 @@
   padding: var(--space-4) 17px;
   color: var(--color-ink);
   text-decoration: none;
+  /* Fades in when it first appears, e.g. replacing a loading skeleton. */
+  animation: card-in var(--motion-base) var(--ease-out);
+}
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+  }
 }
 
 .accent {
@@ -21,7 +29,19 @@
   overflow: hidden;
 }
 
-/* Cards that are links lift slightly on hover so they read as tappable. */
+/* Cards that are links lift slightly on hover so they read as tappable,
+   and press in like buttons (see .pressable in motion.css). */
+a.card {
+  transition:
+    transform var(--motion-fast) var(--ease-out),
+    filter var(--motion-fast) var(--ease-out);
+}
+
 a.card:hover {
   filter: brightness(0.985);
+}
+
+a.card:active {
+  transform: scale(0.97);
+  filter: brightness(0.95);
 }

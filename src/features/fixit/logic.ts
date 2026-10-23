@@ -76,6 +76,25 @@ export function toReportInput(values: ReportFormValues): ReportInput {
   };
 }
 
+/**
+ * A copy of cached report data with one report's "me too" changed, for the
+ * optimistic update in useToggleVote. Works on a list of reports, a single
+ * report, or anything else (returned untouched).
+ */
+export function withVote<T>(data: T, reportId: string, voted: boolean): T {
+  const change = (item: unknown) => {
+    if (!isVotable(item) || item.id !== reportId || item.voted_by_me === voted) return item;
+    return { ...item, voted_by_me: voted, vote_count: item.vote_count + (voted ? 1 : -1) };
+  };
+  return (Array.isArray(data) ? data.map(change) : change(data)) as T;
+}
+
+function isVotable(
+  item: unknown,
+): item is { id: string; vote_count: number; voted_by_me: boolean } {
+  return typeof item === 'object' && item !== null && 'vote_count' in item && 'voted_by_me' in item;
+}
+
 /** What staff may do next with a report (the database enforces the same). */
 export const staffStatusOptions: { value: ReportStatus; label: string }[] = [
   { value: 'acknowledged', label: 'Acknowledged' },

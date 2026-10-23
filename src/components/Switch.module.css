@@ -29,7 +29,7 @@
   border-radius: var(--radius-pill);
   background: var(--color-border);
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background-color var(--motion-fast) var(--ease-out);
 }
 
 /* The sliding knob. */
@@ -43,7 +43,7 @@
   border-radius: 50%;
   background: var(--color-card);
   box-shadow: 0 1px 3px rgba(21, 32, 43, 0.25);
-  transition: transform 0.15s;
+  transition: transform var(--motion-base) var(--ease-out);
 }
 
 .switch:checked {

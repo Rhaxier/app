@@ -27,6 +27,7 @@ export function useCreateRoom() {
   return useMutation({
     mutationFn: (room: TablesInsert<'rooms'>) => createRoom(room),
     onSuccess: invalidate,
+    meta: { successMessage: 'Room added' },
   });
 }
 
@@ -36,12 +37,17 @@ export function useUpdateRoom() {
     mutationFn: ({ id, changes }: { id: string; changes: TablesUpdate<'rooms'> }) =>
       updateRoom(id, changes),
     onSuccess: invalidate,
+    meta: { successMessage: 'Room saved', errorToast: true },
   });
 }
 
 export function useDeleteRoom() {
   const invalidate = useInvalidateMap();
-  return useMutation({ mutationFn: deleteRoom, onSuccess: invalidate });
+  return useMutation({
+    mutationFn: deleteRoom,
+    onSuccess: invalidate,
+    meta: { successMessage: 'Room deleted' },
+  });
 }
 
 export function useUpdateFloor() {
@@ -50,5 +56,6 @@ export function useUpdateFloor() {
     mutationFn: ({ id, changes }: { id: string; changes: TablesUpdate<'floors'> }) =>
       updateFloor(id, changes),
     onSuccess: invalidate,
+    meta: { successMessage: 'Floor saved' },
   });
 }

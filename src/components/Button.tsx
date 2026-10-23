@@ -17,6 +17,7 @@ interface StyleProps {
 
 function classes({ variant = 'primary', size = 'normal', fullWidth }: StyleProps, extra?: string) {
   return [
+    'pressable',
     styles.button,
     styles[variant],
     size === 'small' && styles.small,

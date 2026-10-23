@@ -19,7 +19,7 @@ export function QuickTiles() {
       <ul className={styles.grid}>
         {tiles.map((tile) => (
           <li key={tile.to}>
-            <Link to={tile.to} className={styles.tile}>
+            <Link to={tile.to} className={`${styles.tile} pressable`}>
               <span className={[styles.icon, tile.alert && styles.alert].filter(Boolean).join(' ')}>
                 <Icon name={tile.icon} size={20} />
               </span>

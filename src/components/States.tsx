@@ -1,12 +1,57 @@
 // The three non-happy states every list screen needs: loading, error, empty.
 // Keeping them here means every screen says "nothing here yet" the same way.
+//
+// Loading shows grey "skeleton" shapes where the content will go, instead of
+// a spinner, so the screen doesn't jump when the data arrives. Cards fade in
+// when they appear (Card.module.css), which cross-fades skeleton to content.
 import type { ReactNode } from 'react';
 import { errorMessage } from '@/lib/errors';
 import { Button } from './Button';
 import { Icon, type IconName } from './Icon';
 import styles from './States.module.css';
 
-export function LoadingState({ label = 'Loading…' }: { label?: string }) {
+/** The shape of what's loading: cards (most lists), slim rows, booking slots or one big block. */
+export type SkeletonShape = 'card' | 'row' | 'slot' | 'block';
+
+interface LoadingStateProps {
+  /** Read out by screen readers; nobody sees it. */
+  label?: string;
+  shape?: SkeletonShape;
+  count?: number;
+}
+
+export function LoadingState({ label = 'Loading…', shape = 'card', count = 3 }: LoadingStateProps) {
+  return (
+    <div className={styles.skeletons} role="status" aria-live="polite">
+      <span className="visually-hidden">{label}</span>
+      {shape === 'slot' ? (
+        <div className={`${styles.skeleton} ${styles.slots}`} aria-hidden="true">
+          {Array.from({ length: count + 2 }, (_, index) => (
+            <span key={index} className={styles.slotRow}>
+              <span className={`${styles.bar} ${styles.barTime}`} />
+              <span className={`${styles.bar} ${styles.barSlot}`} />
+            </span>
+          ))}
+        </div>
+      ) : (
+        Array.from({ length: shape === 'block' ? 1 : count }, (_, index) => (
+          <div key={index} className={`${styles.skeleton} ${styles[shape]}`} aria-hidden="true">
+            {shape !== 'block' && <span className={`${styles.bar} ${styles.barTitle}`} />}
+            {shape === 'card' && (
+              <>
+                <span className={styles.bar} />
+                <span className={`${styles.bar} ${styles.barShort}`} />
+              </>
+            )}
+          </div>
+        ))
+      )}
+    </div>
+  );
+}
+
+/** A small spinner, for the rare place too small for a skeleton (inside a button row). */
+export function InlineLoading({ label = 'Loading…' }: { label?: string }) {
   return (
     <div className={styles.loading} role="status" aria-live="polite">
       <span className={styles.spinner} aria-hidden="true" />

@@ -9,7 +9,7 @@ export function NotificationBell() {
   const { data: unread = 0 } = useUnreadCount();
   const label = unread > 0 ? `Notifications, ${unread} unread` : 'Notifications';
   return (
-    <Link to="/notifications" className={styles.bell} aria-label={label}>
+    <Link to="/notifications" className={`${styles.bell} pressable`} aria-label={label}>
       <Icon name="bell" />
       {unread > 0 && (
         <span className={styles.badge} aria-hidden="true">

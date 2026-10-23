@@ -45,6 +45,7 @@ export function useCreateAnnouncement() {
   return useMutation({
     mutationFn: (input: AnnouncementInput) => createAnnouncement(input),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: announcementKeys.all }),
+    meta: { successMessage: 'Announcement posted' },
   });
 }
 
@@ -53,6 +54,7 @@ export function useUpdateAnnouncement(id: string) {
   return useMutation({
     mutationFn: (input: AnnouncementInput) => updateAnnouncement(id, input),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: announcementKeys.all }),
+    meta: { successMessage: 'Announcement saved' },
   });
 }
 
@@ -61,5 +63,6 @@ export function useDeleteAnnouncement() {
   return useMutation({
     mutationFn: (id: string) => deleteAnnouncement(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: announcementKeys.all }),
+    meta: { successMessage: 'Announcement deleted', errorToast: true },
   });
 }

@@ -47,7 +47,9 @@ export function SlotList({ slots, states, onToggle }: SlotListProps) {
               <button
                 type="button"
                 className={
-                  state.kind === 'selected' ? `${styles.block} ${styles.selected}` : styles.free
+                  state.kind === 'selected'
+                    ? `${styles.block} ${styles.selected} pressable`
+                    : `${styles.free} pressable`
                 }
                 aria-pressed={state.kind === 'selected'}
                 aria-label={`${range}, ${state.kind === 'selected' ? 'selected' : 'available'}`}

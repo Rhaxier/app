@@ -18,6 +18,7 @@ import {
   type ReportInput,
   type Responsibility,
 } from './api';
+import { withVote } from './logic';
 
 export const fixitKeys = {
   all: ['fixit'] as const,
@@ -77,15 +78,35 @@ export function useCreateReport() {
     mutationFn: ({ input, photo }: { input: ReportInput; photo: File | null }) =>
       createReport(input, photo),
     onSuccess: invalidate,
+    meta: { successMessage: 'Report sent' },
   });
 }
 
+/**
+ * "Me too", optimistically: the count changes on screen straight away, before
+ * the database answers. If the database refuses, every cached copy goes back
+ * to how it was and a toast says so (meta.errorToast).
+ */
 export function useToggleVote(userId: string) {
-  const invalidate = useInvalidateFixit();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ reportId, voted }: { reportId: string; voted: boolean }) =>
       voted ? removeVote(reportId, userId) : addVote(reportId),
-    onSuccess: invalidate,
+    onMutate: async ({ reportId, voted }) => {
+      // Stop any refetch in flight, so it can't overwrite our change.
+      await queryClient.cancelQueries({ queryKey: fixitKeys.all });
+      const before = queryClient.getQueriesData({ queryKey: fixitKeys.all });
+      queryClient.setQueriesData({ queryKey: fixitKeys.all }, (data: unknown) =>
+        withVote(data, reportId, !voted),
+      );
+      return { before };
+    },
+    onError: (_error, _variables, context) => {
+      for (const [key, data] of context?.before ?? []) queryClient.setQueryData(key, data);
+    },
+    // Either way, fetch the real numbers afterwards.
+    onSettled: () => queryClient.invalidateQueries({ queryKey: fixitKeys.all }),
+    meta: { errorToast: true },
   });
 }
 
@@ -94,6 +115,7 @@ export function useUpdateReport(id: string) {
   return useMutation({
     mutationFn: (changes: ReportChanges) => updateReport(id, changes),
     onSuccess: invalidate,
+    meta: { successMessage: 'Saved', errorToast: true },
   });
 }
 

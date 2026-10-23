@@ -2,7 +2,14 @@
 // Used for quick actions such as "Send back with a note". When it opens it
 // takes focus; Tab stays inside it; Escape or a tap outside closes it; and
 // focus goes back to whatever opened it.
+//
+// Motion: the backdrop fades in while the panel slides up (--motion-slow), and
+// closing plays the same in reverse. To have time for that, the sheet stays on
+// screen a moment after `open` turns false (usePresence), showing what it
+// showed last. Render <Sheet open={…}> rather than {open && <Sheet open>},
+// or there is nothing left to animate.
 import { useEffect, useId, useRef, type ReactNode } from 'react';
+import { usePresence } from '@/lib/usePresence';
 import { Icon } from './Icon';
 import styles from './Sheet.module.css';
 
@@ -19,6 +26,14 @@ const FOCUSABLE =
 export function Sheet({ open, title, onClose, children }: SheetProps) {
   const titleId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
+  const { mounted, leaving } = usePresence(open, 'slow');
+
+  // While closing, keep showing the last open content: the parent may already
+  // have cleared what it was about (e.g. the role being signed up for).
+  const shown = useRef({ title, children });
+  useEffect(() => {
+    if (open) shown.current = { title, children };
+  });
 
   // Parents usually pass a new onClose function on every render. Keeping the
   // latest one in a ref means the effect below runs only when the sheet opens
@@ -61,10 +76,15 @@ export function Sheet({ open, title, onClose, children }: SheetProps) {
     };
   }, [open]);
 
-  if (!open) return null;
+  if (!mounted) return null;
+  const content = leaving ? shown.current : { title, children };
 
   return (
-    <div className={styles.backdrop} onClick={onClose}>
+    <div
+      className={styles.backdrop}
+      data-state={leaving ? 'closing' : 'open'}
+      onClick={leaving ? undefined : onClose}
+    >
       <div
         ref={panelRef}
         className={styles.panel}
@@ -76,12 +96,17 @@ export function Sheet({ open, title, onClose, children }: SheetProps) {
         onClick={(event) => event.stopPropagation()}
       >
         <div className={styles.header}>
-          <h2 id={titleId}>{title}</h2>
-          <button type="button" className={styles.close} onClick={onClose} aria-label="Close">
+          <h2 id={titleId}>{content.title}</h2>
+          <button
+            type="button"
+            className={`${styles.close} pressable`}
+            onClick={onClose}
+            aria-label="Close"
+          >
             <Icon name="close" />
           </button>
         </div>
-        {children}
+        {content.children}
       </div>
     </div>
   );

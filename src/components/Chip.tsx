@@ -16,7 +16,7 @@ export function FilterChip({ selected, onClick, children, marker }: FilterChipPr
   return (
     <button
       type="button"
-      className={[styles.chip, selected && styles.selected].filter(Boolean).join(' ')}
+      className={['pressable', styles.chip, selected && styles.selected].filter(Boolean).join(' ')}
       aria-pressed={selected}
       onClick={onClick}
     >

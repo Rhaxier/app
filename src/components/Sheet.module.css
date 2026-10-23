@@ -6,6 +6,41 @@
   align-items: flex-end;
   justify-content: center;
   background: rgba(21, 32, 43, 0.35);
+  animation: backdrop-in var(--motion-slow) var(--ease-out) both;
+}
+
+/* Closing: the same movement in reverse, and nothing can be tapped meanwhile. */
+.backdrop[data-state='closing'] {
+  animation: backdrop-out var(--motion-slow) var(--ease-in-out) both;
+  pointer-events: none;
+}
+
+.backdrop[data-state='closing'] .panel {
+  animation: panel-out var(--motion-slow) var(--ease-in-out) both;
+}
+
+@keyframes backdrop-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes backdrop-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes panel-in {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes panel-out {
+  to {
+    transform: translateY(100%);
+  }
 }
 
 .panel {
@@ -20,6 +55,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
+  animation: panel-in var(--motion-slow) var(--ease-out) both;
 }
 
 .panel:focus {

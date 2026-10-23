@@ -7,9 +7,11 @@
 //   * content people reported                     (all staff)
 // Each section reuses the feature's own hooks and actions; this page only
 // gathers them. The student screens are unchanged: this is added on top.
+// Handled items fade out of the queue and new ones slide in (MotionList).
 import { ButtonLink } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { PageHeader } from '@/components/PageHeader';
+import { MotionList } from '@/components/MotionList';
 import { EmptyState, LoadingState } from '@/components/States';
 import { SupwExportButton } from '@/features/admin/components/SupwExportButton';
 import { useContentReports } from '@/features/admin/hooks';
@@ -82,50 +84,52 @@ export function ApprovalsPage() {
       )}
 
       <Section id="q-events" title="Student events to approve" count={counts[0]}>
-        {eventsToApprove.map((event) => (
-          <EventApprovalCard key={event.id} event={event} />
-        ))}
+        <MotionList items={eventsToApprove} keyOf={(event) => event.id} className="stack-tight">
+          {(event) => <EventApprovalCard event={event} />}
+        </MotionList>
       </Section>
 
       <Section id="q-venues" title="Venue requests" count={counts[1]}>
         <p className="meta">Soonest first. Approving one rejects any request it overlaps.</p>
-        {venueRequests.data?.map((booking) => (
-          <BookingCard
-            key={booking.id}
-            booking={booking}
-            showRequester
-            actions={<ReviewActions booking={booking} />}
-          />
-        ))}
+        <MotionList items={venueRequests.data} keyOf={(b) => b.id} className="stack-tight">
+          {(booking) => (
+            <BookingCard
+              booking={booking}
+              showRequester
+              actions={<ReviewActions booking={booking} />}
+            />
+          )}
+        </MotionList>
       </Section>
 
       <Section id="q-supervise" title="Bookings to supervise" count={counts[2]}>
-        {toSupervise.data?.map((booking) => (
-          <BookingCard
-            key={booking.id}
-            booking={booking}
-            showRequester
-            actions={<SupervisorActions booking={booking} />}
-          />
-        ))}
+        <MotionList items={toSupervise.data} keyOf={(b) => b.id} className="stack-tight">
+          {(booking) => (
+            <BookingCard
+              booking={booking}
+              showRequester
+              actions={<SupervisorActions booking={booking} />}
+            />
+          )}
+        </MotionList>
       </Section>
 
       <Section id="q-reports" title="Fix-it reports for your team" count={counts[3]}>
-        {routedReports.map((report) => (
-          <ReportQueueCard key={report.id} report={report} />
-        ))}
+        <MotionList items={routedReports} keyOf={(report) => report.id} className="stack-tight">
+          {(report) => <ReportQueueCard report={report} />}
+        </MotionList>
       </Section>
 
       <Section id="q-hours" title="SUPW hours to confirm" count={counts[4]}>
-        {hours.data?.map((item) => (
-          <HoursCard key={item.signup_id} item={item} />
-        ))}
+        <MotionList items={hours.data} keyOf={(item) => item.signup_id} className="stack-tight">
+          {(item) => <HoursCard item={item} />}
+        </MotionList>
       </Section>
 
       <Section id="q-content" title="Reported content" count={counts[5]}>
-        {openContent.map((report) => (
-          <ContentReportCard key={report.id} report={report} />
-        ))}
+        <MotionList items={openContent} keyOf={(report) => report.id} className="stack-tight">
+          {(report) => <ContentReportCard report={report} />}
+        </MotionList>
       </Section>
 
       {(isAdmin(user) || hasResponsibility(user, 'supw')) && (

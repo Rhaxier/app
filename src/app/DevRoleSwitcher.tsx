@@ -48,7 +48,7 @@ export function DevRoleSwitcher() {
                   <li key={user.email}>
                     <button
                       type="button"
-                      className={styles.user}
+                      className={`${styles.user} pressable`}
                       aria-current={isCurrent || undefined}
                       disabled={signIn.isPending}
                       onClick={() => switchTo(user)}
