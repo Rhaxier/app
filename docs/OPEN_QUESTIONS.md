@@ -192,12 +192,17 @@ on the **Admin > Settings** screen; you can also run SQL in Supabase Studio
 
 ## Q15: Who gets email?
 
+**Configurable in Admin.**
+
 - Default used: only staff holding a responsibility (facilities, IT, venues, SUPW), as
-  the plan describes. Teachers without one (e.g. a supervising teacher) get in-app and
-  push only.
-- Where it lives: `notify()` (`..._120200_notifications.sql`).
-- To change it: in `notify()`, replace the responsibilities check with
-  `exists (select 1 from public.profiles where id = p_recipient and role in ('teacher', 'admin'))`.
+  the plan describes: urgent items at once, the rest in a daily digest. Teachers without
+  one (e.g. a supervising teacher) get in-app and push only. Admins can override this per
+  person: off, a daily digest, or every email at once. Urgent emails always go at once.
+- Where it lives: table `staff_email_prefs` (no row = the default); `notify()`
+  (latest in `supabase/migrations/20261023120510_admin_notifications.sql`). The digest
+  goes out after `app_settings.digest_time` (Dubai time, default 07:00): the send-emails
+  function, run hourly, asks `email_digest_due()`.
+- To change it: **Admin > Notifications > Staff email**.
 
 ## Q16: Which notifications can be muted?
 
@@ -463,3 +468,16 @@ on the **Admin > Settings** screen; you can also run SQL in Supabase Studio
   (`supabase/migrations/20261023120400_moderation.sql`).
 - To change it: to let authors see their removed content (with a notice), add
   `or author_id = auth.uid()` (or `owner_id`, `creator_id`) to those policies.
+
+## Q42: How does the emergency broadcast work?
+
+- Default used: an admin writes a title and message and confirms. It becomes a pinned,
+  urgent school-wide announcement (shown in orange) and one urgent notification to
+  every active person: phone push for everyone, immediate email for staff who get email.
+  Urgent notifications can't be muted. The database refuses another broadcast within 10
+  minutes, whichever admin sends it.
+- Where it lives: `admin_emergency_broadcast()`, table `emergency_broadcasts`
+  (`..._20261023120510_admin_notifications.sql`); the `emergency` notification type
+  (`..._20261023120500_emergency_type.sql`).
+- To change it: the 10 minutes is `interval '10 minutes'` in that function; change it in
+  a new migration. Nothing is actually pushed or emailed until Q7 and Q8 are done.

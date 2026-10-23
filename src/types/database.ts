@@ -22,6 +22,7 @@ export type Database = {
           section_ids: string[] | null;
           title: string;
           updated_at: string;
+          urgent: boolean;
         };
         ComputedFields: never;
         Insert: {
@@ -42,6 +43,7 @@ export type Database = {
           section_ids?: string[] | null;
           title: string;
           updated_at?: string;
+          urgent?: boolean;
         };
         Update: {
           audience?: Database['public']['Enums']['announcement_audience'];
@@ -61,6 +63,7 @@ export type Database = {
           section_ids?: string[] | null;
           title?: string;
           updated_at?: string;
+          urgent?: boolean;
         };
         Relationships: [
           {
@@ -86,6 +89,8 @@ export type Database = {
           collab_max_team_size: number;
           collab_requires_teacher: boolean;
           created_at: string;
+          digest_last_sent_on: string | null;
+          digest_time: string;
           id: boolean;
           report_auto_urgent_votes: number | null;
           school_days: number[];
@@ -106,6 +111,8 @@ export type Database = {
           collab_max_team_size?: number;
           collab_requires_teacher?: boolean;
           created_at?: string;
+          digest_last_sent_on?: string | null;
+          digest_time?: string;
           id?: boolean;
           report_auto_urgent_votes?: number | null;
           school_days?: number[];
@@ -125,6 +132,8 @@ export type Database = {
           collab_max_team_size?: number;
           collab_requires_teacher?: boolean;
           created_at?: string;
+          digest_last_sent_on?: string | null;
+          digest_time?: string;
           id?: boolean;
           report_auto_urgent_votes?: number | null;
           school_days?: number[];
@@ -590,6 +599,52 @@ export type Database = {
           {
             foreignKeyName: 'email_outbox_recipient_id_fkey';
             columns: ['recipient_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      emergency_broadcasts: {
+        Row: {
+          announcement_id: string | null;
+          created_at: string;
+          id: string;
+          message: string;
+          recipients: number;
+          sent_by: string | null;
+          title: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          announcement_id?: string | null;
+          created_at?: string;
+          id?: string;
+          message: string;
+          recipients: number;
+          sent_by?: string | null;
+          title: string;
+        };
+        Update: {
+          announcement_id?: string | null;
+          created_at?: string;
+          id?: string;
+          message?: string;
+          recipients?: number;
+          sent_by?: string | null;
+          title?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'emergency_broadcasts_announcement_id_fkey';
+            columns: ['announcement_id'];
+            isOneToOne: false;
+            referencedRelation: 'announcements';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'emergency_broadcasts_sent_by_fkey';
+            columns: ['sent_by'];
             isOneToOne: false;
             referencedRelation: 'profiles';
             referencedColumns: ['id'];
@@ -1600,6 +1655,42 @@ export type Database = {
         };
         Relationships: [];
       };
+      staff_email_prefs: {
+        Row: {
+          created_at: string;
+          enabled: boolean;
+          id: string;
+          mode: Database['public']['Enums']['email_mode'];
+          updated_at: string;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          enabled?: boolean;
+          id?: string;
+          mode?: Database['public']['Enums']['email_mode'];
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          enabled?: boolean;
+          id?: string;
+          mode?: Database['public']['Enums']['email_mode'];
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'staff_email_prefs_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: true;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       staff_emails: {
         Row: {
           added_by: string | null;
@@ -1936,6 +2027,7 @@ export type Database = {
           urgent_count: number;
         }[];
       };
+      admin_emergency_broadcast: { Args: { p_message: string; p_title: string }; Returns: number };
       admin_import_people: {
         Args: { p_dry_run?: boolean; p_rows: Json };
         Returns: {
@@ -2033,6 +2125,19 @@ export type Database = {
       admin_set_role: {
         Args: { p_role: Database['public']['Enums']['user_role']; p_user_id: string };
         Returns: undefined;
+      };
+      admin_staff_email_settings: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          email: string;
+          enabled: boolean;
+          full_name: string;
+          has_setting: boolean;
+          mode: Database['public']['Enums']['email_mode'];
+          responsibilities: Database['public']['Enums']['responsibility_kind'][];
+          role: Database['public']['Enums']['user_role'];
+          user_id: string;
+        }[];
       };
       admin_supw_by_grade: {
         Args: { p_days: number };
@@ -2174,6 +2279,7 @@ export type Database = {
           user_id: string;
         }[];
       };
+      email_digest_due: { Args: Record<PropertyKey, never>; Returns: boolean };
       event_signups: {
         Args: { p_event_id: string };
         Returns: {
@@ -2231,6 +2337,7 @@ export type Database = {
       is_staff: { Args: Record<PropertyKey, never>; Returns: boolean };
       is_staff_member: { Args: { p_user_id: string }; Returns: boolean };
       is_trusted_change: { Args: Record<PropertyKey, never>; Returns: boolean };
+      mark_email_digest_sent: { Args: Record<PropertyKey, never>; Returns: undefined };
       my_account_status: {
         Args: Record<PropertyKey, never>;
         Returns: {
@@ -2367,6 +2474,7 @@ export type Database = {
       booking_status: 'awaiting_teacher' | 'pending' | 'approved' | 'rejected' | 'cancelled';
       collab_status: 'open' | 'full' | 'closed';
       content_report_status: 'open' | 'actioned' | 'dismissed';
+      email_mode: 'immediate' | 'digest';
       join_request_status: 'pending' | 'accepted' | 'declined' | 'withdrawn';
       notification_type:
         | 'announcement_new'
@@ -2388,7 +2496,8 @@ export type Database = {
         | 'booking_rejected'
         | 'booking_reminder'
         | 'project_shared'
-        | 'project_feedback';
+        | 'project_feedback'
+        | 'emergency';
       outbox_kind: 'immediate' | 'digest';
       outbox_status: 'queued' | 'sent' | 'failed';
       project_status: 'draft' | 'shared' | 'in_review' | 'feedback_given' | 'complete';
@@ -2515,6 +2624,7 @@ export const Constants = {
       booking_status: ['awaiting_teacher', 'pending', 'approved', 'rejected', 'cancelled'],
       collab_status: ['open', 'full', 'closed'],
       content_report_status: ['open', 'actioned', 'dismissed'],
+      email_mode: ['immediate', 'digest'],
       join_request_status: ['pending', 'accepted', 'declined', 'withdrawn'],
       notification_type: [
         'announcement_new',
@@ -2537,6 +2647,7 @@ export const Constants = {
         'booking_reminder',
         'project_shared',
         'project_feedback',
+        'emergency',
       ],
       outbox_kind: ['immediate', 'digest'],
       outbox_status: ['queued', 'sent', 'failed'],

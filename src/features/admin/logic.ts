@@ -188,6 +188,22 @@ export function categoryKey(name: string, takenKeys: string[]): string {
 }
 
 // ---------------------------------------------------------------------------
+// Emergency broadcast
+// ---------------------------------------------------------------------------
+
+export function validateBroadcast(
+  title: string,
+  message: string,
+): { title?: string; message?: string } {
+  const errors: { title?: string; message?: string } = {};
+  if (!title.trim()) errors.title = 'Give it a short title.';
+  else if (title.trim().length > 80) errors.title = 'Keep the title under 80 characters.';
+  if (!message.trim()) errors.message = 'Write what people need to know.';
+  else if (message.trim().length > 500) errors.message = 'Keep it under 500 characters.';
+  return errors;
+}
+
+// ---------------------------------------------------------------------------
 // Import
 // ---------------------------------------------------------------------------
 

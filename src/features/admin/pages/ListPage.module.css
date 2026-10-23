@@ -128,3 +128,13 @@
   background: var(--color-ink);
   color: var(--color-on-accent);
 }
+
+/* A person on the left, their setting on the right (stacks on a phone). */
+.staffRow {
+  flex-wrap: wrap;
+  padding: var(--space-2) 0;
+}
+
+.staffRow > :last-child {
+  flex: 1 1 200px;
+}

@@ -24,6 +24,16 @@
   color: var(--color-accent-soft);
 }
 
+/* White on the orange is about 5.7:1 (and the soft meta text 4.7:1), so text stays readable. */
+.alert {
+  background: var(--color-alert);
+  color: var(--color-on-accent);
+}
+
+.alert :global(.meta) {
+  color: var(--color-alert-soft);
+}
+
 .flush {
   padding: 0;
   overflow: hidden;

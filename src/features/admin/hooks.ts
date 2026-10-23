@@ -9,7 +9,11 @@ import {
   fetchMetrics,
   fetchSupwByGrade,
   fetchVenueUtilisation,
+  fetchBroadcasts,
   fetchModerationQueue,
+  fetchStaffEmailSettings,
+  sendEmergencyBroadcast,
+  setStaffEmail,
   importPeople,
   moderate,
   type ModerationAction,
@@ -248,6 +252,46 @@ export function useModerate() {
       showToast(moderationToast[action]);
     },
     meta: { errorToast: true },
+  });
+}
+
+// Notifications ----------------------------------------------------------------
+
+export function useBroadcasts() {
+  return useQuery({ queryKey: [...adminKeys.all, 'broadcasts'], queryFn: fetchBroadcasts });
+}
+
+export function useSendBroadcast() {
+  const invalidate = useInvalidate(['announcements'], ['notifications']);
+  return useMutation({
+    mutationFn: ({ title, message }: { title: string; message: string }) =>
+      sendEmergencyBroadcast(title, message),
+    onSuccess: (count) => {
+      invalidate();
+      showToast(`Sent to ${count} people`);
+    },
+  });
+}
+
+export function useStaffEmailSettings() {
+  return useQuery({
+    queryKey: [...adminKeys.all, 'staff-email'],
+    queryFn: fetchStaffEmailSettings,
+  });
+}
+
+export function useSetStaffEmail() {
+  const invalidate = useInvalidate();
+  return useMutation({
+    mutationFn: ({
+      userId,
+      setting,
+    }: {
+      userId: string;
+      setting: Parameters<typeof setStaffEmail>[1];
+    }) => setStaffEmail(userId, setting),
+    onSuccess: invalidate,
+    meta: { successMessage: 'Saved', errorToast: true },
   });
 }
 

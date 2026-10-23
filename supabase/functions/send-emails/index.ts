@@ -2,7 +2,11 @@
 //
 // What it will do: pick up queued rows from email_outbox and email staff.
 //   POST /functions/v1/send-emails?kind=immediate   run every few minutes
-//   POST /functions/v1/send-emails?kind=digest      run once a day
+//   POST /functions/v1/send-emails?kind=digest      run every hour; it only
+//        sends once a day, after the digest time admins set (Admin >
+//        Notifications > Staff email, app_settings.digest_time, Dubai time).
+//        email_digest_due() says whether it's time; mark_email_digest_sent()
+//        records that today's went out.
 //
 // What it does now: a dry run. It builds the emails it WOULD send, returns a
 // preview, and leaves every row `queued`. No email provider is chosen yet.
@@ -14,12 +18,14 @@
 //      { from, to, subject, text }.
 //   3. Mark each row sent: update email_outbox set status = 'sent', sent_at = now();
 //      on error set status = 'failed', attempts = attempts + 1, last_error = <message>.
-//   4. Schedule both calls with pg_cron + pg_net (see README, "Email and push").
+//   4. After a real digest run, call mark_email_digest_sent() (see below).
+//   5. Schedule both calls with pg_cron + pg_net (see README, "Email and push").
 import {
   groupByRecipient,
   isServiceCaller,
   json,
   queuedRows,
+  serviceClient,
   type OutboxRow,
 } from '../_shared/outbox.ts';
 
@@ -49,8 +55,19 @@ Deno.serve(async (request) => {
   const kind = new URL(request.url).searchParams.get('kind') === 'digest' ? 'digest' : 'immediate';
 
   try {
+    if (kind === 'digest') {
+      // Hourly calls: wait for the school's digest time, then send once a day.
+      const due = await serviceClient().rpc('email_digest_due');
+      if (due.error) throw due.error;
+      if (!due.data)
+        return json({ dryRun: true, kind, skipped: 'Not digest time yet, or already sent today.' });
+    }
+
     const rows = await queuedRows('email_outbox', kind);
     const emails = [...groupByRecipient(rows).values()].map((group) => buildEmail(group, kind));
+    // When sending for real: after the digest goes out,
+    //   await serviceClient().rpc('mark_email_digest_sent');
+    // (Not in the dry run, so the preview can be run again.)
     return json({
       dryRun: true,
       kind,

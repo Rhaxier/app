@@ -364,6 +364,66 @@ export async function moderate(
 }
 
 // ---------------------------------------------------------------------------
+// Notifications (B6): the emergency broadcast and which staff get email.
+// ---------------------------------------------------------------------------
+
+export type EmergencyBroadcast = Pick<
+  Tables<'emergency_broadcasts'>,
+  'id' | 'title' | 'message' | 'recipients' | 'created_at'
+> & { sender: { full_name: string } | null };
+
+/** Sends it (urgent, pinned, everyone). Refused within 10 minutes of the last one. */
+export async function sendEmergencyBroadcast(title: string, message: string): Promise<number> {
+  const { data, error } = await supabase.rpc('admin_emergency_broadcast', {
+    p_title: title,
+    p_message: message,
+  });
+  if (error) throw error;
+  return data;
+}
+
+export async function fetchBroadcasts(): Promise<EmergencyBroadcast[]> {
+  const { data, error } = await supabase
+    .from('emergency_broadcasts')
+    .select('id, title, message, recipients, created_at, sender:profiles(full_name)')
+    .order('created_at', { ascending: false })
+    .limit(20);
+  if (error) throw error;
+  return data;
+}
+
+export interface StaffEmailSetting {
+  user_id: string;
+  full_name: string;
+  email: string;
+  role: Role;
+  responsibilities: Responsibility[];
+  /** false = following the default (email only with a responsibility). */
+  has_setting: boolean;
+  enabled: boolean;
+  mode: Enums<'email_mode'>;
+}
+
+export async function fetchStaffEmailSettings(): Promise<StaffEmailSetting[]> {
+  const { data, error } = await supabase.rpc('admin_staff_email_settings');
+  if (error) throw error;
+  return data as StaffEmailSetting[];
+}
+
+/** Set someone's email on/off and immediate/digest (null = back to the default). */
+export async function setStaffEmail(
+  userId: string,
+  setting: { enabled: boolean; mode: Enums<'email_mode'> } | null,
+): Promise<void> {
+  const { error } = setting
+    ? await supabase
+        .from('staff_email_prefs')
+        .upsert({ user_id: userId, ...setting }, { onConflict: 'user_id' })
+    : await supabase.from('staff_email_prefs').delete().eq('user_id', userId);
+  if (error) throw error;
+}
+
+// ---------------------------------------------------------------------------
 // Audit log and outboxes (read-only)
 // ---------------------------------------------------------------------------
 

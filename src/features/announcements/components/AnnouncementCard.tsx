@@ -25,10 +25,16 @@ export function AnnouncementCard({ announcement, showAudience }: AnnouncementCar
   const sections = useSections().data;
   const state = announcementState(announcement);
   return (
-    <Card as="article" tone={announcement.pinned ? 'accent' : 'default'} className={styles.card}>
+    <Card
+      as="article"
+      tone={announcement.urgent ? 'alert' : announcement.pinned ? 'accent' : 'default'}
+      className={styles.card}
+    >
       <Link to={`/announcements/${announcement.id}`} className={styles.link}>
         <div className={styles.top}>
-          {announcement.pinned ? (
+          {announcement.urgent ? (
+            <span className="label">Emergency · {byline}</span>
+          ) : announcement.pinned ? (
             <span className="label">Pinned · {byline}</span>
           ) : (
             <span className="meta">{byline}</span>

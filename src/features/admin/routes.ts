@@ -56,6 +56,11 @@ export const adminRoutes: RouteObject = {
       lazy: lazyPage(() => import('./pages/ModerationPage'), 'ModerationPage'),
     },
     // Notifications
+    { path: 'emergency', lazy: lazyPage(() => import('./pages/EmergencyPage'), 'EmergencyPage') },
+    {
+      path: 'staff-email',
+      lazy: lazyPage(() => import('./pages/StaffEmailPage'), 'StaffEmailPage'),
+    },
     { path: 'outbox', lazy: lazyPage(() => import('./pages/OutboxPage'), 'OutboxPage') },
     // System
     { path: 'settings', lazy: lazyPage(() => import('./pages/SettingsPage'), 'SettingsPage') },

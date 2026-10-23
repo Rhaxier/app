@@ -24,7 +24,7 @@ import type { Enums, TablesInsert } from '@/types/database';
 // Only columns the signed-in role may read can be embedded, which is why we
 // never ask for the author's email.
 const ANNOUNCEMENT_COLUMNS =
-  'id, title, body, posted_as, audience, grades, section_ids, pinned, publish_at, expires_at, author_id, author:profiles!announcements_author_id_fkey(full_name)';
+  'id, title, body, posted_as, audience, grades, section_ids, pinned, urgent, publish_at, expires_at, author_id, author:profiles!announcements_author_id_fkey(full_name)';
 
 // What a screen gets back. Written by hand (rather than inferred) so it's easy
 // to read; the generated Database types check that it matches the query.
@@ -38,6 +38,8 @@ export interface Announcement {
   /** Only these sections of those grades; null = the whole grades. */
   section_ids: string[] | null;
   pinned: boolean;
+  /** An emergency broadcast (Admin > Notifications). Shown in orange. */
+  urgent: boolean;
   /** When it appears. In the future = scheduled (only its author and admins see it). */
   publish_at: string;
   /** When it disappears; null = it stays. */

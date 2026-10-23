@@ -160,6 +160,18 @@ export const adminGroups: AdminGroup[] = [
     title: 'Notifications',
     sections: [
       {
+        path: 'emergency',
+        title: 'Emergency broadcast',
+        description: 'Tell everyone at once',
+        icon: 'megaphone',
+      },
+      {
+        path: 'staff-email',
+        title: 'Staff email',
+        description: 'Digest time, and who gets email',
+        icon: 'mail',
+      },
+      {
         path: 'outbox',
         title: 'Outbox',
         description: 'Emails and pushes waiting to be sent',

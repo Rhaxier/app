@@ -11,6 +11,7 @@ import {
   rowsFromCsv,
   validateClass,
   validatePeriod,
+  validateBroadcast,
   validateRange,
 } from './logic';
 
@@ -144,5 +145,15 @@ describe('calendar forms', () => {
     expect(
       validateRange({ name: 'Day off', startsOn: '2026-12-02', endsOn: '2026-12-02' }),
     ).toEqual({});
+  });
+});
+
+describe('emergency broadcast form', () => {
+  it('needs a short title and a message', () => {
+    expect(validateBroadcast('', '')).toEqual({
+      title: 'Give it a short title.',
+      message: 'Write what people need to know.',
+    });
+    expect(validateBroadcast('Early closure', 'School closes at 12:00 today.')).toEqual({});
   });
 });

@@ -177,7 +177,8 @@ select cron.schedule('send-urgent-emails', '*/5 * * * *', $$
       (select decrypted_secret from vault.decrypted_secrets where name = 'service_role_key'))
   );
 $$);
--- and once a day for ?kind=digest, and every minute for send-push.
+-- and every hour for ?kind=digest: it sends once a day, after the digest time set in
+-- Admin > Notifications > Staff email. And every minute for send-push.
 ```
 
 Venue reminders (`venue_reminders()`) are already scheduled hourly by a migration when

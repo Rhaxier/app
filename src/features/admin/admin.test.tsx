@@ -26,6 +26,8 @@ const settings: AppSettings = {
   collab_max_team_size: 8,
   report_auto_urgent_votes: 5,
   student_events_need_approval: true,
+  digest_time: '07:00:00',
+  digest_last_sent_on: null,
   venue_reminder_hours: 48,
   venue_reminder_days_before: 3,
   school_days: [0, 1, 2, 3, 4],

@@ -136,6 +136,19 @@ the Users screen. All of them go through one function, `admin_moderate(action, â
 writes the audit log. Removing is a soft delete (Q41): `removed_at` is set, and restrictive
 policies hide the row from everyone but admins.
 
+## Notifications (B6)
+
+- **Emergency broadcast** (Q42): title and message, a confirmation showing exactly what
+  will be sent, then `admin_emergency_broadcast()` creates a pinned, urgent announcement
+  and one urgent notification per active person. Refused within 10 minutes of the last
+  one, even by another admin (an advisory lock makes two at once take turns). The list
+  underneath shows every broadcast with its sender and reach.
+- **Staff email** (Q15): the daily digest's time, and per teacher or admin "Default",
+  "Daily digest", "Every email at once" or "Off" (`staff_email_prefs`, read by `notify()`).
+  The send-emails function asks `email_digest_due()` each hour and sends the digest once a
+  day after that time.
+- **Outbox:** what would be emailed or pushed (nothing is sent until Q7 and Q8).
+
 ## Files to read
 
 - `supabase/migrations/20261023120000_admin_overview.sql`
@@ -145,6 +158,8 @@ policies hide the row from everyone but admins.
 - `supabase/migrations/20261023120200_school_calendar.sql`
 - `supabase/migrations/20261023120300_feature_settings.sql`
 - `supabase/migrations/20261023120400_moderation.sql`; `src/features/admin/pages/ModerationPage.tsx`
+- `supabase/migrations/20261023120500_emergency_type.sql`, `20261023120510_admin_notifications.sql`;
+  `src/features/admin/pages/EmergencyPage.tsx`, `StaffEmailPage.tsx`
 - `src/features/admin/components/SettingControls.tsx` (one setting, edited in place) and
   `NameListEditor.tsx` (add, rename, retire)
 - `src/features/school/` (grades, sections, classes, periods, terms, holidays, blackouts:
@@ -152,5 +167,6 @@ policies hide the row from everyone but admins.
 - `src/features/admin/pages/UsersPage.tsx`, `ImportPage.tsx`, `RolloverPage.tsx`,
   `ClassesPage.tsx`, `GradesPage.tsx`; `src/components/ConfirmDialog.tsx`
 - Tests: `supabase/tests/09_admin_overview_test.sql`, `10_people_test.sql`,
-  `11_calendar_test.sql`, `12_feature_settings_test.sql`, `13_moderation_test.sql`; `src/features/school/school.test.ts`;
+  `11_calendar_test.sql`, `12_feature_settings_test.sql`, `13_moderation_test.sql`,
+  `14_admin_notifications_test.sql`; `src/features/school/school.test.ts`;
   `src/features/admin/overview.test.tsx`, `people.test.tsx`

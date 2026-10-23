@@ -1,6 +1,7 @@
 // What each notification type means, in words for the settings screen.
-// UNMUTABLE_TYPES must match notification_type_is_unmutable() in
-// supabase/migrations/20261019120200_notifications.sql (Q16).
+// UNMUTABLE_TYPES must match notification_type_is_unmutable() (first in
+// supabase/migrations/20261019120200_notifications.sql, now in
+// 20261023120510_admin_notifications.sql; Q16).
 import type { Enums } from '@/types/database';
 
 export type NotificationType = Enums<'notification_type'>;
@@ -26,6 +27,7 @@ export const notificationTypeLabel: Record<NotificationType, string> = {
   booking_reminder: 'Reminders about venue requests still waiting',
   project_shared: 'A student shares a project with you',
   project_feedback: 'A teacher gives feedback on your project',
+  emergency: 'Emergency messages from the school',
 };
 
 /** Approvals and "someone is waiting on you": always delivered. */
@@ -35,6 +37,7 @@ export const UNMUTABLE_TYPES: NotificationType[] = [
   'booking_awaiting_teacher',
   'booking_pending',
   'booking_reminder',
+  'emergency',
 ];
 
 /** Types only staff receive, hidden from students' settings to keep it short. */

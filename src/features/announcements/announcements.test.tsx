@@ -197,6 +197,7 @@ describe('AnnouncementCard', () => {
     grades: null,
     section_ids: null,
     pinned: true,
+    urgent: false,
     publish_at: new Date().toISOString(),
     expires_at: null,
     author_id: 'admin-1',
