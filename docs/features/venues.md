@@ -7,8 +7,9 @@ Same shape as announcements; read [`announcements.md`](announcements.md) first.
 
 - **Calendar** (reference screen 4): venue chips, a strip of school days, and the day's
   slots: available, booked (grey), pending approval (orange) and your selection (teal).
-  Tap neighbouring free slots to book a longer block. Slot times and school days come from
-  `app_settings` (Q11).
+  Tap neighbouring free slots to book a longer block. The slots are that weekday's
+  `periods` and the days are `app_settings.school_days` (Q11, Admin > School calendar).
+  Holidays and blackouts are greyed out; the database refuses them too.
 - **Requests.** Staff requests start `pending`. A student must name a supervising teacher;
   their request starts `awaiting_teacher` until that teacher confirms (Q2: only while
   `students_can_request_venues` is on). Venues with `needs_approval = false` are approved
