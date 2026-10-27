@@ -1,3 +1,19 @@
+/* "Holiday: … Nothing can be booked this day." above the greyed-out periods. */
+.closed {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-input);
+  background: var(--color-quiet);
+  font-size: var(--text-small);
+  font-weight: 500;
+}
+
+/* Why a custom time can't be requested. */
+.problem {
+  color: var(--color-alert-ink);
+  font-size: var(--text-meta);
+  font-weight: 500;
+}
+
 /* The Request button stays in view above the tab bar while scrolling. */
 .footer {
   position: sticky;

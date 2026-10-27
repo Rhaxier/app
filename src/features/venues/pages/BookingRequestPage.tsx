@@ -1,5 +1,7 @@
 // The request form, reached from "Request 10:30–12:00" on the calendar.
-// The venue and times come from the address (?venue=…&start=…&end=…).
+// The venue and times come from the address (?venue=…&start=…&end=…); the
+// summary names the periods they cover ("Period 2 to Period 3"). The database
+// checks the times follow the bell times (unless custom times are allowed).
 import { useState, type FormEvent } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Button, ButtonLink } from '@/components/Button';
@@ -9,12 +11,14 @@ import { PageHeader } from '@/components/PageHeader';
 import { EmptyState, LoadingState } from '@/components/States';
 import { useCurrentUser } from '@/features/auth/hooks';
 import { TeacherSelect } from '@/features/people/TeacherSelect';
+import { usePeriods } from '@/features/school/hooks';
 import { useAppSettings } from '@/features/settings/hooks';
 import { formatDate, formatTimeRange } from '@/lib/dates';
 import { errorMessage } from '@/lib/errors';
 import { useRequestBooking, useVenues } from '../hooks';
 import {
   emptyBookingValues,
+  periodsLabel,
   validateBooking,
   type BookingFormErrors,
   type BookingFormValues,
@@ -26,6 +30,7 @@ export function BookingRequestPage() {
   const user = useCurrentUser();
   const settings = useAppSettings();
   const venues = useVenues();
+  const periods = usePeriods();
   const request = useRequestBooking();
   const [values, setValues] = useState(emptyBookingValues);
   const [errors, setErrors] = useState<BookingFormErrors>({});
@@ -81,6 +86,7 @@ export function BookingRequestPage() {
   }
 
   const when = `${formatDate(start)}, ${formatTimeRange(start, end)}`;
+  const covers = periodsLabel(new Date(start), new Date(end), periods.data ?? []) ?? 'Custom time';
 
   if (request.isSuccess) {
     const booked = request.data.status === 'approved';
@@ -110,6 +116,7 @@ export function BookingRequestPage() {
       <PageHeader back={back} title="Request a venue" />
       <Card className={styles.summary}>
         <p className={styles.venue}>{venue.name}</p>
+        <p>{covers}</p>
         <p className="meta">
           {when}
           {venue.capacity ? ` · up to ${venue.capacity} people` : ''}

@@ -1,7 +1,8 @@
-// Admin > Features > Venues (Q2, Q6, Q10). Who may request venues, when venue
-// staff are reminded, and per venue: where it is, how many people it holds,
-// whether bookings need approval, and when, how long and how far ahead it can
-// be booked. The database enforces those limits on every request.
+// Admin > Features > Venues (Q2, Q6, Q10, Q48). Who may request venues,
+// whether bookings must follow the bell times, when venue staff are reminded,
+// and per venue: where it is, how many people it holds, whether bookings need
+// approval, and when, how long and how far ahead it can be booked. The
+// database enforces those limits on every request.
 // Venues are retired ("not bookable") rather than deleted: bookings refer to them.
 import { useState, type FormEvent } from 'react';
 import { Badge } from '@/components/Badge';
@@ -52,6 +53,11 @@ export function VenuesAdminPage() {
           setting="students_can_request_venues"
           label="Students can request venues"
           hint="Q2. They name a supervising teacher, who confirms first."
+        />
+        <SettingSwitch
+          setting="allow_custom_booking_times"
+          label="Allow custom booking times"
+          hint="Off: bookings follow the bell times (one period, or several in a row). On: people can also pick any start and end, e.g. after school. Each venue's limits still apply."
         />
         <p className="meta">Remind venue staff about a waiting request when (Q10):</p>
         <SettingNumber

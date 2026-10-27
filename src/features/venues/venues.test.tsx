@@ -1,16 +1,20 @@
-// Venue booking: the calendar's slot logic and the request form's checks.
-// Double bookings, clash rejection and who may approve are tested in the
-// database: supabase/tests/07_venues_test.sql.
+// Venue booking: the calendar's period logic and the request form's checks.
+// Double bookings, clash rejection, who may approve, and bookings having to
+// follow the bell times are tested in the database:
+// supabase/tests/07_venues_test.sql and 17_bell_times_test.sql.
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import type { Period } from '@/features/school/api';
 import type { BookingDetails, CalendarBooking } from './api';
-import { SlotList } from './components/SlotList';
+import { PeriodList } from './components/PeriodList';
 import {
   buildSlots,
+  customTimesProblem,
   firstBookableDay,
+  freeRun,
   nextSelection,
+  periodsLabel,
   selectionTimes,
   slotStates,
   validateBooking,
@@ -192,8 +196,8 @@ describe('nextSelection', () => {
   });
 });
 
-describe('SlotList', () => {
-  it('shows each state and lets free slots be picked', async () => {
+describe('PeriodList', () => {
+  it('shows each period by name and state, and lets free ones be picked', async () => {
     const states = slotStates(
       slots,
       [approved('Grade 10 assembly', '2026-10-20T05:00:00Z', '2026-10-20T06:30:00Z')],
@@ -202,17 +206,135 @@ describe('SlotList', () => {
       morning,
     );
     const onToggle = vi.fn();
-    render(<SlotList slots={slots} states={states} onToggle={onToggle} />);
+    render(<PeriodList slots={slots} states={states} onToggle={onToggle} />);
+    expect(screen.getByText('Period 4')).toBeInTheDocument();
     expect(screen.getByText('Booked · until 10:30')).toBeInTheDocument();
     expect(screen.getByText('Pending approval')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: '10:30–12:00, selected' })).toHaveAttribute(
+    expect(screen.getByRole('button', { name: 'Period 3, 10:30–12:00, selected' })).toHaveAttribute(
       'aria-pressed',
       'true',
     );
-    await userEvent.click(screen.getByRole('button', { name: '7:30–9:00, available' }));
+    expect(screen.getByText('Period 3 · 10:30–12:00')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Period 1, 7:30–9:00, available' }));
     expect(onToggle).toHaveBeenCalledWith(0);
-    // Booked and pending slots are not buttons.
-    expect(screen.queryByRole('button', { name: /9:00–10:30/ })).not.toBeInTheDocument();
+    // Booked and pending periods are not buttons.
+    expect(screen.queryByRole('button', { name: /Period 2/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Period 4/ })).not.toBeInTheDocument();
+  });
+
+  it('shows every period of a holiday as not bookable, with nothing to pick', () => {
+    const states = slotStates(slots, [], [], null, morning, 'Holiday: Mid-term break');
+    render(<PeriodList slots={slots} states={states} onToggle={vi.fn()} />);
+    expect(screen.getAllByText('Not bookable')).toHaveLength(5);
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+  });
+});
+
+describe('booking by periods', () => {
+  // Period 3 (index 2) is taken; 1, 2, 4 and 5 are free.
+  const taken = slotStates(
+    slots,
+    [approved('Busy', '2026-10-20T06:30:00Z', '2026-10-20T08:00:00Z')],
+    [],
+    null,
+    morning,
+  );
+  const pending = slotStates(
+    slots,
+    [],
+    [waiting('Someone else', '2026-10-20T06:30:00Z', '2026-10-20T08:00:00Z')],
+    null,
+    morning,
+  );
+
+  it('blocks a run that would cross a booked period: tapping past it starts a new run', () => {
+    let selection = nextSelection(null, 0, taken);
+    selection = nextSelection(selection, 1, taken);
+    expect(selection).toEqual({ first: 0, last: 1 });
+    // Period 3 is booked: tapping it does nothing.
+    expect(nextSelection(selection, 2, taken)).toEqual({ first: 0, last: 1 });
+    // Period 4 is free but not next to the run: a new run starts there.
+    expect(nextSelection(selection, 3, taken)).toEqual({ first: 3, last: 3 });
+  });
+
+  it('blocks a run that would cross a pending period the same way', () => {
+    const selection = nextSelection({ first: 0, last: 1 }, 3, pending);
+    expect(selection).toEqual({ first: 3, last: 3 });
+  });
+
+  it("won't request a run once a period in it stops being free", () => {
+    const picked = slotStates(slots, [], [], { first: 1, last: 3 }, morning);
+    expect(freeRun({ first: 1, last: 3 }, picked)).toEqual({ first: 1, last: 3 });
+    // Someone's request for Period 3 arrives over Realtime.
+    const now = slotStates(
+      slots,
+      [],
+      [waiting('Someone else', '2026-10-20T06:30:00Z', '2026-10-20T08:00:00Z')],
+      { first: 1, last: 3 },
+      morning,
+    );
+    expect(freeRun({ first: 1, last: 3 }, now)).toBeNull();
+  });
+
+  it('closes every period of a holiday, but still shows bookings already made', () => {
+    const states = slotStates(
+      slots,
+      [
+        approved(
+          'Booked before the holiday was added',
+          '2026-10-20T03:30:00Z',
+          '2026-10-20T05:00:00Z',
+        ),
+      ],
+      [],
+      null,
+      morning,
+      'Holiday: Mid-term break',
+    );
+    expect(states.map((state) => state.kind)).toEqual([
+      'booked',
+      'closed',
+      'closed',
+      'closed',
+      'closed',
+    ]);
+    expect(nextSelection(null, 1, states)).toBeNull();
+  });
+
+  it("runs from the first period's start to the last one's end, and names them", () => {
+    const times = selectionTimes(slots, { first: 1, last: 2 });
+    expect(times.start.toISOString()).toBe('2026-10-20T05:00:00.000Z'); // 9:00
+    expect(times.end.toISOString()).toBe('2026-10-20T08:00:00.000Z'); // 12:00
+    expect(periodsLabel(times.start, times.end, periods)).toBe('Period 2 to Period 3');
+    expect(periodsLabel(slots[0].start, slots[0].end, periods)).toBe('Period 1');
+    // 9:00–11:00 isn't on the bell times: a custom time.
+    expect(periodsLabel(times.start, new Date('2026-10-20T07:00:00Z'), periods)).toBeNull();
+  });
+});
+
+describe('customTimesProblem', () => {
+  const busy = [approved('Assembly', '2026-10-20T11:00:00Z', '2026-10-20T12:00:00Z')]; // 15:00–16:00
+
+  it('needs both times, the end after the start', () => {
+    expect(customTimesProblem(day, { from: '15:30', to: '' }, [], null, morning)).toBe(
+      'Choose a start and an end time.',
+    );
+    expect(customTimesProblem(day, { from: '17:00', to: '16:00' }, [], null, morning)).toBe(
+      'The end must be after the start.',
+    );
+  });
+
+  it('refuses a clash with an approved booking, and a closed day', () => {
+    expect(customTimesProblem(day, { from: '15:30', to: '17:00' }, busy, null, morning)).toBe(
+      'Clashes with "Assembly" (15:00–16:00).',
+    );
+    expect(
+      customTimesProblem(day, { from: '16:00', to: '17:00' }, [], 'Holiday: Eid', morning),
+    ).toBe('Holiday: Eid');
+  });
+
+  it('accepts a free time after school', () => {
+    expect(customTimesProblem(day, { from: '16:00', to: '17:30' }, busy, null, morning)).toBeNull();
   });
 });
 
