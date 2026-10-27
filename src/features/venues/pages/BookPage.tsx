@@ -5,23 +5,22 @@ import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button, ButtonLink } from '@/components/Button';
 import { FilterChip } from '@/components/Chip';
+import { DateStrip } from '@/components/DateStrip';
 import { PageHeader } from '@/components/PageHeader';
 import { EmptyState, ErrorState, LoadingState } from '@/components/States';
 import { useCurrentUser } from '@/features/auth/hooks';
 import type { Period } from '@/features/school/api';
 import { useBlackouts, useHolidays, usePeriods, useTerms } from '@/features/school/hooks';
-import { dayNote, type CalendarData } from '@/features/school/logic';
+import { dayNote, schoolDaysOfWeek, type CalendarData } from '@/features/school/logic';
 import { useAppSettings } from '@/features/settings/hooks';
 import { dayRange, formatTimeRange } from '@/lib/dates';
 import type { Venue } from '../api';
-import { DateStrip } from '../components/DateStrip';
 import { SlotList } from '../components/SlotList';
 import { useApprovedBookings, useLiveBookings, useVenues, useWaitingRequests } from '../hooks';
 import {
   buildSlots,
   firstBookableDay,
   nextSelection,
-  schoolDaysOfWeek,
   selectionTimes,
   slotStates,
   type Selection,

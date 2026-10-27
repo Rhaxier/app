@@ -1,7 +1,8 @@
 // The row of school days (reference screen 4: Sun 12 … Thu 16), with arrows
 // above it to move a week at a time. Days come from app_settings.school_days.
-// Days that can't be booked (past, holidays, blackouts, no periods) are greyed
-// out, and the reason is read out and listed under the strip.
+// Used by venue booking and bell times. Special days (holidays, blackouts, no
+// periods) have their reason read out and listed under the strip; days that
+// can't be chosen at all are greyed out.
 import { Icon } from '@/components/Icon';
 import { atSchoolTime, dayKey, dayLabels, formatDate } from '@/lib/dates';
 import styles from './DateStrip.module.css';

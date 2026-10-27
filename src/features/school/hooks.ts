@@ -10,6 +10,7 @@ import {
   fetchHolidays,
   fetchPeriods,
   fetchTerms,
+  importPeriods,
   saveCalendarRow,
   type CalendarFields,
   type CalendarTable,
@@ -20,6 +21,7 @@ import {
   saveGrade,
   setClassArchived,
   type ClassInput,
+  type PeriodCsvRow,
 } from './api';
 import type { CalendarData } from './logic';
 
@@ -183,5 +185,23 @@ export function useDeleteCalendarRow(table: CalendarTable) {
     mutationFn: (id: string) => deleteCalendarRow(table, id),
     onSuccess: invalidate,
     meta: { successMessage: 'Deleted', errorToast: true },
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Bell times upload
+// ---------------------------------------------------------------------------
+
+/** The preview: checks every row, saves nothing. */
+export function usePeriodImportPreview() {
+  return useMutation({ mutationFn: (rows: PeriodCsvRow[]) => importPeriods(rows, true) });
+}
+
+export function useImportPeriods() {
+  const invalidate = useInvalidateSchool();
+  return useMutation({
+    mutationFn: (rows: PeriodCsvRow[]) => importPeriods(rows, false),
+    onSuccess: invalidate,
+    meta: { successMessage: 'Bell times updated' },
   });
 }

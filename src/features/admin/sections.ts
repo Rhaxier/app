@@ -85,6 +85,12 @@ export const adminGroups: AdminGroup[] = [
         icon: 'clock',
       },
       {
+        path: 'bell-times',
+        title: 'Upload bell times',
+        description: 'Replace periods from a CSV file',
+        icon: 'download',
+      },
+      {
         path: 'terms',
         title: 'Terms and holidays',
         description: 'The school year and days off',

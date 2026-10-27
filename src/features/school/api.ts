@@ -4,7 +4,7 @@
 // Class lists (who is in a class) are private to the student, the class's
 // teachers and admins.
 import { supabase } from '@/lib/supabase';
-import type { Tables } from '@/types/database';
+import type { Json, Tables } from '@/types/database';
 
 export type Grade = Pick<Tables<'grades'>, 'id' | 'grade' | 'name' | 'active'>;
 export type Section = Pick<Tables<'sections'>, 'id' | 'grade' | 'name'>;
@@ -195,4 +195,49 @@ export async function saveCalendarRow<T extends CalendarTable>(
 export async function deleteCalendarRow(table: CalendarTable, id: string): Promise<void> {
   const { error } = await supabase.from(table).delete().eq('id', id);
   if (error) throw error;
+}
+
+// ---------------------------------------------------------------------------
+// Bell times upload (CSV). See admin_import_periods() in
+// supabase/migrations/20261027120000_period_import.sql.
+// ---------------------------------------------------------------------------
+
+/** One line of the bell times file, as typed (the database checks it all). */
+export interface PeriodCsvRow {
+  weekday: string;
+  period_name: string;
+  start_time: string;
+  end_time: string;
+  order: string;
+}
+
+export interface PeriodImportResult {
+  /** The line in the file (line 1 is the headings). */
+  line: number;
+  weekday: string;
+  period_name: string;
+  start_time: string;
+  end_time: string;
+  sort_order: string;
+  /** ok = will be (or was) saved; error = see message, nothing is saved. */
+  outcome: 'ok' | 'error';
+  /** What's wrong, or a note worth knowing; null when there's nothing to say. */
+  message: string | null;
+}
+
+/**
+ * dryRun = true is the preview: every row checked, nothing saved. Then the
+ * real import replaces the periods of every weekday in the file in one
+ * transaction, or, if any row has a problem, refuses and changes nothing.
+ */
+export async function importPeriods(
+  rows: PeriodCsvRow[],
+  dryRun: boolean,
+): Promise<PeriodImportResult[]> {
+  const { data, error } = await supabase.rpc('admin_import_periods', {
+    p_rows: rows as unknown as Json,
+    p_dry_run: dryRun,
+  });
+  if (error) throw error;
+  return data as PeriodImportResult[];
 }

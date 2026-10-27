@@ -1,8 +1,10 @@
 // Admin > School week and periods (Q11). Which weekdays are school days, and
-// the periods of each day. Venue booking offers exactly these periods, so a
-// short Friday is a set of periods that run only on Fridays.
+// the periods of each day. Venue booking offers exactly these periods (and the
+// database only accepts bookings that line up with them), so a short Friday is
+// a set of periods that run only on Fridays. To change many at once, upload
+// the timetable as a CSV file (Upload bell times).
 import { useState } from 'react';
-import { Button } from '@/components/Button';
+import { Button, ButtonLink } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { FilterChip } from '@/components/Chip';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
@@ -29,9 +31,14 @@ export function SchoolWeekPage() {
       title="School week and periods"
       description="School days, and the periods venues can be booked by."
       actions={
-        <Button size="small" icon="plus" onClick={() => setEditing(null)}>
-          Add period
-        </Button>
+        <span className="row-wrap">
+          <ButtonLink to="/admin/bell-times" size="small" variant="secondary" icon="download">
+            Upload CSV
+          </ButtonLink>
+          <Button size="small" icon="plus" onClick={() => setEditing(null)}>
+            Add period
+          </Button>
+        </span>
       }
     >
       <SchoolDays />
@@ -39,7 +46,8 @@ export function SchoolWeekPage() {
       <Card className="stack-tight">
         <h2 className={styles.cardTitle}>Periods</h2>
         <p className="meta">
-          Venue booking offers these on the days they run. Give a short day its own periods.
+          Venue booking offers these on the days they run, and everyone sees them under Bell times.
+          Give a short day its own periods. Periods on the same day can't overlap.
         </p>
         {periods.isPending && <LoadingState shape="row" />}
         {periods.isError && <ErrorState error={periods.error} onRetry={() => periods.refetch()} />}

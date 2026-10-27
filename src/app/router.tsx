@@ -39,6 +39,7 @@ const book = () => import('@/features/venues/pages/BookPage');
 const bookingRequest = () => import('@/features/venues/pages/BookingRequestPage');
 const myBookings = () => import('@/features/venues/pages/MyBookingsPage');
 const search = () => import('@/features/search/pages/SearchPage');
+const bellTimes = () => import('@/features/school/pages/BellTimesPage');
 const approvals = () => import('@/features/approvals/pages/ApprovalsPage');
 
 export const router = createBrowserRouter([
@@ -59,6 +60,7 @@ export const router = createBrowserRouter([
               { path: '/notifications', element: <InboxPage /> },
               { path: '/notifications/settings', element: <NotificationSettingsPage /> },
               { path: '/search', lazy: lazyPage(search, 'SearchPage') },
+              { path: '/bell-times', lazy: lazyPage(bellTimes, 'BellTimesPage') },
               // Each feature's screens sit inside RequireFeature: while an admin
               // has switched the feature off, everyone else gets a short note.
               {

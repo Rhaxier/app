@@ -6,7 +6,7 @@
 import type { Period } from '@/features/school/api';
 import { periodsOn } from '@/features/school/logic';
 import type { AppSettings } from '@/features/settings/api';
-import { addDaysToKey, atSchoolTime, dayKey, weekdayOfKey, WEEK_STARTS_ON } from '@/lib/dates';
+import { atSchoolTime, dayKey } from '@/lib/dates';
 import type { BookingDetails, CalendarBooking } from './api';
 
 export type SlotSettings = Pick<AppSettings, 'school_days'>;
@@ -27,20 +27,6 @@ export function buildSlots(day: string, periods: Period[]): Slot[] {
     start: atSchoolTime(day, period.starts_at.slice(0, 5)),
     end: atSchoolTime(day, period.ends_at.slice(0, 5)),
   }));
-}
-
-/** The school days of a week, as day keys. weekOffset 0 = this week. */
-export function schoolDaysOfWeek(
-  weekOffset: number,
-  settings: Pick<SlotSettings, 'school_days'>,
-  now = new Date(),
-): string[] {
-  const today = dayKey(now);
-  const sinceWeekStart = (weekdayOfKey(today) - WEEK_STARTS_ON + 7) % 7;
-  const weekStart = addDaysToKey(today, -sinceWeekStart + weekOffset * 7);
-  return Array.from({ length: 7 }, (_, i) => addDaysToKey(weekStart, i)).filter((day) =>
-    settings.school_days.includes(weekdayOfKey(day)),
-  );
 }
 
 /**

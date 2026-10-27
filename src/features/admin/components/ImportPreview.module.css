@@ -50,3 +50,8 @@
 .error .message {
   color: var(--color-alert-ink);
 }
+
+/* Keeps "07:30–08:15" on one line. */
+.nowrap {
+  white-space: nowrap;
+}

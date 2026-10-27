@@ -11,15 +11,11 @@ import {
   buildSlots,
   firstBookableDay,
   nextSelection,
-  schoolDaysOfWeek,
   selectionTimes,
   slotStates,
   validateBooking,
   emptyBookingValues,
-  type SlotSettings,
 } from './logic';
-
-const settings: SlotSettings = { school_days: [0, 1, 2, 3, 4] };
 
 // Five 90-minute periods from 7:30, Sunday to Thursday (as drawn in the mockup).
 const periods: Period[] = ['07:30', '09:00', '10:30', '12:00', '13:30'].map((start, i) => ({
@@ -71,29 +67,6 @@ describe('buildSlots', () => {
       '2026-10-20T06:30:00.000Z', // 10:30
       '2026-10-20T08:00:00.000Z', // 12:00
       '2026-10-20T09:30:00.000Z', // 13:30
-    ]);
-  });
-});
-
-describe('schoolDaysOfWeek', () => {
-  it('lists the school days of this week, starting on Sunday', () => {
-    expect(schoolDaysOfWeek(0, settings, morning)).toEqual([
-      '2026-10-18',
-      '2026-10-19',
-      '2026-10-20',
-      '2026-10-21',
-      '2026-10-22',
-    ]);
-    expect(schoolDaysOfWeek(1, settings, morning)[0]).toBe('2026-10-25');
-  });
-
-  it('follows the school_days setting (e.g. Monday to Friday)', () => {
-    expect(schoolDaysOfWeek(0, { school_days: [1, 2, 3, 4, 5] }, morning)).toEqual([
-      '2026-10-19',
-      '2026-10-20',
-      '2026-10-21',
-      '2026-10-22',
-      '2026-10-23',
     ]);
   });
 });
