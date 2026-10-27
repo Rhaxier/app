@@ -85,6 +85,7 @@ export type Database = {
       app_settings: {
         Row: {
           accent_color: string;
+          allow_custom_booking_times: boolean;
           allow_dev_accounts: boolean;
           announcement_default_expiry_days: number | null;
           collab_max_team_size: number;
@@ -112,6 +113,7 @@ export type Database = {
         ComputedFields: never;
         Insert: {
           accent_color?: string;
+          allow_custom_booking_times?: boolean;
           allow_dev_accounts?: boolean;
           announcement_default_expiry_days?: number | null;
           collab_max_team_size?: number;
@@ -138,6 +140,7 @@ export type Database = {
         };
         Update: {
           accent_color?: string;
+          allow_custom_booking_times?: boolean;
           allow_dev_accounts?: boolean;
           announcement_default_expiry_days?: number | null;
           collab_max_team_size?: number;
@@ -2120,6 +2123,19 @@ export type Database = {
           row_number: number;
         }[];
       };
+      admin_import_periods: {
+        Args: { p_dry_run?: boolean; p_rows: Json };
+        Returns: {
+          end_time: string;
+          line: number;
+          message: string;
+          outcome: string;
+          period_name: string;
+          sort_order: string;
+          start_time: string;
+          weekday: string;
+        }[];
+      };
       admin_lift_suspension: { Args: { p_user_id: string }; Returns: undefined };
       admin_list_users: {
         Args: Record<PropertyKey, never>;
@@ -2328,6 +2344,7 @@ export type Database = {
         Args: { p_ends: string; p_ignore: string; p_starts: string; p_venue_id: string };
         Returns: boolean;
       };
+      booking_period_problem: { Args: { p_ends: string; p_starts: string }; Returns: string };
       calendar_day_note: { Args: { p_day: string; p_venue_id: string }; Returns: string };
       can_confirm_hours: { Args: { p_event_id: string }; Returns: boolean };
       can_manage_report: { Args: { p_category: string }; Returns: boolean };
@@ -2570,6 +2587,8 @@ export type Database = {
           waitlisted_count: number;
         }[];
       };
+      weekday_from_text: { Args: { p_text: string }; Returns: number };
+      weekday_name: { Args: { p_day: number }; Returns: string };
     };
     Enums: {
       announcement_audience: 'school' | 'grades';

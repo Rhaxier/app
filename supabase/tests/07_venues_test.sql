@@ -42,6 +42,11 @@ grant usage on schema extensions to authenticated;
 grant execute on all functions in schema extensions to authenticated;
 grant execute on function pg_temp.act_as(text), pg_temp.act_as_owner(), pg_temp.uid(text) to authenticated;
 
+-- These tests are about clashes and approvals, and use times that don't follow
+-- the bell times (2030-01-06 is a Sunday). Booking by periods has its own
+-- tests in 17_bell_times_test.sql. Undone by the rollback at the end.
+update public.app_settings set allow_custom_booking_times = true;
+
 -- ---------------------------------------------------------------------------
 -- Required test 7: no double bookings
 -- ---------------------------------------------------------------------------

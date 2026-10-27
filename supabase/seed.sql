@@ -532,14 +532,14 @@ begin
   -- Teacher A has confirmed the student's request, so it's now pending too.
   update public.bookings set status = 'pending' where id = v_booking;
 
-  -- Overlap case already decided: approving "Club fair setup" rejected
-  -- "Basketball practice", which asked for the same slot.
+  -- Overlap case already decided: approving "Club fair setup" (Periods 4 and
+  -- 5) rejected "Basketball practice", which asked for Period 5.
   insert into public.bookings (venue_id, requester_id, title, purpose, expected_attendance, starts_at, ends_at)
   values (pg_temp.venue('MPH (placeholder)'), pg_temp.u('teacher.c'), 'Basketball practice (sample)',
           'Team practice.', 15, pg_temp.at_long(2, '13:30'), pg_temp.at_long(2, '15:00'));
   insert into public.bookings (venue_id, requester_id, title, purpose, expected_attendance, starts_at, ends_at)
   values (pg_temp.venue('MPH (placeholder)'), pg_temp.u('admin.plain'), 'Club fair setup (sample)',
-          'Set up tables for the club fair.', 30, pg_temp.at_long(2, '13:00'), pg_temp.at_long(2, '15:00'))
+          'Set up tables for the club fair.', 30, pg_temp.at_long(2, '12:00'), pg_temp.at_long(2, '15:00'))
   returning id into v_booking;
   update public.bookings set status = 'approved', reviewed_by = pg_temp.u('admin.venues') where id = v_booking;
 

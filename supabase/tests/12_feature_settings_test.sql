@@ -71,7 +71,11 @@ select throws_ok($$ select public.admin_review_tag_suggestion((select id from pu
 -- ---------------------------------------------------------------------------
 -- New test 3 (the rest): the venue's own limits.
 -- Seed: the Auditorium is bookable 07:00–18:00, up to 240 minutes, 60 days ahead.
+-- These limits apply to any booking, so test them with custom times allowed:
+-- then the bell times (17_bell_times_test.sql) don't get in the way.
 -- ---------------------------------------------------------------------------
+select pg_temp.act_as_owner();
+update public.app_settings set allow_custom_booking_times = true;
 select pg_temp.act_as('teacher.b');
 
 select throws_ok(
@@ -101,6 +105,8 @@ select lives_ok(
              pg_temp.on_day(5, '09:00'), pg_temp.on_day(5, '10:30')) $$,
   'A booking within every rule goes through'
 );
+select pg_temp.act_as_owner();
+update public.app_settings set allow_custom_booking_times = false;
 
 -- ---------------------------------------------------------------------------
 -- New test 4: scheduled and expired announcements

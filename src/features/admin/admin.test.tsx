@@ -20,6 +20,7 @@ const settings: AppSettings = {
   allow_dev_accounts: true,
   staff_email_pattern: null,
   students_can_request_venues: true,
+  allow_custom_booking_times: false,
   collab_requires_teacher: false,
   teachers_post_any_grade: true,
   announcement_default_expiry_days: null,
