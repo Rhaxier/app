@@ -83,6 +83,36 @@ database (or after `npx supabase db reset --linked`, which wipes everything).
   every grade, and makes existing posts' skills the first skills list.
 - The others only add tables, columns and functions.
 
+## 1c. Round 3: side-by-side fields, bell times, booking by periods
+
+| Change                  | What was done                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Overlapping fields      | Cause: two-column rows were `1fr 1fr` grids, and a `1fr` column never shrinks below its content's minimum width. Native date and time inputs have a built-in minimum (wider on iPhones, where Safari also ignores `width: 100%`), so on a phone the second field spilled out or over its neighbour. Fix: one shared `FieldRow` (fields shrink to their share, `min-width: 0`, and stack below about 420px) and date/time inputs without the native box, used on every screen with paired fields. |
+| Bell times upload       | Admin > School calendar > Upload bell times: template filled with today's periods, a database dry run that shows each line's problem, then an all-or-nothing import that replaces only the weekdays in the file, in one transaction, written to the audit log. Periods on the same weekday can no longer overlap.                                                                                                                                                                                |
+| Bell times for everyone | `/bell-times`, from a new card on Home ("Now: Period 2, until 10:30"): any school day's own periods.                                                                                                                                                                                                                                                                                                                                                                                             |
+| Booking by periods      | The booking list shows the chosen date's periods by name and time; pick one or a run of neighbours, never across a booked, pending, holiday or blackout period. The database refuses new bookings that don't start and end on that weekday's periods, unless an admin turns on `allow_custom_booking_times` (Admin > Venues), which adds an "Another time" card. Existing bookings are untouched.                                                                                                |
+
+**Why the fixed 90-minute slots were still there.** The booking screen already read the
+`periods` table, but on an upgraded project those periods _are_ the old slots: the round 2
+calendar migration turned the slot settings (07:30, 90 minutes, the same every day) into
+periods, and `db push` doesn't run the seed's weekday-specific timetable (even the seed's
+periods are 90 minutes long, apart from Friday's). The list showed only a start time and
+"Available", so it looked unchanged, and the database accepted any times. Check yours with
+`select name, starts_at, ends_at, weekdays from periods order by starts_at;` and upload the
+real bell times.
+
+### Migrations to run on a cloud project (round 3)
+
+```bash
+npx supabase db push
+```
+
+It applies `20261027120000_period_import.sql` and `20261027120100_booking_by_periods.sql`.
+Neither changes existing data: the first adds the period overlap trigger and the import
+function, the second adds `app_settings.allow_custom_booking_times` (off) and the bell
+times check on new bookings. Then upload the school's bell times (Admin > Upload bell
+times); until then, bookings follow the periods already in the table.
+
 ## 2. How to run it
 
 See the [README](../README.md):
@@ -96,12 +126,12 @@ See the [README](../README.md):
 
 ## 3. Test results
 
-| Suite                                        | Result                                                    |
-| -------------------------------------------- | --------------------------------------------------------- |
-| Database (pgTAP, `npm run db:test`)          | **348 passed, 0 failed** in 16 files (round 1: 119 in 8)  |
-| UI (Vitest, `npm test`)                      | **159 passed, 0 failed** in 22 files (round 1: 111 in 15) |
-| Lint, type check, Prettier, production build | All clean                                                 |
-| Edge Functions                               | Type-check with Deno                                      |
+| Suite                                        | Result                                                                        |
+| -------------------------------------------- | ----------------------------------------------------------------------------- |
+| Database (pgTAP, `npm run db:test`)          | **383 passed, 0 failed** in 17 files (round 2: 348 in 16; round 1: 119 in 8)  |
+| UI (Vitest, `npm test`)                      | **176 passed, 0 failed** in 23 files (round 2: 159 in 22; round 1: 111 in 15) |
+| Lint, type check, Prettier, production build | All clean                                                                     |
+| Edge Functions                               | Type-check with Deno                                                          |
 
 The 15 required database rules map to these files: roles and audit (1) →
 `01_identity_test.sql`; projects (2) → `05`; announcements (3) → `03`; volunteering (4–6)
@@ -121,6 +151,13 @@ non-admins and the overview shows counts (`src/features/admin/overview.test.tsx`
 import preview shows row errors (`people.test.tsx`), the accent validator
 (`src/lib/contrast.test.ts`), the toast (`src/components/Toaster.test.tsx`) and optimistic
 rollback (`src/features/fixit/optimistic.test.tsx`).
+
+Round 3: `17_bell_times_test.sql` covers a booking off the period boundaries refused with
+custom times off and allowed with them on, a two-period booking accepted, the short Friday,
+the venue limits still applying, and the CSV import refusing overlapping and invalid lines
+and replacing only the weekdays in the file. UI: period selection can't cross an
+unavailable period (`venues.test.tsx`), and the import preview shows each line's problem
+(`src/features/admin/bellTimes.test.tsx`).
 
 ### How it was verified, and what wasn't
 
@@ -174,8 +211,8 @@ sideways overflow (none) and page errors (none).
 
 ## 4. Open questions
 
-All 46 are in [`OPEN_QUESTIONS.md`](OPEN_QUESTIONS.md), each with the default used, where
-it lives and exact steps to change it. Q1, Q11, Q12, Q15, Q25 and Q27 are now
+All 50 are in [`OPEN_QUESTIONS.md`](OPEN_QUESTIONS.md), each with the default used, where
+it lives and exact steps to change it. Q1, Q11, Q12, Q15, Q25, Q27, Q47 and Q48 are
 configurable in Admin. In short:
 
 | #   | Question                                       | Default used                                                                           |
@@ -190,7 +227,7 @@ configurable in Admin. In short:
 | Q8  | Push?                                          | Nothing sent; outbox + dry-run function; flag off                                      |
 | Q9  | Name, logo, term dates, SUPW rules?            | Placeholders; no SUPW target                                                           |
 | Q10 | Venue reminder timing?                         | 48 hours pending or event within 3 days, hourly                                        |
-| Q11 | School days and booking slots?                 | Configurable in Admin: Sun–Thu, five 90-minute periods (sample: Mon–Fri, short Friday) |
+| Q11 | School days and periods?                       | Configurable in Admin: Sun–Thu, five 90-minute periods (sample: Mon–Fri, short Friday) |
 | Q12 | Which grades does each teacher teach?          | Configurable in Admin: classes; teachers may post anywhere until switched off          |
 | Q13 | Who confirms hours on staff events?            | Organising teacher, approving teacher, SUPW coordinator, admins                        |
 | Q14 | Who sees approved booking details?             | Everyone sees title/venue/time; details only for those involved                        |
@@ -214,7 +251,7 @@ configurable in Admin. In short:
 | Q32 | How does the rollover move students?           | To the next grade in use; top grade archived, sign-in blocked                          |
 | Q33 | Who can be imported?                           | Students and teachers; admins one at a time                                            |
 | Q34 | Volunteering on holidays or weekends?          | Allowed, with a warning                                                                |
-| Q35 | Bookings on weekends or outside term?          | Not offered on the calendar, not refused by the database                               |
+| Q35 | Bookings on weekends or outside term?          | Not offered; a day without periods is refused unless custom times are on               |
 | Q36 | Scheduled and expiring announcements?          | Hidden until published and after expiry; default expiry off                            |
 | Q37 | When does a report become urgent by itself?    | After 5 "me too"                                                                       |
 | Q38 | Team size and skills?                          | Up to 8 including the owner; skills from a list, suggestions reviewed                  |
@@ -226,13 +263,17 @@ configurable in Admin. In short:
 | Q44 | Branding, and what signed-out visitors see?    | Placeholder name, no logo, teal; `public_status()` is the only signed-out call         |
 | Q45 | What does data deletion delete?                | Name, email, files, settings, sign-in; records stay as "Deleted user"                  |
 | Q46 | Maintenance banner?                            | Off; on shows on every screen until its end time                                       |
+| Q47 | The timetable's format?                        | Configurable in Admin: CSV upload, all or nothing, whole weekdays replaced             |
+| Q48 | Bookings at times that aren't periods?         | Configurable in Admin: no by default (custom times off)                                |
+| Q49 | Can periods overlap on the same day?           | No; staggered lunches are one "Lunch" period                                           |
+| Q50 | Who sees the bell times?                       | Everyone signed in (Home card, `/bell-times`)                                          |
 
 ## 5. What you need to unlock
 
 | Item                     | Exact steps                                                                                                                                                                                                                                                                                                       |
 | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Supabase project**     | Create a free project (README, option B) or run `npm run db:start` with Docker. Check the "Not verified yet" list above on first run.                                                                                                                                                                             |
-| **School answers**       | Take Q1–Q4, Q11, Q12 and Q29–Q46 to the school. Almost every answer is a change in the admin dashboard (`/admin`), no code.                                                                                                                                                                                       |
+| **School answers**       | Take Q1–Q4, Q11, Q12 and Q29–Q50 to the school, and ask for the bell times of each weekday (upload them as a CSV, Q47). Almost every answer is a change in the admin dashboard (`/admin`), no code.                                                                                                               |
 | **First real admin**     | After the first real sign-in, in the Supabase SQL editor: `update profiles set role = 'admin' where email = '<their email>';`. From then on use Admin > People > Users (or import everyone from a CSV).                                                                                                           |
 | **School sign-in (SSO)** | Q5 steps 1–5: OAuth client from school IT (Google Cloud or Microsoft Entra), redirect URL `<SUPABASE_URL>/auth/v1/callback`, enable the provider in Supabase, set the school email domain in Admin > System > Sign-in, set `VITE_AUTH_PROVIDER` and `VITE_SCHOOL_EMAIL_DOMAIN`. Then untick "Allow dev accounts". |
 | **Email**                | Q7: choose a provider (e.g. Resend), set the secret, add the send call where `supabase/functions/send-emails/index.ts` says, deploy with `npx supabase functions deploy send-emails`, schedule it (README, "Email and push").                                                                                     |
@@ -256,7 +297,10 @@ configurable in Admin. In short:
    `usePresence.ts`, `useListMotion.ts`, `toast.ts` and `src/styles/motion.css`.
 8. [`docs/features/admin-dashboard.md`](features/admin-dashboard.md), section by section
    with its migration (`20261023120000` to `…120600`) and pgTAP file (09 to 16).
-9. [`docs/OPEN_QUESTIONS.md`](OPEN_QUESTIONS.md) before talking to the school.
+9. [`docs/features/bell-times.md`](features/bell-times.md): the CSV import and booking by
+   periods (migrations `20261027120000` and `…120100`, pgTAP file 17), and `FieldRow` in
+   "Decisions worth knowing" in [`docs/ARCHITECTURE.md`](ARCHITECTURE.md).
+10. [`docs/OPEN_QUESTIONS.md`](OPEN_QUESTIONS.md) before talking to the school.
 
 For each feature the order is the same: migration → its pgTAP test → `api.ts` →
 `hooks.ts` → `logic.ts` → `components/` → `pages/` → `*.test.tsx`.

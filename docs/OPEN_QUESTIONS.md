@@ -156,12 +156,15 @@ cloud dashboard's SQL editor.
   the mockup. (The sample data switches to Monday to Friday with a shorter Friday, as most
   UAE schools have run since 2022. Please confirm.) The old slot settings were turned into
   rows of the `periods` table by the migration, so nothing changed until an admin edits
-  them.
+  them. **A project upgraded with `db push` keeps those 90-minute periods on every day
+  until an admin changes them** (the seed's timetable doesn't run there): upload the real
+  bell times (Q47). Bookings follow the periods (Q48).
 - Where it lives: `app_settings.school_days` (0 = Sunday … 6 = Saturday); table `periods`
   (name, start, end, weekdays) (`supabase/migrations/20261023120200_school_calendar.sql`).
   The week in date strips starts on `WEEK_STARTS_ON` in `src/lib/dates.ts` (Sunday).
 - To change it: **Admin > School calendar > School week and periods**. Give a short day
-  its own periods (e.g. "Period 3 (short Friday)", Fridays only).
+  its own periods (e.g. "Period 3 (short Friday)", Fridays only), or upload the whole
+  timetable at once (**Upload bell times**, Q47).
 
 ## Q12: Which classes or grades does each teacher teach?
 
@@ -400,12 +403,16 @@ cloud dashboard's SQL editor.
 ## Q35: Can venues be booked on non-school days or outside term?
 
 - Default used: the booking calendar only offers school days that have periods, and the
-  database refuses holidays and blackouts. It doesn't refuse weekends or days outside
-  term: staff sometimes book the hall for a weekend event, and those requests still need
-  approval.
-- Where it lives: `bookings_check_rules()` and `booking_calendar_problem()`
-  (`..._20261023120200_school_calendar.sql`).
-- To change it: add a weekday check to `bookings_check_rules()` in a new migration.
+  database refuses holidays and blackouts. Since bookings follow the bell times (Q48), a
+  day with no periods (a weekend, usually) can't be booked either, unless an admin allows
+  custom times: then weekends and days outside term can be requested, e.g. for a weekend
+  event, and still need approval.
+- Where it lives: `bookings_check_rules()`, `booking_calendar_problem()`
+  (`..._20261023120200_school_calendar.sql`) and `booking_period_problem()`
+  (`..._20261027120100_booking_by_periods.sql`).
+- To change it: **Admin > Features > Venues > Allow custom booking times** to allow
+  weekend bookings. To refuse weekends even then, add a weekday check to
+  `bookings_check_rules()` in a new migration.
 
 ## Q36: How do scheduled and expiring announcements work?
 
@@ -536,3 +543,69 @@ cloud dashboard's SQL editor.
 - Where it lives: `app_settings.maintenance_enabled`, `maintenance_message`,
   `maintenance_until`; `public_status()`; `MaintenanceBanner` in `src/app/Branding.tsx`.
 - To change it: **Admin > System > Maintenance banner**.
+
+## Q47: In what form will the school's timetable (bell times) arrive?
+
+**Configurable in Admin.**
+
+- Default used: a CSV file with the columns `weekday, period_name, start_time, end_time,
+order`, one line per period per weekday. A weekday is its name or its first three
+  letters or more (`Friday`, `Fri`, `fri`); times are 24-hour (`7:30`, `07:30` or
+  `07:30:00`); order is 1 for the first period of the day. The import is **all or
+  nothing**: while any line has a problem, nothing is saved, because importing only the
+  good lines could leave a day with a gap. Each weekday in the file is replaced
+  completely; weekdays not in the file keep their periods. A weekday that isn't a school
+  day is accepted with a note. The same period on several days (same name, times and
+  order) is stored once, with all its days.
+- Where it lives: `admin_import_periods()` in
+  `supabase/migrations/20261027120000_period_import.sql`; the template and file reading
+  in `src/features/school/logic.ts` (`periodTemplateRows`, `periodRowsFromCsv`); the
+  screen in `src/features/admin/pages/BellTimesImportPage.tsx`.
+- To change it: **Admin > School calendar > Upload bell times** to load a timetable. To
+  accept other column names or weekday spellings, change `periodRowsFromCsv()` (column
+  names) or `weekday_from_text()` (weekday spellings, in a new migration). To import good
+  lines and skip bad ones, change the "Nothing was imported" check in
+  `admin_import_periods()` in a new migration.
+
+## Q48: May venues be booked at times that aren't periods (e.g. after school)?
+
+**Configurable in Admin.**
+
+- Default used: no. A new booking must start when a period starts and end when a period
+  ends on that date's weekday: one period, or several in a row (the booking then also
+  covers any break between them). Bookings made before this rule, or while custom times
+  were allowed, are left as they are. With custom times on, any start and end can be
+  requested, and the venue's own limits (bookable hours, longest booking, days ahead) and
+  holidays and blackouts still apply.
+- Where it lives: `app_settings.allow_custom_booking_times` (default false);
+  `booking_period_problem()` called from `bookings_check_rules()`
+  (`supabase/migrations/20261027120100_booking_by_periods.sql`); the "Another time" card
+  in `src/features/venues/pages/BookPage.tsx`.
+- To change it: **Admin > Features > Venues > Allow custom booking times**, or
+  `update app_settings set allow_custom_booking_times = true;`. To make a break bookable
+  on its own, add it as a period (e.g. "Break", 09:45–10:05).
+
+## Q49: Can two periods overlap on the same day (e.g. lunch at different times by grade)?
+
+- Default used: no. Periods on the same weekday may touch (one ends at 09:00, the next
+  starts at 09:00) but not overlap, so a run of consecutive periods always means the same
+  thing. Staggered lunches can be one "Lunch" period covering all of them. Existing
+  overlaps (if any were entered before this rule) are left alone until those periods are
+  edited.
+- Where it lives: the `periods_check_overlap` trigger in
+  `supabase/migrations/20261027120000_period_import.sql`; the import checks the same.
+- To change it: this one is a rule, not a setting. Allowing overlaps needs a new
+  migration that drops the trigger and changes how a run of periods is chosen
+  (`nextSelection()` in `src/features/venues/logic.ts`). Ask the school first.
+
+## Q50: Who can see the bell times?
+
+- Default used: everyone signed in, on the Bell times screen (`/bell-times`) and the card
+  on Home. Bell times are school-wide information, so they show even when venue booking is
+  switched off. Days already past in the current week are greyed out in the day strip,
+  as in booking; next week's arrow shows the same weekdays.
+- Where it lives: the `periods` table is readable by every signed-in user ("Everyone reads
+  periods" in `20261023120200_school_calendar.sql`);
+  `src/features/school/pages/BellTimesPage.tsx`, `components/TodayBellTimes.tsx`.
+- To change it: to hide the Home card, remove `<TodayBellTimes />` from
+  `src/features/home/pages/HomePage.tsx`.

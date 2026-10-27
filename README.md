@@ -108,16 +108,16 @@ Dev accounts only work while `app_settings.allow_dev_accounts` is on
 
 ## What's in the app
 
-| Tab or screen            | What it does                                                           | Guide                                                        |
-| ------------------------ | ---------------------------------------------------------------------- | ------------------------------------------------------------ |
-| Home                     | Greeting, search, six tools, today's bookings, announcements, the bell | [announcements](docs/features/announcements.md)              |
-| Map                      | Floor plans with rooms, rooms in use, fix-it pins; report a problem    | [map](docs/features/map.md), [fixit](docs/features/fixit.md) |
-| Volunteer                | SUPW events, roles, sign-ups, approvals, hours                         | [volunteering](docs/features/volunteering.md)                |
-| Collab                   | Find teammates, requests, auto-close, moderation                       | [collab](docs/features/collab.md)                            |
-| Book                     | Venue calendar, requests, approvals, no double bookings                | [venues](docs/features/venues.md)                            |
-| Projects (from Home)     | Share work with teachers for feedback                                  | [projects](docs/features/projects.md)                        |
-| Approvals (staff)        | One queue of everything waiting on you                                 | [approvals and admin](docs/features/approvals-and-admin.md)  |
-| Admin dashboard (admins) | Overview, people, calendar, feature settings, moderation, system       | [admin dashboard](docs/features/admin-dashboard.md)          |
+| Tab or screen            | What it does                                                                       | Guide                                                                                      |
+| ------------------------ | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| Home                     | Greeting, search, six tools, bell times, today's bookings, announcements, the bell | [announcements](docs/features/announcements.md), [bell times](docs/features/bell-times.md) |
+| Map                      | Floor plans with rooms, rooms in use, fix-it pins; report a problem                | [map](docs/features/map.md), [fixit](docs/features/fixit.md)                               |
+| Volunteer                | SUPW events, roles, sign-ups, approvals, hours                                     | [volunteering](docs/features/volunteering.md)                                              |
+| Collab                   | Find teammates, requests, auto-close, moderation                                   | [collab](docs/features/collab.md)                                                          |
+| Book                     | Venue calendar by periods, requests, approvals, no double bookings                 | [venues](docs/features/venues.md)                                                          |
+| Projects (from Home)     | Share work with teachers for feedback                                              | [projects](docs/features/projects.md)                                                      |
+| Approvals (staff)        | One queue of everything waiting on you                                             | [approvals and admin](docs/features/approvals-and-admin.md)                                |
+| Admin dashboard (admins) | Overview, people, calendar, feature settings, moderation, system                   | [admin dashboard](docs/features/admin-dashboard.md)                                        |
 
 ## Project layout
 

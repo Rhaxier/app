@@ -74,17 +74,21 @@ some sections; a trigger fills in their grades. Students in other sections don't
 
 ## School calendar (B3)
 
-| Section                 | What it does                                                                   | Database                              |
-| ----------------------- | ------------------------------------------------------------------------------ | ------------------------------------- |
-| School week and periods | School days (Q11) and the periods of each weekday, e.g. a shorter Friday       | `app_settings.school_days`, `periods` |
-| Terms and holidays      | The school year and days off                                                   | `terms`, `holidays`                   |
-| Venue blackouts         | Days one venue (or every venue) can't be booked, with a reason such as "Exams" | `venue_blackouts`                     |
+| Section                 | What it does                                                                             | Database                              |
+| ----------------------- | ---------------------------------------------------------------------------------------- | ------------------------------------- |
+| School week and periods | School days (Q11) and the periods of each weekday, e.g. a shorter Friday                 | `app_settings.school_days`, `periods` |
+| Upload bell times       | The whole timetable from a CSV: template, preview with each line's problem, import (Q47) | `admin_import_periods(rows, dry_run)` |
+| Terms and holidays      | The school year and days off                                                             | `terms`, `holidays`                   |
+| Venue blackouts         | Days one venue (or every venue) can't be booked, with a reason such as "Exams"           | `venue_blackouts`                     |
 
 **Where it shows up:**
 
-- **Book a venue:** the slots are that weekday's periods. Holidays, blackouts and days
-  without periods are greyed out in the date strip, with the reason read out and listed
-  underneath.
+- **Book a venue:** the list is that date's periods, and the database only accepts
+  bookings that start and end on them (unless custom times are allowed, Q48). Holidays and
+  blackouts show every period as not bookable, with the reason; days without periods are
+  greyed out in the date strip.
+- **Bell times** (`/bell-times`, from Home): everyone can see any day's periods. See
+  [`bell-times.md`](bell-times.md).
 - **The database** refuses any booking request that touches a holiday or a blackout
   (`bookings_check_rules()`, a BEFORE INSERT trigger on `bookings`), with a message such
   as "This venue can't be booked then: Mon 16 Nov is a holiday (Mid-term break)."
@@ -95,15 +99,15 @@ some sections; a trigger fills in their grades. Students in other sections don't
 
 ## Feature settings (B4)
 
-| Section           | What it changes                                                                                                                      | Database                                                                                  |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- |
-| Announcements     | Default expiry; every post (live, scheduled, expired) with Pin, Edit, Delete                                                         | `announcements.publish_at`, `expires_at`; `app_settings.announcement_default_expiry_days` |
-| Collab            | Supervising teacher required (Q4), biggest team, the skills list, suggested skills (approve, merge, reject)                          | `skill_tags`, `skill_tag_suggestions`, `admin_review_tag_suggestion()`                    |
-| Volunteering      | Student events need approval, categories (Q27), SUPW target per grade                                                                | `volunteer_categories`, `supw_targets`, `app_settings.student_events_need_approval`       |
-| Venues            | Students may request (Q2), reminder timing (Q10); per venue: capacity, approval, bookable hours, longest booking, days ahead, retire | `venues`, `bookings_check_rules()`                                                        |
-| Map               | Floors (upload a plan image), rooms and pins                                                                                         | `floors`, `rooms`, bucket `floor-plans`                                                   |
-| Fix-it categories | Categories with icon and team, retire instead of delete; auto-urgent threshold (Q37)                                                 | `report_categories`, `app_settings.report_auto_urgent_votes`                              |
-| Fix-it reports    | Every open report, urgent first                                                                                                      | `report_feed()`                                                                           |
+| Section           | What it changes                                                                                                                                                  | Database                                                                                  |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Announcements     | Default expiry; every post (live, scheduled, expired) with Pin, Edit, Delete                                                                                     | `announcements.publish_at`, `expires_at`; `app_settings.announcement_default_expiry_days` |
+| Collab            | Supervising teacher required (Q4), biggest team, the skills list, suggested skills (approve, merge, reject)                                                      | `skill_tags`, `skill_tag_suggestions`, `admin_review_tag_suggestion()`                    |
+| Volunteering      | Student events need approval, categories (Q27), SUPW target per grade                                                                                            | `volunteer_categories`, `supw_targets`, `app_settings.student_events_need_approval`       |
+| Venues            | Students may request (Q2), custom booking times (Q48), reminder timing (Q10); per venue: capacity, approval, bookable hours, longest booking, days ahead, retire | `venues`, `bookings_check_rules()`                                                        |
+| Map               | Floors (upload a plan image), rooms and pins                                                                                                                     | `floors`, `rooms`, bucket `floor-plans`                                                   |
+| Fix-it categories | Categories with icon and team, retire instead of delete; auto-urgent threshold (Q37)                                                                             | `report_categories`, `app_settings.report_auto_urgent_votes`                              |
+| Fix-it reports    | Every open report, urgent first                                                                                                                                  | `report_feed()`                                                                           |
 
 **The report categories migration changes existing data.** Fix-it categories used to be a
 fixed list inside the database (the `report_category` enum) plus a `report_category_routes`

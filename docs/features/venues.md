@@ -5,18 +5,25 @@ Same shape as announcements; read [`announcements.md`](announcements.md) first.
 
 ## What it does
 
-- **Calendar** (reference screen 4): venue chips, a strip of school days, and the day's
-  slots: available, booked (grey), pending approval (orange) and your selection (teal).
-  Tap neighbouring free slots to book a longer block. The slots are that weekday's
-  `periods` and the days are `app_settings.school_days` (Q11, Admin > School calendar).
-  Holidays and blackouts are greyed out; the database refuses them too.
+- **Calendar, by periods** (reference screen 4): venue chips, a strip of school days, and
+  the chosen date's **periods**, each with its name and times: available, booked (grey),
+  pending approval (orange), not bookable (a holiday or blackout) and your selection
+  (teal). Tap one period, or neighbouring free ones to book several in a row; a run can't
+  cross a period that isn't free. The periods are that weekday's own `periods` (Q11,
+  Admin > School calendar, or the bell times upload), so a short Friday looks shorter.
+- **Bell times in the database.** A new booking must start when a period starts and end
+  when a period ends on that weekday (`booking_period_problem()`), so nobody can send other
+  times by hand. An admin can allow **custom times** (Q48, Admin > Venues): then the
+  calendar also shows an "Another time" card with From and Until, e.g. for after school.
+  Holidays, blackouts, bookable hours, the longest booking and how far ahead still apply
+  either way. Bookings made before a rule changed are left as they are.
 - **Requests.** Staff requests start `pending`. A student must name a supervising teacher;
   their request starts `awaiting_teacher` until that teacher confirms (Q2: only while
   `students_can_request_venues` is on). Venues with `needs_approval = false` are approved
-  straight away if the slot is free.
+  straight away if the time is free.
 - **Approval.** Venue staff (the `venues` responsibility) or admins approve or reject, with an
   optional note and "Announce this to the school". Approving rejects every overlapping
-  request still waiting, and each of those requesters is told the slot was taken.
+  request still waiting, and each of those requesters is told the time was taken.
 - **No double bookings.** An exclusion constraint refuses two approved bookings for the same
   venue at overlapping times, even if two approvers click at the same instant.
 - **Notifications.** Approvers get an in-app notification and an immediate email row for
@@ -35,9 +42,11 @@ Same shape as announcements; read [`announcements.md`](announcements.md) first.
 | `bookings`          | Each request and its status. Only the calendar columns are readable directly |
 | `booking_details()` | Full details for the people involved, plus `overlaps_pending` for the queue  |
 | `venue_reminders()` | Reminds approvers about requests still waiting (run hourly by pg_cron)       |
+| `periods`           | The bell times: each period's name, start, end and weekdays (see bell times) |
 
-Migration: `supabase/migrations/20261019120800_venues.sql`.
-Database tests: `supabase/tests/07_venues_test.sql`.
+Migrations: `supabase/migrations/20261019120800_venues.sql`; the bell times rule is in
+`20261027120100_booking_by_periods.sql`.
+Database tests: `supabase/tests/07_venues_test.sql`, `17_bell_times_test.sql`.
 
 ## Where the rules live
 
@@ -46,19 +55,24 @@ Database tests: `supabase/tests/07_venues_test.sql`.
 - Who may move a booking between statuses: `bookings_before_update()` (the table of
   transitions is in its header comment).
 - Clash rejection, notifications and "announce": `bookings_after_write()`.
+- Holidays, blackouts, bell times and the venue's own limits: `bookings_check_rules()`
+  (a BEFORE INSERT trigger), which calls `booking_calendar_problem()` and
+  `booking_period_problem()`.
 
 ## Files to read
 
 1. `src/features/venues/api.ts`: the two ways to read bookings, and the Realtime subscription.
-2. `logic.ts`: slots, slot states, selection, the week strip, form validation.
+2. `logic.ts`: a date's periods (`buildSlots`), their states, picking a run
+   (`nextSelection`, `freeRun`), custom times, form validation.
 3. `pages/BookPage.tsx` (reference screen 4), `pages/BookingRequestPage.tsx`,
-   `pages/MyBookingsPage.tsx`; `components/SlotList.tsx`, `DateStrip.tsx`,
-   `ReviewActions.tsx` (used in Approvals), `TodayAtSchool.tsx` (on Home).
+   `pages/MyBookingsPage.tsx`; `components/PeriodList.tsx`, `ReviewActions.tsx` (used in
+   Approvals), `TodayAtSchool.tsx` (on Home); the shared `src/components/DateStrip.tsx`.
 4. `venues.test.tsx`.
 
 ## Try it
 
 As **Admin Venues**, open the Approvals tab: "Debate club practice" and "Robotics demo" want
-the same slot. Approve one; the other is rejected and its requester notified. As **Student
+the same period. Approve one; the other is rejected and its requester notified. As **Student
 Grade 10 B**, request the MPH: you must choose a supervising teacher, and the request waits
-for them in their Approvals tab.
+for them in their Approvals tab. Pick a Friday: Period 3 ends at 11:30, and there are no
+Periods 4 and 5.

@@ -60,26 +60,28 @@ Resend and push delivery plug in.
 
 Migrations live in `supabase/migrations/` and run in filename order.
 
-| Feature                | Tables, buckets and read functions                                                                                                           | Migration                              |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
-| Defaults               | locks signed-out access and new functions down                                                                                               | `20261019120000_lockdown_defaults.sql` |
-| Identity and roles     | `profiles`, `staff_emails`, `responsibilities`, `app_settings`, `audit_log`; `admin_list_users()`                                            | `20261019120100_identity.sql`          |
-| Notifications          | `notifications`, `notification_prefs`, `email_outbox`, `push_outbox`; `notify()`                                                             | `20261019120200_notifications.sql`     |
-| School map             | `floors`, `rooms`                                                                                                                            | `20261019120300_map.sql`               |
-| Announcements          | `announcements`                                                                                                                              | `20261019120400_announcements.sql`     |
-| SUPW volunteering      | `volunteer_events`, `event_roles`, `role_signups`; `volunteer_role_counts()`, `event_signups()`, `hours_to_confirm()`, `supw_hours_report()` | `20261019120500_volunteering.sql`      |
-| Projects with teachers | `projects`, `project_shares`, `project_feedback`; bucket `project-files`                                                                     | `20261019120600_projects.sql`          |
-| Collab finder          | `collab_posts`, `join_requests`, `content_reports`; `collab_post_counts()`, `collab_requests()`, `collab_team()`                             | `20261019120700_collab.sql`            |
-| Venue booking          | `venues`, `bookings`; `booking_details()`, `venue_reminders()`                                                                               | `20261019120800_venues.sql`            |
-| Fix-it reports         | `reports`, `report_votes`, `report_categories` (B4); `report_feed()`, `open_reports_in_room()`; bucket `report-photos`                       | `20261019120900_fixit.sql`             |
-| Realtime and cron      | Realtime on `notifications`, `bookings`, `reports`; hourly `venue_reminders()`                                                               | `20261019121000_realtime_and_cron.sql` |
-| Admin overview         | `admin_attention()`, `admin_metrics()`, `admin_venue_utilisation()`, `admin_supw_by_grade()`                                                 | `20261023120000_admin_overview.sql`    |
-| People and grades      | `grades`, `sections`, `classes`, `class_teachers`, `class_students`, `roster`; suspension; import; rollover                                  | `20261023120100_people_and_grades.sql` |
-| School calendar        | `periods`, `terms`, `holidays`, `venue_blackouts`; `bookings_check_rules()`                                                                  | `20261023120200_school_calendar.sql`   |
-| Feature settings       | `report_categories` (was an enum), `skill_tags`, `skill_tag_suggestions`, `volunteer_categories`, `supw_targets`; venue limits; scheduling   | `20261023120300_feature_settings.sql`  |
-| Moderation             | `removed_*` columns; `admin_moderation_queue()`, `admin_moderate()`                                                                          | `20261023120400_moderation.sql`        |
-| Notifications admin    | `emergency` type; `emergency_broadcasts`, `staff_email_prefs`; digest time                                                                   | `20261023120500…`, `…120510…`          |
-| System                 | `feature_flags`; branding, maintenance, `public_status()`; exports; `admin_anonymise_user()`                                                 | `20261023120600_system.sql`            |
+| Feature                | Tables, buckets and read functions                                                                                                           | Migration                               |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
+| Defaults               | locks signed-out access and new functions down                                                                                               | `20261019120000_lockdown_defaults.sql`  |
+| Identity and roles     | `profiles`, `staff_emails`, `responsibilities`, `app_settings`, `audit_log`; `admin_list_users()`                                            | `20261019120100_identity.sql`           |
+| Notifications          | `notifications`, `notification_prefs`, `email_outbox`, `push_outbox`; `notify()`                                                             | `20261019120200_notifications.sql`      |
+| School map             | `floors`, `rooms`                                                                                                                            | `20261019120300_map.sql`                |
+| Announcements          | `announcements`                                                                                                                              | `20261019120400_announcements.sql`      |
+| SUPW volunteering      | `volunteer_events`, `event_roles`, `role_signups`; `volunteer_role_counts()`, `event_signups()`, `hours_to_confirm()`, `supw_hours_report()` | `20261019120500_volunteering.sql`       |
+| Projects with teachers | `projects`, `project_shares`, `project_feedback`; bucket `project-files`                                                                     | `20261019120600_projects.sql`           |
+| Collab finder          | `collab_posts`, `join_requests`, `content_reports`; `collab_post_counts()`, `collab_requests()`, `collab_team()`                             | `20261019120700_collab.sql`             |
+| Venue booking          | `venues`, `bookings`; `booking_details()`, `venue_reminders()`                                                                               | `20261019120800_venues.sql`             |
+| Fix-it reports         | `reports`, `report_votes`, `report_categories` (B4); `report_feed()`, `open_reports_in_room()`; bucket `report-photos`                       | `20261019120900_fixit.sql`              |
+| Realtime and cron      | Realtime on `notifications`, `bookings`, `reports`; hourly `venue_reminders()`                                                               | `20261019121000_realtime_and_cron.sql`  |
+| Admin overview         | `admin_attention()`, `admin_metrics()`, `admin_venue_utilisation()`, `admin_supw_by_grade()`                                                 | `20261023120000_admin_overview.sql`     |
+| People and grades      | `grades`, `sections`, `classes`, `class_teachers`, `class_students`, `roster`; suspension; import; rollover                                  | `20261023120100_people_and_grades.sql`  |
+| School calendar        | `periods`, `terms`, `holidays`, `venue_blackouts`; `bookings_check_rules()`                                                                  | `20261023120200_school_calendar.sql`    |
+| Feature settings       | `report_categories` (was an enum), `skill_tags`, `skill_tag_suggestions`, `volunteer_categories`, `supw_targets`; venue limits; scheduling   | `20261023120300_feature_settings.sql`   |
+| Moderation             | `removed_*` columns; `admin_moderation_queue()`, `admin_moderate()`                                                                          | `20261023120400_moderation.sql`         |
+| Notifications admin    | `emergency` type; `emergency_broadcasts`, `staff_email_prefs`; digest time                                                                   | `20261023120500…`, `…120510…`           |
+| System                 | `feature_flags`; branding, maintenance, `public_status()`; exports; `admin_anonymise_user()`                                                 | `20261023120600_system.sql`             |
+| Bell times             | periods can't overlap; `admin_import_periods()` (CSV preview and import)                                                                     | `20261027120000_period_import.sql`      |
+| Booking by periods     | `app_settings.allow_custom_booking_times`; `booking_period_problem()` in `bookings_check_rules()`                                            | `20261027120100_booking_by_periods.sql` |
 
 The staff **Approvals** tab has no tables of its own: it reads the feature tables and
 functions above (events awaiting approval, `booking_details()`, `report_feed()`,
@@ -95,6 +97,7 @@ first visit), so the app starts faster on phones.
 | `/login`                                                                | Sign in (dev password; Google / Microsoft when configured)                                                                                           | everyone                |
 | `/`                                                                     | Home: greeting, search, six tools, today at school, announcements                                                                                    | everyone                |
 | `/search?q=`                                                            | Search rooms, events, announcements, collab posts                                                                                                    | everyone                |
+| `/bell-times`                                                           | Any school day's periods (from the Home card)                                                                                                        | everyone                |
 | `/announcements`, `/announcements/:id`                                  | Feed and one announcement                                                                                                                            | read: all               |
 | `/announcements/new`, `/announcements/:id/edit`                         | Announcement editor                                                                                                                                  | staff                   |
 | `/notifications`, `/notifications/settings`                             | Inbox and mutes                                                                                                                                      | everyone                |
@@ -159,6 +162,10 @@ waits for an exit animation doesn't wait.
 - **Admin functions start with `admin_` and check `is_admin()` first.** A test finds every
   one of them in the database and checks it refuses teachers and students
   (`supabase/tests/16_admin_lockdown_test.sql`).
+- **Fields side by side use `FieldRow`** (`src/components/Input.tsx`). It lets each field
+  shrink to its share of the row and stacks them on a phone, so date and time inputs (which
+  have a built-in minimum width) never spill over their neighbour. Don't build your own
+  two-column grid for form fields; if you need a grid, use `minmax(0, 1fr)` tracks.
 - **Soft rules in triggers, hard rules in RLS.** Where a refusal needs a sentence a person
   can act on ("Posting is paused until…", "Collab is switched off"), a BEFORE INSERT
   trigger raises it; a restrictive RLS policy refuses the same thing underneath.
