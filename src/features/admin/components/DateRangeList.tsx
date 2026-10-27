@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
-import { FormError, SelectField, TextField } from '@/components/Input';
+import { FieldRow, FormError, SelectField, TextField } from '@/components/Input';
 import { Sheet } from '@/components/Sheet';
 import { ErrorState, LoadingState } from '@/components/States';
 import { useDeleteCalendarRow, useSaveCalendarRow } from '@/features/school/hooks';
@@ -159,7 +159,7 @@ function RangeEditor({ table, noun, row, venues, onDone }: RangeEditorProps) {
           ))}
         </SelectField>
       )}
-      <div className={styles.twoColumns}>
+      <FieldRow>
         <TextField
           label="First day"
           type="date"
@@ -180,7 +180,7 @@ function RangeEditor({ table, noun, row, venues, onDone }: RangeEditorProps) {
           onChange={(e) => setValues({ ...values, endsOn: e.target.value })}
           error={errors.endsOn}
         />
-      </div>
+      </FieldRow>
       <FormError message={save.isError ? errorMessage(save.error) : null} />
       <Button fullWidth loading={save.isPending} onClick={submit}>
         Save {noun}

@@ -2,6 +2,27 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  /* A field is as narrow as its column, never as wide as its input wants to
+     be (see the date inputs below). */
+  min-width: 0;
+}
+
+/*
+ * Fields side by side (FieldRow), e.g. "First day" and "Last day".
+ * Each field takes an equal share of the row, but no less than 190px: when two
+ * don't fit (a row under about 400px, so every phone) they wrap onto their
+ * own lines. min-width: 0 lets a field shrink to its share; without it a date
+ * input's built-in width wins and it spills over the field beside it.
+ */
+.fieldRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.fieldRow > * {
+  flex: 1 1 190px;
+  min-width: 0;
 }
 
 .label {
@@ -21,6 +42,25 @@
 
 .input::placeholder {
   color: var(--color-muted);
+}
+
+/*
+ * Date and time inputs come with a built-in minimum width, and on iPhones
+ * Safari won't shrink them to width: 100%, so in a narrow column they used to
+ * draw over the next field. Without the native box look they size like any
+ * other input; tapping still opens the date or time picker.
+ */
+.input[type='date'],
+.input[type='time'],
+.input[type='datetime-local'] {
+  -webkit-appearance: none;
+  appearance: none;
+  min-width: 0;
+}
+
+/* Safari centres the value once the native look is off; keep it left. */
+.input::-webkit-date-and-time-value {
+  text-align: left;
 }
 
 .input[aria-invalid='true'] {

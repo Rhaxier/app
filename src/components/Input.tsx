@@ -136,6 +136,15 @@ export function CheckboxField({ label, hint, id, ...rest }: CheckboxFieldProps) 
   );
 }
 
+/**
+ * Two or three fields side by side, e.g. a start and an end. They share the
+ * row equally and stack on a phone. Use this rather than a grid of your own:
+ * it's what keeps date and time inputs from overlapping.
+ */
+export function FieldRow({ children }: { children: ReactNode }) {
+  return <div className={styles.fieldRow}>{children}</div>;
+}
+
 /** A form-level error, shown above the submit button. */
 export function FormError({ message }: { message?: string | null }) {
   if (!message) return null;

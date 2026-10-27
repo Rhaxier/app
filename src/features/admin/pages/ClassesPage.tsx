@@ -9,7 +9,7 @@ import { Badge } from '@/components/Badge';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
-import { CheckboxField, FormError, SelectField, TextField } from '@/components/Input';
+import { CheckboxField, FieldRow, FormError, SelectField, TextField } from '@/components/Input';
 import { Sheet } from '@/components/Sheet';
 import { EmptyState, ErrorState, LoadingState } from '@/components/States';
 import { Switch } from '@/components/Switch';
@@ -218,7 +218,7 @@ function ClassEditor({ schoolClass, onDone }: ClassEditorProps) {
         value={values.subject}
         onChange={(e) => setValues({ ...values, subject: e.target.value })}
       />
-      <div className={styles.twoColumns}>
+      <FieldRow>
         <SelectField
           label="Grade"
           value={values.grade}
@@ -247,7 +247,7 @@ function ClassEditor({ schoolClass, onDone }: ClassEditorProps) {
             </option>
           ))}
         </SelectField>
-      </div>
+      </FieldRow>
 
       <fieldset className={styles.fieldset}>
         <legend className="label">Teachers</legend>

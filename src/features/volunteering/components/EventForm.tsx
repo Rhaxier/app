@@ -3,7 +3,14 @@
 import { useState, type FormEvent } from 'react';
 import { Button, ButtonLink } from '@/components/Button';
 import { Card } from '@/components/Card';
-import { CheckboxField, FormError, SelectField, TextArea, TextField } from '@/components/Input';
+import {
+  CheckboxField,
+  FieldRow,
+  FormError,
+  SelectField,
+  TextArea,
+  TextField,
+} from '@/components/Input';
 import { SegmentedControl } from '@/components/SegmentedControl';
 import { useRooms } from '@/features/map/hooks';
 import { useCalendarData } from '@/features/school/hooks';
@@ -119,7 +126,7 @@ export function EventForm({
         value={values.description}
         onChange={(e) => update('description', e.target.value)}
       />
-      <div className={styles.twoColumns}>
+      <FieldRow>
         <TextField
           label="Starts"
           hint={
@@ -139,7 +146,7 @@ export function EventForm({
           onChange={(e) => update('endsAt', e.target.value)}
           error={errors.endsAt}
         />
-      </div>
+      </FieldRow>
 
       <div className="stack-tight">
         <span className={styles.legend}>Where</span>
@@ -176,7 +183,7 @@ export function EventForm({
         )}
       </div>
 
-      <div className={styles.twoColumns}>
+      <FieldRow>
         <TextField
           label="SUPW hours"
           type="number"
@@ -194,7 +201,7 @@ export function EventForm({
           onChange={(e) => update('signupDeadline', e.target.value)}
           error={errors.signupDeadline}
         />
-      </div>
+      </FieldRow>
       <CheckboxField
         label="Students may sign up for more than one role"
         checked={values.allowMultipleRoles}

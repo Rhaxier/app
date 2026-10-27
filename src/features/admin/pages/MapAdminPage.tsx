@@ -3,7 +3,7 @@
 import { useRef, useState, type FormEvent } from 'react';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
-import { FormError, SelectField, TextField } from '@/components/Input';
+import { FieldRow, FormError, SelectField, TextField } from '@/components/Input';
 import { SegmentedControl } from '@/components/SegmentedControl';
 import { ErrorState, LoadingState } from '@/components/States';
 import type { Floor, Room } from '@/features/map/api';
@@ -149,7 +149,7 @@ function RoomEditor({
         Pin at x {Math.round(room.x)}, y {Math.round(room.y)}
       </p>
       <form className="stack-tight" onSubmit={handleSubmit} noValidate>
-        <div className={styles.twoColumns}>
+        <FieldRow>
           <TextField
             label="Code"
             value={code}
@@ -167,7 +167,7 @@ function RoomEditor({
               </option>
             ))}
           </SelectField>
-        </div>
+        </FieldRow>
         <TextField
           label="Name"
           value={name}
@@ -183,7 +183,7 @@ function RoomEditor({
                 : null
           }
         />
-        <div className={styles.twoColumns}>
+        <FieldRow>
           <Button
             variant="quiet"
             icon="trash"
@@ -195,7 +195,7 @@ function RoomEditor({
           <Button type="submit" loading={update.isPending}>
             Save room
           </Button>
-        </div>
+        </FieldRow>
       </form>
     </Card>
   );
@@ -245,7 +245,7 @@ function NewRoom({
     <Card as="section" className="stack-tight" aria-label="Add a room">
       <h2 className={styles.heading}>Add a room to floor {floor.name}</h2>
       <form className="stack-tight" onSubmit={handleSubmit} noValidate>
-        <div className={styles.twoColumns}>
+        <FieldRow>
           <TextField
             label="Code"
             placeholder="G.14"
@@ -259,7 +259,7 @@ function NewRoom({
             onChange={(e) => setName(e.target.value)}
             error={errors.name}
           />
-        </div>
+        </FieldRow>
         <FormError message={create.isError ? errorMessage(create.error) : null} />
         <Button type="submit" variant="secondary" icon="plus" loading={create.isPending}>
           Add room
@@ -320,7 +320,7 @@ function FloorEditor({ floor }: { floor: Floor }) {
         value={imagePath}
         onChange={(e) => setImagePath(e.target.value)}
       />
-      <div className={styles.twoColumns}>
+      <FieldRow>
         <TextField
           label="Width (px)"
           type="number"
@@ -333,7 +333,7 @@ function FloorEditor({ floor }: { floor: Floor }) {
           value={height}
           onChange={(e) => setHeight(e.target.value)}
         />
-      </div>
+      </FieldRow>
       <FormError message={update.isError ? errorMessage(update.error) : null} />
       <Button
         variant="secondary"

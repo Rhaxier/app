@@ -96,12 +96,6 @@
   font-weight: 600;
 }
 
-.twoColumns {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-3);
-}
-
 .fieldset {
   display: flex;
   flex-direction: column;
@@ -142,7 +136,7 @@
 /* A card of filters: one column on a phone, three across on a laptop. */
 .filters {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   align-items: end;
   gap: var(--space-3);
 }

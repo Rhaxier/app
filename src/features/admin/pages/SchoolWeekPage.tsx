@@ -6,7 +6,7 @@ import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { FilterChip } from '@/components/Chip';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
-import { FormError, TextField } from '@/components/Input';
+import { FieldRow, FormError, TextField } from '@/components/Input';
 import { Sheet } from '@/components/Sheet';
 import { EmptyState, ErrorState, LoadingState } from '@/components/States';
 import type { Period } from '@/features/school/api';
@@ -161,7 +161,7 @@ function PeriodEditor({ period, onDone }: { period: Period | null; onDone: () =>
         onChange={(e) => setValues({ ...values, name: e.target.value })}
         error={errors.name}
       />
-      <div className={styles.twoColumns}>
+      <FieldRow>
         <TextField
           label="Starts"
           type="time"
@@ -176,7 +176,7 @@ function PeriodEditor({ period, onDone }: { period: Period | null; onDone: () =>
           onChange={(e) => setValues({ ...values, endsAt: e.target.value })}
           error={errors.endsAt}
         />
-      </div>
+      </FieldRow>
       <fieldset className={styles.fieldset}>
         <legend className="label">Runs on</legend>
         <div className="row-wrap">

@@ -12,7 +12,7 @@
 import { useState, type FormEvent } from 'react';
 import { Button, ButtonLink } from '@/components/Button';
 import { FilterChip } from '@/components/Chip';
-import { CheckboxField, FormError, TextArea, TextField } from '@/components/Input';
+import { CheckboxField, FieldRow, FormError, TextArea, TextField } from '@/components/Input';
 import { SegmentedControl } from '@/components/SegmentedControl';
 import { useCurrentUser } from '@/features/auth/hooks';
 import { useAppSettings } from '@/features/settings/hooks';
@@ -185,7 +185,7 @@ export function AnnouncementForm({
         </fieldset>
       )}
 
-      <div className={styles.twoColumns}>
+      <FieldRow>
         <TextField
           label="Publish (optional)"
           type="datetime-local"
@@ -202,7 +202,7 @@ export function AnnouncementForm({
           onChange={(event) => update('expiresAt', event.target.value)}
           error={errors.expiresAt}
         />
-      </div>
+      </FieldRow>
 
       {isAdmin && (
         <CheckboxField

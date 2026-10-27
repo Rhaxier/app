@@ -7,7 +7,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
-import { FormError, TextField } from '@/components/Input';
+import { FieldRow, FormError, TextField } from '@/components/Input';
 import { addDaysToKey, dayKey, formatDateTime } from '@/lib/dates';
 import { downloadCsv, toCsv } from '@/lib/csv';
 import { errorMessage } from '@/lib/errors';
@@ -54,7 +54,7 @@ export function ExportPage() {
 
       <Card className="stack-tight">
         <h2 className={styles.cardTitle}>Bookings and fix-it reports: dates</h2>
-        <div className={styles.twoColumns}>
+        <FieldRow>
           <TextField
             label="From"
             type="date"
@@ -62,7 +62,7 @@ export function ExportPage() {
             onChange={(e) => setFrom(e.target.value)}
           />
           <TextField label="To" type="date" value={to} onChange={(e) => setTo(e.target.value)} />
-        </div>
+        </FieldRow>
       </Card>
 
       <ExportCard

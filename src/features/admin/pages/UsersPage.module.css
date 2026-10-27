@@ -31,12 +31,6 @@
   gap: var(--space-1);
 }
 
-.twoColumns {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-3);
-}
-
 .panel {
   display: flex;
   flex-direction: column;

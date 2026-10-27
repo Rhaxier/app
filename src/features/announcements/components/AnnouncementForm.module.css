@@ -25,17 +25,3 @@
   grid-template-columns: 1fr 2fr;
   gap: var(--space-3);
 }
-
-/* Publish and expiry side by side when there's room. */
-.twoColumns {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--gap-block);
-}
-
-@media (min-width: 420px) {
-  .twoColumns {
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-3);
-  }
-}

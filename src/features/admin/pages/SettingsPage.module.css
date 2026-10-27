@@ -21,18 +21,6 @@
   font-weight: 600;
 }
 
-.twoColumns {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-3);
-}
-
-.threeColumns {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-2);
-}
-
 .error {
   color: var(--color-alert-ink);
   font-size: var(--text-meta);

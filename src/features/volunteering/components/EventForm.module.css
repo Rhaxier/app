@@ -13,18 +13,6 @@
   font-weight: 600;
 }
 
-.twoColumns {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--space-4);
-}
-
-@media (min-width: 420px) {
-  .twoColumns {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
 .roles {
   display: flex;
   flex-direction: column;
@@ -42,7 +30,7 @@
 
 .roleTop {
   display: grid;
-  grid-template-columns: 1fr 96px;
+  grid-template-columns: minmax(0, 1fr) 96px;
   gap: var(--space-3);
 }
 

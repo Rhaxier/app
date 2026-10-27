@@ -7,7 +7,7 @@ import { useState, type FormEvent } from 'react';
 import { Badge } from '@/components/Badge';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
-import { CheckboxField, FormError, SelectField, TextField } from '@/components/Input';
+import { CheckboxField, FieldRow, FormError, SelectField, TextField } from '@/components/Input';
 import { Sheet } from '@/components/Sheet';
 import { ErrorState, LoadingState } from '@/components/States';
 import { useRooms } from '@/features/map/hooks';
@@ -185,7 +185,7 @@ function VenueEditor({ venue, onClose }: { venue: Venue | null; onClose: () => v
         error={errors.capacity}
       />
       <p className="label">Booking limits (empty = no limit)</p>
-      <div className={styles.twoColumns}>
+      <FieldRow>
         <TextField
           label="Earliest start"
           type="time"
@@ -214,7 +214,7 @@ function VenueEditor({ venue, onClose }: { venue: Venue | null; onClose: () => v
           onChange={(e) => set({ maxDaysAhead: e.target.value })}
           error={errors.maxDaysAhead}
         />
-      </div>
+      </FieldRow>
       <CheckboxField
         label="Bookings need approval"
         hint="Untick for small rooms: free slots are then booked straight away."

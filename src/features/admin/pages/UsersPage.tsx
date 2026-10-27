@@ -9,7 +9,7 @@ import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Tag } from '@/components/Chip';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
-import { FormError, SelectField, TextField } from '@/components/Input';
+import { FieldRow, FormError, SelectField, TextField } from '@/components/Input';
 import { SegmentedControl } from '@/components/SegmentedControl';
 import { Sheet } from '@/components/Sheet';
 import { EmptyState, ErrorState, LoadingState } from '@/components/States';
@@ -66,7 +66,7 @@ export function UsersPage() {
           { value: 'admin', label: 'Admins' },
         ]}
       />
-      <div className={styles.twoColumns}>
+      <FieldRow>
         <SelectField
           label="Grade"
           value={filters.grade}
@@ -89,7 +89,7 @@ export function UsersPage() {
           <option value="archived">Left (archived)</option>
           <option value="all">Everyone</option>
         </SelectField>
-      </div>
+      </FieldRow>
 
       {users.isPending && <LoadingState shape="row" count={6} />}
       {users.isError && <ErrorState error={users.error} onRetry={() => users.refetch()} />}
@@ -183,7 +183,7 @@ function UserEditor({ user }: { user: AdminUser }) {
       </SelectField>
 
       <TextField label="Name" value={fullName} onChange={(e) => setFullName(e.target.value)} />
-      <div className={styles.twoColumns}>
+      <FieldRow>
         <SelectField
           label="Grade"
           value={grade}
@@ -212,7 +212,7 @@ function UserEditor({ user }: { user: AdminUser }) {
             </option>
           ))}
         </SelectField>
-      </div>
+      </FieldRow>
       <Button
         variant="secondary"
         loading={updateProfile.isPending}
