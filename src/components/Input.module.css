@@ -26,22 +26,27 @@
 }
 
 .label {
-  font-size: var(--text-small);
+  color: var(--ink2);
+  font-size: var(--text-body);
   font-weight: 600;
 }
 
+/* A see-through fill (iOS's tertiary fill), so a field reads the same on the
+   canvas, on a card and inside a glass sheet. 16px text: iPhones zoom the
+   page into anything smaller. */
 .input {
   width: 100%;
   min-height: var(--height-input);
   padding: 0 14px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-input);
-  background: var(--color-card);
-  font-size: var(--text-body);
+  border: 0;
+  border-radius: var(--r-field);
+  background-color: var(--field);
+  color: var(--ink);
+  font-size: var(--text-input);
 }
 
 .input::placeholder {
-  color: var(--color-muted);
+  color: var(--muted);
 }
 
 /*
@@ -64,7 +69,7 @@
 }
 
 .input[aria-invalid='true'] {
-  border-color: var(--color-alert);
+  box-shadow: inset 0 0 0 1px var(--fix);
 }
 
 .textarea {
@@ -75,7 +80,7 @@
 
 .select {
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%235b6470' stroke-width='1.8' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-image: var(--chevron-down);
   background-repeat: no-repeat;
   background-position: right 12px center;
   padding-right: 40px;
@@ -83,12 +88,12 @@
 
 .hint {
   display: block;
-  color: var(--color-muted);
+  color: var(--muted);
   font-size: var(--text-meta);
 }
 
 .error {
-  color: var(--color-alert-ink);
+  color: var(--fixink);
   font-size: var(--text-meta);
   font-weight: 500;
 }
@@ -113,19 +118,25 @@
   height: 22px;
   margin: 11px 0 0;
   flex: none;
-  accent-color: var(--color-accent);
+  accent-color: var(--acc);
 }
 
 .checkboxLabel {
-  font-size: var(--text-body);
+  font-size: var(--text-reading);
   font-weight: 500;
+}
+
+/* Options in a native <select> drop-down use the page's colours. */
+.select option {
+  background: var(--card);
+  color: var(--ink);
 }
 
 .formError {
   padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-input);
-  background: var(--color-alert-soft);
-  color: var(--color-alert-ink);
-  font-size: var(--text-small);
+  border-radius: var(--r-field);
+  background: var(--fixsoft);
+  color: var(--on-fixsoft);
+  font-size: var(--text-body);
   font-weight: 500;
 }

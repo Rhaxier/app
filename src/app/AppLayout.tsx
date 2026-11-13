@@ -1,8 +1,9 @@
 // The frame around every signed-in screen: a centred phone-width column (wider
-// for the admin dashboard), the bottom tab bar, and the things that run once
-// per session (the live notification badge and phone push registration).
+// for the staff desk view and the admin dashboard), the floating tab bar, and
+// the things that run once per session (the live notification dot, phone push
+// registration, and ⌘K / Ctrl+K to jump to search from anywhere).
 import { useEffect, useRef } from 'react';
-import { Outlet, ScrollRestoration, useLocation } from 'react-router-dom';
+import { Outlet, ScrollRestoration, useLocation, useNavigate } from 'react-router-dom';
 import { useCurrentUser } from '@/features/auth/hooks';
 import { useLiveNotifications } from '@/features/notifications/hooks';
 import { registerForPush } from '@/features/notifications/push';
@@ -14,8 +15,22 @@ import styles from './AppLayout.module.css';
 export function AppLayout() {
   const user = useCurrentUser();
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   const mainRef = useRef<HTMLElement>(null);
   useLiveNotifications(user.id);
+
+  // "⌘K jumps anywhere" (design PDF page 9): the search screen finds rooms,
+  // events, announcements and collab posts.
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        navigate('/search');
+      }
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [navigate]);
 
   useEffect(() => {
     registerForPush().catch((error) => console.warn('Push registration failed', error));
@@ -30,7 +45,8 @@ export function AppLayout() {
     main.animate([{ opacity: 0 }, { opacity: 1 }], { duration, easing: 'ease-out' });
   }, [pathname]);
 
-  const wide = pathname === '/admin' || pathname.startsWith('/admin/');
+  // Staff work at a laptop: the desk view and admin screens use the wide column.
+  const wide = pathname === '/approvals' || pathname === '/admin' || pathname.startsWith('/admin/');
 
   return (
     <div className={styles.shell}>

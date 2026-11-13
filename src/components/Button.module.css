@@ -1,58 +1,76 @@
+/* Buttons (design PDF pages 3 and 11): pills with radius 24, 15px semibold. */
 .button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-2);
+  gap: 6px;
   min-height: var(--height-button);
   padding: 0 var(--space-5);
-  border: 1px solid transparent;
-  border-radius: var(--radius-button);
-  font-size: var(--text-body);
+  border: 0;
+  border-radius: var(--r-button);
+  font-size: var(--text-reading);
   font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  text-align: center;
   text-decoration: none;
   cursor: pointer;
 }
 
-.button:hover:not(:disabled) {
-  filter: brightness(0.94);
+@media (hover: hover) {
+  .button:hover:not(:disabled) {
+    filter: brightness(var(--press-dim));
+  }
 }
 
 .button:disabled {
-  opacity: 0.55;
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
+/* The one primary action on a screen: white in dark mode, black in light,
+   so the hierarchy is the same in both (page 5). */
 .primary {
-  background: var(--color-accent);
-  color: var(--color-on-accent);
+  background: var(--pribg);
+  color: var(--prifg);
 }
 
+/* Your next step on a card: Request, Ask to join. */
+.accent {
+  background: var(--acc);
+  color: var(--onacc);
+}
+
+/* Everything else that matters: Me too, Send back, Share with a teacher.
+   A see-through fill, so it shows on the canvas, on a card and on glass. */
 .secondary {
-  background: var(--color-card);
-  border-color: var(--color-border);
-  color: var(--color-ink);
+  background: var(--segbg);
+  color: var(--ink);
 }
 
+/* Destructive or emergency actions: calm, but clearly not like the others. */
 .alert {
-  background: var(--color-alert);
-  color: var(--color-on-accent);
+  background: var(--fixsoft);
+  color: var(--on-fixsoft);
 }
 
+/* Minor actions: just an outline. */
 .quiet {
-  background: var(--color-quiet);
-  color: var(--color-ink);
+  background: transparent;
+  color: var(--ink);
+  box-shadow: inset 0 0 0 0.5px var(--hair);
 }
 
 .ghost {
+  padding: 0 var(--space-3);
   background: transparent;
-  color: var(--color-accent);
-  padding: 0 var(--space-2);
+  color: var(--acc);
 }
 
 .small {
   min-height: var(--height-button-small);
   padding: 0 var(--space-4);
-  font-size: var(--text-small);
+  font-size: var(--text-body);
   /* Small buttons sit beside titles; keep "New class" on one line. */
   white-space: nowrap;
 }

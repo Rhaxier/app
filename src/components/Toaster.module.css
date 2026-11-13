@@ -1,8 +1,8 @@
-/* Sits just above the tab bar, centred in the app's column. */
+/* Sits just above the floating tab bar, centred in the app's column. */
 .stack {
   position: fixed;
   left: 50%;
-  bottom: calc(var(--height-tabbar) + var(--space-3) + env(safe-area-inset-bottom));
+  bottom: calc(var(--tabbar-space) + var(--space-3));
   z-index: 1100;
   display: flex;
   flex-direction: column;
@@ -17,34 +17,27 @@
   align-items: center;
   gap: var(--space-3);
   min-height: 52px;
-  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-4);
-  border-radius: var(--radius-input);
-  background: var(--color-ink);
-  color: var(--color-on-accent);
-  box-shadow: var(--shadow-float);
+  padding: var(--space-1) var(--space-1) var(--space-1) var(--space-4);
+  border-radius: var(--r-card);
+  color: var(--ink);
   pointer-events: auto;
   animation: toast-in var(--motion-base) var(--ease-out);
 }
 
-/* Errors keep the dark background (good contrast) with an orange marker. */
-.error {
-  box-shadow:
-    inset 4px 0 0 var(--color-alert),
-    var(--shadow-float);
-}
-
 .success svg:first-child {
-  color: var(--color-accent-soft);
+  flex: none;
+  color: var(--okink);
 }
 
 .error svg:first-child {
-  color: var(--color-alert-soft);
+  flex: none;
+  color: var(--fix);
 }
 
 .message {
   flex: 1;
-  font-size: var(--text-small);
-  font-weight: 500;
+  font-size: var(--text-body);
+  font-weight: 600;
 }
 
 .dismiss {
@@ -56,7 +49,7 @@
   border: 0;
   border-radius: 50%;
   background: transparent;
-  color: inherit;
+  color: var(--muted);
   cursor: pointer;
 }
 
@@ -67,13 +60,13 @@
 @keyframes toast-in {
   from {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(calc(var(--motion-shift) * 1.5));
   }
 }
 
 @keyframes toast-out {
   to {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(var(--motion-shift));
   }
 }

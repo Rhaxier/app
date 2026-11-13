@@ -11,6 +11,7 @@ import {
   fromDateTimeInputValue,
   greeting,
   relativeTime,
+  shortWhen,
   toDateTimeInputValue,
 } from './dates';
 
@@ -48,6 +49,14 @@ describe('dates (Asia/Dubai)', () => {
     expect(relativeTime('2026-10-18T08:00:00Z', now)).toBe('Yesterday');
     expect(relativeTime('2026-10-15T08:00:00Z', now)).toBe('Thu');
     expect(relativeTime('2026-10-01T08:00:00Z', now)).toBe('1 Oct');
+  });
+
+  it('says when in a few letters, for narrow columns', () => {
+    const now = new Date('2026-10-19T08:00:00Z'); // Monday 12:00 in Dubai
+    expect(shortWhen('2026-10-19T04:12:00Z', now)).toBe('8:12');
+    expect(shortWhen('2026-10-18T08:00:00Z', now)).toBe('Yest.');
+    expect(shortWhen('2026-10-15T08:00:00Z', now)).toBe('Thu');
+    expect(shortWhen('2026-10-01T08:00:00Z', now)).toBe('1 Oct');
   });
 
   it('greets by Dubai time of day', () => {

@@ -5,6 +5,7 @@ import { TZDate, tz } from '@date-fns/tz';
 import {
   addDays,
   differenceInCalendarDays,
+  differenceInCalendarWeeks,
   differenceInMinutes,
   format,
   isSameWeek,
@@ -82,6 +83,16 @@ export function relativeTime(value: DateInput, now: Date = new Date()): string {
   return format(date, 'd MMM', { in: inSchoolZone });
 }
 
+/** A short "when" for a narrow column: "08:12" today, "Yest.", "Mon", then "13 Oct". */
+export function shortWhen(value: DateInput, now: Date = new Date()): string {
+  const date = toDate(value);
+  const days = differenceInCalendarDays(now, date, { in: inSchoolZone });
+  if (days <= 0) return formatTime(date);
+  if (days === 1) return 'Yest.';
+  if (days < 7) return format(date, 'EEE', { in: inSchoolZone });
+  return format(date, 'd MMM', { in: inSchoolZone });
+}
+
 /** "Good morning" / "Good afternoon" / "Good evening", by Dubai time. */
 export function greeting(now: Date = new Date()): string {
   const hour = Number(format(now, 'H', { in: inSchoolZone }));
@@ -120,6 +131,14 @@ export function dayRange(key: string): { start: string; end: string } {
     start: atSchoolTime(key, '00:00').toISOString(),
     end: atSchoolTime(addDaysToKey(key, 1), '00:00').toISOString(),
   };
+}
+
+/** How many school weeks back a date is: 0 this week, 1 last week (weeks start on WEEK_STARTS_ON). */
+export function weeksAgo(value: DateInput, now: Date = new Date()): number {
+  return differenceInCalendarWeeks(now, toDate(value), {
+    weekStartsOn: WEEK_STARTS_ON,
+    in: inSchoolZone,
+  });
 }
 
 /** True if the date falls in the current school week (weeks start on WEEK_STARTS_ON). */

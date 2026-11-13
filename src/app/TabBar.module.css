@@ -1,45 +1,84 @@
+/*
+ * The floating tab bar. Floating chrome sits 16px in from the screen edges and
+ * 18px up from the bottom (page 10), within the app's centred column.
+ * The pill: radius 31, 5px padding, so the active lens is 31 − 5 = 26.
+ */
 .bar {
   position: fixed;
   left: 0;
   right: 0;
-  bottom: 0;
+  bottom: calc(var(--chrome-bottom) + env(safe-area-inset-bottom));
   z-index: 800;
-  background: var(--color-card);
-  border-top: 1px solid var(--color-border);
-  padding-bottom: env(safe-area-inset-bottom);
-  /* Its own layer in screen transitions, so it stays put while the screen
-     above it changes (see motion.css). */
-  view-transition-name: tab-bar;
-}
-
-.list {
   display: flex;
+  gap: 10px;
   max-width: var(--content-max);
-  height: var(--height-tabbar);
   margin: 0 auto;
-  padding: 0 var(--space-2);
+  padding: 0 var(--chrome-inset);
+  pointer-events: none;
 }
 
-.list li {
-  flex: 1;
+.tabs {
   display: flex;
+  flex: 1;
+  min-width: 0;
+  height: var(--height-tabbar);
+  padding: 5px;
+  border-radius: var(--r-tabbar);
+  pointer-events: auto;
+  /* No view-transition-name here or on the <nav>: see "Screen changes" in
+     motion.css for why the glass can't have one. */
+}
+
+.tabs li {
+  display: flex;
+  flex: 1;
+  min-width: 0;
 }
 
 .tab {
-  flex: 1;
   display: flex;
+  flex: 1;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding-top: 12px;
+  justify-content: center;
+  gap: 2px;
   min-width: var(--touch-min);
-  color: var(--color-muted);
+  border: 0.5px solid transparent;
+  border-radius: var(--r-lens);
+  color: var(--tabtext);
   font-size: var(--text-tab);
   font-weight: 500;
+  line-height: 12px;
   text-decoration: none;
+  white-space: nowrap;
 }
 
-.tab[aria-current='page'] {
-  color: var(--color-accent);
+/* 6 · The raised lens (the global .lens class draws it) and the accent. */
+.active {
+  color: var(--acc);
   font-weight: 600;
+}
+
+/* The round search button: same glass, same height. */
+.search {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--height-tabbar);
+  height: var(--height-tabbar);
+  border-radius: 50%;
+  color: var(--ink);
+  pointer-events: auto;
+}
+
+.searching {
+  color: var(--acc);
+}
+
+/* Six tabs (staff) on a phone narrower than 375px: the tabs need the room,
+   so the search button moves into the Home header (HomeHeader.module.css). */
+@media (max-width: 374px) {
+  .crowded .search {
+    display: none;
+  }
 }

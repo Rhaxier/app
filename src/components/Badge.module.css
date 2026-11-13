@@ -1,26 +1,45 @@
+/* Status badges on soft tints (design PDF page 3: "You're in", "Pending").
+   Every text colour reaches 4.5:1 on its tint, in both themes (see the
+   --on-* tokens and src/lib/contrast.test.ts). */
 .badge {
   display: inline-flex;
   align-items: center;
+  flex: none;
   height: var(--height-badge);
-  padding: 0 10px;
-  border-radius: var(--radius-pill);
-  font-size: var(--text-label);
+  padding: 0 9px;
+  border-radius: var(--r-tag);
+  font-size: var(--text-meta);
   font-weight: 600;
+  line-height: 1;
   white-space: nowrap;
 }
 
-/* Contrast checked against 4.5:1: teal 5.5, orange ink 6.8, muted 5.0. */
+/* Yours, your next step, something new for you. */
+.accent {
+  background: var(--accsoft);
+  color: var(--on-accsoft);
+}
+
+/* Approved, done. */
 .good {
-  background: var(--color-accent-soft);
-  color: var(--color-accent);
+  background: var(--ok);
+  color: var(--okink);
 }
 
+/* Pending, waiting on someone. */
 .attention {
-  background: var(--color-alert-soft);
-  color: var(--color-alert-ink);
+  background: var(--wait);
+  color: var(--waitink);
 }
 
+/* Fix-it: something is broken. */
+.fix {
+  background: var(--fixsoft);
+  color: var(--on-fixsoft);
+}
+
+/* Draft, closed, not chosen. */
 .quiet {
-  background: var(--color-quiet);
-  color: var(--color-muted);
+  background: var(--segbg);
+  color: var(--on-quiet);
 }

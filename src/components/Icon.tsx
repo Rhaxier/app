@@ -69,6 +69,16 @@ const paths = {
   plus: <path d="M12 5v14M5 12h14" />,
   chevronLeft: <path d="m14.5 5.5-6.5 6.5 6.5 6.5" />,
   chevronRight: <path d="m9.5 5.5 6.5 6.5-6.5 6.5" />,
+  chevronDown: <path d="m6 9.5 6 6 6-6" />,
+  arrowRight: <path d="M5 12h13.5M13 6.5l5.5 5.5-5.5 5.5" />,
+  // "Report" on Home: a screwdriver, as on the Home mockup.
+  wrench: (
+    <>
+      <path d="m14.5 9.5-8.8 8.8a1.6 1.6 0 0 1-2.3-2.3l8.8-8.8" />
+      <path d="m12.2 7.2 2.6-2.6 4.6 4.6-2.6 2.6z" />
+      <path d="m17.1 6.9 2.4-2.4" />
+    </>
+  ),
   close: <path d="M6 6l12 12M18 6 6 18" />,
   check: <path d="m5 12.5 4.5 4.5L19 7.5" />,
   alert: (

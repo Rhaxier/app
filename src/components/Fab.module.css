@@ -1,15 +1,11 @@
+/* The round "+" in a screen's top corner: Regular glass, 44px (page 10:
+   "Regular · tab bar, search, FAB, floor switch"). */
 .fab {
   display: grid;
-  place-items: center;
   flex: none;
-  width: 52px;
-  height: 52px;
+  place-items: center;
+  width: var(--touch-min);
+  height: var(--touch-min);
   border-radius: 50%;
-  background: var(--color-accent);
-  color: var(--color-on-accent);
-  box-shadow: var(--shadow-float);
-}
-
-.fab:hover {
-  filter: brightness(0.94);
+  color: var(--ink);
 }

@@ -1,12 +1,18 @@
-// The app's buttons. Primary = teal fill (main action on a screen), secondary =
-// white with a border, alert = orange (fix-it actions), quiet = grey fill,
-// ghost = text only. ButtonLink looks the same but navigates (a real <a>).
+// The app's buttons (design PDF pages 3 and 11). One primary action per screen
+// ("calm by default"); everything else is quieter.
+//   primary    the screen's main action: white in dark mode, black in light
+//   accent     blue, your next step on a card: Request, Ask to join
+//   secondary  a soft grey fill: Me too, Send back, Share with a teacher
+//   alert      soft orange: destructive or emergency actions
+//   quiet      an outline, for minor actions
+//   ghost      text only, in the accent colour
+// ButtonLink looks the same but navigates (a real <a>).
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { Link, type LinkProps } from 'react-router-dom';
 import { Icon, type IconName } from './Icon';
 import styles from './Button.module.css';
 
-type Variant = 'primary' | 'secondary' | 'alert' | 'quiet' | 'ghost';
+type Variant = 'primary' | 'accent' | 'secondary' | 'alert' | 'quiet' | 'ghost';
 
 interface StyleProps {
   variant?: Variant;
@@ -54,7 +60,7 @@ export function Button({
       aria-busy={loading || undefined}
       {...rest}
     >
-      {icon && <Icon name={icon} size={20} />}
+      {icon && <Icon name={icon} size={18} />}
       {loading ? 'Working…' : children}
     </button>
   );
@@ -75,7 +81,7 @@ export function ButtonLink({
 }: ButtonLinkProps) {
   return (
     <Link className={classes({ variant, size, fullWidth }, className)} {...rest}>
-      {icon && <Icon name={icon} size={20} />}
+      {icon && <Icon name={icon} size={18} />}
       {children}
     </Link>
   );

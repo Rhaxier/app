@@ -5,10 +5,10 @@
   gap: var(--space-3);
   margin-bottom: var(--gap-block);
   padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-input);
-  background: var(--color-alert-soft);
-  color: var(--color-alert-ink);
-  font-size: var(--text-small);
+  border-radius: var(--r-field);
+  background: var(--fixsoft);
+  color: var(--on-fixsoft);
+  font-size: var(--text-body);
 }
 
 .notice svg {

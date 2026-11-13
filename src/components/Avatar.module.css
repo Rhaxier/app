@@ -4,6 +4,7 @@
   flex: none;
   border-radius: 50%;
   font-weight: 600;
+  letter-spacing: 0.02em;
 }
 
 .normal {
@@ -15,20 +16,22 @@
 .small {
   width: 32px;
   height: 32px;
-  font-size: var(--text-label);
+  font-size: var(--text-caps);
 }
 
 .accent {
-  background: var(--color-accent-soft);
-  color: var(--color-accent);
+  background: var(--accsoft);
+  color: var(--on-accsoft);
 }
 
+/* A person's initials in a soft circle ("OK" on a collab post). */
 .quiet {
-  background: var(--color-quiet);
-  color: var(--color-muted);
+  background: var(--segbg);
+  color: var(--ink2);
 }
 
+/* You: the primary fill, like "SA" on Home. */
 .ink {
-  background: var(--color-ink);
-  color: var(--color-on-accent);
+  background: var(--pribg);
+  color: var(--prifg);
 }

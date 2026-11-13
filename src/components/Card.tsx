@@ -1,6 +1,6 @@
-// White rounded panel: the main surface of every screen. `tone="accent"` is the
-// teal card used for pinned announcements; `tone="alert"` the orange one for
-// emergency announcements.
+// The resting surface of every screen (E1, radius 22). `tone="accent"` marks a
+// featured card (a pinned announcement: its caps label turns accent);
+// `tone="alert"` washes it orange, for emergency announcements.
 import type { HTMLAttributes, ReactNode } from 'react';
 import styles from './Card.module.css';
 

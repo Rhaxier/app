@@ -6,25 +6,17 @@
   min-width: var(--touch-min);
   height: var(--touch-min);
   padding: 0 var(--space-3);
-  border: 0;
   border-radius: var(--radius-pill);
-  background: var(--color-ink);
-  color: var(--color-on-accent);
+  color: var(--ink);
   font-size: var(--text-meta);
   font-weight: 600;
-  letter-spacing: var(--tracking-label);
-  box-shadow: var(--shadow-float);
+  letter-spacing: var(--tracking-caps);
   cursor: pointer;
-  opacity: 0.85;
-}
-
-.trigger:hover {
-  opacity: 1;
 }
 
 /* Signed in: sit above the tab bar instead of covering it. */
 .aboveTabs {
-  bottom: calc(var(--height-tabbar) + var(--space-3) + env(safe-area-inset-bottom));
+  bottom: calc(var(--tabbar-space) + var(--space-3));
 }
 
 .group {
@@ -34,7 +26,7 @@
 }
 
 .group h3 {
-  color: var(--color-muted);
+  color: var(--muted);
 }
 
 .list {
@@ -50,18 +42,22 @@
   min-height: 52px;
   padding: var(--space-2);
   border: 0;
-  border-radius: var(--radius-small);
+  border-radius: var(--r-tag);
   background: transparent;
   text-align: left;
   cursor: pointer;
 }
 
 .user:hover:not(:disabled) {
-  background: var(--color-bg);
+  background: var(--card2);
 }
 
 .user[aria-current='true'] {
-  background: var(--color-accent-soft);
+  background: var(--accsoft);
+}
+
+.user[aria-current='true'] .name {
+  color: var(--on-accsoft);
 }
 
 .userText {
@@ -75,8 +71,8 @@
 
 .error {
   padding: var(--space-3);
-  border-radius: var(--radius-small);
-  background: var(--color-alert-soft);
-  color: var(--color-alert-ink);
-  font-size: var(--text-small);
+  border-radius: var(--r-tag);
+  background: var(--fixsoft);
+  color: var(--fixink);
+  font-size: var(--text-body);
 }

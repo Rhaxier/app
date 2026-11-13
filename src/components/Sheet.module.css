@@ -5,14 +5,28 @@
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  background: rgba(21, 32, 43, 0.35);
+  padding: 0 var(--space-2) calc(var(--space-2) + env(safe-area-inset-bottom));
+}
+
+/* The dimming is its own layer. If the backdrop itself faded, the glass sheet
+   inside it could only blur the dimming while the fade ran, then "pop" to
+   blurring the screen behind. */
+.backdrop::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--scrim);
   animation: backdrop-in var(--motion-slow) var(--ease-out) both;
 }
 
 /* Closing: the same movement in reverse, and nothing can be tapped meanwhile. */
 .backdrop[data-state='closing'] {
-  animation: backdrop-out var(--motion-slow) var(--ease-in-out) both;
   pointer-events: none;
+}
+
+.backdrop[data-state='closing']::before {
+  animation: backdrop-out var(--motion-slow) var(--ease-in-out) both;
 }
 
 .backdrop[data-state='closing'] .panel {
@@ -33,28 +47,26 @@
 
 @keyframes panel-in {
   from {
-    transform: translateY(100%);
+    transform: translateY(110%);
   }
 }
 
 @keyframes panel-out {
   to {
-    transform: translateY(100%);
+    transform: translateY(110%);
   }
 }
 
+/* Thick glass (the glass and thick classes) with the sheet radius, 32. The
+   header stays; the body scrolls. */
 .panel {
-  width: 100%;
-  max-width: var(--content-max);
-  max-height: 85vh;
-  overflow-y: auto;
-  padding: var(--space-5) var(--space-5) calc(var(--space-6) + env(safe-area-inset-bottom));
-  border-radius: 22px 22px 0 0;
-  background: var(--color-card);
-  box-shadow: var(--shadow-float);
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  width: 100%;
+  max-width: var(--content-max);
+  max-height: 88vh;
+  overflow: hidden;
+  border-radius: var(--r-sheet);
   animation: panel-in var(--motion-slow) var(--ease-out) both;
 }
 
@@ -62,20 +74,60 @@
   outline: none;
 }
 
+.grabber {
+  flex: none;
+  width: 36px;
+  height: 5px;
+  margin: 8px auto 0;
+  border-radius: var(--radius-pill);
+  background: var(--hair);
+}
+
 .header {
   display: flex;
+  flex: none;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
+  padding: var(--space-2) var(--space-4) var(--space-2) var(--space-5);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  overflow-y: auto;
+  padding: var(--space-2) var(--space-5) var(--space-6);
 }
 
 .close {
+  position: relative;
   display: grid;
+  flex: none;
   place-items: center;
-  width: var(--touch-min);
-  height: var(--touch-min);
+  width: 32px;
+  height: 32px;
   border: 0;
   border-radius: 50%;
-  background: var(--color-quiet);
+  background: var(--segbg);
+  color: var(--muted);
   cursor: pointer;
+}
+
+/* 32px to see, 44px to tap. */
+.close::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+}
+
+/* Reduced motion: the sheet fades in and out instead of sliding. */
+@media (prefers-reduced-motion: reduce) {
+  .panel {
+    animation-name: backdrop-in;
+  }
+
+  .backdrop[data-state='closing'] .panel {
+    animation-name: backdrop-out;
+  }
 }

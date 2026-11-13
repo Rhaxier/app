@@ -1,14 +1,18 @@
+/* Filter chips: pills with a hairline rim; the chosen one takes the primary
+   fill (white in dark mode, black in light), like "All skills" on the
+   Collab mockup. */
 .chip {
   position: relative;
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: 6px;
   min-height: var(--height-chip);
   padding: 0 14px;
-  border: 1px solid var(--color-border);
+  border: 0.5px solid var(--hair);
   border-radius: var(--radius-pill);
-  background: var(--color-card);
-  font-size: var(--text-small);
+  background: var(--card);
+  color: var(--ink2);
+  font-size: var(--text-body);
   font-weight: 500;
   white-space: nowrap;
   cursor: pointer;
@@ -23,54 +27,81 @@
 }
 
 .selected {
-  background: var(--color-ink);
-  border-color: var(--color-ink);
-  color: var(--color-on-accent);
+  border-color: transparent;
+  background: var(--pribg);
+  color: var(--prifg);
+  font-weight: 600;
 }
 
+/* Glass chips float over the map (the "thin" material, page 10). The chosen
+   layer reads at full strength; a hidden one fades back. */
+.glassChip {
+  border: 0;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.glassChip:not(.selected) {
+  color: var(--muted);
+}
+
+.glassChip.selected {
+  background: none;
+}
+
+.glassChip:not([aria-pressed='true']) .marker {
+  opacity: 0.4;
+}
+
+/* The small dot before a map layer's name, matching its pins. */
 .marker {
-  width: 10px;
-  height: 10px;
   flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
 }
 
 .room {
-  border-radius: 50%;
-  background: var(--color-accent);
+  background: var(--ink2);
 }
 
 .report {
-  border-radius: 2px;
-  background: var(--color-alert);
+  background: var(--fix);
 }
 
 .busy {
-  border-radius: 50%;
-  background: var(--color-ink);
-  box-shadow: 0 0 0 2px var(--color-accent-soft);
+  background: var(--okink);
+  box-shadow: 0 0 0 2px var(--ok);
 }
 
+/* Tags: static labels, radius 12 (page 10). Neutral is outlined, like the
+   skills on a collab post; the others are soft tints. */
 .tag {
   display: inline-flex;
   align-items: center;
-  min-height: 28px;
+  min-height: 26px;
   padding: 0 10px;
-  border-radius: var(--radius-small);
-  font-size: var(--text-meta);
+  border-radius: var(--r-tag);
+  font-size: var(--text-body);
   font-weight: 500;
 }
 
+.tag_neutral {
+  box-shadow: inset 0 0 0 0.5px var(--hair);
+  color: var(--ink2);
+}
+
 .tag_alert {
-  background: var(--color-alert-soft);
-  color: var(--color-alert-ink);
+  background: var(--fixsoft);
+  color: var(--on-fixsoft);
 }
 
 .tag_accent {
-  background: var(--color-accent-soft);
-  color: var(--color-accent);
+  background: var(--accsoft);
+  color: var(--on-accsoft);
 }
 
 .tag_quiet {
-  background: var(--color-quiet);
-  color: var(--color-muted);
+  background: var(--segbg);
+  color: var(--on-quiet);
 }

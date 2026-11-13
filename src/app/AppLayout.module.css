@@ -5,8 +5,10 @@
 .main {
   max-width: var(--content-max);
   margin: 0 auto;
-  /* Room at the bottom so the last card isn't hidden behind the tab bar. */
-  padding: var(--space-6) var(--space-5) calc(var(--height-tabbar) + var(--space-8));
+  /* Screen margin 20 (page 10). Room at the bottom so the last card can
+     scroll clear of the floating tab bar. */
+  padding: calc(var(--space-3) + env(safe-area-inset-top)) var(--screen-margin)
+    calc(var(--tabbar-space) + var(--space-8));
 }
 
 /* The admin dashboard is desktop-first: a side menu plus content needs room. */
@@ -24,9 +26,9 @@
   top: -60px;
   z-index: 1000;
   padding: var(--space-2) var(--space-4);
-  border-radius: var(--radius-small);
-  background: var(--color-ink);
-  color: var(--color-on-accent);
+  border-radius: var(--r-tag);
+  background: var(--pribg);
+  color: var(--prifg);
 }
 
 .skip:focus {

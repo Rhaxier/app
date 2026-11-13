@@ -1,5 +1,6 @@
-// Draws the toasts from src/lib/toast.ts, just above the tab bar. They slide up
-// and fade in, then fade out after a few seconds (or when dismissed).
+// Draws the toasts from src/lib/toast.ts, just above the tab bar, on thick
+// glass. They slide up and fade in, then fade out after a few seconds (or
+// when dismissed).
 //
 // Screen readers: two hidden "live regions" are always on the page, empty
 // until a toast arrives, which is what makes the announcement reliable. They
@@ -38,7 +39,12 @@ export function Toaster() {
         {rows.map(({ item: toast, key, motion }) => (
           <div
             key={key}
-            className={[styles.toast, styles[toast.tone], motion === 'leave' && styles.leaving]
+            className={[
+              'glass thick',
+              styles.toast,
+              styles[toast.tone],
+              motion === 'leave' && styles.leaving,
+            ]
               .filter(Boolean)
               .join(' ')}
           >

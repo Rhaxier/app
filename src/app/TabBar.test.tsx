@@ -1,6 +1,6 @@
 // The Approvals tab is for staff only. (The database also refuses students
 // the data behind it; this checks the UI hides the tab.)
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { makeUser, renderWithProviders, teacher } from '@/test/utils';
 import type { CurrentUser } from '@/features/auth/api';
@@ -18,8 +18,19 @@ describe('TabBar', () => {
 
   it('shows students the five tabs from the design, without Approvals', () => {
     renderWithProviders(<TabBar />);
-    const labels = screen.getAllByRole('link').map((link) => link.textContent);
-    expect(labels).toEqual(['Home', 'Map', 'Volunteer', 'Collab', 'Book']);
+    const tabs = within(screen.getByRole('list')).getAllByRole('link');
+    expect(tabs.map((link) => link.textContent)).toEqual([
+      'Home',
+      'Map',
+      'Volunteer',
+      'Collab',
+      'Book',
+    ]);
+  });
+
+  it('has the round search button beside the tabs', () => {
+    renderWithProviders(<TabBar />);
+    expect(screen.getByRole('link', { name: 'Search' })).toHaveAttribute('href', '/search');
   });
 
   it('adds an Approvals tab for teachers', () => {

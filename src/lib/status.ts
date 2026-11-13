@@ -1,6 +1,7 @@
 // Every database status, mapped to the words people see and the chip colour.
-// Tones follow the design: good = teal soft, attention = orange soft
-// (waiting / needs action), quiet = draft or closed.
+// Tones follow the design's colour meanings (design PDF page 3; Badge.tsx):
+// accent = blue, yours or your next step · good = green, approved ·
+// attention = yellow, pending · fix = orange, a fix-it problem · quiet = draft or closed.
 import type { BadgeTone } from '@/components/Badge';
 import type { Enums } from '@/types/database';
 
@@ -14,13 +15,13 @@ type StatusMap<E extends string> = Record<E, StatusLook>;
 export const volunteerEventStatus: StatusMap<Enums<'volunteer_event_status'>> = {
   awaiting_approval: { label: 'Awaiting approval', tone: 'attention' },
   published: { label: 'Published', tone: 'good' },
-  sent_back: { label: 'Sent back', tone: 'attention' },
+  sent_back: { label: 'Sent back', tone: 'accent' },
   closed: { label: 'Closed', tone: 'quiet' },
 };
 
 export const signupStatus: StatusMap<Enums<'signup_status'>> = {
   applied: { label: 'Signed up', tone: 'attention' },
-  selected: { label: 'Selected', tone: 'good' },
+  selected: { label: 'Selected', tone: 'accent' },
   waitlisted: { label: 'Waitlisted', tone: 'attention' },
   not_selected: { label: 'Not selected', tone: 'quiet' },
   withdrawn: { label: 'Withdrawn', tone: 'quiet' },
@@ -30,7 +31,7 @@ export const projectStatus: StatusMap<Enums<'project_status'>> = {
   draft: { label: 'Draft', tone: 'quiet' },
   shared: { label: 'Shared', tone: 'attention' },
   in_review: { label: 'In review', tone: 'attention' },
-  feedback_given: { label: 'Feedback', tone: 'good' },
+  feedback_given: { label: 'Feedback', tone: 'accent' },
   complete: { label: 'Complete', tone: 'good' },
 };
 
@@ -56,7 +57,7 @@ export const bookingStatus: StatusMap<Enums<'booking_status'>> = {
 };
 
 export const reportStatus: StatusMap<Enums<'report_status'>> = {
-  open: { label: 'Open', tone: 'attention' },
+  open: { label: 'Open', tone: 'fix' },
   acknowledged: { label: 'Acknowledged', tone: 'attention' },
   in_progress: { label: 'In progress', tone: 'attention' },
   resolved: { label: 'Resolved', tone: 'good' },

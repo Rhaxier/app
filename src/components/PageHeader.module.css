@@ -1,49 +1,72 @@
 .header {
   display: flex;
   flex-direction: column;
+  gap: 4px;
+}
+
+/* Back link or eyebrow on the left, meta or action on the right. 44px tall,
+   so the round "+" fits without pushing the title down. */
+.topRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: var(--space-3);
+  min-height: var(--touch-min);
+  margin-bottom: 2px;
+}
+
+.eyebrow {
+  color: var(--muted);
 }
 
 .back {
   display: inline-flex;
   align-items: center;
   gap: 2px;
-  align-self: flex-start;
   min-height: var(--touch-min);
-  margin: calc(var(--space-2) * -1) 0 calc(var(--space-2) * -1) -4px;
-  color: var(--color-ink);
-  font-size: var(--text-small);
+  margin-left: -6px;
+  color: var(--muted);
+  font-size: var(--text-body);
   font-weight: 500;
   text-decoration: none;
 }
 
-.row {
+.title {
+  overflow-wrap: anywhere;
+}
+
+.subtitle {
+  color: var(--muted);
+  font-size: var(--text-body);
+}
+
+/* Section header: caps label on the left, a quiet link on the right. */
+.section {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
+  min-height: 28px;
+  padding: 0 2px;
 }
 
-.titles {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-.section {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--space-3);
+.sectionTitle {
+  color: var(--muted);
+  font-size: var(--text-caps);
+  font-weight: 500;
+  line-height: 16px;
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
 }
 
 .section a {
-  /* A comfortable tap area (44px) around the short "See all" link. */
+  /* A comfortable tap area (44px) around the short "All" link. */
   display: inline-flex;
   align-items: center;
   min-height: var(--touch-min);
+  margin: -8px 0;
+  color: var(--ink);
   font-size: var(--text-body);
-  font-weight: 600;
+  font-weight: 500;
   text-decoration: none;
 }

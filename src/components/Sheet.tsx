@@ -3,8 +3,12 @@
 // takes focus; Tab stays inside it; Escape or a tap outside closes it; and
 // focus goes back to whatever opened it.
 //
-// Motion: the backdrop fades in while the panel slides up (--motion-slow), and
-// closing plays the same in reverse. To have time for that, the sheet stays on
+// Look: the "thick" liquid glass (design PDF page 10), radius 32, floating a
+// little in from the screen edges. The title stays put while a long sheet
+// scrolls. The dimmed backdrop is not glass: never glass on glass.
+//
+// Motion: the backdrop fades in while the panel slides up (sheet 280ms), and
+// closing plays the same in reverse. With reduced motion it only fades. To have time for that, the sheet stays on
 // screen a moment after `open` turns false (usePresence), showing what it
 // showed last. Render <Sheet open={…}> rather than {open && <Sheet open>},
 // or there is nothing left to animate.
@@ -95,7 +99,7 @@ export function Sheet({ open, title, onClose, children }: SheetProps) {
     >
       <div
         ref={panelRef}
-        className={styles.panel}
+        className={`glass thick ${styles.panel}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
@@ -103,6 +107,7 @@ export function Sheet({ open, title, onClose, children }: SheetProps) {
         // Clicks inside the panel must not reach the backdrop and close it.
         onClick={(event) => event.stopPropagation()}
       >
+        <span className={styles.grabber} aria-hidden="true" />
         <div className={styles.header}>
           <h2 id={titleId}>{content.title}</h2>
           <button
@@ -111,10 +116,10 @@ export function Sheet({ open, title, onClose, children }: SheetProps) {
             onClick={onClose}
             aria-label="Close"
           >
-            <Icon name="close" />
+            <Icon name="close" size={18} />
           </button>
         </div>
-        {content.children}
+        <div className={styles.body}>{content.children}</div>
       </div>
     </div>
   );

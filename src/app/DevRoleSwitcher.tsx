@@ -26,7 +26,7 @@ export function DevRoleSwitcher() {
     <>
       <button
         type="button"
-        className={[styles.trigger, session && styles.aboveTabs].filter(Boolean).join(' ')}
+        className={['glass', styles.trigger, session && styles.aboveTabs].filter(Boolean).join(' ')}
         onClick={() => setOpen(true)}
         aria-label="Dev role switcher: sign in as a test user"
       >

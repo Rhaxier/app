@@ -1,9 +1,11 @@
+/* E1 · resting surface (page 10): cards and lists. Radius 22. */
 .card {
   display: block;
-  background: var(--color-card);
-  border-radius: var(--radius-card);
-  padding: var(--space-4) 17px;
-  color: var(--color-ink);
+  padding: var(--space-4) 18px;
+  border-radius: var(--r-card);
+  background: var(--card);
+  box-shadow: var(--e1);
+  color: var(--ink);
   text-decoration: none;
   /* Fades in when it first appears, e.g. replacing a loading skeleton. */
   animation: card-in var(--motion-base) var(--ease-out);
@@ -15,23 +17,22 @@
   }
 }
 
-.accent {
-  background: var(--color-accent);
-  color: var(--color-on-accent);
+/* Featured (a pinned announcement): the same calm card; the caps label turns
+   accent, as on the Home mockup ("PINNED · ADMIN OFFICE"). */
+.accent :global(.label) {
+  color: var(--acc);
 }
 
-.accent :global(.meta) {
-  color: var(--color-accent-soft);
-}
-
-/* White on the orange is about 5.7:1 (and the soft meta text 4.7:1), so text stays readable. */
+/* Emergency: an orange wash and rim over the card, the label in fix-it ink. */
 .alert {
-  background: var(--color-alert);
-  color: var(--color-on-accent);
+  background: linear-gradient(var(--fixsoft), var(--fixsoft)), var(--card);
+  box-shadow:
+    var(--e1),
+    inset 0 0 0 0.5px color-mix(in srgb, var(--fix) 45%, transparent);
 }
 
-.alert :global(.meta) {
-  color: var(--color-alert-soft);
+.alert :global(.label) {
+  color: var(--on-fixsoft);
 }
 
 .flush {
@@ -39,19 +40,14 @@
   overflow: hidden;
 }
 
-/* Cards that are links lift slightly on hover so they read as tappable,
-   and press in like buttons (see .pressable in motion.css). */
+/* Cards that are links press in like buttons (see .pressable in motion.css). */
 a.card {
   transition:
     transform var(--motion-fast) var(--ease-out),
     filter var(--motion-fast) var(--ease-out);
 }
 
-a.card:hover {
-  filter: brightness(0.985);
-}
-
 a.card:active {
-  transform: scale(0.97);
-  filter: brightness(0.95);
+  transform: scale(var(--press-scale));
+  filter: brightness(var(--press-dim));
 }
