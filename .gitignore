@@ -18,3 +18,6 @@ ios/
 .DS_Store
 .idea/
 *.log
+
+# Vercel CLI link (`vercel link`): which Vercel project this folder deploys to
+.vercel
