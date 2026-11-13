@@ -95,36 +95,76 @@ first visit), so the app starts faster on phones.
 | Route                                                                   | Screen                                                                                                                                               | Who                     |
 | ----------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------- |
 | `/login`                                                                | Sign in (dev password; Google / Microsoft when configured)                                                                                           | everyone                |
-| `/`                                                                     | Home: greeting, search, six tools, today at school, announcements                                                                                    | everyone                |
+| `/`                                                                     | Home: greeting, pinned news, six tools, bell times, today at school, announcements                                                                   | everyone                |
 | `/search?q=`                                                            | Search rooms, events, announcements, collab posts                                                                                                    | everyone                |
 | `/bell-times`                                                           | Any school day's periods (from the Home card)                                                                                                        | everyone                |
 | `/announcements`, `/announcements/:id`                                  | Feed and one announcement                                                                                                                            | read: all               |
 | `/announcements/new`, `/announcements/:id/edit`                         | Announcement editor                                                                                                                                  | staff                   |
 | `/notifications`, `/notifications/settings`                             | Inbox and mutes                                                                                                                                      | everyone                |
-| `/me`                                                                   | Who you are, your jobs, notification settings, sign out                                                                                              | everyone                |
+| `/me`                                                                   | Who you are, your jobs, appearance (light or dark), notification settings, sign out                                                                  | everyone                |
 | `/map`, `/map/report`, `/reports/:id`                                   | Campus map with fix-it pins; report form; report detail                                                                                              | everyone (staff act)    |
 | `/volunteer`, `/volunteer/new`, `/volunteer/:id`, `/volunteer/:id/edit` | SUPW events, roles, sign-ups                                                                                                                         | everyone                |
 | `/projects`, `/projects/new`, `/projects/:id`, `/projects/:id/edit`     | Projects and teacher feedback                                                                                                                        | owners; shared teachers |
 | `/collab`, `/collab/new`, `/collab/:id`, `/collab/:id/edit`             | Collab posts, requests, team                                                                                                                         | everyone                |
 | `/book`, `/book/request`, `/book/mine`                                  | Venue calendar, request form, my bookings                                                                                                            | everyone                |
-| `/approvals`                                                            | Staff queue                                                                                                                                          | teachers and admins     |
+| `/approvals`                                                            | Staff desk view: counts, then one queue of everything waiting on you                                                                                 | teachers and admins     |
 | `/admin/*`                                                              | The admin dashboard: overview, people, school calendar, feature settings, moderation, notifications, system (see `docs/features/admin-dashboard.md`) | admins                  |
+
+## Look and feel (design v5)
+
+The look comes from `docs/School-App-Design.pdf` (v5, "Campus"): a true-black canvas,
+cards that rest on it, and Apple-style liquid glass for everything that floats. Light
+mode is designed separately, not inverted.
+
+**Where it lives:**
+
+| File                     | What it holds                                                                                                                                                                                                                                  |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/styles/tokens.css`  | Every colour, size, radius, shadow and duration. Page 12's tokens copied exactly (`--paper`, `--card`, `--ink`, `--acc`, `--g-*`, `--e1`…), plus the type scale, radii and spacing from pages 3, 10 and 11. Dark on `:root`, light in `.light` |
+| `src/styles/glass.css`   | The liquid glass material: `.glass` (Regular), plus `.tabglass`, `.thick` and `.thin`, and `.lens` for the active tab                                                                                                                          |
+| `src/styles/globals.css` | Type, the ambient glow behind every screen, the keyboard focus ring                                                                                                                                                                            |
+| `src/lib/theme.ts`       | System / Dark / Light (Me > Appearance), saved on the device; `index.html` applies it before the first paint                                                                                                                                   |
+| `src/lib/contrast.ts`    | The school's own accent colour, worked out for both themes                                                                                                                                                                                     |
+
+**Rules worth knowing:**
+
+- **Use tokens, never raw colours.** If a value isn't in `tokens.css`, add it there.
+- **One primary action per screen** ("calm by default"). Button variants: `primary`
+  (white in dark mode, black in light), `accent` (blue, your next step on a card:
+  Request, Ask to join), `secondary`, `quiet`, `ghost`, and `alert` for destructive
+  actions.
+- **Glass only for things that float**: the tab bar and search button, the map's
+  controls, sheets, the booking bar, toasts. Never glass on glass, and never body text on
+  glass without its tint (the `.glass` class always includes it).
+- **Nothing with glass inside it may have a `view-transition-name`.** It makes the
+  element a "backdrop root", and the glass inside can then blur nothing. That's why the
+  tab bar isn't named for screen changes (see Motion).
+- **Status colours mean one thing each** (`src/components/Badge.tsx`, `src/lib/status.ts`):
+  blue = yours or your next step, green = approved, yellow = pending, orange = fix-it,
+  grey = draft or closed. Badge text reaches 4.5:1 on its tint in both themes
+  (`--on-accsoft` and friends; checked in `src/lib/contrast.test.ts`).
+- **Room codes use Geist Mono**; everything else is Instrument Sans. Numbers use tabular
+  figures everywhere, so times and counts line up.
+- **Floor plans are drawn light.** Dark mode inverts the plan image (`--plan-filter`), so
+  a real plan uploaded by an admin becomes a dark architect's plan too.
 
 ## Motion
 
-Interactions should feel quick and calm: presses respond at once, screens and sheets
-glide, nothing bounces, nothing takes over 300ms. Everything is plain CSS (no
-animation library) and only `opacity` and `transform` ever animate.
+Interactions should feel quick and calm: presses respond at once (scale .97, darken 6%,
+4% in light mode), screens fade, sheets glide, nothing bounces, nothing takes over
+300ms. Everything is plain CSS (no animation library) and only `opacity` and
+`transform` ever animate.
 
 **Tokens** (`src/styles/tokens.css`):
 
-| Token           | Value                          | Used for                                  |
-| --------------- | ------------------------------ | ----------------------------------------- |
-| `--motion-fast` | `120ms`                        | press feedback, hovers, colour changes    |
-| `--motion-base` | `200ms`                        | fades, list items, toasts, screen changes |
-| `--motion-slow` | `280ms`                        | bottom sheets                             |
-| `--ease-out`    | `cubic-bezier(0.2, 0, 0, 1)`   | things arriving                           |
-| `--ease-in-out` | `cubic-bezier(0.4, 0, 0.2, 1)` | things leaving or moving                  |
+| Token            | Value                             | Used for                                  |
+| ---------------- | --------------------------------- | ----------------------------------------- |
+| `--motion-fast`  | `120ms`                           | press feedback, hovers, colour changes    |
+| `--motion-base`  | `200ms`                           | fades, list items, toasts, screen changes |
+| `--motion-slow`  | `280ms`                           | bottom sheets                             |
+| `--ease-out`     | `cubic-bezier(0.2, 0, 0, 1)`      | things arriving                           |
+| `--ease-in-out`  | `cubic-bezier(0.4, 0, 0.2, 1)`    | things leaving or moving                  |
+| `--motion-shift` | `8px` (`0px` with reduced motion) | how far things travel as they fade in     |
 
 **What to use:**
 
@@ -139,14 +179,18 @@ animation library) and only `opacity` and `transform` ever animate.
 | An instant response to a small toggle    | An optimistic mutation: see `useToggleVote` (fix-it), `useMarkRead`, `useSetRequestStatus`           |
 
 **Screen changes** use the browser's View Transitions API. `src/app/screenTransitions.ts`
-turns it on for every navigation and marks the direction on `<html data-nav>`: switching
-tabs cross-fades, drilling into a detail page fades in rising 8px, and going back
-reverses it. The tab bar stays still. Taps pass straight through during a transition.
-Browsers without the API get a plain fade (`AppLayout`).
+turns it on for every navigation and marks the direction on `<html data-nav>`. Screens
+fade (the design's "fade 200ms"); nothing slides. Switching tabs cross-fades, drilling
+into a detail page fades the new screen in over the old one, and going back fades the old
+one away. Because nothing moves, the tab bar is identical in both pictures and stays
+still. Taps pass straight through during a transition. Browsers without the API get a
+plain fade (`AppLayout`).
 
-**Reduced motion.** When the device asks for less motion, every animation and transition
-becomes instant (`globals.css` and `motion.css`), and `motionMs()` returns 0 so code that
-waits for an exit animation doesn't wait.
+**Reduced motion** (the design's "opacity only"). When the device asks for less motion,
+nothing slides, shrinks or spins, but things still fade: `--motion-shift` becomes 0 and
+`--press-scale` 1 (`tokens.css`), sheets fade instead of sliding, and Leaflet's zoom
+stops animating. `motionMs()` still returns the real durations, so code waits for the
+fades.
 
 ## Decisions worth knowing
 

@@ -5,12 +5,18 @@ problems are. Same shape as announcements; read [`announcements.md`](announcemen
 
 ## What it does
 
-- One floor plan image per floor (G, 1, 2), switched with the G / 1 / 2 control.
-- **Room pins** (teal) for every room; tap one for its details, a **Book** shortcut if a
-  venue is in that room, and **Report issue**.
-- **Fix-it reports** (orange squares) for every open report; tap one for the card with
-  **Me too** and **Report new** (see [`fixit.md`](fixit.md)).
-- **In use now** pins (dark with a ring) come from approved bookings happening right now.
+- The plan fills the screen; search, the G / 1 / 2 floor switch and the layer chips float
+  over it in glass. One floor plan image per floor (G, 1, 2).
+- **Room pins** (small dots) for every room; tap one for its details in a sheet above the
+  tab bar, a **Book** shortcut if a venue is in that room, and **Report an issue**. The
+  chosen room shows its code in the "selected room" tag.
+- **Fix-it count pins** (orange, with a number): one per room, counting its open reports;
+  tap one for the sheet with the Open · Seen · Fixing · Fixed track, **Me too** and
+  **Report an issue** (see [`fixit.md`](fixit.md)). With several reports in a room, the
+  sheet steps through them.
+- **"You are here"**: `/map?here=G.14` shows a blue pin in that room, e.g. from a QR code
+  on a door (Q53). The app never reads anyone's location.
+- **In use now** pins (green, with a halo) come from approved bookings happening right now.
   They refresh every minute and whenever a booking changes (Realtime).
 - **Find a room** searches room codes and names across all floors.
 - Links like `/map?room=G.06` open the right floor with that room selected (used by

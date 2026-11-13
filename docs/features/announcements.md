@@ -8,7 +8,7 @@ you understand this one, the rest will feel familiar.
 
 - One feed of school news. Students see posts for the whole school and for their grade.
 - Teachers post to one or more grades. They can't post school-wide or pin.
-- Admins post school-wide and pin. Pinned posts sit at the top in the teal card.
+- Admins post school-wide and pin. Pinned posts are the big card at the top of Home (swipe when there are several).
 - Authors edit or delete their own posts; admins can edit or delete any.
 - Pinned posts notify everyone; grade posts notify that grade's students. Ordinary
   school-wide posts notify nobody, to avoid notification spam.

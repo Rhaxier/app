@@ -166,10 +166,13 @@ policies hide the row from everyone but admins.
 | Audit log          | Filter by person, action, table and dates; filtered in the database                       | `audit_log`, `admin_audit_filters()`                               |
 
 **How branding reaches the screen.** `public_status()` returns the name, logo, colour and
-any maintenance message, and works signed out. `src/app/Branding.tsx` sets
-`--color-accent` (and a pale tint for badges, kept readable by `accentSoftFor()`) on
-`<html>`, and draws the maintenance banner. Both sit in `RootLayout`, so every screen has
-them.
+any maintenance message, and works signed out. `src/app/Branding.tsx` turns the school
+colour into accents for both themes (`brandAccents()` in `src/lib/contrast.ts`: the colour
+itself in light mode, a lighter mix of it in dark mode so accent text still reads on a dark
+card) and sets them on `<html>` as `--brand-acc-light`, `--brand-acc-dark` and their tints;
+`tokens.css` falls back to the design's system blue when they aren't set. The database's
+default colour (`#0e6857`) means "no school colour". It also draws the maintenance banner.
+Both sit in `RootLayout`, so every screen has them.
 
 **Every admin function refuses everyone else.** `supabase/tests/16_admin_lockdown_test.sql`
 finds every function named `admin_*` in the database and calls it as a teacher and as a

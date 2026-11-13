@@ -124,7 +124,7 @@ Dev accounts only work while `app_settings.allow_dev_accounts` is on
 ```
 src/
   app/          router, layout, tab bar, route guards, dev role switcher
-  styles/       tokens.css (design tokens), globals.css
+  styles/       tokens.css (design tokens), glass.css (liquid glass), globals.css, motion.css
   components/   shared UI: Button, Card, Chip, Badge, Input, SegmentedControl, Sheet, ...
   lib/          supabase client, query client, dates (Asia/Dubai), errors, statuses, CSV
   config/       static school text (placeholders)

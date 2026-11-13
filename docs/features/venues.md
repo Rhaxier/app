@@ -5,10 +5,11 @@ Same shape as announcements; read [`announcements.md`](announcements.md) first.
 
 ## What it does
 
-- **Calendar, by periods** (reference screen 4): venue chips, a strip of school days, and
-  the chosen date's **periods**, each with its name and times: available, booked (grey),
-  pending approval (orange), not bookable (a holiday or blackout) and your selection
-  (teal). Tap one period, or neighbouring free ones to book several in a row; a run can't
+- **Calendar, by periods** (reference screen 4): the venue's name as the title (tap it to
+  choose another), a strip of school days, and the chosen date's **periods**, each with
+  its name and start time: available (with a "+"), booked (hatched), pending approval
+  (yellow), not bookable (a holiday or blackout) and your selection (one blue block, with
+  the exact times in the floating bar and its Request button). Tap one period, or neighbouring free ones to book several in a row; a run can't
   cross a period that isn't free. The periods are that weekday's own `periods` (Q11,
   Admin > School calendar, or the bell times upload), so a short Friday looks shorter.
 - **Bell times in the database.** A new booking must start when a period starts and end

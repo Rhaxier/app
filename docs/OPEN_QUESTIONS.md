@@ -508,7 +508,7 @@ cloud dashboard's SQL editor.
 
 ## Q44: School branding, and what signed-out visitors can see
 
-- Default used: `[SCHOOL NAME]`, no logo, the design's teal. Admins set the name, upload a
+- Default used: `[SCHOOL NAME]`, no logo, the design's system blue. Admins set the name, upload a
   logo (public `branding` bucket, images up to 1 MB) and pick an accent colour, which
   must keep white text at 4.5:1 contrast (checked as they type and by the database). The
   app reads these at start-up through `public_status()`, which is the one thing signed-out
@@ -609,3 +609,48 @@ order`, one line per period per weekday. A weekday is its name or its first thre
   `src/features/school/pages/BellTimesPage.tsx`, `components/TodayBellTimes.tsx`.
 - To change it: to hide the Home card, remove `<TodayBellTimes />` from
   `src/features/home/pages/HomePage.tsx`.
+
+## Q51: Light or dark by default, and who chooses?
+
+- Default used: the design's dark look unless the device is set to light: "System" follows
+  the phone or computer, and changes with it. Anyone can pick Dark or Light under
+  **Me > Appearance**. The choice is a per-device convenience, so it's saved in the browser
+  (`localStorage`), not the database; a new phone starts on System again.
+- Where it lives: `src/lib/theme.ts` (`resolveTheme()`, `THEME_STORAGE_KEY`), the start-up
+  script in `index.html`, the `.light` block in `src/styles/tokens.css`.
+- To change it: to make dark the default whatever the device says, make
+  `getThemePreference()` return `'dark'` when nothing is saved, and change `'system'` to
+  `'dark'` in the `index.html` script.
+
+## Q52: Where the design's own colours fall below 4.5:1 contrast
+
+- Default used: the design's values, as specified, with two exceptions for status badges.
+  Badge text (blue, orange and grey on their soft tints) is a stronger mix of the colour so
+  it reaches 4.5:1 in both themes (`--on-accsoft`, `--on-fixsoft`, `--on-quiet`), the way
+  the deck already darkens light-mode status text. Two design values are kept even though
+  they fall short for small text: light-mode grey text (`--muted`, about 3.6:1 on white)
+  and white on the system blue (`--onacc` on `--acc`, about 3.7:1 dark and 4.0:1 light, on
+  the Request and Ask to join buttons). A school colour set under Branding must reach 4.5:1
+  with white, so this only applies to the default blue.
+- Where it lives: `src/styles/tokens.css`; the checks are in `src/lib/contrast.test.ts`.
+- To change it: for AA everywhere, set light-mode `--muted` to `rgba(60, 60, 67, 0.75)`
+  (about 5:1) and make `--acc` darker, e.g. `#0062cc` in light mode, in `tokens.css`.
+
+## Q53: "You are here" on the map
+
+- Default used: the app doesn't know where anyone is and never asks for location. The
+  design's "You are here" pin appears when the map is opened with `?here=` and a room
+  code, e.g. `/map?here=G.14`, which suits a QR code on a classroom door.
+- Where it lives: `src/features/map/pages/MapPage.tsx` (`hereRoom`), `HerePin` in
+  `src/features/map/components/Pins.tsx`.
+- To change it: print QR codes for `<app address>/map?here=<room code>`; nothing to set up.
+
+## Q54: Fonts: Google Fonts or bundled?
+
+- Default used: the design's fonts (Instrument Sans, and Geist Mono for room codes), bundled
+  with the app through Fontsource rather than fetched from Google Fonts, so the phone app
+  works offline and no request leaves the school's app for a font.
+- Where it lives: `package.json` (`@fontsource/instrument-sans`, `@fontsource/geist-mono`),
+  the imports in `src/main.tsx`, `--font` and `--font-mono` in `src/styles/tokens.css`.
+- To change it: swap the imports for a Google Fonts `<link>` in `index.html`; the token
+  names stay the same.

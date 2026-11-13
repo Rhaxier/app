@@ -113,6 +113,35 @@ function, the second adds `app_settings.allow_custom_booking_times` (off) and th
 times check on new bookings. Then upload the school's bell times (Admin > Upload bell
 times); until then, bookings follow the periods already in the table.
 
+## 1d. Round 4: the v5 design ("Campus")
+
+The whole app now follows `docs/School-App-Design.pdf` v5. No database change.
+
+| Change           | What was done                                                                                                                                                                                                        |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Tokens and type  | Page 12's tokens copied exactly into `tokens.css` (dark on `:root`, light in `.light`), with the type scale, concentric radii, spacing, elevation and motion from pages 3, 10 and 11. Instrument Sans and Geist Mono |
+| Liquid glass     | `src/styles/glass.css`, the page 4 recipe in order: backdrop filter, tint, sheen, top-left highlight, 0.5px rim, edge highlights, E3 lift. Regular, tab bar, thick and thin materials, and the active-tab lens       |
+| Light mode       | Designed, not inverted: grey canvas, navy shadows, brighter glass, darker status text, black primary button. System, Dark or Light under Me > Appearance                                                             |
+| Navigation       | A floating glass tab bar with a raised lens on the active tab, and a round glass search button beside it. ⌘K / Ctrl+K opens search                                                                                   |
+| Home             | Two-line greeting, pinned news as the one large card (swipe between several), six tools in one card with counts and dots, announcements as quiet rows                                                                |
+| Map              | The plan fills the screen under floating glass controls; placeholder plans redrawn as an architect's plan, inverted for dark mode; count pins, selected-room tag, "You are here"; fix-it and room sheets in glass    |
+| Volunteer, Book  | Hours as one large figure with an 8-week chart; roles with capacity bars. Booking reads like a timetable; your run of periods is one blue block; a floating glass bar with the times and Request                     |
+| Projects, Collab | One grouped card with teacher feedback quoted inline; collab posts lead with the title, skills, and spots you can count                                                                                              |
+| Staff desk view  | Approvals is now one queue, oldest first, with counts leading the page, a filter by kind, and quick actions on every row; a table on a laptop                                                                        |
+| Micro-details    | Notification dot, press and focus states, segmented thumb, hairlines, corridor hatch; reduced motion fades without moving                                                                                            |
+
+**Glass and screen changes.** An element with a `view-transition-name` becomes a
+"backdrop root", and any glass inside it can only blur what's inside it (nothing). The tab
+bar used to have one so it stayed still during screen changes; screens now only fade (the
+design's motion), so the bar stays still without it. See "Look and feel" in
+`docs/ARCHITECTURE.md`.
+
+**How it was checked.** Every reference screen was screenshotted against the PDF in dark
+and light at 390px, the desk view at 1280px, and the main screens at 320px (no sideways
+overflow). Headless Chrome's software renderer doesn't blur in-page content behind fixed
+glass, so the screenshots were taken with GPU emulation (SwiftShader); real browsers blur
+normally.
+
 ## 2. How to run it
 
 See the [README](../README.md):
@@ -129,7 +158,7 @@ See the [README](../README.md):
 | Suite                                        | Result                                                                        |
 | -------------------------------------------- | ----------------------------------------------------------------------------- |
 | Database (pgTAP, `npm run db:test`)          | **383 passed, 0 failed** in 17 files (round 2: 348 in 16; round 1: 119 in 8)  |
-| UI (Vitest, `npm test`)                      | **176 passed, 0 failed** in 23 files (round 2: 159 in 22; round 1: 111 in 15) |
+| UI (Vitest, `npm test`)                      | **197 passed, 0 failed** in 26 files (round 3: 176 in 23; round 2: 159 in 22) |
 | Lint, type check, Prettier, production build | All clean                                                                     |
 | Edge Functions                               | Type-check with Deno                                                          |
 
@@ -260,13 +289,17 @@ configurable in Admin. In short:
 | Q41 | What does removing content do?                 | Soft delete: admins only, restorable                                                   |
 | Q42 | Emergency broadcast?                           | Pinned urgent announcement + urgent notification to all; 10-minute limit               |
 | Q43 | Feature switches?                              | All on; off hides and blocks new content, deletes nothing                              |
-| Q44 | Branding, and what signed-out visitors see?    | Placeholder name, no logo, teal; `public_status()` is the only signed-out call         |
+| Q44 | Branding, and what signed-out visitors see?    | Placeholder name, no logo, system blue; `public_status()` is the only signed-out call  |
 | Q45 | What does data deletion delete?                | Name, email, files, settings, sign-in; records stay as "Deleted user"                  |
 | Q46 | Maintenance banner?                            | Off; on shows on every screen until its end time                                       |
 | Q47 | The timetable's format?                        | Configurable in Admin: CSV upload, all or nothing, whole weekdays replaced             |
 | Q48 | Bookings at times that aren't periods?         | Configurable in Admin: no by default (custom times off)                                |
 | Q49 | Can periods overlap on the same day?           | No; staggered lunches are one "Lunch" period                                           |
 | Q50 | Who sees the bell times?                       | Everyone signed in (Home card, `/bell-times`)                                          |
+| Q51 | Light or dark by default?                      | Follows the device; anyone can choose under Me > Appearance (saved on the device)      |
+| Q52 | Design colours below 4.5:1?                    | Kept as designed, except badge text, which is strengthened to reach 4.5:1              |
+| Q53 | "You are here" on the map?                     | Only from a `/map?here=G.14` link (e.g. a QR code); location is never read             |
+| Q54 | Fonts from Google or bundled?                  | Bundled (Fontsource), so the phone app works offline                                   |
 
 ## 5. What you need to unlock
 
