@@ -13,11 +13,12 @@ export function prefersReducedMotion(): boolean {
 
 /**
  * A motion token in milliseconds, e.g. motionMs('slow') = 280. Returns 0 when
- * animations won't run (reduced motion, or no styles loaded, as in tests), so
- * callers can skip waiting altogether.
+ * no styles are loaded (as in tests), so callers can skip waiting altogether.
+ * Reduced motion still waits: things fade without moving (the design's
+ * "opacity only"), and the fade takes the same time.
  */
 export function motionMs(token: MotionToken): number {
-  if (typeof window === 'undefined' || prefersReducedMotion()) return 0;
+  if (typeof window === 'undefined') return 0;
   const value = getComputedStyle(document.documentElement).getPropertyValue(`--motion-${token}`);
   const ms = parseFloat(value);
   return Number.isFinite(ms) ? ms : 0;

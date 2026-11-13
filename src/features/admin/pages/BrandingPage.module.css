@@ -1,6 +1,6 @@
 .heading {
-  font-family: var(--font-body);
-  font-size: var(--text-card-title);
+  font-family: var(--font);
+  font-size: var(--text-title);
   font-weight: 600;
   letter-spacing: 0;
 }
@@ -14,9 +14,9 @@
 .logo {
   width: 64px;
   height: 64px;
-  border-radius: 16px;
+  border-radius: var(--r-thumb);
   object-fit: contain;
-  background: var(--color-bg);
+  background: var(--card2);
 }
 
 .colourRow {
@@ -30,16 +30,34 @@
   width: var(--height-input);
   height: var(--height-input);
   padding: 4px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-input);
-  background: var(--color-card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-field);
+  background: var(--card);
   cursor: pointer;
+}
+
+.previews {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
 }
 
 .preview {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--r-thumb);
+}
+
+/* Each theme's canvas, side by side, whichever theme the admin is using. */
+.light {
+  background: #f2f2f7;
+}
+
+.dark {
+  background: #000;
 }
 
 .previewButton {
@@ -47,8 +65,8 @@
   align-items: center;
   min-height: var(--height-button-small);
   padding: 0 var(--space-4);
-  border-radius: var(--radius-button);
-  color: #ffffff;
+  border-radius: var(--r-button);
+  color: var(--onacc);
   font-weight: 600;
 }
 
@@ -58,6 +76,6 @@
   height: var(--height-badge);
   padding: 0 10px;
   border-radius: var(--radius-pill);
-  font-size: var(--text-label);
+  font-size: var(--text-caps);
   font-weight: 600;
 }

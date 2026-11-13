@@ -1,0 +1,85 @@
+/*
+ * Liquid glass (design PDF pages 4, 10 and 12): the material for floating
+ * controls. Add className="glass" plus, if it isn't the Regular material, one of:
+ *
+ *   .tabglass  the tab bar: blur 28px (the hero use)
+ *   .thick     bottom sheets, the booking bar, toasts: blur 30px, tint .72 / .76
+ *   .thin      map chips and overlays: blur 16px, tint .45 / .50
+ *
+ * Every value is a token from tokens.css, so dark and light mode each get
+ * their own recipe without any change here.
+ *
+ * The recipe order matters (page 4):
+ *   1 backdrop filter on the element: blur, saturate, brightness
+ *   2 tint and 3 specular sheen, as stacked backgrounds (sheen on top)
+ *     a radial highlight from the top-left, in ::after
+ *   4 rim (0.5px), 5 edge highlights (inset top and bottom), 7 lift (E3)
+ * (6, the raised lens, is .lens below: the active tab sits in one.)
+ *
+ * Two rules from the deck:
+ *   * Never stack glass on glass. Glass floats over content, never over glass.
+ *   * Never put body text on glass without the tint. The tint is always part
+ *     of the background here, and browsers that can't blur get a nearly solid
+ *     tint instead (the @supports rule at the end).
+ */
+.glass {
+  background: linear-gradient(180deg, var(--g-spec), transparent 46%), var(--g-tint);
+  -webkit-backdrop-filter: blur(var(--g-blur)) saturate(var(--g-sat)) brightness(var(--g-bright));
+  backdrop-filter: blur(var(--g-blur)) saturate(var(--g-sat)) brightness(var(--g-bright));
+  border: 0.5px solid var(--g-rim);
+  box-shadow:
+    inset 0 1px 0 var(--g-hi),
+    inset 0 -1px 0 var(--g-lo),
+    var(--e3);
+}
+
+/* :where() has no specificity, so a component that positions its glass
+   (fixed, absolute) always wins over this default. */
+:where(.glass) {
+  position: relative;
+  isolation: isolate;
+}
+
+/* The radial highlight from the top-left: 120% × 90% at 18% −10%. It sits
+   above the tint (z-index −1 inside the glass's own stacking context) and
+   below the content, and never catches a tap. */
+.glass::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: radial-gradient(120% 90% at 18% -10%, var(--g-spec), transparent 42%);
+  pointer-events: none;
+}
+
+.tabglass {
+  --g-blur: 28px;
+}
+
+.thick {
+  --g-blur: 30px;
+  --g-tint: var(--g-tint-thick);
+}
+
+.thin {
+  --g-blur: 16px;
+  --g-tint: var(--g-tint-thin);
+}
+
+/* 6 · The raised lens behind the active tab: a soft fill, a 0.5px rim and a
+   1px top highlight. Radius 26 = tab bar 31 − 5 padding. */
+.lens {
+  border: 0.5px solid var(--g-rim);
+  border-radius: var(--r-lens);
+  background: var(--lens);
+  box-shadow: inset 0 1px 0 var(--g-hi);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass,
+  .thick,
+  .thin {
+    --g-tint: var(--g-tint-solid);
+  }
+}

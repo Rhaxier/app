@@ -1,6 +1,6 @@
 // Motion logic that isn't CSS: which way a screen change goes, and how lists
-// decide which items animate. (Durations are 0 in tests: no styles are loaded,
-// which is also what reduced motion does, so removals are immediate here.)
+// decide which items animate. (Durations are 0 in tests: no styles are
+// loaded, so removals are immediate here.)
 import { act, render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { transitionKind } from '@/app/screenTransitions';
@@ -45,7 +45,7 @@ describe('useListMotion', () => {
     expect(screen.getByText('b')).toHaveAttribute('data-motion', '');
   });
 
-  it('drops removed items (straight away when motion is off)', () => {
+  it('drops removed items (straight away when nothing animates)', () => {
     const { rerender } = render(<List items={['a', 'b']} />);
     act(() => rerender(<List items={['a']} />));
     expect(screen.queryByText('b')).not.toBeInTheDocument();

@@ -11,7 +11,8 @@
  */
 
 /* ---------------------------------------------------------------------------
-   Press feedback. Add className="pressable" to buttons, chips, tiles and tabs:
+   Press feedback (page 11: scale .97 · 120ms ease-out · darken 6%, 4% in
+   light mode). Add className="pressable" to buttons, chips, tiles and tabs:
    they shrink a touch and darken while pressed, and colours change smoothly.
    The focus ring (box-shadow) is left out of the transition on purpose, so it
    appears at once instead of sliding in.
@@ -26,8 +27,8 @@
 }
 
 .pressable:active:not(:disabled):not([aria-disabled='true']) {
-  transform: scale(0.97);
-  filter: brightness(0.92);
+  transform: scale(var(--press-scale));
+  filter: brightness(var(--press-dim));
 }
 
 /* ---------------------------------------------------------------------------
@@ -39,17 +40,19 @@
   }
 }
 
+/* Movement uses --motion-shift (8px), which reduced motion sets to 0: then
+   things only fade (tokens.css). */
 @keyframes motion-enter {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(var(--motion-shift));
   }
 }
 
 @keyframes motion-leave {
   to {
     opacity: 0;
-    transform: translateY(-4px);
+    transform: translateY(calc(var(--motion-shift) * -0.5));
   }
 }
 
@@ -72,12 +75,16 @@
 /* ---------------------------------------------------------------------------
    Screen changes (View Transitions API).
    The browser takes a picture of the old screen, the app draws the new one,
-   and these rules animate between the two pictures. src/app/screenTransitions.ts
-   sets data-nav on <html> so we know which way the person is going:
-     fade     another tab or an unrelated screen: a quick cross-fade
-     forward  drilling into a detail page: the new screen fades in, rising 8px
-     back     going back: the old screen fades out, sinking 8px
-   The tab bar has its own name (see TabBar.module.css), so it stays put.
+   and these rules animate between the two pictures. The design's motion is
+   "fade 200ms" (page 11), so screens fade; nothing slides.
+   src/app/screenTransitions.ts sets data-nav on <html> so we know which way
+   the person is going, and the fade shows depth:
+     fade     another tab or an unrelated screen: a cross-fade
+     forward  drilling into a detail page: the new screen fades in over the old
+     back     going back: the old screen fades away, uncovering the new one
+   Because nothing moves, the tab bar is the same in both pictures and stays
+   put. (It can't have a view-transition-name of its own: that would make it a
+   "backdrop root", and its glass couldn't blur the screen behind it.)
    --------------------------------------------------------------------------- */
 
 /* The pictures sit on top of the page; let taps go through to the real page. */
@@ -93,16 +100,18 @@
   animation: motion-vt-in var(--motion-base) var(--ease-out) both;
 }
 
-html[data-nav='forward']::view-transition-new(root) {
-  animation-name: motion-vt-rise-in;
+/* Forward: the old screen stays underneath while the new one fades in. */
+html[data-nav='forward']::view-transition-old(root) {
+  animation: none;
+}
+
+/* Back: the new screen is already underneath; the old one fades off the top. */
+html[data-nav='back']::view-transition-new(root) {
+  animation: none;
 }
 
 html[data-nav='back']::view-transition-old(root) {
-  animation-name: motion-vt-sink-out;
-}
-
-::view-transition-group(tab-bar) {
-  animation-duration: var(--motion-fast);
+  z-index: 1;
 }
 
 @keyframes motion-vt-in {
@@ -117,29 +126,9 @@ html[data-nav='back']::view-transition-old(root) {
   }
 }
 
-@keyframes motion-vt-rise-in {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-}
-
-@keyframes motion-vt-sink-out {
-  to {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-}
-
 /* ---------------------------------------------------------------------------
-   Reduced motion: when someone asks their device for less motion, every
-   animation and transition becomes instant. globals.css already does this for
-   normal elements; the screen-change pictures need saying separately.
+   Reduced motion (page 11: "opacity only"). Nothing slides, shrinks or
+   spins; things still fade, because a fade tells you something changed
+   without moving it. tokens.css sets --motion-shift to 0 and --press-scale to
+   1, which covers every keyframe above. Screen changes are fades already.
    --------------------------------------------------------------------------- */
-@media (prefers-reduced-motion: reduce) {
-  ::view-transition-group(*),
-  ::view-transition-old(*),
-  ::view-transition-new(*) {
-    animation: none !important;
-  }
-}

@@ -1,83 +1,273 @@
 /*
- * Design tokens from docs/School-App-Design.pdf, page 1.
- * Every colour, size and radius in the app comes from here, so a design
- * change is a one-line edit. Components use var(--token), never raw hex.
+ * Design tokens from docs/School-App-Design.pdf (v5).
+ *
+ *   Colour, glass and elevation  page 12 ("Copy-paste tokens"), copied exactly
+ *   Type scale                   pages 3 and 11
+ *   Radii, spacing, materials    page 10
+ *   Press, focus, motion         page 11
+ *
+ * Dark is the default, on :root. Light mode is the `.light` class on <html>,
+ * which src/lib/theme.ts sets (Me > Appearance: System, Dark or Light).
+ * Light mode is designed, not inverted (page 5): a grey grouped canvas, navy
+ * shadows, brighter glass, darker status text, and a black primary button.
+ *
+ * Every colour, size and radius in the app comes from here. Components use
+ * var(--token), never a raw colour, so a design change is a one-line edit.
  */
 :root {
-  /* Colour */
-  --color-bg: #f4f2ec;
-  --color-card: #ffffff;
-  --color-ink: #15202b;
-  --color-muted: #5b6470;
-  --color-border: #e2ded4;
-  --color-quiet: #eeebe3;
-  --color-accent: #0e6857; /* teal: primary actions, "good" states */
-  --color-accent-soft: #dcede8;
-  --color-alert: #a4520f; /* orange: fix-it actions, "attention" states */
-  --color-alert-soft: #f8e6d3;
-  --color-alert-ink: #7a3e0b; /* text on --color-alert-soft */
-  --color-on-accent: #ffffff;
+  /* Native form controls, scrollbars and date pickers follow the theme. */
+  color-scheme: dark;
 
-  /* Typography */
-  --font-heading: 'Bricolage Grotesque', system-ui, sans-serif;
-  --font-body: 'DM Sans', system-ui, sans-serif;
-  --text-page-title: 28px;
-  --text-section-title: 20px;
-  --text-card-title: 16px;
-  --text-body: 15px;
-  --text-small: 14px;
-  --text-meta: 13px;
-  --text-label: 12px; /* small caps-style labels */
-  --text-tab: 11px;
+  /* ---- Colour (page 12) -------------------------------------------------- */
+  --paper: #000; /* canvas */
+  --card: #1c1c1e; /* cards and lists */
+  --card2: #2c2c2e; /* fills inside cards: quotes, quiet buttons */
+  --ink: #ffffff;
+  --ink2: #e5e5ea;
+  --muted: rgba(235, 235, 245, 0.6);
+  --faint: rgba(235, 235, 245, 0.32); /* decoration only: never for text people must read */
+  --line: rgba(84, 84, 88, 0.42); /* 1px separators */
+  --hair: rgba(120, 120, 128, 0.5); /* outlines on chips and tags */
+  /* The accent: "yours" and "next step". A school's own colour (Admin >
+     System > Branding) arrives through --brand-*; see src/app/Branding.tsx. */
+  --acc: var(--brand-acc-dark, #0a84ff);
+  --accsoft: var(--brand-accsoft-dark, rgba(10, 132, 255, 0.18));
+  --fix: #ff9f0a; /* fix-it */
+  --fixsoft: rgba(255, 159, 10, 0.16);
+  --fixink: #ffb340;
+  --wait: rgba(255, 214, 10, 0.14); /* pending */
+  --waitink: #ffd60a;
+  --ok: rgba(48, 209, 88, 0.15); /* approved */
+  --okink: #30d158;
+  --onink: #000; /* text on an --ink fill */
+  --pribg: #ffffff; /* the one primary button per screen */
+  --prifg: #000;
+  --segbg: rgba(118, 118, 128, 0.24);
+  --segon: #636366;
+  --tabtext: rgba(235, 235, 245, 0.72);
+  /* Ambient glow behind every screen (page 10): blue from the top, violet bloom on the right. */
+  --glow:
+    radial-gradient(90% 38% at 50% -6%, rgba(10, 132, 255, 0.28), transparent 70%),
+    radial-gradient(60% 30% at 100% 30%, rgba(94, 92, 230, 0.12), transparent 70%);
+
+  /* ---- Liquid glass (pages 4, 10, 12; used by src/styles/glass.css) ------- */
+  --g-tint: rgba(38, 38, 42, 0.55); /* Regular: tab bar, search, FAB, floor switch */
+  --g-blur: 24px;
+  --g-sat: 190%;
+  --g-bright: 1.1;
+  --g-rim: rgba(255, 255, 255, 0.16);
+  --g-hi: rgba(255, 255, 255, 0.22);
+  --g-lo: rgba(255, 255, 255, 0.05);
+  --g-spec: rgba(255, 255, 255, 0.09);
+  --lens: rgba(255, 255, 255, 0.11);
+  /* The other two materials (page 10, "Glass materials"). */
+  --g-tint-thick: rgba(38, 38, 42, 0.72); /* bottom sheets, booking bar */
+  --g-tint-thin: rgba(38, 38, 42, 0.45); /* map chips, overlays */
+  /* Browsers without backdrop-filter get a nearly solid tint instead, so text stays readable. */
+  --g-tint-solid: rgba(38, 38, 42, 0.96);
+
+  /* ---- Elevation (page 10) ------------------------------------------------ */
+  --e1: 0 0 0 0.5px rgba(255, 255, 255, 0.06); /* resting: cards, lists */
+  --e2: 0 10px 28px -12px rgba(0, 0, 0, 0.65); /* raised: selected block, popovers */
+  --e3:
+    0 20px 44px -18px rgba(0, 0, 0, 0.85), 0 2px 6px -2px rgba(0, 0, 0, 0.5); /* floating glass */
+  /* Accent glow under "your selection". color-mix keeps it following the accent;
+     with the default accent it is exactly rgba(10,132,255,.55). */
+  --selglow: 0 12px 28px -10px color-mix(in srgb, var(--acc) 55%, transparent);
+
+  /* ---- Colours the deck describes in words -------------------------------- */
+  --onacc: #ffffff; /* text on an accent fill, e.g. "Request" */
+  /*
+   * Text on the soft tints (status badges, "You're in"). Status text must reach
+   * 4.5:1 (page 5 darkens light-mode status text for the same reason). The
+   * deck's blue on its own blue tint reaches only 3.8:1, so badge text is a
+   * lighter mix of the accent in dark mode (≈ #64B5FF, the deck's selected-room
+   * blue) and a darker one in light mode. color-mix keeps them following a
+   * school's own colour. Checked in src/lib/contrast.test.ts.
+   */
+  --on-accsoft: color-mix(in srgb, var(--acc) 60%, #fff);
+  --on-fixsoft: var(--fixink);
+  --on-quiet: var(--muted);
+  --switch-on: #30d158; /* native switches are green when on */
+  --knob: #ffffff; /* switch knobs are white in both themes */
+  --knob-shadow: 0 3px 8px rgba(0, 0, 0, 0.15), 0 3px 1px rgba(0, 0, 0, 0.06);
+  --seg-shadow: 0 3px 8px rgba(0, 0, 0, 0.16); /* segmented thumb (page 11) */
+  --sel-hi: rgba(255, 255, 255, 0.25); /* your selection: inner top 1px white 25% (page 11) */
+  --field: rgba(
+    118,
+    118,
+    128,
+    0.24
+  ); /* text fields: a translucent fill works on canvas, cards and glass */
+  --scrim: rgba(0, 0, 0, 0.5); /* behind an open sheet */
+  --press-dim: 0.94; /* press: darken 6% (page 11) */
+  --hatch: #2a2a2f; /* corridor hatch lines (page 11) */
+  --selroom: #64b5ff; /* a selected room's code (page 11) */
+  /* The placeholder floor plans (public/floorplans) are drawn light, like most
+     real plans; dark mode inverts them into the dark architect's plan. */
+  --plan-filter: invert(1) hue-rotate(180deg);
+  --chevron-down: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%239d9da3' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+
+  /* ---- Typography (pages 3 and 11) ---------------------------------------- */
+  --font: 'Instrument Sans', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace; /* room codes only */
+  --text-large-title: 34px; /* 34/36 Bold −3% */
+  --leading-large-title: 36px;
+  --tracking-large-title: -0.03em;
+  --text-display: 22px; /* the one big card title on a screen: pinned news, a collab post */
+  --text-title2: 20px; /* section headings on detail and form screens, sheet titles */
+  --text-title: 16px; /* 16/21 600 −2%: card and row titles */
+  --leading-title: 21px;
   --tracking-title: -0.02em;
-  --tracking-label: 0.05em;
+  --text-reading: 15px; /* long text people read, and button labels */
+  --text-body: 13px; /* 13/18 */
+  --leading-body: 18px;
+  --text-meta: 12px; /* muted detail lines, e.g. "Gr 10 · 2d" */
+  --text-caps: 12px; /* Caps 12 500 +3%, e.g. "LOOKING FOR" */
+  --tracking-caps: 0.03em;
+  --text-tab: 10px; /* Tab 10 500 */
+  /* Text fields stay at 16px: iPhones zoom the whole page into anything smaller. */
+  --text-input: 16px;
 
-  /* Spacing */
+  /* ---- Spacing: 4-point base (page 10) ------------------------------------ */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
   --space-4: 16px;
-  --space-5: 20px; /* screen padding */
+  --space-5: 20px;
   --space-6: 24px;
   --space-8: 32px;
-  --gap-block: 18px; /* vertical gap between blocks (design: 16–22px) */
+  --screen-margin: 20px;
+  --chrome-inset: 16px; /* floating chrome from the screen edges */
+  --chrome-bottom: 18px; /* floating chrome from the bottom */
+  --gap-block: 20px; /* between blocks on a screen */
+  --gap-tight: 10px; /* between cards in a list */
 
-  /* Shape */
-  --radius-card: 18px;
-  --radius-input: 14px;
-  --radius-button: 14px;
-  --radius-small: 10px;
+  /* ---- Corner radii, concentric (page 10) --------------------------------- */
+  /* Inner radius = outer − padding: tab bar 31 − 5 = lens 26; segment 10 − 2 = 8. */
+  --r-seg-thumb: 8px;
+  --r-seg: 10px;
+  --r-tag: 12px;
+  --r-field: 14px;
+  --r-thumb: 16px; /* thumbnails, quote blocks inside cards */
+  --r-selected: 18px; /* your selection */
+  --r-date: 20px; /* date pills */
+  --r-card: 22px;
+  --r-button: 24px;
+  --r-search: 26px;
+  --r-lens: 26px;
+  --r-tabbar: 31px;
+  --r-sheet: 32px;
   --radius-pill: 999px;
 
-  /* Sizes */
+  /* ---- Sizes --------------------------------------------------------------- */
   --height-input: 48px;
   --height-button: 48px;
   --height-button-small: 44px; /* never below 44px: touch target minimum */
   --height-chip: 34px;
-  --height-badge: 26px;
-  --height-tabbar: 78px;
+  --height-badge: 22px;
+  --height-tabbar: 62px; /* 31 radius × 2 */
+  --tabbar-space: calc(var(--height-tabbar) + var(--chrome-bottom) + env(safe-area-inset-bottom));
   --touch-min: 44px;
   --icon-size: 22px;
   --icon-stroke: 1.8;
 
-  /* Layout */
+  /* ---- Layout -------------------------------------------------------------- */
   --phone-width: 390px;
-  --content-max: 480px; /* desktop: centred column */
-  --content-max-wide: 1180px; /* admin dashboard on a laptop: menu + content */
+  --content-max: 480px; /* the phone column, centred on a desktop */
+  --content-max-wide: 1180px; /* staff desk view and admin dashboard */
 
-  /* Elevation (only for floating things: sheets, the map card, FAB) */
-  --shadow-float: 0 8px 28px rgba(21, 32, 43, 0.12);
-  /* Follows the accent, including a school's own (Admin > System > Branding). */
-  --focus-ring: 0 0 0 3px color-mix(in srgb, var(--color-accent) 35%, transparent);
+  /* ---- Press and focus (page 11) ------------------------------------------- */
+  /* Focus: 0 0 0 3px accent at 45%, offset 2px, keyboard only (see globals.css). */
+  --focus: color-mix(in srgb, var(--acc) 45%, transparent);
 
   /*
-   * Motion (see "Motion" in docs/ARCHITECTURE.md). Quick and calm: nothing
-   * bounces and nothing takes longer than 300ms. Only opacity and transform
-   * ever animate. src/lib/motion.ts reads these, so JS waits exactly as long.
+   * ---- Motion (page 11; "Motion" in docs/ARCHITECTURE.md) -------------------
+   * fade 200ms · sheet 280ms · cubic-bezier(.2,0,0,1). Only opacity and
+   * transform ever animate. With reduced motion, things fade but don't move
+   * (--motion-shift becomes 0). src/lib/motion.ts reads these, so JS waits
+   * exactly as long as the CSS runs.
    */
-  --motion-fast: 120ms; /* press feedback, hovers */
-  --motion-base: 200ms; /* fades, small movements */
+  --motion-fast: 120ms; /* press feedback */
+  --motion-base: 200ms; /* fades */
   --motion-slow: 280ms; /* sheets, screen transitions */
-  --ease-out: cubic-bezier(0.2, 0, 0, 1); /* things arriving */
+  --ease-out: cubic-bezier(0.2, 0, 0, 1); /* the deck's curve: things arriving */
   --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1); /* things leaving or moving */
+  --motion-shift: 8px; /* how far things travel as they fade in */
+  --press-scale: 0.97;
+}
+
+/* ---------------------------------------------------------------------------
+   Light mode (page 5 and page 12's .light block).
+   --------------------------------------------------------------------------- */
+.light {
+  color-scheme: light;
+
+  --paper: #f2f2f7;
+  --card: #ffffff;
+  --card2: #f2f2f7;
+  --ink: #000000;
+  --ink2: #1c1c1e;
+  --muted: rgba(60, 60, 67, 0.62);
+  --faint: rgba(60, 60, 67, 0.32);
+  --line: rgba(60, 60, 67, 0.13);
+  --hair: rgba(60, 60, 67, 0.22);
+  --acc: var(--brand-acc-light, #007aff);
+  --accsoft: var(--brand-accsoft-light, rgba(0, 122, 255, 0.11));
+  --fix: #ff9500;
+  --fixsoft: rgba(255, 149, 0, 0.13);
+  --fixink: #b35900;
+  --wait: #fff3cd;
+  --waitink: #8a6100;
+  --ok: #e3f5e8;
+  --okink: #1e7a3a;
+  --onink: #ffffff;
+  --pribg: #000;
+  --prifg: #ffffff;
+  --segbg: rgba(118, 118, 128, 0.12);
+  --segon: #ffffff;
+  --tabtext: rgba(60, 60, 67, 0.78);
+  --glow:
+    radial-gradient(90% 36% at 50% -6%, rgba(0, 122, 255, 0.16), transparent 70%),
+    radial-gradient(60% 30% at 100% 28%, rgba(175, 82, 222, 0.07), transparent 70%);
+
+  --g-tint: rgba(255, 255, 255, 0.58);
+  --g-blur: 24px;
+  --g-sat: 180%;
+  --g-bright: 1.04;
+  --g-rim: rgba(255, 255, 255, 0.8);
+  --g-hi: rgba(255, 255, 255, 0.95);
+  --g-lo: rgba(16, 24, 40, 0.04);
+  --g-spec: rgba(255, 255, 255, 0.5);
+  --lens: rgba(0, 0, 0, 0.055);
+  --g-tint-thick: rgba(255, 255, 255, 0.76);
+  --g-tint-thin: rgba(255, 255, 255, 0.5);
+  --g-tint-solid: rgba(255, 255, 255, 0.97);
+
+  --e1: 0 1px 2px rgba(16, 24, 40, 0.04), 0 0 0 0.5px rgba(16, 24, 40, 0.06);
+  --e2: 0 10px 28px -12px rgba(28, 40, 90, 0.22);
+  --e3: 0 18px 40px -16px rgba(28, 40, 90, 0.28), 0 2px 6px -2px rgba(28, 40, 90, 0.1);
+  /* The deck's light glow is a little softer: 26px blur at 45%. */
+  --selglow: 0 12px 26px -10px color-mix(in srgb, var(--acc) 45%, transparent);
+
+  --onacc: #ffffff;
+  --on-accsoft: color-mix(in srgb, var(--acc) 80%, #000);
+  --on-fixsoft: color-mix(in srgb, var(--fixink) 88%, #000);
+  --on-quiet: rgba(60, 60, 67, 0.85);
+  --switch-on: #34c759;
+  --field: rgba(118, 118, 128, 0.12);
+  --scrim: rgba(16, 24, 40, 0.28); /* navy-tinted, like the shadows */
+  --press-dim: 0.96; /* press: darken 4% in light mode */
+  --hatch: #e3e3e8;
+  --selroom: var(--on-accsoft);
+  --plan-filter: none;
+  --chevron-down: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%238a8a8e' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+}
+
+/* Reduced motion (page 11): opacity only. Things still fade; nothing moves. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-shift: 0px;
+    --press-scale: 1;
+  }
 }

@@ -1,4 +1,4 @@
-/* Base styles for the whole app: reset, fonts, and a few utility classes. */
+/* Base styles for the whole app: reset, type, the ambient glow, and a few utility classes. */
 *,
 *::before,
 *::after {
@@ -12,38 +12,58 @@ body {
 }
 
 body {
-  background: var(--color-bg);
-  color: var(--color-ink);
-  font-family: var(--font-body);
+  min-height: 100vh;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font);
   font-size: var(--text-body);
-  line-height: 1.45;
+  line-height: var(--leading-body);
+  /* Numbers use tabular figures, so times and counts line up (page 3). */
+  font-variant-numeric: tabular-nums;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   -webkit-tap-highlight-color: transparent;
 }
 
-h1,
-h2,
-h3 {
-  margin: 0;
-  font-family: var(--font-heading);
-  font-weight: 700;
-  letter-spacing: var(--tracking-title);
-  line-height: 1.15;
+/*
+ * E0 · the ambient glow behind every screen (page 10): soft blue from the top
+ * and a violet bloom on the right. It is fixed to the screen and doesn't
+ * scroll. A fixed layer behind everything is used rather than
+ * background-attachment: fixed, which iPhones ignore.
+ */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: var(--glow);
+  pointer-events: none;
 }
 
+/* Large title: 34/36 Bold −3% (page 11). */
 h1 {
-  font-size: var(--text-page-title);
+  margin: 0;
+  font-size: var(--text-large-title);
+  font-weight: 700;
+  line-height: var(--leading-large-title);
+  letter-spacing: var(--tracking-large-title);
 }
 
 h2 {
-  font-size: var(--text-section-title);
+  margin: 0;
+  font-size: var(--text-title2);
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: var(--tracking-title);
 }
 
+/* Title: 16/21 600 −2%. */
 h3 {
-  font-family: var(--font-body);
-  font-size: var(--text-card-title);
+  margin: 0;
+  font-size: var(--text-title);
   font-weight: 600;
-  letter-spacing: 0;
+  line-height: var(--leading-title);
+  letter-spacing: var(--tracking-title);
 }
 
 p {
@@ -51,7 +71,7 @@ p {
 }
 
 a {
-  color: var(--color-accent);
+  color: var(--acc);
 }
 
 button,
@@ -69,10 +89,19 @@ ol {
   list-style: none;
 }
 
-/* Keyboard users see where they are; mouse users don't get a ring on click. */
+::selection {
+  background: var(--accsoft);
+}
+
+/* Focus (page 11): 0 0 0 3px accent at 45%, 2px away from the element, for
+   keyboard users only; a tap or click never shows a ring. */
 :focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+:focus:not(:focus-visible) {
   outline: none;
-  box-shadow: var(--focus-ring);
 }
 
 /* Text that screen readers announce but nobody sees. */
@@ -88,18 +117,20 @@ ol {
   border: 0;
 }
 
-/* Muted meta text, e.g. "Grade 10 · 2 days ago". */
+/* Muted detail line, e.g. "Grade 10 · 2 days ago". */
 .meta {
-  color: var(--color-muted);
+  color: var(--muted);
   font-size: var(--text-meta);
+  line-height: 16px;
 }
 
-/* Small caps-style label, e.g. "LOOKING FOR". */
+/* Caps label, e.g. "LOOKING FOR": 12 500 +3%. */
 .label {
-  font-size: var(--text-label);
-  font-weight: 600;
+  font-size: var(--text-caps);
+  font-weight: 500;
+  line-height: 16px;
   text-transform: uppercase;
-  letter-spacing: var(--tracking-label);
+  letter-spacing: var(--tracking-caps);
 }
 
 /* Vertical stack with the standard gap between blocks. */
@@ -112,7 +143,7 @@ ol {
 .stack-tight {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--gap-tight);
 }
 
 .row {
@@ -127,9 +158,21 @@ ol {
   gap: var(--space-2);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation: none !important;
-    transition: none !important;
-  }
+/* A row of chips that scrolls sideways instead of wrapping (the collab skill
+   filter). The scrollbar is hidden; the cut-off chip shows there's more. */
+.scroll-row {
+  display: flex;
+  gap: var(--space-2);
+  margin: 0 calc(var(--screen-margin) * -1);
+  padding: 5px var(--screen-margin);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.scroll-row::-webkit-scrollbar {
+  display: none;
+}
+
+.scroll-row > * {
+  flex: none;
 }

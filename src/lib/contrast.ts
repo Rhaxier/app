@@ -1,7 +1,8 @@
 // Colour contrast (WCAG 2), for the school's accent colour. White text sits on
-// the accent (buttons, the pinned announcement), so it must reach 4.5:1. The
-// database checks the same rule (app_settings_check_branding); this gives the
-// admin the answer while they type, with the reason.
+// the accent (the Request and Ask to join buttons), so it must reach 4.5:1.
+// The database checks the same rule (app_settings_check_branding); this gives
+// the admin the answer while they type, with the reason. brandAccents() then
+// derives what each theme needs from that one colour.
 
 /** '#0e6857' → its relative luminance, 0 (black) to 1 (white). */
 export function luminance(hex: string): number {
@@ -40,15 +41,40 @@ export function tint(hex: string, share: number): string {
   return `#${mixed.join('')}`;
 }
 
+/** '#0a84ff', 0.18 → 'rgba(10, 132, 255, 0.18)': the colour, see-through. */
+export function withAlpha(hex: string, alpha: number): string {
+  const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+/** The dark theme's card colour (--card in tokens.css), which accent text sits on. */
+const DARK_CARD = '#1c1c1e';
+
 /**
- * The pale background for "good" badges and chips, which carry text in the
- * accent colour. Starts as a soft tint and gets paler until that text is
- * readable (at worst plain white, where accentProblem() already guarantees 4.5:1).
+ * The school colour for dark mode. A colour dark enough for white text in
+ * light mode is usually too dark to read on a black screen, so it is mixed
+ * with white until accent-coloured text on a card reaches 4.5:1, which is
+ * about where the design's own system blue sits.
  */
-export function accentSoftFor(hex: string): string {
-  for (const share of [0.15, 0.12, 0.09, 0.06, 0.03]) {
-    const soft = tint(hex, share);
-    if (contrastRatio(hex, soft) >= MIN_CONTRAST) return soft;
+export function accentForDark(hex: string): string {
+  for (const share of [1, 0.85, 0.7, 0.55, 0.4, 0.25]) {
+    const lighter = tint(hex, share);
+    if (contrastRatio(lighter, DARK_CARD) >= MIN_CONTRAST) return lighter;
   }
-  return '#ffffff';
+  return tint(hex, 0.1);
+}
+
+/**
+ * Everything the app needs from a school colour, for both themes (see
+ * src/app/Branding.tsx). The soft tints use the same strengths as the
+ * design's blue: 11% in light mode, 18% in dark.
+ */
+export function brandAccents(hex: string) {
+  const dark = accentForDark(hex);
+  return {
+    light: hex,
+    lightSoft: withAlpha(hex, 0.11),
+    dark,
+    darkSoft: withAlpha(dark, 0.18),
+  };
 }

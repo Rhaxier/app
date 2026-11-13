@@ -1,7 +1,9 @@
 // Admin > System > Branding (Q9). The school's name, logo and accent colour.
-// The app reads them at start-up (public_status) and sets --color-accent.
-// White text sits on the accent, so it must reach 4.5:1 contrast: the colour
-// is checked as you type (src/lib/contrast.ts) and again by the database.
+// The app reads them at start-up (public_status) and sets the accent for both
+// themes (src/app/Branding.tsx). White text sits on the accent, so it must
+// reach 4.5:1 contrast: the colour is checked as you type (src/lib/contrast.ts)
+// and again by the database. The database's default colour means "use the
+// design's system blue".
 import { useRef, useState } from 'react';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
@@ -10,7 +12,7 @@ import { LoadingState } from '@/components/States';
 import { DEFAULT_ACCENT } from '@/app/Branding';
 import type { AppSettings } from '@/features/settings/api';
 import { useAppSettings } from '@/features/settings/hooks';
-import { accentProblem, accentSoftFor, contrastRatio } from '@/lib/contrast';
+import { accentProblem, brandAccents, contrastRatio } from '@/lib/contrast';
 import { errorMessage } from '@/lib/errors';
 import { AdminPage } from '../components/AdminPage';
 import { useUpdateSettings, useUploadLogo } from '../hooks';
@@ -35,6 +37,13 @@ function BrandingForm({ settings }: { settings: AppSettings }) {
   const [accent, setAccent] = useState(settings.accent_color);
   const problem = accentProblem(accent);
   const valid = !problem && name.trim() !== '';
+  const designBlue = accent.toLowerCase() === DEFAULT_ACCENT || problem !== null;
+  const brand = designBlue ? null : brandAccents(accent);
+  // The design's own blue and its tints (tokens.css) when there's no school colour.
+  const preview = {
+    light: { acc: brand?.light ?? '#007aff', soft: brand?.lightSoft ?? 'rgba(0, 122, 255, 0.11)' },
+    dark: { acc: brand?.dark ?? '#0a84ff', soft: brand?.darkSoft ?? 'rgba(10, 132, 255, 0.18)' },
+  };
 
   return (
     <>
@@ -108,26 +117,28 @@ function BrandingForm({ settings }: { settings: AppSettings }) {
             White text on it: {contrastRatio(accent, '#ffffff').toFixed(1)}:1 (needs 4.5:1).
           </p>
         )}
-        {/* A preview of where the colour appears. */}
-        <div className={styles.preview} aria-hidden="true">
-          <span
-            className={styles.previewButton}
-            style={{ background: problem ? DEFAULT_ACCENT : accent }}
-          >
-            Button
-          </span>
-          <span
-            className={styles.previewBadge}
-            style={{
-              background: accentSoftFor(problem ? DEFAULT_ACCENT : accent),
-              color: problem ? DEFAULT_ACCENT : accent,
-            }}
-          >
-            Approved
-          </span>
+        {/* A preview of the colour in each theme. Dark mode uses a lighter mix
+            of it, so accent text still reads on a dark card. */}
+        <div className={styles.previews} aria-hidden="true">
+          {(['light', 'dark'] as const).map((theme) => (
+            <div key={theme} className={`${styles.preview} ${styles[theme]}`}>
+              <span className={styles.previewButton} style={{ background: preview[theme].acc }}>
+                Request
+              </span>
+              <span
+                className={styles.previewBadge}
+                style={{ background: preview[theme].soft, color: preview[theme].acc }}
+              >
+                You're in
+              </span>
+            </div>
+          ))}
         </div>
+        {designBlue && (
+          <p className="meta">This is the default, so the app uses the design's system blue.</p>
+        )}
         <Button variant="ghost" onClick={() => setAccent(DEFAULT_ACCENT)}>
-          Back to the design's teal
+          Back to the design's blue
         </Button>
       </Card>
 

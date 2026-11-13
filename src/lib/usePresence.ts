@@ -5,7 +5,7 @@
 //   mounted  should it be rendered at all?
 //   leaving  is it on its way out (play the exit animation)?
 // When `show` turns false, `mounted` stays true for one motion token's length,
-// then turns false. With reduced motion (or in tests) it turns false at once.
+// then turns false. In tests (no styles, so no animation) it turns false at once.
 import { useEffect, useState } from 'react';
 import { motionMs, type MotionToken } from './motion';
 
