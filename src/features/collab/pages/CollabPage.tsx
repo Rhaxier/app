@@ -1,4 +1,5 @@
-// Collab finder (reference screen 6): posts from every grade, filtered by skill.
+// Collab finder (reference screen 6; design PDF page 8): posts from every
+// grade, filtered by skill with a row of chips that scrolls sideways.
 import { useState } from 'react';
 import { FilterChip } from '@/components/Chip';
 import { Fab } from '@/components/Fab';
@@ -24,11 +25,11 @@ export function CollabPage() {
   return (
     <div className="stack">
       <PageHeader
+        eyebrow="Across every grade"
         title="Collab finder"
-        subtitle="Find teammates across every grade"
         action={<Fab to="/collab/new" label="Post a project" />}
       />
-      <div className="row-wrap" role="group" aria-label="Filter by skill">
+      <div className="scroll-row" role="group" aria-label="Filter by skill">
         <FilterChip selected={skill === null} onClick={() => setSkill(null)}>
           All skills
         </FilterChip>

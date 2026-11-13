@@ -1,0 +1,38 @@
+/* Quiet rows straight on the canvas, as on the Home mockup: a short date
+   column, then the title and who it's from. Hairlines between rows. */
+.list {
+  display: flex;
+  flex-direction: column;
+}
+
+.list li + li {
+  border-top: 1px solid var(--line);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: var(--space-2);
+  align-items: baseline;
+  min-height: var(--touch-min);
+  padding: 10px 2px;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.when {
+  color: var(--muted);
+  font-size: var(--text-meta);
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.title {
+  font-size: var(--text-body);
+  font-weight: 600;
+}

@@ -1,49 +1,60 @@
-// A student's volunteering event waiting for a teacher: Open, Send back, Approve.
+// A student's volunteering event waiting for a teacher: Send back (with a
+// note, in a sheet) or Approve. The title opens the event.
 import { useState } from 'react';
-import { Button, ButtonLink } from '@/components/Button';
-import { Card } from '@/components/Card';
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/Button';
 import { FormError, TextArea } from '@/components/Input';
 import { Sheet } from '@/components/Sheet';
 import type { VolunteerEvent } from '@/features/volunteering/api';
 import { useSetEventStatus } from '@/features/volunteering/hooks';
 import { formatDate, formatTimeRange } from '@/lib/dates';
 import { errorMessage } from '@/lib/errors';
-import styles from './QueueCard.module.css';
+import { shortWait } from '../logic';
+import { QueueRow } from './QueueRow';
 
-export function EventApprovalCard({ event }: { event: VolunteerEvent }) {
+interface EventApprovalCardProps {
+  event: VolunteerEvent;
+  oldest?: boolean;
+}
+
+export function EventApprovalCard({ event, oldest }: EventApprovalCardProps) {
   const setStatus = useSetEventStatus(event.id);
   const [sendingBack, setSendingBack] = useState(false);
   const [note, setNote] = useState('');
+  const spots = event.roles.reduce((total, role) => total + role.spots_wanted, 0);
 
   return (
-    <Card className={styles.card}>
-      <h3>{event.title}</h3>
-      <p className="meta">
-        By {event.creator?.full_name} · {formatDate(event.starts_at)},{' '}
-        {formatTimeRange(event.starts_at, event.ends_at)}
-      </p>
-      <p className="meta">
-        {event.roles.length} {event.roles.length === 1 ? 'role' : 'roles'} · {event.supw_hours} SUPW
-        hours
-      </p>
+    <QueueRow
+      type="event"
+      title={<Link to={`/volunteer/${event.id}`}>{event.title}</Link>}
+      meta={
+        <>
+          {formatDate(event.starts_at)}, {formatTimeRange(event.starts_at, event.ends_at)} ·{' '}
+          {event.roles.length} {event.roles.length === 1 ? 'role' : 'roles'}, {spots}{' '}
+          {spots === 1 ? 'spot' : 'spots'} · {event.supw_hours} SUPW hours
+        </>
+      }
+      by={event.creator?.full_name}
+      waiting={shortWait(event.created_at)}
+      oldest={oldest}
+      actions={
+        <>
+          <Button variant="secondary" size="small" onClick={() => setSendingBack(true)}>
+            Send back
+          </Button>
+          <Button
+            size="small"
+            loading={setStatus.isPending && !sendingBack}
+            onClick={() => setStatus.mutate({ status: 'published' })}
+          >
+            Approve
+          </Button>
+        </>
+      }
+    >
       <FormError
         message={setStatus.isError && !sendingBack ? errorMessage(setStatus.error) : null}
       />
-      <div className={styles.actions}>
-        <ButtonLink to={`/volunteer/${event.id}`} variant="ghost" size="small">
-          Open
-        </ButtonLink>
-        <Button variant="secondary" size="small" onClick={() => setSendingBack(true)}>
-          Send back
-        </Button>
-        <Button
-          size="small"
-          loading={setStatus.isPending && !sendingBack}
-          onClick={() => setStatus.mutate({ status: 'published' })}
-        >
-          Approve
-        </Button>
-      </div>
       <Sheet
         open={sendingBack}
         title={`Send back: ${event.title}`}
@@ -70,6 +81,6 @@ export function EventApprovalCard({ event }: { event: VolunteerEvent }) {
           Send back
         </Button>
       </Sheet>
-    </Card>
+    </QueueRow>
   );
 }

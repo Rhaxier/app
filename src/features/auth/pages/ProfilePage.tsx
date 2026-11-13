@@ -1,10 +1,13 @@
-// "Me": who you're signed in as, your role and jobs, and sign out.
+// "Me": who you're signed in as, your role and jobs, how the app looks
+// (Appearance: System, Dark or Light), and sign out.
 import { Avatar } from '@/components/Avatar';
 import { Button, ButtonLink } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Tag } from '@/components/Chip';
 import { PageHeader } from '@/components/PageHeader';
+import { SegmentedControl } from '@/components/SegmentedControl';
 import { isAdmin } from '@/lib/permissions';
+import { themeOptions, useThemePreference } from '@/lib/theme';
 import { responsibilityLabel, roleLabel } from '@/lib/status';
 import { useCurrentUser, useSignOut } from '../hooks';
 import styles from './ProfilePage.module.css';
@@ -12,6 +15,7 @@ import styles from './ProfilePage.module.css';
 export function ProfilePage() {
   const user = useCurrentUser();
   const signOut = useSignOut();
+  const [theme, setTheme] = useThemePreference();
 
   const details = [
     roleLabel[user.role],
@@ -43,6 +47,17 @@ export function ProfilePage() {
           </div>
         </Card>
       )}
+
+      <Card className="stack-tight">
+        <h3>Appearance</h3>
+        <p className="meta">System follows your phone or computer. Saved on this device.</p>
+        <SegmentedControl
+          label="Appearance"
+          value={theme}
+          onChange={setTheme}
+          options={themeOptions}
+        />
+      </Card>
 
       <div className="stack-tight">
         <ButtonLink to="/notifications/settings" variant="secondary" icon="settings" fullWidth>

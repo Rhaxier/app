@@ -1,7 +1,8 @@
-// Projects (reference screen 5). Students see their own work with All /
-// Shared / Drafts; teachers see what's been shared with them.
+// Projects (reference screen 5; design PDF page 8). Students see their own
+// work with All / Shared / Drafts, grouped in one card, and one primary
+// action under it: New project. Teachers see what's been shared with them.
 import { useState } from 'react';
-import { Fab } from '@/components/Fab';
+import { ButtonLink } from '@/components/Button';
 import { PageHeader } from '@/components/PageHeader';
 import { SegmentedControl } from '@/components/SegmentedControl';
 import { EmptyState, ErrorState, LoadingState } from '@/components/States';
@@ -10,6 +11,7 @@ import { isStaff } from '@/lib/permissions';
 import { ProjectCard } from '../components/ProjectCard';
 import { useProjects } from '../hooks';
 import { filterProjects, studentSegments, teacherSegments, type ProjectSegment } from '../logic';
+import styles from './ProjectsPage.module.css';
 
 export function ProjectsPage() {
   const user = useCurrentUser();
@@ -21,22 +23,29 @@ export function ProjectsPage() {
   // reviewing other people's work here, so they get the reviewer's view.
   const mine = projects.data?.filter((project) => project.owner_id === user.id) ?? [];
   const others = projects.data?.filter((project) => project.owner_id !== user.id) ?? [];
-  const list = filterProjects(staff ? others : mine, segment);
+  const all = staff ? others : mine;
+  const list = filterProjects(all, segment);
+  // "All 3 · Shared 2 · Drafts 1": each option shows how many it holds.
+  const options = (staff ? teacherSegments : studentSegments).map((option) => ({
+    ...option,
+    count: projects.data ? filterProjects(all, option.value).length : undefined,
+  }));
 
   return (
     <div className="stack">
       <PageHeader
         back={{ to: '/', label: 'Home' }}
+        meta={
+          projects.data ? `${all.length} ${all.length === 1 ? 'project' : 'projects'}` : undefined
+        }
         title="Projects"
-        subtitle={staff ? 'Student work shared with you' : 'Share your work with teachers'}
-        action={!staff && <Fab to="/projects/new" label="New project" />}
+        subtitle={
+          staff
+            ? 'Student work shared with you.'
+            : 'Share your work with teachers. Feedback lands here.'
+        }
       />
-      <SegmentedControl
-        label="Show"
-        value={segment}
-        onChange={setSegment}
-        options={staff ? teacherSegments : studentSegments}
-      />
+      <SegmentedControl label="Show" value={segment} onChange={setSegment} options={options} />
       {projects.isPending && <LoadingState />}
       {projects.isError && <ErrorState error={projects.error} onRetry={() => projects.refetch()} />}
       {projects.data && list.length === 0 && (
@@ -46,11 +55,20 @@ export function ProjectsPage() {
             : 'Add a project, then share it with a teacher for feedback.'}
         </EmptyState>
       )}
-      <div className="stack-tight">
-        {list.map((project) => (
-          <ProjectCard key={project.id} project={project} showOwner={staff} canShare={!staff} />
-        ))}
-      </div>
+      {list.length > 0 && (
+        <ul className={styles.list}>
+          {list.map((project) => (
+            <li key={project.id}>
+              <ProjectCard project={project} showOwner={staff} canShare={!staff} />
+            </li>
+          ))}
+        </ul>
+      )}
+      {!staff && (
+        <ButtonLink to="/projects/new" icon="plus" fullWidth>
+          New project
+        </ButtonLink>
+      )}
     </div>
   );
 }

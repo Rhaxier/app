@@ -1,6 +1,6 @@
 // SUPW volunteering: plain functions the screens use to decide what to show.
 // No React and no Supabase, so they're simple to test (volunteering.test.tsx).
-import { fromDateTimeInputValue, isThisWeek, toDateTimeInputValue } from '@/lib/dates';
+import { fromDateTimeInputValue, isThisWeek, toDateTimeInputValue, weeksAgo } from '@/lib/dates';
 import type { EventInput, EventRole, MySignup, RoleInput, VolunteerEvent } from './api';
 
 /** Signed up, selected or waitlisted: still taking part. */
@@ -48,6 +48,33 @@ export function hasStarted(
 /** Total confirmed SUPW hours from a student's own sign-ups. */
 export function hoursSoFar(signups: Pick<MySignup, 'hours_confirmed'>[]): number {
   return signups.reduce((total, signup) => total + (signup.hours_confirmed ?? 0), 0);
+}
+
+/**
+ * Confirmed hours in each of the last few school weeks, oldest first: the
+ * small chart beside your total (design PDF page 7, "Hours as a number").
+ * A sign-up counts in the week its event happened.
+ */
+export function hoursByWeek(
+  signups: Pick<MySignup, 'event_id' | 'hours_confirmed'>[],
+  events: Pick<VolunteerEvent, 'id' | 'starts_at'>[],
+  now: Date = new Date(),
+  weeks = 8,
+): number[] {
+  const startsAt = new Map(events.map((event) => [event.id, event.starts_at]));
+  const totals: number[] = Array(weeks).fill(0);
+  for (const signup of signups) {
+    const start = startsAt.get(signup.event_id);
+    if (!signup.hours_confirmed || !start) continue;
+    const ago = weeksAgo(start, now);
+    if (ago >= 0 && ago < weeks) totals[weeks - 1 - ago] += signup.hours_confirmed;
+  }
+  return totals;
+}
+
+/** Your sign-up for an event that's still taking part, if any (the "You're in" chip). */
+export function activeSignupFor(eventId: string, signups: MySignup[]): MySignup | undefined {
+  return signups.find((signup) => signup.event_id === eventId && isActiveSignup(signup));
 }
 
 export type VolunteerFilter = 'all' | 'week' | 'school' | 'mine';

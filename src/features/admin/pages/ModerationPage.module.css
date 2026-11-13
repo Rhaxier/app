@@ -12,7 +12,7 @@
 }
 
 .top :global(.label) {
-  color: var(--color-muted);
+  color: var(--muted);
 }
 
 /* The reported content, set apart like a quotation. */
@@ -22,9 +22,9 @@
   gap: var(--space-1);
   margin: 0;
   padding: var(--space-3);
-  border-left: 3px solid var(--color-border);
-  border-radius: var(--radius-small);
-  background: var(--color-bg);
+  border-left: 3px solid var(--line);
+  border-radius: var(--r-tag);
+  background: var(--card2);
 }
 
 .title {
@@ -32,6 +32,6 @@
 }
 
 .excerpt {
-  font-size: var(--text-small);
+  font-size: var(--text-body);
   white-space: pre-line;
 }

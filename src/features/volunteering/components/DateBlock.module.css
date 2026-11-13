@@ -1,28 +1,27 @@
+/* "18 / SAT OCT": the day large, the weekday and month in small caps under it. */
 .block {
   display: flex;
+  flex: none;
   flex-direction: column;
   align-items: center;
-  flex: none;
-  width: 44px;
-  padding-right: var(--space-3);
-  border-right: 1px solid var(--color-border);
-  line-height: 1.1;
-}
-
-.month {
-  color: var(--color-alert);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: var(--tracking-label);
+  width: 46px;
+  padding-top: 2px;
+  line-height: 1;
 }
 
 .day {
-  font-family: var(--font-heading);
-  font-size: 24px;
+  font-size: 32px;
   font-weight: 700;
+  letter-spacing: var(--tracking-large-title);
 }
 
-.weekday {
-  color: var(--color-muted);
-  font-size: 11px;
+.when {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 12px;
+  letter-spacing: var(--tracking-caps);
+  text-align: center;
+  text-transform: uppercase;
 }

@@ -1,0 +1,125 @@
+/*
+ * A phone stacks each row:   type ............ waiting
+ *                            title
+ *                            meta · requested by
+ *                            ............... actions
+ * In a wide queue (the list is at least 760px, see the container in
+ * ApprovalsPage.module.css) the rows line up as the desk view's table.
+ */
+.row {
+  display: grid;
+  grid-template-areas:
+    'type waiting'
+    'item item'
+    'by by'
+    'actions actions'
+    'extra extra';
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px var(--space-3);
+  padding: 14px 18px;
+}
+
+.type {
+  grid-area: type;
+}
+
+.item {
+  grid-area: item;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.title {
+  font-size: var(--text-reading);
+  line-height: 20px;
+}
+
+.title a {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.title a:hover {
+  text-decoration: underline;
+}
+
+.by {
+  grid-area: by;
+  min-width: 0;
+  color: var(--muted);
+  font-size: var(--text-body);
+}
+
+.waiting {
+  grid-area: waiting;
+  color: var(--muted);
+  font-size: var(--text-body);
+}
+
+/* "Oldest waiting item flagged" (page 9). */
+.oldest {
+  color: var(--fixink);
+  font-weight: 600;
+}
+
+.actions {
+  grid-area: actions;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  margin-top: 4px;
+}
+
+.extra {
+  grid-area: extra;
+}
+
+.extra:empty {
+  display: none;
+}
+
+.heading {
+  display: none;
+}
+
+@container queue (min-width: 760px) {
+  .row,
+  .heading {
+    grid-template-areas:
+      'type item by waiting actions'
+      'type extra extra extra extra';
+    /* Fixed actions width: every row is its own grid, so columns only line
+       up with the heading if none of them depends on the row's content. */
+    grid-template-columns: 96px minmax(0, 1fr) minmax(0, 0.5fr) 64px 252px;
+    gap: 2px var(--space-4);
+  }
+
+  .row {
+    padding: 12px 18px;
+  }
+
+  .type {
+    align-self: start;
+    padding-top: 1px;
+  }
+
+  .actions {
+    margin-top: 0;
+  }
+
+  .heading {
+    display: grid;
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--line);
+    color: var(--muted);
+    font-size: var(--text-caps);
+    font-weight: 500;
+    letter-spacing: var(--tracking-caps);
+    text-transform: uppercase;
+  }
+}

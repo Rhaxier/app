@@ -1,41 +1,52 @@
-.card {
+/* The room sheet over the map: thick glass (the glass and thick classes),
+   radius 32 like every sheet. */
+.sheet {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  box-shadow: var(--shadow-float);
+  padding: var(--space-4) 18px 18px;
+  border-radius: var(--r-sheet);
 }
 
 .roomLabel {
-  color: var(--color-accent);
+  color: var(--acc);
 }
 
-.reportLabel {
-  color: var(--color-alert);
-}
-
-.title {
-  font-family: var(--font-body);
-  font-size: 18px;
-  font-weight: 600;
+/* Room codes are set in Geist Mono, as on the plan. */
+.code {
+  font-family: var(--font-mono);
   letter-spacing: 0;
 }
 
+.title {
+  font-size: var(--text-display);
+  font-weight: 700;
+  line-height: 26px;
+}
+
 .busy {
-  color: var(--color-accent);
-  font-size: var(--text-small);
+  color: var(--okink);
+  font-size: var(--text-body);
   font-weight: 600;
 }
 
-.top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--space-3);
+.reports {
+  color: var(--fixink);
+  font-size: var(--text-body);
+  font-weight: 500;
 }
 
+/* Book (when the room is a venue) and Report an issue, the main action. */
 .actions {
-  display: grid;
-  grid-template-columns: 1fr 1.4fr;
-  gap: var(--space-3);
+  display: flex;
+  gap: 10px;
   margin-top: var(--space-2);
+}
+
+.actions > * {
+  flex: 1;
+}
+
+.actions > :last-child {
+  flex: 1.5;
 }

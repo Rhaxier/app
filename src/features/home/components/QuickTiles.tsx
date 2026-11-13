@@ -1,48 +1,60 @@
-// The six tool tiles on Home (design: 3 × 2 grid, icon in a soft square).
-// "Report issue" is orange because fix-it actions use the alert colour.
+// The six tools on Home (design PDF page 6: "Six tools, one calm grid"): one
+// card split by hairlines, not six separate cards. Each tool has a line icon,
+// its name, a small count, and a dot when there's something new (blue) or
+// something broken (orange).
 import { Link } from 'react-router-dom';
 import { Icon, type IconName } from '@/components/Icon';
 import { useCurrentUser } from '@/features/auth/hooks';
 import type { FeatureName } from '@/features/settings/api';
 import { useFeatureVisible } from '@/features/settings/hooks';
 import { isAdmin } from '@/lib/permissions';
+import { useToolHints } from '../hooks';
+import type { ToolKey } from '../logic';
 import styles from './QuickTiles.module.css';
 
 // Tiles for switched-off features are left out (Admin > System > Feature switches).
-const tiles: {
-  to: string;
-  label: string;
-  icon: IconName;
-  feature: FeatureName;
-  alert?: boolean;
-}[] = [
-  { to: '/map', label: 'Campus map', icon: 'map', feature: 'map' },
-  { to: '/volunteer', label: 'Volunteer', icon: 'heart', feature: 'volunteering' },
-  { to: '/projects', label: 'Projects', icon: 'folder', feature: 'projects' },
-  { to: '/book', label: 'Book a venue', icon: 'calendar', feature: 'venues' },
-  { to: '/collab', label: 'Collab finder', icon: 'users', feature: 'collab' },
-  { to: '/map/report', label: 'Report issue', icon: 'camera', feature: 'fixit', alert: true },
+const tiles: { key: ToolKey; to: string; label: string; icon: IconName; feature: FeatureName }[] = [
+  { key: 'map', to: '/map', label: 'Map', icon: 'map', feature: 'map' },
+  {
+    key: 'volunteer',
+    to: '/volunteer',
+    label: 'Volunteer',
+    icon: 'heart',
+    feature: 'volunteering',
+  },
+  { key: 'projects', to: '/projects', label: 'Projects', icon: 'folder', feature: 'projects' },
+  { key: 'book', to: '/book', label: 'Book', icon: 'calendar', feature: 'venues' },
+  { key: 'collab', to: '/collab', label: 'Collab', icon: 'users', feature: 'collab' },
+  { key: 'report', to: '/map/report', label: 'Report', icon: 'wrench', feature: 'fixit' },
 ];
+
+const dotWords = { new: 'new for you', problem: 'needs fixing' };
 
 export function QuickTiles() {
   const visible = useFeatureVisible(isAdmin(useCurrentUser()));
+  const hints = useToolHints();
   return (
     <nav aria-label="Tools">
       <ul className={styles.grid}>
         {tiles
           .filter((tile) => visible(tile.feature))
-          .map((tile) => (
-            <li key={tile.to}>
-              <Link to={tile.to} className={`${styles.tile} pressable`}>
-                <span
-                  className={[styles.icon, tile.alert && styles.alert].filter(Boolean).join(' ')}
-                >
-                  <Icon name={tile.icon} size={20} />
-                </span>
-                {tile.label}
-              </Link>
-            </li>
-          ))}
+          .map((tile) => {
+            const hint = hints[tile.key];
+            return (
+              <li key={tile.key}>
+                <Link to={tile.to} className={`${styles.tile} pressable`}>
+                  <Icon name={tile.icon} size={21} className={styles.icon} />
+                  {hint.dot && (
+                    <span className={`${styles.dot} ${styles[hint.dot]}`}>
+                      <span className="visually-hidden">{dotWords[hint.dot]}</span>
+                    </span>
+                  )}
+                  <span className={styles.label}>{tile.label}</span>
+                  <span className={styles.sub}>{hint.sub}</span>
+                </Link>
+              </li>
+            );
+          })}
       </ul>
     </nav>
   );

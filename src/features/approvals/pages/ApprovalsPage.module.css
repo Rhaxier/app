@@ -1,0 +1,146 @@
+/* The desk view (design PDF page 9). On a laptop the page uses the wide
+   column (AppLayout); on a phone it's the usual phone column. */
+.page {
+  padding-bottom: var(--space-4);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.topRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: var(--touch-min);
+  color: var(--muted);
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.name {
+  color: var(--muted);
+}
+
+/* "Search or jump to… ⌘K": a search field look, only where there's room. */
+.jump {
+  display: none;
+  gap: var(--space-2);
+  min-width: 260px;
+  justify-content: flex-start;
+  border-radius: var(--r-search);
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.kbd {
+  margin-left: auto;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: var(--segbg);
+  color: var(--muted);
+  font-family: var(--font);
+  font-size: var(--text-meta);
+}
+
+/* Four counts in one card, split by hairlines: two by two on a phone, one
+   row on a laptop. */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  margin: 0;
+  overflow: hidden;
+  border-radius: var(--r-card);
+  background: var(--card);
+  box-shadow: var(--e1);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 18px;
+  box-shadow:
+    1px 0 0 var(--line),
+    0 1px 0 var(--line);
+}
+
+.stat dt {
+  color: var(--muted);
+  font-size: var(--text-caps);
+  font-weight: 500;
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+}
+
+.stat dd {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.number {
+  font-size: var(--text-large-title);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: var(--tracking-large-title);
+}
+
+.flag {
+  color: var(--fixink);
+  font-size: var(--text-meta);
+  font-weight: 500;
+}
+
+.queueHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.queueTitle {
+  font-size: var(--text-title);
+}
+
+.queueCount {
+  margin-left: 4px;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+/* The queue: one card; the rows decide between table and stack by its width. */
+.queue {
+  container: queue / inline-size;
+  overflow: hidden;
+  border-radius: var(--r-card);
+  background: var(--card);
+  box-shadow: var(--e1);
+}
+
+.rows > li + li {
+  border-top: 1px solid var(--line);
+}
+
+@media (min-width: 900px) {
+  .jump {
+    display: inline-flex;
+  }
+
+  .stats {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .stat {
+    padding: 16px 20px;
+  }
+}

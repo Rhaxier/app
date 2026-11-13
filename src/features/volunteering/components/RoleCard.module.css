@@ -12,11 +12,11 @@
 }
 
 .description {
-  font-size: var(--text-small);
+  font-size: var(--text-body);
 }
 
 .selected {
-  color: var(--color-accent);
-  font-size: var(--text-small);
+  color: var(--acc);
+  font-size: var(--text-body);
   font-weight: 500;
 }

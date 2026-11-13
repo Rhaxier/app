@@ -1,12 +1,12 @@
 .hint {
-  color: var(--color-accent);
-  font-size: var(--text-small);
+  color: var(--acc);
+  font-size: var(--text-body);
   font-weight: 600;
 }
 
 .heading {
-  font-family: var(--font-body);
-  font-size: var(--text-card-title);
+  font-family: var(--font);
+  font-size: var(--text-title);
   font-weight: 600;
   letter-spacing: 0;
 }

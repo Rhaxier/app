@@ -3,15 +3,15 @@
   align-items: flex-start;
   gap: var(--space-3);
   padding: var(--space-4);
-  border-radius: var(--radius-card);
-  background: var(--color-alert-soft);
-  color: var(--color-alert-ink);
+  border-radius: var(--r-card);
+  background: var(--fixsoft);
+  color: var(--fixink);
   font-weight: 600;
 }
 
 .safety svg {
   flex: none;
-  color: var(--color-alert);
+  color: var(--fix);
 }
 
 .fieldset {
@@ -26,12 +26,12 @@
 .legend {
   padding: 0;
   margin-bottom: var(--space-1);
-  font-size: var(--text-small);
+  font-size: var(--text-body);
   font-weight: 600;
 }
 
 .error {
-  color: var(--color-alert-ink);
+  color: var(--fixink);
   font-size: var(--text-meta);
   font-weight: 500;
 }

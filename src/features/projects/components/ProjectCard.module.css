@@ -1,7 +1,10 @@
-.card {
+/* A row in the Projects card. The card draws the hairlines between rows. */
+.row {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+  padding: 14px 18px;
 }
 
 .top {
@@ -14,25 +17,53 @@
 .titles {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
   min-width: 0;
 }
 
+.title {
+  font-size: var(--text-reading);
+}
+
 .link {
-  color: var(--color-ink);
+  color: var(--ink);
   text-decoration: none;
 }
 
-.link:hover {
-  text-decoration: underline;
+/* The whole row is the link's tap area (the feedback and Share stay their own). */
+.link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
 }
 
+/* The teacher's words, quoted large, with who and when underneath. */
 .feedback {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-3);
-  padding: var(--space-3);
-  border-radius: 12px;
-  background: var(--color-bg);
-  font-size: var(--text-small);
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: var(--r-thumb);
+  background: var(--segbg);
+}
+
+.quote {
+  margin: 0 0 6px;
+  color: var(--ink2);
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 23px;
+  letter-spacing: var(--tracking-title);
+}
+
+/* The quote marks are drawn, not typed, so the words themselves stay as written. */
+.quote p::before {
+  content: '“';
+}
+
+.quote p::after {
+  content: '”';
+}
+
+.share {
+  position: relative;
+  z-index: 1;
 }

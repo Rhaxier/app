@@ -46,15 +46,30 @@ export function roomsInUse(
   return inUse;
 }
 
+export interface ReportSpot<R> {
+  /** The room's id, or the report's own id for one placed outside a room. */
+  key: string;
+  x: number;
+  y: number;
+  /** In the order given (the feed is newest first). */
+  reports: R[];
+}
+
 /**
- * Where to draw the n-th fix-it pin in a room. Reports share their room's
- * position, so they're nudged to the right (and along, if there are several)
- * to keep the room pin visible.
+ * Where to draw the fix-it count pins: one per room, counting its open
+ * reports (design PDF page 11), and one for each report placed outside a
+ * room. Reports share their room's position, so the pin is nudged up and to
+ * the right, keeping the room's own pin visible and tappable.
  */
-export function reportPinPosition(
-  x: number,
-  y: number,
-  indexInRoom: number,
-): { x: number; y: number } {
-  return { x: x + 45 + indexInRoom * 35, y: y - 30 };
+export function reportSpots<R extends { id: string; room_id: string | null; x: number; y: number }>(
+  reports: R[],
+): ReportSpot<R>[] {
+  const spots = new Map<string, ReportSpot<R>>();
+  for (const report of reports) {
+    const key = report.room_id ?? report.id;
+    const spot = spots.get(key);
+    if (spot) spot.reports.push(report);
+    else spots.set(key, { key, x: report.x + 45, y: report.y - 30, reports: [report] });
+  }
+  return [...spots.values()];
 }

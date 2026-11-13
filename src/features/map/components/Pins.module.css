@@ -1,40 +1,108 @@
-/* Leaflet positions these boxes; the styles only draw them. */
+/* Leaflet sizes and positions the 44px box (the tap area); these styles
+   draw what's inside it, centred (design PDF page 11, "The small things"). */
+.pin {
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+}
+
+.pin > span {
+  grid-area: 1 / 1;
+}
+
 .room,
 .busy,
 .report {
-  display: grid;
-  place-items: center;
-  border: 2px solid var(--color-card);
-  box-shadow: 0 2px 6px rgba(21, 32, 43, 0.25);
   cursor: pointer;
 }
 
-.room {
+/* A room nobody has chosen: a quiet dot, so the plan stays the main thing. */
+.roomDot {
+  width: 9px;
+  height: 9px;
+  border: 1.5px solid var(--paper);
   border-radius: 50%;
-  background: var(--color-accent);
+  background: var(--ink2);
+  opacity: 0.75;
 }
 
-.busy {
-  border-radius: 50%;
-  background: var(--color-ink);
-  outline: 3px solid var(--color-accent-soft);
-}
-
-.report {
+/* Selected room: fill accent 20% (light 10%), stroke 1.6px accent, the room
+   code turns light blue. */
+.roomTag {
+  padding: 3px 8px;
+  border: 1.6px solid var(--acc);
   border-radius: 6px;
-  background: var(--color-alert);
-  color: var(--color-on-accent);
-  font-weight: 700;
+  background: color-mix(in srgb, var(--acc) 20%, var(--paper));
+  color: var(--selroom);
+  font-family: var(--font-mono);
   font-size: 12px;
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+  box-shadow: var(--e2);
 }
 
-/* The pin whose details are open below the map. */
-.selected {
-  outline: 4px solid rgba(164, 82, 15, 0.3);
-  outline-offset: 2px;
+:global(.light) .roomTag {
+  background: color-mix(in srgb, var(--acc) 10%, var(--card));
 }
 
-.room.selected,
-.busy.selected {
-  outline-color: rgba(14, 104, 87, 0.35);
+/* In use now: an approved booking is on (green = approved). */
+.busyDot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--okink);
+  box-shadow: 0 0 0 4px var(--ok);
+}
+
+/* Fix-it count pin: 26px orange, 11px white numeral, 40px outer ring 1px at 35%. */
+.countRing {
+  width: 40px;
+  height: 40px;
+  border: 1px solid color-mix(in srgb, var(--fix) 35%, transparent);
+  border-radius: 50%;
+}
+
+.count {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--fix);
+  color: var(--onacc);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* The pin whose details are open: a little lift. */
+.selected .count {
+  box-shadow: var(--e2);
+  transform: scale(1.12);
+}
+
+.selected .countRing {
+  border-color: color-mix(in srgb, var(--fix) 70%, transparent);
+}
+
+/* "You are here": 7px core, 16px halo at 14%, no stroke, no shadow. */
+.hereHalo {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--acc) 14%, transparent);
+}
+
+.hereCore {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--acc);
+}
+
+/* Leaflet's keyboard focus on a pin. */
+.pin:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: -4px;
 }

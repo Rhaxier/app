@@ -1,7 +1,7 @@
 /* Shared by the simple admin list pages. */
 .cardTitle {
-  font-family: var(--font-body);
-  font-size: var(--text-card-title);
+  font-family: var(--font);
+  font-size: var(--text-title);
   font-weight: 600;
   letter-spacing: 0;
 }
@@ -12,7 +12,7 @@
   justify-content: space-between;
   gap: var(--space-3);
   min-height: var(--touch-min);
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--line);
 }
 
 .row:last-child {
@@ -28,7 +28,7 @@
   border: 0;
   border-radius: 50%;
   background: transparent;
-  color: var(--color-muted);
+  color: var(--muted);
   cursor: pointer;
 }
 
@@ -40,8 +40,8 @@
 }
 
 .warning {
-  color: var(--color-alert-ink);
-  font-size: var(--text-small);
+  color: var(--fixink);
+  font-size: var(--text-body);
   font-weight: 500;
 }
 
@@ -59,8 +59,8 @@
   min-height: var(--height-chip);
   padding-left: 14px;
   border-radius: var(--radius-pill);
-  background: var(--color-quiet);
-  font-size: var(--text-small);
+  background: var(--card2);
+  font-size: var(--text-body);
   font-weight: 500;
 }
 
@@ -73,7 +73,7 @@
   border: 0;
   border-radius: 50%;
   background: transparent;
-  color: var(--color-muted);
+  color: var(--muted);
   cursor: pointer;
 }
 
@@ -111,16 +111,16 @@
   place-items: center;
   width: var(--touch-min);
   height: var(--touch-min);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-small);
-  background: var(--color-card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-tag);
+  background: var(--card);
   cursor: pointer;
 }
 
 .iconChoice[aria-pressed='true'] {
-  border-color: var(--color-ink);
-  background: var(--color-ink);
-  color: var(--color-on-accent);
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--onink);
 }
 
 /* A person on the left, their setting on the right (stacks on a phone). */

@@ -16,7 +16,7 @@
 }
 
 .groupTitle {
-  color: var(--color-muted);
+  color: var(--muted);
 }
 
 .list {
@@ -35,28 +35,28 @@
   gap: var(--space-3);
   min-height: 64px;
   padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-card);
-  background: var(--color-card);
-  color: var(--color-ink);
+  border-radius: var(--r-card);
+  background: var(--card);
+  color: var(--ink);
   text-decoration: none;
 }
 
 .compact .link {
   min-height: var(--touch-min);
   padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-small);
+  border-radius: var(--r-tag);
   background: transparent;
-  font-size: var(--text-small);
+  font-size: var(--text-body);
 }
 
 .compact .link:hover {
-  background: var(--color-card);
+  background: var(--card);
 }
 
 /* NavLink marks the current section with aria-current="page". */
 .compact .link[aria-current='page'] {
-  background: var(--color-accent-soft);
-  color: var(--color-accent);
+  background: var(--accsoft);
+  color: var(--acc);
   font-weight: 600;
 }
 
@@ -66,9 +66,9 @@
   flex: none;
   width: 40px;
   height: 40px;
-  border-radius: 12px;
-  background: var(--color-accent-soft);
-  color: var(--color-accent);
+  border-radius: var(--r-tag);
+  background: var(--accsoft);
+  color: var(--acc);
 }
 
 .compact .icon {

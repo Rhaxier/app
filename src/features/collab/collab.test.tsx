@@ -10,6 +10,7 @@ import {
   allSkills,
   emptyCollabValues,
   filledLabel,
+  openLabel,
   filterBySkill,
   joinState,
   parseSkills,
@@ -51,6 +52,12 @@ describe('"x of y filled"', () => {
   it('counts accepted students against the number wanted', () => {
     expect(filledLabel(makePost())).toBe('2 of 3 spots filled');
     expect(spotsLeft(makePost())).toBe(1);
+  });
+
+  it('says how many spots are still open, for the dots on a post', () => {
+    expect(openLabel(makePost())).toBe('1 of 3 spots open');
+    expect(openLabel(makePost({ spots_wanted: 1, accepted_count: 0 }))).toBe('1 of 1 spot open');
+    expect(openLabel(makePost({ spots_wanted: 2, accepted_count: 3 }))).toBe('0 of 2 spots open');
   });
 
   it('uses the singular for one spot and never shows more filled than wanted', () => {

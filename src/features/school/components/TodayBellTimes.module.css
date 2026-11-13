@@ -5,9 +5,9 @@
   gap: var(--space-3);
   min-height: 64px;
   padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-card);
-  background: var(--color-card);
-  color: var(--color-ink);
+  border-radius: var(--r-card);
+  background: var(--card);
+  color: var(--ink);
   text-decoration: none;
 }
 
@@ -17,9 +17,9 @@
   place-items: center;
   width: 40px;
   height: 40px;
-  border-radius: var(--radius-small);
-  background: var(--color-accent-soft);
-  color: var(--color-accent);
+  border-radius: var(--r-tag);
+  background: var(--accsoft);
+  color: var(--acc);
 }
 
 .text {

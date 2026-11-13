@@ -1,11 +1,24 @@
-.card {
+/* Thick glass (the glass and thick classes), radius 32 like every sheet. */
+.sheet {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
-  box-shadow: var(--shadow-float);
+  gap: 10px;
+  padding: var(--space-4) 18px 18px;
+  border-radius: var(--r-sheet);
 }
 
 .top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.label {
+  color: var(--fixink);
+}
+
+.titleRow {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -19,35 +32,108 @@
   min-width: 0;
 }
 
-.label {
-  color: var(--color-alert);
-}
-
 .title {
-  font-family: var(--font-body);
-  font-size: 18px;
-  font-weight: 600;
-  letter-spacing: 0;
+  font-size: var(--text-display);
+  font-weight: 700;
+  line-height: 26px;
 }
 
 .title a {
-  color: var(--color-ink);
+  color: var(--ink);
   text-decoration: none;
 }
 
+/* A photo was added: a 16-radius thumbnail tile (page 10). */
 .thumb {
   display: grid;
-  place-items: center;
   flex: none;
-  width: 60px;
-  height: 60px;
-  border-radius: 12px;
-  background: var(--color-quiet);
-  color: var(--color-muted);
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: var(--r-thumb);
+  background: var(--segbg);
+  color: var(--ink2);
+}
+
+/*
+ * Progress: a 2px rail with the filled part up to the current step, and the
+ * four step names under it. --fill (0–1) sets how much is filled.
+ */
+.track {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  padding-top: 10px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.track::before,
+.track::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 2px;
+  border-radius: 1px;
+}
+
+.track::before {
+  right: 0;
+  background: var(--segbg);
+}
+
+.track::after {
+  width: calc(var(--fill) * 100%);
+  background: var(--ink);
+}
+
+.track li:last-child {
+  text-align: right;
+}
+
+.track li:nth-child(2),
+.track li:nth-child(3) {
+  text-align: center;
+}
+
+.done {
+  color: var(--ink);
+}
+
+/* Several open reports at this pin: step through them. */
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.pagerButtons {
+  display: flex;
+}
+
+.pagerButton {
+  display: grid;
+  place-items: center;
+  width: var(--touch-min);
+  height: var(--touch-min);
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.pagerButton:disabled {
+  color: var(--faint);
+  cursor: default;
 }
 
 .actions {
   display: grid;
-  grid-template-columns: 1fr 1.3fr;
-  gap: var(--space-3);
+  grid-template-columns: 1fr 1.5fr;
+  gap: 10px;
+  margin-top: 4px;
 }

@@ -3,7 +3,7 @@
 import { describe, expect, it } from 'vitest';
 import type { CalendarBooking } from '@/features/venues/api';
 import type { Room } from './api';
-import { fromLatLng, reportPinPosition, roomsInUse, searchRooms, toLatLng } from './logic';
+import { fromLatLng, reportSpots, roomsInUse, searchRooms, toLatLng } from './logic';
 
 const floor = { width: 1000, height: 700 };
 
@@ -71,9 +71,23 @@ describe('roomsInUse', () => {
   });
 });
 
-describe('reportPinPosition', () => {
-  it('nudges fix-it pins off the room pin, one after another', () => {
-    expect(reportPinPosition(500, 485, 0)).toEqual({ x: 545, y: 455 });
-    expect(reportPinPosition(500, 485, 1)).toEqual({ x: 580, y: 455 });
+describe('reportSpots', () => {
+  it('gives each room one count pin, nudged off the room pin', () => {
+    const report = (id: string, roomId: string | null, x = 500, y = 485) => ({
+      id,
+      room_id: roomId,
+      x,
+      y,
+    });
+    const spots = reportSpots([
+      report('r1', 'G.15'),
+      report('r2', 'G.15'),
+      report('r3', null, 100, 100),
+    ]);
+    expect(spots).toHaveLength(2);
+    expect(spots[0]).toMatchObject({ key: 'G.15', x: 545, y: 455 });
+    expect(spots[0].reports.map((r) => r.id)).toEqual(['r1', 'r2']);
+    // A report outside any room keeps a pin of its own.
+    expect(spots[1]).toMatchObject({ key: 'r3', x: 145, y: 70 });
   });
 });

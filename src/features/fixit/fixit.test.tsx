@@ -3,6 +3,7 @@
 // supabase/tests/08_fixit_test.sql.
 import { describe, expect, it } from 'vitest';
 import {
+  progressStep,
   reportLabel,
   reportSummary,
   reportTitle,
@@ -67,6 +68,16 @@ describe('the map card text', () => {
     expect(reportSummary({ created_at: '2026-10-18T05:00:00Z', routed_to: 'it' }, now)).toBe(
       'Reported yesterday · Sent to IT',
     );
+  });
+
+  it('places a report on the Open · Seen · Fixing · Fixed track', () => {
+    expect(progressStep('open')).toBe(0);
+    expect(progressStep('acknowledged')).toBe(1);
+    expect(progressStep('in_progress')).toBe(2);
+    expect(progressStep('resolved')).toBe(3);
+    // Closed another way: no place on the track; the card shows the status.
+    expect(progressStep('duplicate')).toBeNull();
+    expect(progressStep('wont_fix')).toBeNull();
   });
 
   it('uses the first line of the description as the title, shortened', () => {

@@ -1,6 +1,6 @@
 .heading {
-  font-family: var(--font-body);
-  font-size: var(--text-card-title);
+  font-family: var(--font);
+  font-size: var(--text-title);
   font-weight: 600;
   letter-spacing: 0;
 }
@@ -17,17 +17,17 @@
 .legend {
   padding: 0;
   margin-bottom: var(--space-1);
-  font-size: var(--text-small);
+  font-size: var(--text-body);
   font-weight: 600;
 }
 
 .error {
-  color: var(--color-alert-ink);
+  color: var(--fixink);
   font-size: var(--text-meta);
 }
 
 .saved {
-  color: var(--color-accent);
+  color: var(--acc);
   font-weight: 600;
   text-align: center;
 }

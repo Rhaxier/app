@@ -18,12 +18,17 @@
 }
 
 .muted {
-  color: var(--color-muted);
+  color: var(--muted);
+}
+
+/* A little more room above the skills than between other lines. */
+.lookingFor {
+  margin-top: 6px;
 }
 
 .hidden {
-  background: var(--color-alert-soft);
-  color: var(--color-alert-ink);
+  background: var(--fixsoft);
+  color: var(--on-fixsoft);
 }
 
 .hiddenTitle {

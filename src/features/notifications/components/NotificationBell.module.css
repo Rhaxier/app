@@ -1,29 +1,31 @@
+/* A 40px round glass button (44px to tap). Unread notifications show as the
+   design's dot (page 11): 7px system blue, a 2px ring in the surface colour,
+   9px from the top and 10px from the right. The count is read out by screen
+   readers (the link's label) and listed in the inbox. */
 .bell {
   position: relative;
   display: grid;
-  place-items: center;
   flex: none;
-  width: 48px;
-  height: 48px;
-  border: 1px solid var(--color-border);
+  place-items: center;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  background: var(--color-card);
-  color: var(--color-ink);
+  color: var(--ink);
 }
 
-.badge {
+.bell::before {
+  content: '';
   position: absolute;
-  top: 4px;
-  right: 2px;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 5px;
-  border: 2px solid var(--color-card);
-  border-radius: var(--radius-pill);
-  background: var(--color-alert);
-  color: var(--color-on-accent);
-  font-size: 10px;
-  font-weight: 600;
-  line-height: 14px;
-  text-align: center;
+  inset: -2px;
+}
+
+.dot {
+  position: absolute;
+  top: 9px;
+  right: 10px;
+  width: 11px;
+  height: 11px;
+  border: 2px solid var(--card);
+  border-radius: 50%;
+  background: var(--acc);
 }

@@ -18,7 +18,7 @@ import { makeUser, renderWithProviders, teacher } from '@/test/utils';
 import type { Announcement } from './api';
 import { AnnouncementCard } from './components/AnnouncementCard';
 import { AnnouncementForm } from './components/AnnouncementForm';
-import { audienceLabel } from './format';
+import { audienceLabel, splitForHome } from './format';
 import {
   announcementState,
   emptyAnnouncementValues,
@@ -215,6 +215,22 @@ describe('AnnouncementCard', () => {
       <AnnouncementCard announcement={{ ...pinned, posted_as: null, pinned: false }} />,
     );
     expect(screen.getByText('Admin Plain')).toBeInTheDocument();
+  });
+
+  it('puts pinned and emergency posts in the big card on Home, emergencies first', () => {
+    const plain = (id: string) => ({ ...pinned, id, pinned: false });
+    const emergency = { ...pinned, id: 'e1', pinned: false, urgent: true };
+    const { featured, rest } = splitForHome([
+      pinned,
+      emergency,
+      plain('p1'),
+      plain('p2'),
+      plain('p3'),
+      plain('p4'),
+    ]);
+    expect(featured.map((a) => a.id)).toEqual(['e1', 'a1']);
+    // The list under the tools shows the three newest of the rest.
+    expect(rest.map((a) => a.id)).toEqual(['p1', 'p2', 'p3']);
   });
 
   it('describes the audience', () => {

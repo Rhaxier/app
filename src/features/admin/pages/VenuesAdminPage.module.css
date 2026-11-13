@@ -6,8 +6,8 @@
   width: 100%;
   padding: var(--space-3) var(--space-4);
   border: 0;
-  border-radius: var(--radius-card);
-  background: var(--color-card);
+  border-radius: var(--r-card);
+  background: var(--card);
   text-align: left;
   cursor: pointer;
 }

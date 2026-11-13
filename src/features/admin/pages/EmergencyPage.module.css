@@ -1,9 +1,9 @@
 .warning {
   padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-input);
-  background: var(--color-alert-soft);
-  color: var(--color-alert-ink);
-  font-size: var(--text-small);
+  border-radius: var(--r-field);
+  background: var(--fixsoft);
+  color: var(--fixink);
+  font-size: var(--text-body);
 }
 
 /* How the message will look, inside the confirmation. */
@@ -12,9 +12,9 @@
   flex-direction: column;
   gap: var(--space-1);
   padding: var(--space-3) var(--space-4);
-  border-left: 4px solid var(--color-alert);
-  border-radius: var(--radius-small);
-  background: var(--color-bg);
+  border-left: 4px solid var(--fix);
+  border-radius: var(--r-tag);
+  background: var(--card2);
   overflow-wrap: anywhere;
 }
 

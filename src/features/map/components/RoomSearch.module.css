@@ -1,70 +1,88 @@
 .wrap {
   position: relative;
+  flex: 1;
+  min-width: 0;
 }
 
+/* The search bar: Regular glass, radius 26 (page 10). */
 .box {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: 10px;
   min-height: var(--height-input);
   padding: 0 var(--space-4);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-input);
-  background: var(--color-card);
-  color: var(--color-muted);
+  border-radius: var(--r-search);
+  color: var(--muted);
 }
 
 .box:focus-within {
-  box-shadow: var(--focus-ring);
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
 }
 
 .input {
   flex: 1;
   min-width: 0;
-  min-height: 44px;
+  min-height: var(--touch-min);
   border: 0;
   background: transparent;
-  color: var(--color-ink);
+  color: var(--ink);
+  font-size: var(--text-input);
   outline: none;
 }
 
+.input::placeholder {
+  color: var(--muted);
+}
+
+/* Matches: a solid popover (E2), not more glass: never glass on glass. */
 .results {
   position: absolute;
-  top: calc(100% + 6px);
+  top: calc(100% + 8px);
   left: 0;
   right: 0;
   z-index: 1000;
-  padding: var(--space-2);
-  border-radius: var(--radius-input);
-  background: var(--color-card);
-  box-shadow: var(--shadow-float);
+  padding: 6px;
+  border-radius: var(--r-card);
+  background: var(--card);
+  box-shadow: var(--e1), var(--e2);
 }
 
 .result {
   display: grid;
-  grid-template-columns: 56px 1fr auto;
+  grid-template-columns: 56px minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--space-2);
   width: 100%;
   min-height: var(--touch-min);
-  padding: 0 var(--space-2);
+  padding: 0 10px;
   border: 0;
-  border-radius: var(--radius-small);
+  border-radius: var(--r-tag);
   background: transparent;
+  color: var(--ink);
   text-align: left;
   cursor: pointer;
 }
 
 .result:hover {
-  background: var(--color-bg);
+  background: var(--segbg);
 }
 
 .code {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-body);
+}
+
+.name {
+  overflow: hidden;
   font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .none {
   padding: var(--space-3);
-  color: var(--color-muted);
-  font-size: var(--text-small);
+  color: var(--muted);
+  font-size: var(--text-body);
 }

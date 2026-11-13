@@ -3,9 +3,9 @@
   display: block;
   width: 100%;
   max-height: 280px;
-  border-radius: 12px;
+  border-radius: var(--r-tag);
   object-fit: cover;
-  background: var(--color-quiet);
+  background: var(--card2);
 }
 
 .placeholder {

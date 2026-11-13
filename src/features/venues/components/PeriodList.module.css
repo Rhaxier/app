@@ -1,65 +1,108 @@
+/* Straight on the canvas, like a printed timetable (design PDF page 7):
+   period, start time, then what's happening. Hairlines between rows. */
+.wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.heading,
+.row {
+  display: grid;
+  grid-template-columns: 64px 44px minmax(0, 1fr);
+  align-items: center;
+  column-gap: var(--space-3);
+}
+
+.heading {
+  padding: 0 2px 8px;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  font-size: var(--text-caps);
+  font-weight: 500;
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+}
+
 .list {
-  padding: var(--space-2) var(--space-4);
-  border-radius: var(--radius-card);
-  background: var(--color-card);
+  display: flex;
+  flex-direction: column;
 }
 
 .row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  min-height: 64px;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.row:last-child {
-  border-bottom: 0;
-}
-
-/* The period's name over its times, in a fixed column so the states line up. */
-.period {
-  flex: none;
-  display: flex;
-  flex-direction: column;
-  width: 96px;
-  padding: var(--space-2) 0;
+  min-height: 60px;
+  padding: 0 2px;
+  border-bottom: 1px solid var(--line);
 }
 
 .name {
-  font-size: var(--text-small);
+  font-size: var(--text-body);
   font-weight: 600;
+  line-height: 16px;
   overflow-wrap: anywhere;
 }
 
 .time {
-  color: var(--color-muted);
-  font-size: var(--text-meta);
-  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  font-size: var(--text-body);
 }
 
+/* "— Break": a quiet line between periods that don't run on. */
+.break {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 28px;
+  padding: 0 2px;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  font-size: var(--text-meta);
+}
+
+.break::before {
+  content: '';
+  width: 12px;
+  height: 1px;
+  background: var(--hair);
+}
+
+/* Available: the whole cell is the button, with a "+" on the right. */
 .free {
-  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   align-self: stretch;
   border: 0;
   background: transparent;
-  color: var(--color-muted);
+  color: var(--muted);
   font-size: var(--text-body);
   text-align: left;
   cursor: pointer;
 }
 
-.free:hover {
-  color: var(--color-accent);
+.add {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--hair);
+  border-radius: 50%;
+  color: var(--ink2);
+}
+
+@media (hover: hover) {
+  .free:hover .add {
+    border-color: var(--acc);
+    color: var(--acc);
+  }
 }
 
 .muted {
-  color: var(--color-muted);
-  font-size: var(--text-small);
+  color: var(--muted);
+  font-size: var(--text-body);
   opacity: 0.7;
 }
 
 .block {
-  flex: 1;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -67,12 +110,16 @@
   gap: 2px var(--space-2);
   margin: 6px 0;
   padding: 8px var(--space-3);
-  border: 2px solid transparent;
-  border-radius: 10px;
+  border: 0;
+  border-radius: var(--r-tag);
   text-align: left;
 }
 
 .blockTitle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--text-body);
   font-weight: 600;
 }
 
@@ -81,26 +128,66 @@
   font-size: var(--text-meta);
 }
 
+/* Booked by someone else: a 45° hatch, like the corridor on the map. */
 .booked {
-  background: var(--color-quiet);
+  background: repeating-linear-gradient(-45deg, transparent 0 5px, var(--segbg) 5px 6px);
+  box-shadow: inset 0 0 0 0.5px var(--line);
 }
 
 .booked .blockMeta {
-  color: var(--color-muted);
+  color: var(--muted);
 }
 
+/* Waiting for approval: the title in the pending yellow, and a badge. */
 .waiting {
-  background: var(--color-alert-soft);
+  background: transparent;
+  padding-left: 0;
 }
 
-.waiting .blockMeta {
-  color: var(--color-alert-ink);
+.waiting .blockTitle {
+  color: var(--waitink);
 }
 
+/*
+ * Your selection (page 11): accent fill, radius 18, glow 0 12px 28px −10px,
+ * a 1px white top highlight at 25%. Neighbouring selected periods join into
+ * one block: the hairlines between them disappear and only the first and
+ * last rows keep their rounded corners.
+ */
 .selected {
-  min-height: 44px;
-  border-color: var(--color-accent);
-  background: var(--color-accent-soft);
-  color: var(--color-ink);
+  align-self: stretch;
+  align-content: flex-start;
+  margin: 0;
+  border-radius: 0;
+  background: var(--acc);
+  color: var(--onacc);
+  box-shadow:
+    inset 0 1px 0 var(--sel-hi),
+    var(--selglow);
   cursor: pointer;
+}
+
+.selected .blockMeta {
+  color: color-mix(in srgb, var(--onacc) 85%, transparent);
+}
+
+.inRun:not(.runEnd) {
+  border-bottom-color: transparent;
+}
+
+.runStart .selected {
+  margin-top: 6px;
+  border-top-left-radius: var(--r-selected);
+  border-top-right-radius: var(--r-selected);
+}
+
+.runEnd .selected {
+  margin-bottom: 6px;
+  border-bottom-right-radius: var(--r-selected);
+  border-bottom-left-radius: var(--r-selected);
+}
+
+/* Inside a run, only the top piece keeps the highlight. */
+.inRun:not(.runStart) .selected {
+  box-shadow: var(--selglow);
 }

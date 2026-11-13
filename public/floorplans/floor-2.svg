@@ -1,16 +1,30 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700" width="1000" height="700" font-family="DM Sans, system-ui, sans-serif">
-  <!-- PLACEHOLDER floor plan for floor 2. Replace with the real plan (docs/OPEN_QUESTIONS.md, Q6). -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700" width="1000" height="700" font-family="Instrument Sans, -apple-system, system-ui, sans-serif">
+  <!-- PLACEHOLDER floor plan for floor 2. Replace with the real plan (docs/OPEN_QUESTIONS.md, Q6).
+       Drawn light, like most real plans: in dark mode the app inverts it into a dark
+       architect's plan (the plan-filter token in src/styles/tokens.css). -->
+  <defs>
+    <!-- Corridor hatch (design PDF page 11): 45° lines, 1px, every 6px on screen. The plan is
+         shown at about a third of its size on a phone, so here that is 2.6px every 16px. -->
+    <pattern id="hatch" width="16" height="16" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="16" stroke="#e3e3e8" stroke-width="2.6"/></pattern>
+  </defs>
   <rect width="1000" height="700" fill="#ffffff"/>
-  <rect x="40" y="380" width="920" height="50" rx="12" fill="#f4f2ec"/>
-  <text x="500" y="412" text-anchor="middle" font-size="18" letter-spacing="3" fill="#5b6470">MAIN CORRIDOR</text>
-  <rect x="40" y="40" width="620" height="320" rx="16" fill="#eeebe3"/>
-  <text x="58" y="320" font-size="22" font-weight="600" fill="#15202b">Multipurpose hall</text>
-  <text x="58" y="344" font-size="18" fill="#5b6470">2.01</text>
-  <rect x="700" y="40" width="260" height="320" rx="16" fill="#eeebe3"/>
-  <text x="718" y="320" font-size="22" font-weight="600" fill="#15202b">Art room</text>
-  <text x="718" y="344" font-size="18" fill="#5b6470">2.02</text>
-  <rect x="240" y="450" width="520" height="190" rx="16" fill="#eeebe3"/>
-  <text x="258" y="600" font-size="22" font-weight="600" fill="#15202b">Music room</text>
-  <text x="258" y="624" font-size="18" fill="#5b6470">2.03</text>
-  <text x="980" y="690" text-anchor="end" font-size="14" fill="#5b6470">Placeholder plan · Floor 2</text>
+  <rect x="40" y="360" width="920" height="70" fill="url(#hatch)"/>
+  <rect x="380" y="378" width="240" height="34" fill="#ffffff"/>
+  <text x="500" y="403" text-anchor="middle" font-family="Geist Mono, ui-monospace, monospace" font-size="22" letter-spacing="5" fill="#8e8e93">MAIN CORRIDOR</text>
+  <rect x="40" y="40" width="640" height="320" fill="none" stroke="#d1d1d6" stroke-width="1.5"/>
+  <text x="58" y="76" font-family="Geist Mono, ui-monospace, monospace" font-size="22" fill="#8e8e93">2.01</text>
+  <text x="58" y="108" font-size="27" font-weight="600" fill="#3a3a3c">Multipurpose hall</text>
+  <path d="M70 360 v-30 a30 30 0 0 1 30 30" fill="none" stroke="#c7c7cc" stroke-width="1.5"/>
+  <rect x="680" y="40" width="280" height="320" fill="none" stroke="#d1d1d6" stroke-width="1.5"/>
+  <text x="698" y="76" font-family="Geist Mono, ui-monospace, monospace" font-size="22" fill="#8e8e93">2.02</text>
+  <text x="698" y="108" font-size="27" font-weight="600" fill="#3a3a3c">Art room</text>
+  <path d="M710 360 v-30 a30 30 0 0 1 30 30" fill="none" stroke="#c7c7cc" stroke-width="1.5"/>
+  <rect x="240" y="430" width="520" height="230" fill="none" stroke="#d1d1d6" stroke-width="1.5"/>
+  <text x="258" y="466" font-family="Geist Mono, ui-monospace, monospace" font-size="22" fill="#8e8e93">2.03</text>
+  <text x="258" y="498" font-size="27" font-weight="600" fill="#3a3a3c">Music room</text>
+  <path d="M730 430 v30 a30 30 0 0 1 -30 -30" fill="none" stroke="#c7c7cc" stroke-width="1.5"/>
+  <line x1="240" y1="430" x2="240" y2="660" stroke="#d1d1d6" stroke-width="1.5"/>
+  <line x1="760" y1="430" x2="760" y2="660" stroke="#d1d1d6" stroke-width="1.5"/>
+  <rect x="40" y="40" width="920" height="620" fill="none" stroke="#c7c7cc" stroke-width="3"/>
+  <text x="960" y="688" text-anchor="end" font-size="18" fill="#aeaeb2">Placeholder plan · Floor 2</text>
 </svg>

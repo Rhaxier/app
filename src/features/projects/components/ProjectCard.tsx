@@ -1,10 +1,11 @@
-// One project in the list (reference screen 5): title, subject and who it's
-// shared with, a status badge, and the latest teacher feedback inline.
+// One project in the list (reference screen 5; design PDF page 8, "Work that
+// gets seen"): title, subject and who it's shared with, one status tag at the
+// edge, and the teacher's latest feedback quoted inline, so nobody goes
+// looking. It's a row: the Projects screen groups the rows in one card.
 import { Link } from 'react-router-dom';
-import { Avatar } from '@/components/Avatar';
 import { ButtonLink } from '@/components/Button';
-import { Card } from '@/components/Card';
 import { StatusBadge } from '@/components/StatusBadge';
+import { relativeTime } from '@/lib/dates';
 import { projectStatus } from '@/lib/status';
 import type { Project } from '../api';
 import { sharingLine } from '../logic';
@@ -21,10 +22,10 @@ interface ProjectCardProps {
 export function ProjectCard({ project, showOwner, canShare }: ProjectCardProps) {
   const latest = project.feedback[0];
   return (
-    <Card as="article" className={styles.card}>
+    <article className={styles.row}>
       <div className={styles.top}>
         <div className={styles.titles}>
-          <h3>
+          <h3 className={styles.title}>
             <Link to={`/projects/${project.id}`} className={styles.link}>
               {project.title}
             </Link>
@@ -38,22 +39,26 @@ export function ProjectCard({ project, showOwner, canShare }: ProjectCardProps) 
       </div>
 
       {latest && (
-        <div className={styles.feedback}>
-          <Avatar
-            name={latest.author?.full_name ?? 'Teacher'}
-            initials={latest.author?.avatar_initials}
-            size="small"
-            tone="ink"
-          />
-          <p>{latest.body}</p>
-        </div>
+        <figure className={styles.feedback}>
+          <blockquote className={styles.quote}>
+            <p>{latest.body}</p>
+          </blockquote>
+          <figcaption className="meta">
+            — {latest.author?.full_name ?? 'Teacher'} · {relativeTime(latest.created_at)}
+          </figcaption>
+        </figure>
       )}
 
       {canShare && project.shares.length === 0 && (
-        <ButtonLink to={`/projects/${project.id}?share=1`} variant="secondary" fullWidth>
+        <ButtonLink
+          to={`/projects/${project.id}?share=1`}
+          variant="secondary"
+          fullWidth
+          className={styles.share}
+        >
           Share with a teacher
         </ButtonLink>
       )}
-    </Card>
+    </article>
   );
 }

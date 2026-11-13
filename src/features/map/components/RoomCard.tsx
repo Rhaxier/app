@@ -1,7 +1,7 @@
-// The card under the map for the selected room (like the mockup's bottom
-// sheet): what it is, whether it's in use now, and what you can do there.
+// The sheet over the map for the selected room (like the mockup's bottom
+// sheet, in thick glass above the tab bar): what it is, whether it's in use
+// now, and what you can do there.
 import { ButtonLink } from '@/components/Button';
-import { Card } from '@/components/Card';
 import { formatTime } from '@/lib/dates';
 import { roomKindLabel } from '@/lib/status';
 import type { CalendarBooking, Venue } from '@/features/venues/api';
@@ -17,9 +17,9 @@ interface RoomCardProps {
 
 export function RoomCard({ room, inUse, venue, openReports }: RoomCardProps) {
   return (
-    <Card className={styles.card} aria-live="polite">
+    <section className={`glass thick ${styles.sheet}`} aria-label="Room" aria-live="polite">
       <p className={`label ${styles.roomLabel}`}>
-        {roomKindLabel[room.kind]} · Room {room.code}
+        {roomKindLabel[room.kind]} · <span className={styles.code}>{room.code}</span>
       </p>
       <h2 className={styles.title}>{room.name}</h2>
       {inUse ? (
@@ -30,22 +30,20 @@ export function RoomCard({ room, inUse, venue, openReports }: RoomCardProps) {
         <p className="meta">Free right now</p>
       )}
       {openReports > 0 && (
-        <p className="meta">
+        <p className={styles.reports}>
           {openReports} open fix-it {openReports === 1 ? 'report' : 'reports'} here
         </p>
       )}
       <div className={styles.actions}>
-        {venue?.active ? (
+        {venue?.active && (
           <ButtonLink to={`/book?venue=${venue.id}`} variant="secondary">
             Book
           </ButtonLink>
-        ) : (
-          <span />
         )}
-        <ButtonLink to={`/map/report?room=${room.id}`} variant="alert" icon="camera">
-          Report issue
+        <ButtonLink to={`/map/report?room=${room.id}`} icon="camera">
+          Report an issue
         </ButtonLink>
       </div>
-    </Card>
+    </section>
   );
 }

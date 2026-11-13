@@ -1,41 +1,65 @@
+/* One card, three columns, hairlines between the cells. Each cell draws a
+   hairline on its right and bottom; the card clips the ones on its outer
+   edges, so only the inner dividers show, however many tools are switched on. */
 .grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  overflow: hidden;
+  border-radius: var(--r-card);
+  background: var(--card);
+  box-shadow: var(--e1);
+}
+
+.grid li {
+  box-shadow:
+    1px 0 0 var(--line),
+    0 1px 0 var(--line);
 }
 
 .tile {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 8px;
   height: 100%;
-  min-height: 76px;
-  padding: 12px 10px;
-  border-radius: var(--radius-card);
-  background: var(--color-card);
-  color: var(--color-ink);
-  font-size: var(--text-small);
-  font-weight: 500;
-  line-height: 1.25;
+  min-height: 92px;
+  padding: 14px 14px 12px;
+  color: var(--ink);
   text-decoration: none;
 }
 
-.tile:hover {
-  filter: brightness(0.985);
-}
-
 .icon {
-  display: grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: var(--color-accent-soft);
-  color: var(--color-accent);
+  margin-bottom: auto;
+  color: var(--ink2);
 }
 
-.alert {
-  background: var(--color-alert-soft);
-  color: var(--color-alert);
+.label {
+  margin-top: var(--space-4);
+  font-size: var(--text-body);
+  font-weight: 600;
+  line-height: 17px;
+}
+
+.sub {
+  color: var(--muted);
+  font-size: var(--text-meta);
+  line-height: 15px;
+}
+
+/* "Dots flag what's new or broken" (page 6). */
+.dot {
+  position: absolute;
+  top: 16px;
+  right: 14px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.new {
+  background: var(--acc);
+}
+
+.problem {
+  background: var(--fix);
 }

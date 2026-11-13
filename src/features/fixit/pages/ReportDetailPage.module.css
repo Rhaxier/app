@@ -7,11 +7,11 @@
   grid-template-columns: auto 1fr;
   gap: 6px var(--space-4);
   margin: 0;
-  font-size: var(--text-small);
+  font-size: var(--text-body);
 }
 
 .facts dt {
-  color: var(--color-muted);
+  color: var(--muted);
 }
 
 .facts dd {
@@ -20,7 +20,7 @@
 
 .note {
   padding: var(--space-3);
-  border-radius: var(--radius-small);
-  background: var(--color-bg);
-  font-size: var(--text-small);
+  border-radius: var(--r-tag);
+  background: var(--card2);
+  font-size: var(--text-body);
 }

@@ -82,7 +82,7 @@ export function CollabDetailPage() {
 
       <Card className="stack-tight">
         <div className={styles.who}>
-          <Avatar name={owner} initials={item.owner?.avatar_initials} />
+          <Avatar name={owner} initials={item.owner?.avatar_initials} tone="quiet" />
           <div className={styles.whoText}>
             <p className={styles.name}>{owner}</p>
             <p className="meta">
@@ -93,7 +93,7 @@ export function CollabDetailPage() {
           <StatusBadge map={collabStatus} status={item.status} />
         </div>
         {item.description && <p className={styles.description}>{item.description}</p>}
-        <p className={`label ${styles.muted}`}>Looking for</p>
+        <p className={`label ${styles.muted} ${styles.lookingFor}`}>Looking for</p>
         <div className="row-wrap">
           {item.skills.map((skill) => (
             <Tag key={skill}>{skill}</Tag>

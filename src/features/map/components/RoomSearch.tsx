@@ -1,4 +1,5 @@
-// "Find a room": type part of a code or name, pick from the matches.
+// "Find a room": type part of a code or name, pick from the matches. On the
+// map it floats over the plan as a glass search bar (Regular glass, radius 26).
 import { useState } from 'react';
 import { Icon } from '@/components/Icon';
 import type { Room } from '../api';
@@ -17,8 +18,8 @@ export function RoomSearch({ rooms, floorName, onPick }: RoomSearchProps) {
 
   return (
     <div className={styles.wrap}>
-      <div className={styles.box}>
-        <Icon name="search" size={20} />
+      <div className={`glass ${styles.box}`}>
+        <Icon name="search" size={18} />
         <label htmlFor="room-search" className="visually-hidden">
           Find a room
         </label>
@@ -46,7 +47,7 @@ export function RoomSearch({ rooms, floorName, onPick }: RoomSearchProps) {
                 }}
               >
                 <span className={styles.code}>{room.code}</span>
-                <span>{room.name}</span>
+                <span className={styles.name}>{room.name}</span>
                 <span className="meta">Floor {floorName(room.floor_id)}</span>
               </button>
             </li>

@@ -1,0 +1,56 @@
+/* The map fills the screen (MapView, immersive); everything here floats over
+   it, 16px in from the edges (page 10), in the app's centred column. The
+   layers let taps through to the map except on the controls themselves. */
+.page {
+  min-height: 60vh;
+}
+
+.top,
+.bottom {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 0 var(--chrome-inset);
+  pointer-events: none;
+}
+
+.top > *,
+.bottom > * {
+  pointer-events: auto;
+}
+
+.top {
+  top: calc(var(--space-3) + env(safe-area-inset-top));
+  gap: 6px;
+}
+
+.topRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* The chips scroll sideways from edge to edge of the column. */
+.chips {
+  margin: 0 calc(var(--chrome-inset) * -1);
+  padding-right: var(--chrome-inset);
+  padding-left: var(--chrome-inset);
+}
+
+.bottom {
+  bottom: calc(var(--tabbar-space) + 10px);
+}
+
+.hint {
+  align-self: center;
+  padding: 8px 14px;
+  border-radius: var(--radius-pill);
+  color: var(--ink2);
+  font-size: var(--text-meta);
+  font-weight: 500;
+}

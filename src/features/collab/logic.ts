@@ -7,6 +7,11 @@ export function filledLabel(post: Pick<CollabPost, 'accepted_count' | 'spots_wan
   return `${filled} of ${post.spots_wanted} ${post.spots_wanted === 1 ? 'spot' : 'spots'} filled`;
 }
 
+/** "2 of 3 spots open", beside the dots on a post (design PDF page 8). */
+export function openLabel(post: Pick<CollabPost, 'accepted_count' | 'spots_wanted'>): string {
+  return `${spotsLeft(post)} of ${post.spots_wanted} ${post.spots_wanted === 1 ? 'spot' : 'spots'} open`;
+}
+
 export function spotsLeft(post: Pick<CollabPost, 'accepted_count' | 'spots_wanted'>): number {
   return Math.max(0, post.spots_wanted - post.accepted_count);
 }

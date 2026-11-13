@@ -1,0 +1,26 @@
+/* Cards side by side, one screen-width each, snapping into place as you
+   swipe. The track runs to the screen edges so a card can slide off them. */
+.track {
+  display: flex;
+  gap: var(--gap-tight);
+  margin: 0 calc(var(--screen-margin) * -1);
+  padding: 0 var(--screen-margin) 4px;
+  overflow-x: auto;
+  scroll-padding: 0 var(--screen-margin);
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.track::-webkit-scrollbar {
+  display: none;
+}
+
+.slide {
+  display: flex;
+  flex: 0 0 100%;
+  scroll-snap-align: start;
+}
+
+.slide > * {
+  flex: 1;
+}

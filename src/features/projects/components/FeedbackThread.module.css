@@ -3,8 +3,8 @@
   align-items: flex-start;
   gap: var(--space-3);
   padding: var(--space-3);
-  border-radius: 12px;
-  background: var(--color-card);
+  border-radius: var(--r-tag);
+  background: var(--card);
 }
 
 .body {

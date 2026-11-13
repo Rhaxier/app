@@ -40,6 +40,24 @@ export function reportLabel(report: Pick<Report, 'room_code' | 'category_name'>)
     : `Fix-it · ${report.category_name}`;
 }
 
+/** The steps of the progress track on the map's fix-it card (design PDF page 6). */
+export const PROGRESS_STEPS = ['Open', 'Seen', 'Fixing', 'Fixed'] as const;
+
+/**
+ * How far along a report is: 0 (Open) to 3 (Fixed). Duplicates and "won't
+ * fix" didn't go along the track, so they have no step (null): the card shows
+ * their status instead.
+ */
+export function progressStep(status: ReportStatus): number | null {
+  const steps: Partial<Record<ReportStatus, number>> = {
+    open: 0,
+    acknowledged: 1,
+    in_progress: 2,
+    resolved: 3,
+  };
+  return steps[status] ?? null;
+}
+
 export interface ReportFormValues {
   roomId: string;
   category: ReportCategory | '';

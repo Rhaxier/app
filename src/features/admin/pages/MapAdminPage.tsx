@@ -76,6 +76,7 @@ export function MapAdminPage() {
                 floor={floor}
                 x={room.x}
                 y={room.y}
+                code={room.code}
                 title={`${room.code} ${room.name}`}
                 selected={room.id === selected?.id}
                 onSelect={() => setSelectedId(room.id)}

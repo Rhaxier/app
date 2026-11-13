@@ -8,6 +8,7 @@ import {
   eventSpotsLeft,
   filledLabel,
   filterEvents,
+  hoursByWeek,
   hoursSoFar,
   isSignupOpen,
   toEventInput,
@@ -133,6 +134,29 @@ describe('hoursSoFar', () => {
     expect(
       hoursSoFar([signup({ hours_confirmed: 3 }), signup({ hours_confirmed: 1.5 }), signup({})]),
     ).toBe(4.5);
+  });
+});
+
+describe('hoursByWeek (the chart beside your hours)', () => {
+  it('puts confirmed hours in the week their event happened, oldest week first', () => {
+    // now is Monday 19 Oct; school weeks start on Sunday.
+    const events = [
+      makeEvent({ id: 'this-week', starts_at: '2026-10-18T05:00:00Z' }), // Sun 18 Oct
+      makeEvent({ id: 'last-week', starts_at: '2026-10-14T05:00:00Z' }), // Wed 14 Oct
+      makeEvent({ id: 'long-ago', starts_at: '2026-06-01T05:00:00Z' }),
+    ];
+    const weeks = hoursByWeek(
+      [
+        signup({ event_id: 'this-week', hours_confirmed: 3 }),
+        signup({ event_id: 'last-week', hours_confirmed: 2 }),
+        signup({ event_id: 'last-week', hours_confirmed: null }),
+        signup({ event_id: 'long-ago', hours_confirmed: 5 }),
+      ],
+      events,
+      now,
+      4,
+    );
+    expect(weeks).toEqual([0, 0, 2, 3]);
   });
 });
 

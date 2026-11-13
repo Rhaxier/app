@@ -152,7 +152,7 @@ export function ReportFormPage() {
         )}
 
         <FormError message={create.isError ? errorMessage(create.error) : null} />
-        <Button type="submit" variant="alert" fullWidth loading={create.isPending}>
+        <Button type="submit" fullWidth loading={create.isPending}>
           Send report
         </Button>
         <p className="meta">

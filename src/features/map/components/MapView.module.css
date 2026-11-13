@@ -1,22 +1,80 @@
 .frame {
   overflow: hidden;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-card);
-  background: var(--color-card);
+  border-radius: var(--r-card);
+  background: var(--card);
+  box-shadow: var(--e1);
+}
+
+/* The Campus map: the whole screen in the app's column, behind its floating
+   controls and the tab bar. */
+.immersive {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  max-width: var(--content-max);
+  margin: 0 auto;
+  border-radius: 0;
+  background: var(--paper);
+  box-shadow: none;
 }
 
 .map {
   width: 100%;
   height: 100%;
   min-height: 220px;
-  background: var(--color-card);
-  font-family: var(--font-body);
+  background: transparent;
+  font-family: var(--font);
 }
 
-/* Leaflet's zoom buttons are 30px; make them a full 44px touch target. */
+/* The light plan becomes a dark architect's plan in dark mode. */
+.plan {
+  filter: var(--plan-filter);
+}
+
+/* Zoom buttons: thin glass, a full 44px touch target each. On the immersive
+   map they sit bottom right, above the tab bar and any details sheet. */
+.frame :global(.leaflet-control-zoom) {
+  overflow: hidden;
+  border: 0.5px solid var(--g-rim);
+  border-radius: var(--r-tag);
+  background: linear-gradient(180deg, var(--g-spec), transparent 46%), var(--g-tint-thin);
+  -webkit-backdrop-filter: blur(16px) saturate(var(--g-sat)) brightness(var(--g-bright));
+  backdrop-filter: blur(16px) saturate(var(--g-sat)) brightness(var(--g-bright));
+  box-shadow:
+    inset 0 1px 0 var(--g-hi),
+    var(--e3);
+}
+
 .frame :global(.leaflet-control-zoom a) {
   width: var(--touch-min);
   height: var(--touch-min);
-  line-height: var(--touch-min);
+  border: 0;
+  background: transparent;
+  color: var(--ink);
   font-size: 22px;
+  font-weight: 400;
+  line-height: var(--touch-min);
+}
+
+.frame :global(.leaflet-control-zoom a + a) {
+  border-top: 0.5px solid var(--line);
+}
+
+.frame :global(.leaflet-control-zoom a.leaflet-disabled) {
+  color: var(--faint);
+}
+
+.immersive :global(.leaflet-bottom.leaflet-right) {
+  right: var(--chrome-inset);
+  bottom: calc(var(--tabbar-space) + 64px);
+}
+
+.immersive :global(.leaflet-control-zoom) {
+  margin: 0;
+}
+
+/* While a details sheet is open it covers that corner; pinch, scroll or the
+   + and − keys still zoom. (MapPage sets data-sheet.) */
+:global([data-sheet]) .immersive :global(.leaflet-control-zoom) {
+  display: none;
 }

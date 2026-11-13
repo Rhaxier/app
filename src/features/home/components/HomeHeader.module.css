@@ -1,12 +1,16 @@
 .header {
   display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.topRow {
+  display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
-}
-
-.greeting {
-  font-size: 30px;
+  min-height: var(--touch-min);
+  margin-bottom: var(--space-4);
 }
 
 .actions {
@@ -15,11 +19,55 @@
   gap: var(--space-2);
 }
 
+/* Large title, two lines: "Good morning," then your name in grey. */
+.greeting {
+  margin-top: 0;
+}
+
+.name {
+  color: var(--muted);
+}
+
+.who {
+  color: var(--muted);
+  font-size: var(--text-body);
+}
+
+.unread {
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: none;
+}
+
 .me {
+  position: relative;
   display: grid;
   place-items: center;
-  width: var(--touch-min);
-  height: var(--touch-min);
   border-radius: 50%;
   text-decoration: none;
+}
+
+/* 40px to see, 44px to tap. */
+.me::before,
+.search::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+}
+
+/* Search lives in the tab bar, except for staff on a phone narrower than
+   375px, where six tabs leave no room for it (TabBar.module.css). */
+.search {
+  display: none;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: var(--ink);
+}
+
+@media (max-width: 374px) {
+  .search {
+    display: grid;
+  }
 }

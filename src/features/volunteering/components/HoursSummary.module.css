@@ -1,45 +1,52 @@
-.card {
+/* Straight on the canvas, as on the Volunteer mockup: no card. */
+.summary {
   display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  background: var(--color-accent-soft);
-}
-
-.top {
-  display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
-  gap: var(--space-3);
+  gap: var(--space-4);
 }
 
-.card :global(.label) {
-  color: var(--color-accent);
-}
-
-.hours {
-  font-family: var(--font-heading);
-  font-size: 30px;
+/* The one large figure: tabular figures, like every number in the app. */
+.figure {
+  font-size: 40px;
   font-weight: 700;
-  color: var(--color-accent);
-  white-space: nowrap;
+  line-height: 1;
+  letter-spacing: var(--tracking-large-title);
 }
 
-.target {
-  font-size: var(--text-card-title);
-  color: var(--color-accent);
+.unit {
+  color: var(--muted);
+  font-size: var(--text-body);
+  font-weight: 500;
+  letter-spacing: 0;
 }
 
-/* The meter's track is a lighter step of the same teal; the fill is the accent. */
-.track {
-  height: 10px;
-  border-radius: var(--radius-pill);
-  background: var(--color-card);
-  overflow: hidden;
+.line {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: var(--text-body);
 }
 
-.fill {
-  display: block;
-  height: 100%;
-  border-radius: var(--radius-pill);
-  background: var(--color-accent);
+.chart {
+  display: flex;
+  flex: none;
+  align-items: flex-end;
+  gap: 3px;
+  height: 30px;
+  margin-bottom: 2px;
+}
+
+.bar,
+.empty {
+  width: 6px;
+  border-radius: 2px;
+}
+
+.bar {
+  background: var(--ink);
+}
+
+.empty {
+  height: 6px;
+  background: var(--segbg);
 }

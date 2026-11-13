@@ -24,33 +24,39 @@
 }
 
 .cardTitle {
-  font-size: var(--text-small);
+  font-size: var(--text-body);
   font-weight: 600;
 }
 
 .count {
-  font-family: var(--font-heading);
+  font-family: var(--font);
   font-size: 36px;
   font-weight: 700;
   line-height: 1.1;
-  color: var(--color-alert-ink);
+  color: var(--fixink);
 }
 
 .zero {
-  color: var(--color-muted);
+  color: var(--muted);
 }
 
 .items {
   display: flex;
   flex-direction: column;
-  font-size: var(--text-small);
+  font-size: var(--text-body);
 }
 
-/* Links in the breakdowns get a full 44px tap area. */
+/* Links in the breakdowns get a full 44px tap area (13 + 18 + 13), and wrap
+   like ordinary text. */
 .items a {
-  display: inline-flex;
-  align-items: center;
-  min-height: var(--touch-min);
+  display: inline-block;
+  padding: 13px 0;
+  line-height: 18px;
+  text-decoration: none;
+}
+
+.items strong {
+  color: var(--fixink);
 }
 
 /* Push the button to the bottom so the cards line up. */

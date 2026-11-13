@@ -1,0 +1,12 @@
+/* Every project in one card, with hairlines between them (an inset grouped
+   list, design PDF page 8). */
+.list {
+  overflow: hidden;
+  border-radius: var(--r-card);
+  background: var(--card);
+  box-shadow: var(--e1);
+}
+
+.list li + li {
+  border-top: 1px solid var(--line);
+}

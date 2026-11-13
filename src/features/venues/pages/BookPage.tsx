@@ -1,22 +1,26 @@
-// Book a venue (reference screen 4): pick a venue and a day, tap free
-// periods, then Request. The list shows the chosen date's own periods, so a
-// short Friday looks shorter. The calendar listens to Realtime, so an
-// approval made elsewhere appears here at once.
+// Book a venue (reference screen 4; design PDF page 7, "Book by the bell"):
+// the venue is the large title (tap it to choose another), then a day, then
+// the timetable: tap a run of free periods and the floating bar shows the
+// exact times, with one Request button. The list shows the chosen date's own
+// periods, so a short Friday looks shorter. The calendar listens to Realtime,
+// so an approval made elsewhere appears here at once.
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button, ButtonLink } from '@/components/Button';
 import { Card } from '@/components/Card';
-import { FilterChip } from '@/components/Chip';
 import { DateStrip } from '@/components/DateStrip';
+import { Icon } from '@/components/Icon';
 import { FieldRow, TextField } from '@/components/Input';
 import { PageHeader } from '@/components/PageHeader';
 import { EmptyState, ErrorState, LoadingState } from '@/components/States';
 import { useCurrentUser } from '@/features/auth/hooks';
+import { useFloors } from '@/features/map/hooks';
 import type { Period } from '@/features/school/api';
 import { useBlackouts, useHolidays, usePeriods, useTerms } from '@/features/school/hooks';
 import { dayNote, schoolDaysOfWeek, type CalendarData } from '@/features/school/logic';
 import { useAppSettings } from '@/features/settings/hooks';
-import { atSchoolTime, dayRange, formatTimeRange } from '@/lib/dates';
+import { atSchoolTime, dayLabels, dayRange, formatTimeRange } from '@/lib/dates';
+import { useDocumentTitle } from '@/lib/useDocumentTitle';
 import type { Venue } from '../api';
 import { PeriodList } from '../components/PeriodList';
 import { useApprovedBookings, useLiveBookings, useVenues, useWaitingRequests } from '../hooks';
@@ -26,6 +30,7 @@ import {
   firstBookableDay,
   freeRun,
   nextSelection,
+  runLabel,
   selectionTimes,
   slotStates,
   type CustomTimes,
@@ -100,7 +105,9 @@ function BookingCalendar({
   const user = useCurrentUser();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const floors = useFloors();
   useLiveBookings();
+  useDocumentTitle('Book a venue');
 
   const venueId = searchParams.get('venue') ?? venues[0].id;
   const venue = venues.find((v) => v.id === venueId) ?? venues[0];
@@ -183,29 +190,62 @@ function BookingCalendar({
   }
 
   const caption = !venue.needs_approval
-    ? "This venue doesn't need approval: free periods are booked straight away."
+    ? 'Booked straight away: no approval needed'
     : user.role === 'student'
-      ? 'Your supervising teacher confirms first, then venue staff approve.'
-      : 'Bookings are confirmed after admin approval';
+      ? 'Your supervising teacher confirms, then venue staff approve'
+      : 'Confirmed after admin approval';
+
+  // "320 seats · Floor G · needs approval"
+  const floorName = floors.data?.find((f) => f.id === venue.room?.floor_id)?.name;
+  const about = [
+    venue.capacity ? `${venue.capacity} seats` : null,
+    floorName ? `Floor ${floorName}` : null,
+    venue.needs_approval ? 'needs approval' : 'no approval needed',
+  ]
+    .filter(Boolean)
+    .join(' · ');
+
+  // What the floating bar says: the run of periods (or custom time) and its times.
+  const chosenLabel = chosen
+    ? `${run ? runLabel(slots, run) : 'Your time'} · ${formatTimeRange(chosen.start, chosen.end)}`
+    : allowCustomTimes
+      ? 'Choose periods or a time'
+      : 'Choose free periods';
 
   return (
-    <div className="stack">
-      <PageHeader
-        title="Book a venue"
-        action={
+    <div className={`stack ${styles.page}`}>
+      <header className={styles.header}>
+        <div className={styles.topRow}>
+          <p className="label">Book a venue</p>
           <ButtonLink to="/book/mine" variant="secondary" size="small">
             My bookings
           </ButtonLink>
-        }
-      />
-
-      <div className="row-wrap" role="group" aria-label="Venue">
-        {venues.map((v) => (
-          <FilterChip key={v.id} selected={v.id === venue.id} onClick={() => chooseVenue(v.id)}>
-            {v.name}
-          </FilterChip>
-        ))}
-      </div>
+        </div>
+        {/* The venue's name is the title; a real <select> sits over it, so
+            tapping the title opens the phone's own picker. */}
+        <div className={styles.venuePicker}>
+          <h1 className={styles.venueName} aria-hidden="true">
+            {venue.name}
+            <Icon name="chevronDown" size={22} />
+          </h1>
+          <label htmlFor="venue-pick" className="visually-hidden">
+            Venue
+          </label>
+          <select
+            id="venue-pick"
+            className={styles.venueSelect}
+            value={venue.id}
+            onChange={(event) => chooseVenue(event.target.value)}
+          >
+            {venues.map((v) => (
+              <option key={v.id} value={v.id}>
+                {v.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <p className={styles.about}>{about}</p>
+      </header>
 
       <DateStrip
         days={days}
@@ -246,7 +286,12 @@ function BookingCalendar({
               {closedReason}. Nothing can be booked this day.
             </p>
           )}
-          <PeriodList slots={slots} states={states} onToggle={togglePeriod} />
+          <PeriodList
+            slots={slots}
+            states={states}
+            onToggle={togglePeriod}
+            dayLabel={dayLabels(day).long}
+          />
         </>
       )}
 
@@ -276,15 +321,21 @@ function BookingCalendar({
         </Card>
       )}
 
-      <div className={styles.footer}>
-        <Button fullWidth disabled={!chosen} onClick={request}>
-          {chosen
-            ? `Request ${formatTimeRange(chosen.start, chosen.end)}`
-            : allowCustomTimes
-              ? 'Choose periods or a time'
-              : 'Choose free periods'}
+      {/* One next step (design PDF page 7): a floating bar with the exact
+          times and one Request button, above the tab bar. */}
+      <div className={`glass thick ${styles.bar}`} aria-live="polite">
+        <div className={styles.barText}>
+          <p className={chosen ? styles.barTimes : styles.barPrompt}>{chosenLabel}</p>
+          <p className="meta">{caption}</p>
+        </div>
+        <Button
+          variant="accent"
+          disabled={!chosen}
+          aria-label={chosen ? `Request ${chosenLabel}` : undefined}
+          onClick={request}
+        >
+          Request
         </Button>
-        <p className="meta">{caption}</p>
       </div>
     </div>
   );

@@ -5,8 +5,8 @@
 }
 
 .heading {
-  font-size: var(--text-card-title);
-  font-family: var(--font-body);
+  font-size: var(--text-title);
+  font-family: var(--font);
   letter-spacing: 0;
 }
 

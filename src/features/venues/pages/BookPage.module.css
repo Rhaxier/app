@@ -1,28 +1,110 @@
+/* Room at the bottom so the last period can scroll clear of the booking bar. */
+.page {
+  padding-bottom: 96px;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.topRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: var(--touch-min);
+  margin-bottom: 2px;
+  color: var(--muted);
+}
+
+/* The venue's name as the large title, with a chevron: the <select> on top
+   of it is invisible but takes the taps (and keyboard focus). */
+.venuePicker {
+  position: relative;
+  align-self: flex-start;
+  max-width: 100%;
+}
+
+.venueName {
+  overflow-wrap: anywhere;
+}
+
+/* The chevron follows the last word, even when the name wraps. */
+.venueName svg {
+  display: inline-block;
+  margin-left: 4px;
+  color: var(--muted);
+  vertical-align: middle;
+}
+
+.venueSelect {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.venuePicker:has(.venueSelect:focus-visible) {
+  border-radius: var(--r-tag);
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.about {
+  color: var(--muted);
+  font-size: var(--text-body);
+}
+
 /* "Holiday: … Nothing can be booked this day." above the greyed-out periods. */
 .closed {
   padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-input);
-  background: var(--color-quiet);
-  font-size: var(--text-small);
+  border-radius: var(--r-field);
+  background: var(--segbg);
+  font-size: var(--text-body);
   font-weight: 500;
 }
 
 /* Why a custom time can't be requested. */
 .problem {
-  color: var(--color-alert-ink);
+  color: var(--fixink);
   font-size: var(--text-meta);
   font-weight: 500;
 }
 
-/* The Request button stays in view above the tab bar while scrolling. */
-.footer {
-  position: sticky;
-  bottom: calc(var(--height-tabbar) + var(--space-3));
+/* The booking bar: thick glass, floating just above the tab bar. */
+.bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--tabbar-space) + 10px);
+  z-index: 20;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: var(--space-2);
-  padding-top: var(--space-2);
-  background: linear-gradient(to bottom, transparent, var(--color-bg) 30%);
-  text-align: center;
+  gap: var(--space-3);
+  width: calc(100% - 2 * var(--chrome-inset));
+  max-width: calc(var(--content-max) - 2 * var(--chrome-inset));
+  margin: 0 auto;
+  padding: 10px 10px 10px 18px;
+  border-radius: var(--r-card);
+}
+
+.barText {
+  flex: 1;
+  min-width: 0;
+}
+
+.barTimes,
+.barPrompt {
+  overflow: hidden;
+  font-size: var(--text-reading);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.barPrompt {
+  color: var(--ink2);
 }

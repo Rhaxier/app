@@ -5,8 +5,8 @@
 }
 
 .name {
-  font-family: var(--font-body);
-  font-size: var(--text-card-title);
+  font-family: var(--font);
+  font-size: var(--text-title);
   font-weight: 600;
   letter-spacing: 0;
 }

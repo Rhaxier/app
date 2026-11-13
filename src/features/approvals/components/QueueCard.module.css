@@ -1,28 +1,28 @@
-.card {
+/* The hours field beside "Confirm" on an hours row: a small number field. */
+.hours {
+  width: 72px;
+  min-height: var(--touch-min);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--r-tag);
+  background: var(--field);
+  color: var(--ink);
+  font-size: var(--text-input);
+  text-align: center;
+}
+
+/* The details sheet for a venue request: the booking, then the decision. */
+.details {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-}
-
-.top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
   gap: var(--space-2);
 }
 
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: var(--space-2);
-  margin-top: var(--space-2);
+.purpose {
+  font-size: var(--text-reading);
 }
 
-.hours {
-  width: 80px;
-  min-height: var(--touch-min);
-  padding: 0 var(--space-2);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-small);
+.warning {
+  color: var(--fixink);
+  font-weight: 500;
 }
