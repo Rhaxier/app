@@ -118,13 +118,15 @@ mode is designed separately, not inverted.
 
 **Where it lives:**
 
-| File                     | What it holds                                                                                                                                                                                                                                  |
-| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/styles/tokens.css`  | Every colour, size, radius, shadow and duration. Page 12's tokens copied exactly (`--paper`, `--card`, `--ink`, `--acc`, `--g-*`, `--e1`…), plus the type scale, radii and spacing from pages 3, 10 and 11. Dark on `:root`, light in `.light` |
-| `src/styles/glass.css`   | The liquid glass material: `.glass` (Regular), plus `.tabglass`, `.thick` and `.thin`, and `.lens` for the active tab                                                                                                                          |
-| `src/styles/globals.css` | Type, the ambient glow behind every screen, the keyboard focus ring                                                                                                                                                                            |
-| `src/lib/theme.ts`       | System / Dark / Light (Me > Appearance), saved on the device; `index.html` applies it before the first paint                                                                                                                                   |
-| `src/lib/contrast.ts`    | The school's own accent colour, worked out for both themes                                                                                                                                                                                     |
+| File                      | What it holds                                                                                                                                                                                                                                  |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/styles/tokens.css`   | Every colour, size, radius, shadow and duration. Page 12's tokens copied exactly (`--paper`, `--card`, `--ink`, `--acc`, `--g-*`, `--e1`…), plus the type scale, radii and spacing from pages 3, 10 and 11. Dark on `:root`, light in `.light` |
+| `src/styles/glass.css`    | The liquid glass material: `.glass` (Regular), plus `.tabglass`, `.thick` and `.thin`, and `.lens` for the active tab                                                                                                                          |
+| `src/styles/globals.css`  | Type, the ambient glow behind every screen, the keyboard focus ring                                                                                                                                                                            |
+| `src/styles/tailwind.css` | Tailwind, for shadcn/ui components only: no reset, shadcn's colour names mapped onto the tokens                                                                                                                                                |
+| `src/components/ui/`      | shadcn/ui components (Radix base), added with `npx shadcn add <name>`                                                                                                                                                                          |
+| `src/lib/theme.ts`        | System / Dark / Light (Me > Appearance), saved on the device; `index.html` applies it before the first paint                                                                                                                                   |
+| `src/lib/contrast.ts`     | The school's own accent colour, worked out for both themes                                                                                                                                                                                     |
 
 **Rules worth knowing:**
 
@@ -148,12 +150,37 @@ mode is designed separately, not inverted.
 - **Floor plans are drawn light.** Dark mode inverts the plan image (`--plan-filter`), so
   a real plan uploaded by an admin becomes a dark architect's plan too.
 
+### shadcn/ui and Tailwind
+
+shadcn/ui is set up (`components.json`, Radix base) for components the app doesn't have
+yet, such as menus, popovers and comboboxes. Tailwind v4 is there only for them; the
+app's own screens stay on CSS Modules and tokens, and nothing about them changed.
+
+- **Tailwind's reset is off.** It would restyle every element in the app. shadcn
+  components get the small part they rely on, scoped to their own elements
+  (`[data-slot]`, at the end of `tailwind.css`).
+- **shadcn's colours are the design tokens.** `bg-primary` is the primary button fill
+  (white in dark mode, black in light), `bg-muted` is `--card2`, `ring` is the accent,
+  radii are the design's concentric radii. Light and dark mode and a school's own
+  colour come for free. The `dark:` variant means "not `.light`".
+- **Cascade layers decide who wins** (declared at the top of `tokens.css`): `theme` <
+  `base` < `components` < `utilities`, and anything unlayered beats every layer. The
+  app's element defaults (`globals.css`) are in `base`, so a Tailwind class on a shadcn
+  component can override, say, the link colour. Tokens, CSS Modules, `glass.css` and
+  `motion.css` are unlayered, so nothing from Tailwind can change the app's components.
+- **Same names, different meanings.** The app's `--muted` is grey text; shadcn's would
+  be a pale background. The app's always wins, so in shadcn components use the
+  `bg-muted` / `text-muted-foreground` utilities, never `var(--muted)` directly.
+- **Touch targets.** shadcn's default button is 32px tall; use `size="lg"` or add `h-11`
+  where people tap, to keep the 44px minimum.
+
 ## Motion
 
 Interactions should feel quick and calm: presses respond at once (scale .97, darken 6%,
 4% in light mode), screens fade, sheets glide, nothing bounces, nothing takes over
-300ms. Everything is plain CSS (no animation library) and only `opacity` and
-`transform` ever animate.
+300ms. The app's animations are plain CSS, and only `opacity` and `transform` ever
+animate. Motion (the `motion` package) is installed for what CSS does badly (drag and
+swipe gestures, layout animations); nothing uses it yet.
 
 **Tokens** (`src/styles/tokens.css`):
 

@@ -22,10 +22,13 @@ Where the two disagree, **the plan wins**. The mockup predates some decisions: v
 
 | Layer | Choice | Notes |
 | --- | --- | --- |
-| Frontend | **React 18 + Vite + TypeScript** | Keep types simple and readable. Generate DB types with `supabase gen types`. |
+| Frontend | **React 19 + Vite + TypeScript** | Keep types simple and readable. Generate DB types with `supabase gen types`. |
 | Routing | React Router | One route per screen; staff-only routes guarded by role. |
 | Data fetching | `@supabase/supabase-js` + TanStack Query | One hooks file per feature (`useAnnouncements`, ...). No data calls inside components directly. |
-| Styling | Plain CSS with CSS variables (tokens) + CSS Modules | No Tailwind, no UI kit. Tokens from the design PDF in `src/styles/tokens.css`. |
+| Styling | Plain CSS with CSS variables (tokens) + CSS Modules for the app's screens | Tokens from the design PDF in `src/styles/tokens.css`. Tailwind v4 is used only by shadcn/ui components, with its reset off and its colours mapped onto the tokens (`src/styles/tailwind.css`). |
+| UI components | shadcn/ui (Radix base, `src/components/ui`) | Added with `npx shadcn add <name>`. The app's own components in `src/components` stay the default. |
+| Animation | CSS (motion tokens in `tokens.css`); Motion (`motion`) available | Existing animations are CSS. Motion is installed for interactions CSS can't do well (gestures, layout). |
+| Liquid glass | CSS recipe in `src/styles/glass.css` | `liquid-glass-react` and `@vepando/liquid-glass-react` are installed for evaluation. |
 | Backend | **Supabase**: Postgres, Auth, Storage, Realtime, Edge Functions | All schema as SQL migrations in `supabase/migrations/`. |
 | Map | Leaflet + react-leaflet, `CRS.Simple` with an image overlay | Indoor floor plans as images; pins in image coordinates. |
 | Dates | date-fns, timezone **Asia/Dubai** | Store `timestamptz`; display in Asia/Dubai. Week starts Sunday in UI date strips is fine; make it a constant. |
