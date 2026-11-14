@@ -5,3 +5,6 @@ package-lock.json
 supabase/.temp
 docs/*.pdf
 CLAUDE.md
+
+# Third-party Claude Code skills, kept exactly as published
+.claude/skills
