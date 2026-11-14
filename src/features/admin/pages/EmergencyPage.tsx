@@ -12,6 +12,7 @@ import { EmptyState, ErrorState, LoadingState } from '@/components/States';
 import { formatDateTime } from '@/lib/dates';
 import { errorMessage } from '@/lib/errors';
 import { AdminPage } from '../components/AdminPage';
+import { footnotes, pageIntros } from '../strings';
 import { useBroadcasts, useSendBroadcast } from '../hooks';
 import { validateBroadcast } from '../logic';
 import styles from './EmergencyPage.module.css';
@@ -32,14 +33,10 @@ export function EmergencyPage() {
   }
 
   return (
-    <AdminPage
-      title="Emergency broadcast"
-      description="Tell everyone at once. For real emergencies and drills only."
-    >
+    <AdminPage title="Emergency broadcast" description={pageIntros.emergency}>
       <div className={styles.warning} role="note">
         <p>
-          <strong>Everyone with the app is notified immediately</strong>, and it stays pinned at the
-          top of every feed. In a real emergency, follow the school's own procedure first.
+          <strong>{footnotes.emergency.alert}</strong> {footnotes.emergency.procedure}
         </p>
       </div>
 

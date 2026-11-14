@@ -42,6 +42,8 @@
 }
 
 .compact .link {
+  /* A subtitle can wrap onto a second line, so the icon sits by the title. */
+  align-items: flex-start;
   min-height: var(--touch-min);
   padding: var(--space-2) var(--space-3);
   border-radius: var(--r-tag);
@@ -91,4 +93,16 @@
 
 .compact .title {
   font-weight: inherit;
+  line-height: 18px;
+}
+
+/* The grey line under each title. It stays grey and regular weight on the
+   highlighted (current) row, as on iPhone. */
+.subtitle {
+  font-weight: 400;
+  overflow-wrap: anywhere;
+}
+
+.compact .subtitle {
+  margin-top: 1px;
 }

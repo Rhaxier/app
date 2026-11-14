@@ -16,9 +16,17 @@ or `/admin`.
   back link to the menu.
 
 The menu's groups and sections are one list in `src/features/admin/sections.ts`; the
-routes are in `src/features/admin/routes.ts`. To add a section, add it to both. Every
-section page is wrapped in `<AdminPage title description actions>`, which supplies the
-header, the phone back link and a readable column width.
+routes are in `src/features/admin/routes.ts`. To add a section, add it to both, and give it
+a menu subtitle and a page intro in `src/features/admin/strings.ts`. Every section page is
+wrapped in `<AdminPage title description actions>`, which supplies the header, the phone
+back link and a readable column width.
+
+**The wording** lives in `src/features/admin/strings.ts`: the grey subtitle under each
+section in the menu (about 60 characters, like a category in iPhone Settings), the line
+under each section's title, and the footnotes under settings and groups that need
+explaining. One plain sentence each, saying what the app really does; where that comes
+from a database rule, a comment beside the sentence names the rule, so the copy can be
+checked when the rule changes.
 
 ## Overview (B1)
 
@@ -183,7 +191,8 @@ its first line checks `is_admin()`.
 ## Files to read
 
 - `supabase/migrations/20261023120000_admin_overview.sql`
-- `src/features/admin/components/AdminLayout.tsx`, `AdminMenu.tsx`, `AdminPage.tsx`
+- `src/features/admin/components/AdminLayout.tsx`, `AdminMenu.tsx`, `AdminPage.tsx`, and
+  `strings.ts` (all the explaining text)
 - `src/features/admin/pages/OverviewPage.tsx`, `components/BarList.tsx`, `StatTile.tsx`
 - `supabase/migrations/20261023120100_people_and_grades.sql`
 - `supabase/migrations/20261023120200_school_calendar.sql`

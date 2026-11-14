@@ -14,6 +14,7 @@ import { downloadCsv, toCsv } from '@/lib/csv';
 import { errorMessage } from '@/lib/errors';
 import type { ImportResult, ImportRow } from '../api';
 import { AdminPage } from '../components/AdminPage';
+import { footnotes, pageIntros } from '../strings';
 import { ImportPreview } from '../components/ImportPreview';
 import { useImportPeople, useImportPreview } from '../hooks';
 import { IMPORT_COLUMNS, importSummary, rowsFromCsv } from '../logic';
@@ -75,16 +76,10 @@ export function ImportPage() {
   }
 
   return (
-    <AdminPage
-      title="Import people"
-      description="Add or update students and staff from a CSV file."
-    >
+    <AdminPage title="Import people" description={pageIntros.import}>
       <Card className="stack-tight">
         <h3>1. Fill in the template</h3>
-        <p className="meta">
-          One person per line: name, email, role (student or teacher), grade and section (for
-          students). Admins are made one at a time on the Users screen.
-        </p>
+        <p className="meta">{footnotes.import.template}</p>
         <Button variant="secondary" icon="download" onClick={() => downloadTemplate(domain)}>
           Download the template
         </Button>
@@ -129,10 +124,7 @@ export function ImportPage() {
         <Card className="stack-tight" aria-live="polite">
           <h3>Imported</h3>
           <p>{importSummary(done)}.</p>
-          <p className="meta">
-            New people are set up the first time they sign in. Fix any problem rows in the file and
-            import it again: rows already done are simply updated.
-          </p>
+          <p className="meta">{footnotes.import.afterImport}</p>
           <ImportPreview results={done} />
         </Card>
       )}

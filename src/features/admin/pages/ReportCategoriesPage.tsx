@@ -18,6 +18,7 @@ import { responsibilityLabel } from '@/lib/status';
 import { Constants } from '@/types/database';
 import type { Responsibility } from '../api';
 import { AdminPage } from '../components/AdminPage';
+import { footnotes, pageIntros } from '../strings';
 import { SettingNumber } from '../components/SettingControls';
 import { categoryKey, validateReportCategory } from '../logic';
 import styles from './ListPage.module.css';
@@ -46,7 +47,7 @@ export function ReportCategoriesPage() {
   return (
     <AdminPage
       title="Fix-it categories"
-      description="What can be reported, and which team gets each kind."
+      description={pageIntros['report-categories']}
       actions={
         <Button size="small" icon="plus" onClick={() => setEditing(null)}>
           Add
@@ -57,7 +58,7 @@ export function ReportCategoriesPage() {
         <SettingNumber
           setting="report_auto_urgent_votes"
           label="Make urgent after this many “me too”"
-          hint="The team is then emailed straight away. Empty = never automatically."
+          hint={footnotes.reportCategories.autoUrgent}
           min={2}
           max={100}
           optional
@@ -175,7 +176,7 @@ function CategoryEditor({
       </fieldset>
       <SelectField
         label="Send to"
-        hint="Everyone holding this responsibility is notified."
+        hint={footnotes.reportCategories.sendTo}
         value={team}
         onChange={(e) => setTeam(e.target.value as Responsibility)}
       >
@@ -187,7 +188,7 @@ function CategoryEditor({
       </SelectField>
       <Switch
         label="In use"
-        hint="Retired categories stay on old reports but can't be chosen."
+        hint={footnotes.reportCategories.inUse}
         checked={active}
         onChange={setActive}
       />

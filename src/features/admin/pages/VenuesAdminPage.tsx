@@ -16,6 +16,7 @@ import type { Venue } from '@/features/venues/api';
 import { useVenues } from '@/features/venues/hooks';
 import { errorMessage } from '@/lib/errors';
 import { AdminPage } from '../components/AdminPage';
+import { footnotes, pageIntros } from '../strings';
 import { SettingNumber, SettingTime, SettingSwitch } from '../components/SettingControls';
 import { useSaveVenue } from '../hooks';
 import { validateVenue, type VenueFormValues } from '../logic';
@@ -41,7 +42,7 @@ export function VenuesAdminPage() {
   return (
     <AdminPage
       title="Venues"
-      description="Who can book, when, and the rules for each venue."
+      description={pageIntros.venues}
       actions={
         <Button size="small" icon="plus" onClick={() => setEditing(null)}>
           Add
@@ -52,21 +53,22 @@ export function VenuesAdminPage() {
         <SettingSwitch
           setting="students_can_request_venues"
           label="Students can request venues"
-          hint="Q2. They name a supervising teacher, who confirms first."
+          hint={footnotes.venues.studentsCanRequest}
         />
         <SettingSwitch
           setting="allow_custom_booking_times"
           label="Allow custom booking times"
-          hint="Off: bookings follow the bell times (one period, or several in a row). On: people can also pick any start and end, e.g. after school. Each venue's limits still apply."
+          hint={footnotes.venues.customTimes}
         />
         <SettingNumber
           setting="after_school_block_minutes"
           label="After-school booking blocks (minutes)"
+          hint={footnotes.venues.afterSchoolBlocks}
           min={15}
           max={120}
         />
         <SettingTime setting="after_school_until" label="Latest after-school booking ends at" />
-        <p className="meta">Remind venue staff about a waiting request when (Q10):</p>
+        <p className="meta">{footnotes.venues.remindWhen}</p>
         <SettingNumber
           setting="venue_reminder_hours"
           label="Pending for (hours)"
@@ -76,6 +78,7 @@ export function VenuesAdminPage() {
         <SettingNumber
           setting="venue_reminder_days_before"
           label="The event is within (days)"
+          hint={footnotes.venues.reminders}
           min={0}
           max={60}
         />
@@ -197,7 +200,7 @@ function VenueEditor({ venue, onClose }: { venue: Venue | null; onClose: () => v
         onChange={(e) => set({ capacity: e.target.value })}
         error={errors.capacity}
       />
-      <p className="label">Booking limits (empty = no limit)</p>
+      <p className="label">{footnotes.venues.limits}</p>
       <FieldRow>
         <TextField
           label="Earliest start"
@@ -230,13 +233,13 @@ function VenueEditor({ venue, onClose }: { venue: Venue | null; onClose: () => v
       </FieldRow>
       <CheckboxField
         label="Bookings need approval"
-        hint="Untick for small rooms: free slots are then booked straight away."
+        hint={footnotes.venues.needsApproval}
         checked={values.needsApproval}
         onChange={(e) => set({ needsApproval: e.target.checked })}
       />
       <CheckboxField
         label="Bookable"
-        hint="Untick to retire it: it leaves the calendar, existing bookings stay."
+        hint={footnotes.venues.bookable}
         checked={values.active}
         onChange={(e) => set({ active: e.target.checked })}
       />

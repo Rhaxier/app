@@ -6,13 +6,14 @@ import { EmptyState, ErrorState, LoadingState } from '@/components/States';
 import { ReportQueueCard } from '@/features/approvals/components/ReportQueueCard';
 import { useLiveReports, useOpenReports } from '@/features/fixit/hooks';
 import { AdminPage } from '../components/AdminPage';
+import { pageIntros } from '../strings';
 
 export function ReportsQueuePage() {
   const reports = useOpenReports();
   useLiveReports();
 
   return (
-    <AdminPage title="Fix-it reports" description="Every open report, urgent first, oldest first.">
+    <AdminPage title="Fix-it reports" description={pageIntros.reports}>
       {reports.isPending && <LoadingState />}
       {reports.isError && <ErrorState error={reports.error} onRetry={() => reports.refetch()} />}
       {reports.data?.length === 0 && (

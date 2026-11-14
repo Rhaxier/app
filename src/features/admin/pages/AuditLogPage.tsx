@@ -9,6 +9,7 @@ import { EmptyState, ErrorState, LoadingState } from '@/components/States';
 import { formatDateTime } from '@/lib/dates';
 import type { AuditFilters } from '../api';
 import { AdminPage } from '../components/AdminPage';
+import { pageIntros } from '../strings';
 import { useAuditFilterChoices, useAuditLog, useUsers } from '../hooks';
 import styles from './ListPage.module.css';
 
@@ -28,7 +29,7 @@ export function AuditLogPage() {
   const set = (changes: Partial<AuditFilters>) => setFilters((f) => ({ ...f, ...changes }));
 
   return (
-    <AdminPage title="Audit log" description="Who changed what. Shows the latest 200 matches.">
+    <AdminPage title="Audit log" description={pageIntros.audit}>
       <Card className={styles.filters}>
         <SelectField
           label="Person"

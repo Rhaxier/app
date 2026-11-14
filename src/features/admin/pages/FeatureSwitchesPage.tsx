@@ -8,16 +8,14 @@ import { Switch } from '@/components/Switch';
 import { useFeatureFlags, useSetFeatureFlag } from '@/features/settings/hooks';
 import { featureDescription, featureLabel } from '@/features/settings/logic';
 import { AdminPage } from '../components/AdminPage';
+import { footnotes, pageIntros } from '../strings';
 
 export function FeatureSwitchesPage() {
   const flags = useFeatureFlags();
   const save = useSetFeatureFlag();
 
   return (
-    <AdminPage
-      title="Feature switches"
-      description="Turn whole features off and on. Admins always see everything."
-    >
+    <AdminPage title="Feature switches" description={pageIntros.features}>
       {flags.isPending && <LoadingState shape="row" count={7} />}
       {flags.isError && <ErrorState error={flags.error} onRetry={() => flags.refetch()} />}
       {flags.data && (
@@ -36,9 +34,7 @@ export function FeatureSwitchesPage() {
             ))}
         </Card>
       )}
-      <p className="meta">
-        Off means: no tab or tile, and nobody but admins can add anything new. Nothing is deleted.
-      </p>
+      <p className="meta">{footnotes.features.off}</p>
     </AdminPage>
   );
 }

@@ -12,6 +12,7 @@ import { useAddStaffEmail, useRemoveStaffEmail, useStaffEmails } from '../hooks'
 import { validateStaffEmail } from '../logic';
 import styles from './ListPage.module.css';
 import { AdminPage } from '../components/AdminPage';
+import { footnotes, pageIntros } from '../strings';
 
 export function StaffEmailsPage() {
   const emails = useStaffEmails();
@@ -31,7 +32,7 @@ export function StaffEmailsPage() {
   }
 
   return (
-    <AdminPage title="Staff emails" description="These people become teachers when they sign in.">
+    <AdminPage title="Staff emails" description={pageIntros['staff-emails']}>
       <form className={styles.addRow} onSubmit={handleSubmit} noValidate>
         <TextField
           label="Add an email"
@@ -71,9 +72,7 @@ export function StaffEmailsPage() {
           </ul>
         </Card>
       )}
-      <p className="meta">
-        Removing an email doesn't change anyone's role. Use Users and roles for that.
-      </p>
+      <p className="meta">{footnotes.staffEmails.list}</p>
     </AdminPage>
   );
 }

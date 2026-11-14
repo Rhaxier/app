@@ -12,12 +12,13 @@ import { useAppSettings } from '@/features/settings/hooks';
 import { fromDateTimeInputValue, toDateTimeInputValue } from '@/lib/dates';
 import { errorMessage } from '@/lib/errors';
 import { AdminPage } from '../components/AdminPage';
+import { footnotes, pageIntros } from '../strings';
 import { useUpdateSettings } from '../hooks';
 
 export function MaintenancePage() {
   const settings = useAppSettings();
   return (
-    <AdminPage title="Maintenance banner" description="A notice at the top of every screen.">
+    <AdminPage title="Maintenance banner" description={pageIntros.maintenance}>
       {settings.isPending && <LoadingState />}
       {settings.data && <MaintenanceForm key={settings.data.updated_at} settings={settings.data} />}
     </AdminPage>
@@ -35,7 +36,7 @@ function MaintenanceForm({ settings }: { settings: AppSettings }) {
     <Card className="stack-tight">
       <Switch
         label="Show the banner"
-        hint="Everyone sees it, signed in or not."
+        hint={footnotes.maintenance.show}
         checked={enabled}
         onChange={setEnabled}
       />
@@ -51,7 +52,7 @@ function MaintenanceForm({ settings }: { settings: AppSettings }) {
       <TextField
         label="Hide it after (optional)"
         type="datetime-local"
-        hint="It disappears on its own then. Empty: until you switch it off."
+        hint={footnotes.maintenance.until}
         value={until}
         onChange={(e) => setUntil(e.target.value)}
       />

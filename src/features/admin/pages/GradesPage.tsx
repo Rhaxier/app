@@ -21,6 +21,7 @@ import {
 import { sectionLabel } from '@/features/school/logic';
 import { errorMessage } from '@/lib/errors';
 import { AdminPage } from '../components/AdminPage';
+import { footnotes, pageIntros } from '../strings';
 import { validateGrade, validateSectionName } from '../logic';
 import styles from './ListPage.module.css';
 
@@ -31,10 +32,7 @@ export function GradesPage() {
   const remove = useDeleteSection();
 
   return (
-    <AdminPage
-      title="Grades and sections"
-      description="The grades the school uses and the sections in each."
-    >
+    <AdminPage title="Grades and sections" description={pageIntros.grades}>
       {(grades.isPending || sections.isPending) && <LoadingState />}
       {grades.isError && <ErrorState error={grades.error} onRetry={() => grades.refetch()} />}
       {grades.data &&
@@ -98,7 +96,7 @@ function GradeCard({ grade, sections, onRemoveSection }: GradeCardProps) {
       </div>
       <Switch
         label="In use"
-        hint="Archived grades stay in the records but aren't offered in pickers."
+        hint={footnotes.grades.inUse}
         checked={grade.active}
         disabled={save.isPending}
         onChange={(active) =>

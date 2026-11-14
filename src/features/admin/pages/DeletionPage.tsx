@@ -15,6 +15,7 @@ import { errorMessage } from '@/lib/errors';
 import { roleLabel } from '@/lib/status';
 import type { AdminUser } from '../api';
 import { AdminPage } from '../components/AdminPage';
+import { footnotes, pageIntros } from '../strings';
 import { useAnonymiseUser, useUsers } from '../hooks';
 import styles from './ListPage.module.css';
 
@@ -35,21 +36,15 @@ export function DeletionPage() {
         );
 
   return (
-    <AdminPage
-      title="Data deletion"
-      description="Delete someone's personal data when they ask, keeping the school's records."
-    >
+    <AdminPage title="Data deletion" description={pageIntros.deletion}>
       <Card className="stack-tight">
         <h2 className={styles.cardTitle}>What happens</h2>
         <ul className="stack-tight">
-          <li>Their name becomes “Deleted user” and their email is removed.</li>
-          <li>Photos and files they uploaded are deleted.</li>
-          <li>Their notifications, settings and class lists go, and they can't sign in.</li>
-          <li>Kept: confirmed SUPW hours, reports, posts and bookings, under “Deleted user”.</li>
+          {footnotes.deletion.steps.map((step) => (
+            <li key={step}>{step}</li>
+          ))}
         </ul>
-        <p className="meta">
-          Older audit log entries can't be changed, so a name may still appear there.
-        </p>
+        <p className="meta">{footnotes.deletion.auditNote}</p>
       </Card>
 
       <TextField

@@ -11,6 +11,7 @@ import { dayKey } from '@/lib/dates';
 import { errorMessage } from '@/lib/errors';
 import type { RolloverStep } from '../api';
 import { AdminPage } from '../components/AdminPage';
+import { footnotes, pageIntros } from '../strings';
 import { useRollover, useRolloverPreview } from '../hooks';
 import styles from './ListPage.module.css';
 
@@ -29,10 +30,7 @@ export function RolloverPage() {
   const phrase = `ROLLOVER ${dayKey().slice(0, 4)}`;
 
   return (
-    <AdminPage
-      title="Year-end rollover"
-      description="Move every student up a grade at the end of the school year."
-    >
+    <AdminPage title="Year-end rollover" description={pageIntros.rollover}>
       <Card className="stack-tight">
         <h3>What will happen</h3>
         {preview.isPending && <LoadingState shape="row" count={3} />}
@@ -47,11 +45,7 @@ export function RolloverPage() {
             ))}
           </ul>
         )}
-        <p className="meta">
-          Archived students keep their history (SUPW hours, reports, projects) but can no longer
-          sign in. Sections stay the same (10 A becomes 11 A). Class lists are not changed: set up
-          next year's classes afterwards.
-        </p>
+        <p className="meta">{footnotes.rollover.whatHappens}</p>
       </Card>
 
       {run.data ? (
@@ -62,7 +56,7 @@ export function RolloverPage() {
               <li key={step.from_grade}>{describe(step)}</li>
             ))}
           </ul>
-          <p className="meta">The rollover is recorded in the audit log.</p>
+          <p className="meta">{footnotes.rollover.recorded}</p>
         </Card>
       ) : (
         <Button

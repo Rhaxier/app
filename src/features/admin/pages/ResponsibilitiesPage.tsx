@@ -13,22 +13,18 @@ import type { AdminUser, Responsibility } from '../api';
 import { useToggleResponsibility, useUsers } from '../hooks';
 import styles from './ListPage.module.css';
 import { AdminPage } from '../components/AdminPage';
+import { footnotes, pageIntros } from '../strings';
 
 const kinds = Constants.public.Enums.responsibility_kind as readonly Responsibility[];
 
-const explanations: Record<Responsibility, string> = {
-  facilities: 'Gets fix-it reports for everything except IT (see Report routes).',
-  it: 'Gets IT fix-it reports.',
-  venues: 'Approves or rejects venue bookings.',
-  supw: 'Confirms SUPW hours for any event and exports the totals.',
-};
+const explanations: Record<Responsibility, string> = footnotes.responsibilities;
 
 export function ResponsibilitiesPage() {
   const users = useUsers();
   const toggle = useToggleResponsibility();
 
   return (
-    <AdminPage title="Responsibilities">
+    <AdminPage title="Responsibilities" description={pageIntros.responsibilities}>
       {users.isPending && <LoadingState />}
       {users.isError && <ErrorState error={users.error} onRetry={() => users.refetch()} />}
       <FormError message={toggle.isError ? errorMessage(toggle.error) : null} />

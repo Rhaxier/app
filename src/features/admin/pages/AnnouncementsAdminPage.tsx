@@ -19,6 +19,7 @@ import { announcementState } from '@/features/announcements/validation';
 import { formatDateTime } from '@/lib/dates';
 import { errorMessage } from '@/lib/errors';
 import { AdminPage } from '../components/AdminPage';
+import { footnotes, pageIntros } from '../strings';
 import { SettingNumber } from '../components/SettingControls';
 import styles from './ListPage.module.css';
 
@@ -44,7 +45,7 @@ export function AnnouncementsAdminPage() {
   return (
     <AdminPage
       title="Announcements"
-      description="Defaults, pinning, and every post including scheduled and expired ones."
+      description={pageIntros.announcements}
       actions={
         <ButtonLink to="/announcements/new" size="small" icon="plus">
           New
@@ -55,7 +56,7 @@ export function AnnouncementsAdminPage() {
         <SettingNumber
           setting="announcement_default_expiry_days"
           label="Default expiry (days)"
-          hint="New announcements expire after this many days unless the author changes it. Empty = no expiry."
+          hint={footnotes.announcements.defaultExpiry}
           min={1}
           max={365}
           optional
