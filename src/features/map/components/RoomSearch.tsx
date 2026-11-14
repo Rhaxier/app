@@ -34,7 +34,7 @@ export function RoomSearch({ rooms, floorName, onPick }: RoomSearchProps) {
         />
       </div>
       {query.trim() && (
-        <ul className={styles.results} aria-label="Matching rooms">
+        <ul className={`glass thick ${styles.results}`} aria-label="Matching rooms">
           {matches.length === 0 && <li className={styles.none}>No rooms match “{query.trim()}”</li>}
           {matches.map((room) => (
             <li key={room.id}>

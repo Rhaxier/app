@@ -1,12 +1,11 @@
 .card {
+  composes: surface from global;
   position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
   padding: var(--space-4) 18px 6px;
   border-radius: var(--r-card);
-  background: var(--card);
-  box-shadow: var(--e1);
 }
 
 .row {

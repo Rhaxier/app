@@ -1,10 +1,9 @@
 /* E1 · resting surface (page 10): cards and lists. Radius 22. */
 .card {
+  composes: surface from global;
   display: block;
   padding: var(--space-4) 18px;
   border-radius: var(--r-card);
-  background: var(--card);
-  box-shadow: var(--e1);
   color: var(--ink);
   text-decoration: none;
   /* Fades in when it first appears, e.g. replacing a loading skeleton. */
@@ -25,10 +24,13 @@
 
 /* Emergency: an orange wash and rim over the card, the label in fix-it ink. */
 .alert {
-  background: linear-gradient(var(--fixsoft), var(--fixsoft)), var(--card);
+  background:
+    linear-gradient(var(--fixsoft), var(--fixsoft)),
+    linear-gradient(180deg, var(--s-spec), transparent 42%), var(--s-tint);
   box-shadow:
-    var(--e1),
-    inset 0 0 0 0.5px color-mix(in srgb, var(--fix) 45%, transparent);
+    inset 0 1px 0 var(--s-rim),
+    inset 0 0 0 0.5px color-mix(in srgb, var(--fix) 45%, transparent),
+    var(--s-lift);
 }
 
 .alert :global(.label) {

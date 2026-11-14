@@ -1,12 +1,12 @@
 /* A whole-card link: icon, two lines of text, chevron. */
 .card {
+  composes: surface from global;
   display: flex;
   align-items: center;
   gap: var(--space-3);
   min-height: 64px;
   padding: var(--space-3) var(--space-4);
   border-radius: var(--r-card);
-  background: var(--card);
   color: var(--ink);
   text-decoration: none;
 }

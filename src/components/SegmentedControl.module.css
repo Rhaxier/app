@@ -7,7 +7,10 @@
   grid-auto-flow: column;
   padding: 2px;
   border-radius: var(--r-seg);
-  background: var(--segbg);
+  background: linear-gradient(180deg, var(--s-spec), transparent 60%), var(--segbg);
+  box-shadow:
+    inset 0 1px 0 var(--s-rim),
+    inset 0 0 0 0.5px var(--c-rim);
 }
 
 .thumb {
@@ -17,8 +20,10 @@
   left: 2px;
   width: calc((100% - 4px) / var(--count));
   border-radius: var(--r-seg-thumb);
-  background: var(--segon);
-  box-shadow: var(--seg-shadow);
+  background: linear-gradient(180deg, var(--s-spec), transparent 60%), var(--segon);
+  box-shadow:
+    inset 0 1px 0 var(--s-rim),
+    var(--seg-shadow);
   transform: translateX(calc(100% * var(--index)));
   transition: transform var(--motion-slow) var(--ease-out);
 }

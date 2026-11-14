@@ -1,8 +1,11 @@
 /* Straight on the canvas, like a printed timetable (design PDF page 7):
    period, start time, then what's happening. Hairlines between rows. */
 .wrap {
+  composes: surface from global;
   display: flex;
   flex-direction: column;
+  padding: 12px 14px 4px;
+  border-radius: var(--r-card);
 }
 
 .heading,
@@ -32,6 +35,10 @@
   min-height: 60px;
   padding: 0 2px;
   border-bottom: 1px solid var(--line);
+}
+
+.row:last-child {
+  border-bottom: 0;
 }
 
 .name {

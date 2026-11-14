@@ -8,12 +8,11 @@
 }
 
 .skeleton {
+  composes: surface from global;
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
   border-radius: var(--r-card);
-  background: var(--card);
-  box-shadow: var(--e1);
   animation: skeleton-pulse 1.4s var(--ease-in-out) infinite;
 }
 
@@ -116,14 +115,13 @@
 }
 
 .box {
+  composes: surface from global;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 6px;
   padding: var(--space-8) var(--space-5) var(--space-6);
   border-radius: var(--r-card);
-  background: var(--card);
-  box-shadow: var(--e1);
   text-align: center;
 }
 

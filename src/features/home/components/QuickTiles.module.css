@@ -2,12 +2,11 @@
    hairline on its right and bottom; the card clips the ones on its outer
    edges, so only the inner dividers show, however many tools are switched on. */
 .grid {
+  composes: surface from global;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   overflow: hidden;
   border-radius: var(--r-card);
-  background: var(--card);
-  box-shadow: var(--e1);
 }
 
 .grid li {

@@ -1,4 +1,5 @@
 .venue {
+  composes: surface from global;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -7,7 +8,6 @@
   padding: var(--space-3) var(--space-4);
   border: 0;
   border-radius: var(--r-card);
-  background: var(--card);
   text-align: left;
   cursor: pointer;
 }

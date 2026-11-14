@@ -27,12 +27,12 @@
 }
 
 .picker {
+  composes: surface-control from global;
   width: var(--height-input);
   height: var(--height-input);
   padding: 4px;
   border: 1px solid var(--line);
   border-radius: var(--r-field);
-  background: var(--card);
   cursor: pointer;
 }
 

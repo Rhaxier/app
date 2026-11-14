@@ -1,8 +1,11 @@
 /* Quiet rows straight on the canvas, as on the Home mockup: a short date
    column, then the title and who it's from. Hairlines between rows. */
 .list {
+  composes: surface from global;
   display: flex;
   flex-direction: column;
+  padding: 2px 16px;
+  border-radius: var(--r-card);
 }
 
 .list li + li {

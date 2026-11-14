@@ -2,15 +2,15 @@
    fill (white in dark mode, black in light), like "All skills" on the
    Collab mockup. */
 .chip {
+  composes: surface-control from global;
   position: relative;
   display: inline-flex;
   align-items: center;
   gap: 6px;
   min-height: var(--height-chip);
   padding: 0 14px;
-  border: 0.5px solid var(--hair);
+  border: 0;
   border-radius: var(--radius-pill);
-  background: var(--card);
   color: var(--ink2);
   font-size: var(--text-body);
   font-weight: 500;

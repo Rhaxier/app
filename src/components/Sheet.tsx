@@ -7,12 +7,17 @@
 // little in from the screen edges. The title stays put while a long sheet
 // scrolls. The dimmed backdrop is not glass: never glass on glass.
 //
+// It's drawn at the end of <body> (a portal), wherever it's used: cards are
+// glass, and a blurred ancestor would turn the sheet's full-screen
+// position: fixed into "fixed inside that card".
+//
 // Motion: the backdrop fades in while the panel slides up (sheet 280ms), and
 // closing plays the same in reverse. With reduced motion it only fades. To have time for that, the sheet stays on
 // screen a moment after `open` turns false (usePresence), showing what it
 // showed last. Render <Sheet open={…}> rather than {open && <Sheet open>},
 // or there is nothing left to animate.
 import { useEffect, useId, useRef, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { usePresence } from '@/lib/usePresence';
 import { Icon } from './Icon';
 import styles from './Sheet.module.css';
@@ -91,7 +96,7 @@ export function Sheet({ open, title, onClose, children }: SheetProps) {
   if (!mounted) return null;
   const content = leaving ? shown.current : { title, children };
 
-  return (
+  return createPortal(
     <div
       className={styles.backdrop}
       data-state={leaving ? 'closing' : 'open'}
@@ -121,6 +126,7 @@ export function Sheet({ open, title, onClose, children }: SheetProps) {
         </div>
         <div className={styles.body}>{content.children}</div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

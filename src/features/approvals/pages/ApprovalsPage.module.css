@@ -53,13 +53,12 @@
 /* Four counts in one card, split by hairlines: two by two on a phone, one
    row on a laptop. */
 .stats {
+  composes: surface from global;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   margin: 0;
   overflow: hidden;
   border-radius: var(--r-card);
-  background: var(--card);
-  box-shadow: var(--e1);
 }
 
 .stat {
@@ -120,11 +119,10 @@
 
 /* The queue: one card; the rows decide between table and stack by its width. */
 .queue {
+  composes: surface from global;
   container: queue / inline-size;
   overflow: hidden;
   border-radius: var(--r-card);
-  background: var(--card);
-  box-shadow: var(--e1);
 }
 
 .rows > li + li {

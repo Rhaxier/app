@@ -35,7 +35,8 @@
   color: var(--muted);
 }
 
-/* Matches: a solid popover (E2), not more glass: never glass on glass. */
+/* Matches: a thick-glass popover. It hangs below the search bar, not on top
+   of it, so it's never glass on glass. */
 .results {
   position: absolute;
   top: calc(100% + 8px);
@@ -44,8 +45,6 @@
   z-index: 1000;
   padding: 6px;
   border-radius: var(--r-card);
-  background: var(--card);
-  box-shadow: var(--e1), var(--e2);
 }
 
 .result {
