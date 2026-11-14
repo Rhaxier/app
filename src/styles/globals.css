@@ -33,9 +33,14 @@
 
   /*
    * E0 · the ambient glow behind every screen (page 10): soft blue from the top
-   * and a violet bloom on the right. It is fixed to the screen and doesn't
-   * scroll. A fixed layer behind everything is used rather than
-   * background-attachment: fixed, which iPhones ignore.
+   * and a violet bloom on the right, with fainter rose, teal and amber ones
+   * (the --glow token). It is fixed to the screen and doesn't scroll. A fixed
+   * layer behind everything is used rather than background-attachment: fixed,
+   * which iPhones ignore.
+   *
+   * It stays still on purpose. Every glass surface blurs whatever is behind
+   * it, so a drifting glow would make each of them redraw its blur on every
+   * frame, which drains phone batteries and stutters on older phones.
    */
   body::before {
     content: '';
