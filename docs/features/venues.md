@@ -5,6 +5,12 @@ Same shape as announcements; read [`announcements.md`](announcements.md) first.
 
 ## What it does
 
+- **The school's real timetable (2026–27)** is loaded as the periods: see
+  [`docs/timetable/README.md`](../timetable/README.md) for every period, break and lunch,
+  the CSV files to re-upload (Admin › Upload bell times), and the Term 3 version. Breaks
+  and lunch are the gaps between periods; the list labels them ("Lunch" for 25 minutes or
+  more) with their times.
+
 - **Calendar, by periods** (reference screen 4): the venue's name as the title (tap it to
   choose another), a strip of school days, and the chosen date's **periods**, each with
   its name and start time: available (with a "+"), booked (hatched), pending approval

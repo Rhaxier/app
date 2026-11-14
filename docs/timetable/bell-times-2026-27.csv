@@ -1,0 +1,40 @@
+weekday,period_name,start_time,end_time,order
+Monday,Period 1,07:45,08:25,1
+Monday,Period 2,08:25,09:15,2
+Monday,Period 3,09:15,10:05,3
+Monday,Period 4,10:20,11:10,4
+Monday,Period 5,11:10,12:00,5
+Monday,Period 6,12:00,12:50,6
+Monday,Period 7,13:20,14:10,7
+Monday,Period 8,14:10,15:00,8
+Tuesday,Period 1,07:45,08:25,1
+Tuesday,Period 2,08:25,09:15,2
+Tuesday,Period 3,09:15,10:05,3
+Tuesday,Period 4,10:20,11:10,4
+Tuesday,Period 5,11:10,12:00,5
+Tuesday,Period 6,12:00,12:50,6
+Tuesday,Period 7,13:20,14:10,7
+Tuesday,Period 8,14:10,15:00,8
+Wednesday,Period 1,07:45,08:25,1
+Wednesday,Period 2,08:25,09:15,2
+Wednesday,Period 3,09:30,10:20,3
+Wednesday,Period 4,10:20,11:10,4
+Wednesday,Period 5,11:10,12:00,5
+Wednesday,Period 6,12:25,13:15,6
+Wednesday,Period 7,13:15,14:05,7
+Wednesday,Collab / PD,14:15,15:50,8
+Thursday,Period 1,07:45,08:25,1
+Thursday,Period 2,08:25,09:15,2
+Thursday,Period 3,09:30,10:20,3
+Thursday,Period 4,10:20,11:10,4
+Thursday,Period 5,11:10,12:00,5
+Thursday,Period 6,12:25,13:15,6
+Thursday,Period 7,13:15,14:05,7
+Thursday,Collab / PD,14:15,15:50,8
+Friday,Period 1 (Registration),07:35,07:45,1
+Friday,Period 2,07:45,08:20,2
+Friday,Period 3,08:20,08:55,3
+Friday,Period 4,08:55,09:25,4
+Friday,Period 5,09:40,10:10,5
+Friday,Period 6,10:10,10:40,6
+Friday,Period 7,10:40,11:10,7

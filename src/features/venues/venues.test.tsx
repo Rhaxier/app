@@ -10,6 +10,7 @@ import type { BookingDetails, CalendarBooking } from './api';
 import { PeriodList } from './components/PeriodList';
 import {
   buildSlots,
+  gapBetween,
   customTimesProblem,
   firstBookableDay,
   freeRun,
@@ -72,6 +73,37 @@ describe('buildSlots', () => {
       '2026-10-20T08:00:00.000Z', // 12:00
       '2026-10-20T09:30:00.000Z', // 13:30
     ]);
+  });
+});
+
+describe('breaks and lunch (the gaps in the timetable)', () => {
+  // Monday in the 2026–27 timetable: Period 3 ends 10:05, Period 4 starts
+  // 10:20 (a break); Period 6 ends 12:50, Period 7 starts 13:20 (lunch).
+  const monday: Period[] = [
+    ['Period 3', '09:15', '10:05'],
+    ['Period 4', '10:20', '11:10'],
+    ['Period 5', '11:10', '12:00'],
+    ['Period 6', '12:00', '12:50'],
+    ['Period 7', '13:20', '14:10'],
+  ].map(([name, starts, ends], i) => ({
+    ...periods[0],
+    id: `m${i}`,
+    name,
+    starts_at: `${starts}:00`,
+    ends_at: `${ends}:00`,
+    sort_order: i,
+    weekdays: [1],
+  }));
+  const day = buildSlots('2026-10-19', monday);
+
+  it('names a 15-minute gap a break and a 30-minute one lunch, with times', () => {
+    expect(gapBetween(day[0], day[1])).toMatchObject({ label: 'Break' });
+    expect(gapBetween(day[3], day[4])).toMatchObject({ label: 'Lunch' });
+    expect(gapBetween(day[3], day[4])?.start.toISOString()).toBe('2026-10-19T08:50:00.000Z');
+  });
+
+  it('draws no line between periods that run on', () => {
+    expect(gapBetween(day[1], day[2])).toBeNull();
   });
 });
 

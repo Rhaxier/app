@@ -139,6 +139,25 @@ export function selectionTimes(slots: Slot[], selection: Selection): { start: Da
   return { start: slots[selection.first].start, end: slots[selection.last].end };
 }
 
+/** A gap of five minutes or more between periods is shown as a line in the list. */
+const GAP_MS = 5 * 60_000;
+/** Gaps this long are lunch (the timetable's lunches are 25–30 minutes, its breaks 10–15). */
+const LUNCH_MS = 25 * 60_000;
+
+/**
+ * The line between two periods, if there's a gap: "Lunch" or "Break", with its
+ * times. Breaks and lunch aren't stored; they're the gaps in the timetable
+ * (docs/timetable/README.md).
+ */
+export function gapBetween(
+  previous: Slot,
+  next: Slot,
+): { label: string; start: Date; end: Date } | null {
+  const gap = next.start.getTime() - previous.end.getTime();
+  if (gap < GAP_MS) return null;
+  return { label: gap >= LUNCH_MS ? 'Lunch' : 'Break', start: previous.end, end: next.start };
+}
+
 /** "Period 2" or "Period 2 to Period 3": the names of a run. */
 export function runLabel(slots: Slot[], selection: Selection): string {
   const first = slots[selection.first].name;
