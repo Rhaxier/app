@@ -571,10 +571,11 @@ order`, one line per period per weekday. A weekday is its name or its first thre
 
 **Configurable in Admin.**
 
-- Default used: no. A new booking must start when a period starts and end when a period
-  ends on that date's weekday: one period, or several in a row (the booking then also
-  covers any break between them). Bookings made before this rule, or while custom times
-  were allowed, are left as they are. With custom times on, any start and end can be
+- Default used: no. During school hours a new booking must start when a period starts
+  and end when a period ends on that date's weekday: one period, or several in a row (the
+  booking then also covers any break between them). After the day's last period,
+  bookings come in blocks instead (see Q55). Bookings made before this rule, or while
+  custom times were allowed, are left as they are. With custom times on, any start and end can be
   requested, and the venue's own limits (bookable hours, longest booking, days ahead) and
   holidays and blackouts still apply.
 - Where it lives: `app_settings.allow_custom_booking_times` (default false);
@@ -654,3 +655,35 @@ order`, one line per period per weekday. A weekday is its name or its first thre
   the imports in `src/main.tsx`, `--font` and `--font-mono` in `src/styles/tokens.css`.
 - To change it: swap the imports for a Google Fonts `<link>` in `index.html`; the token
   names stay the same.
+
+## Q55: How late can venues be booked after school, and in what blocks?
+
+**Configurable in Admin.** The school hasn't said; these are defaults.
+
+- Default used: after-school bookings are listed under the periods, below an "After School
+  Hours" line, in **30-minute blocks until 18:00**. After school starts when that day's
+  last period ends, rounded up to a whole block: with the 2026–27 timetable, 15:00 on
+  Monday and Tuesday, 16:00 on Wednesday and Thursday (the Collab / PD block runs until
+  15:50 and is itself bookable as a period), and 11:30 on Friday. Several blocks in a row
+  make one booking. A venue's own "Latest end" still applies if it's earlier. No new
+  required fields: the request form is the same.
+- Where it lives: `app_settings.after_school_block_minutes` (15–120, steps of 5) and
+  `app_settings.after_school_until`; enforced by `booking_period_problem()` in
+  `supabase/migrations/20261114120000_after_school_booking.sql`; the list in
+  `afterSchoolSlots()` (`src/features/venues/logic.ts`) and `PeriodList.tsx`.
+- To change it: **Admin > Features > Venues > After-school booking blocks** and **Latest
+  after-school booking ends at**, or `update app_settings set after_school_until = '19:00';`.
+  The migration must be applied first (`npx supabase db push`); until then the app hides
+  the after-school list and the two settings.
+
+## Q56: Which timetable applies when?
+
+- Default used: the Terms 1–2 bell times from `School Timings 2026-27.pdf` are loaded.
+  Term 3's (Monday–Thursday only) is ready as a file but not loaded, since the app keeps
+  one set of periods at a time; Friday keeps its Term 1–2 periods. How the PDF was read
+  (which rows are bookable, breaks and lunch, Term 3's printed durations) is in
+  `docs/timetable/README.md`.
+- Where it lives: the `periods` table; the files in `docs/timetable/`.
+- To change it: when Term 3 starts, **Admin > School calendar > Upload bell times** with
+  `docs/timetable/bell-times-2026-27-term3.csv`, and upload `bell-times-2026-27.csv` again
+  for the next year's Terms 1–2 (or a new file once the school publishes 2027–28).

@@ -142,6 +142,21 @@ overflow). Headless Chrome's software renderer doesn't blur in-page content behi
 glass, so the screenshots were taken with GPU emulation (SwiftShader); real browsers blur
 normally.
 
+## 1e. Round 5: glass, motion, timetable booking, polish
+
+Eight items, one commit each (`Item 1` … `Item 8` in `git log`).
+
+| Item                   | What was done                                                                                                                                                                                                  |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1 More liquid glass    | Cards, tiles, list rows, inputs, segmented controls, chips, sheets and popovers are glass (`.surface`, `.surface-control`); never glass on glass; solid with reduced transparency                              |
+| 2 iOS-style motion     | Motion library: the tab lens springs between tabs, screens slide when drilling in and back, search grows out of its button, sliding segments and chips, rolling counters. One tokens file: `src/lib/motion.ts` |
+| 3 Timetable booking    | The 2026–27 bell times (`docs/timetable/`) loaded into `periods`; booking offers periods, breaks and lunch as the school day runs (Q56)                                                                        |
+| 4 After-school booking | Blocks after the last period, under "After School Hours", 30 minutes until 18:00 by default (Q55). **Needs migration `20261114120000` pushed**                                                                 |
+| 5 Bottom bar           | 50px search button, labels no longer widen when active; staff phones under 390px get search in the Home header                                                                                                 |
+| 6 Search as you type   | Results 150ms after typing stops; Enter at once; waits for Japanese/Chinese/Korean keyboards to finish a word                                                                                                  |
+| 7 Ambient glows        | Rose, teal and amber glows join blue and violet; contrast checked; still, not drifting                                                                                                                         |
+| 8 Admin descriptions   | A subtitle under every admin section and footnotes under hard settings, all in `src/features/admin/strings.ts`                                                                                                 |
+
 ## 2. How to run it
 
 See the [README](../README.md):
@@ -155,12 +170,12 @@ See the [README](../README.md):
 
 ## 3. Test results
 
-| Suite                                        | Result                                                                        |
-| -------------------------------------------- | ----------------------------------------------------------------------------- |
-| Database (pgTAP, `npm run db:test`)          | **383 passed, 0 failed** in 17 files (round 2: 348 in 16; round 1: 119 in 8)  |
-| UI (Vitest, `npm test`)                      | **197 passed, 0 failed** in 26 files (round 3: 176 in 23; round 2: 159 in 22) |
-| Lint, type check, Prettier, production build | All clean                                                                     |
-| Edge Functions                               | Type-check with Deno                                                          |
+| Suite                                        | Result                                                                                                         |
+| -------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| Database (pgTAP, `npm run db:test`)          | **383 passed, 0 failed** in 17 files; round 5's `18_after_school_test.sql` (11 checks) not yet run (no Docker) |
+| UI (Vitest, `npm test`)                      | **209 passed, 0 failed** in 27 files (round 4: 197 in 26; round 3: 176 in 23)                                  |
+| Lint, type check, Prettier, production build | All clean                                                                                                      |
+| Edge Functions                               | Type-check with Deno                                                                                           |
 
 The 15 required database rules map to these files: roles and audit (1) →
 `01_identity_test.sql`; projects (2) → `05`; announcements (3) → `03`; volunteering (4–6)

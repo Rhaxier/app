@@ -176,22 +176,30 @@ app's own screens stay on CSS Modules and tokens, and nothing about them changed
 
 ## Motion
 
-Interactions should feel quick and calm: presses respond at once (scale .97, darken 6%,
-4% in light mode), screens fade, sheets glide, nothing bounces, nothing takes over
-300ms. The app's animations are plain CSS, and only `opacity` and `transform` ever
-animate. Motion (the `motion` package) is installed for what CSS does badly (drag and
-swipe gestures, layout animations); nothing uses it yet.
+Interactions should feel quick and calm, iOS-style: presses respond at once (scale .97,
+darken 6%, 4% in light mode), indicators spring to where you tapped, screens slide when
+you drill in and cross-fade between tabs, sheets glide up. Everything settles in 150–400ms
+and only `opacity` and `transform` ever animate. Simple things (presses, hovers, fades,
+list stagger) are plain CSS; springs, shared-element moves and exits use Motion (the
+`motion` package).
 
-**Tokens** (`src/styles/tokens.css`):
+**One tokens file:** `src/lib/motion.ts` holds every duration, curve, distance and spring.
+Motion components import the springs; `installMotionTokens()` (called in `main.tsx`)
+writes the same values onto `<html>` as CSS custom properties, so CSS and Motion can't
+drift apart.
 
-| Token            | Value                             | Used for                                  |
-| ---------------- | --------------------------------- | ----------------------------------------- |
-| `--motion-fast`  | `120ms`                           | press feedback, hovers, colour changes    |
-| `--motion-base`  | `200ms`                           | fades, list items, toasts, screen changes |
-| `--motion-slow`  | `280ms`                           | bottom sheets                             |
-| `--ease-out`     | `cubic-bezier(0.2, 0, 0, 1)`      | things arriving                           |
-| `--ease-in-out`  | `cubic-bezier(0.4, 0, 0.2, 1)`    | things leaving or moving                  |
-| `--motion-shift` | `8px` (`0px` with reduced motion) | how far things travel as they fade in     |
+| Token / export                      | Value                             | Used for                                         |
+| ----------------------------------- | --------------------------------- | ------------------------------------------------ |
+| `--motion-fast` / `duration.fast`   | `120ms`                           | press feedback, hovers, colour changes           |
+| `--motion-base` / `duration.base`   | `200ms`                           | fades, list items, toasts                        |
+| `--motion-slow` / `duration.slow`   | `280ms`                           | CSS-only panels                                  |
+| `--ease-out` / `easeOut`            | `cubic-bezier(0.2, 0, 0, 1)`      | everything that arrives (the deck's curve)       |
+| `--ease-in-out` / `easeInOut`       | `cubic-bezier(0.4, 0, 0.2, 1)`    | things moving on screen                          |
+| `--motion-shift` / `distance.shift` | `8px` (`0px` with reduced motion) | how far things travel as they fade in            |
+| `spring.indicator`                  | 0.34s, bounce 0.14                | tab lens, segmented thumb, chip pill             |
+| `spring.page`                       | 0.32s, no bounce                  | screens sliding in and out                       |
+| `spring.sheet`                      | 0.4s, bounce 0.08                 | sheets, the search panel growing from its button |
+| `spring.pop`                        | 0.3s, bounce 0.22                 | notification dots and counters                   |
 
 **What to use:**
 
@@ -202,22 +210,33 @@ swipe gestures, layout animations); nothing uses it yet.
 | Errors from a button with nowhere to say | `meta: { errorToast: true }` on the mutation                                                         |
 | A loading list                           | `<LoadingState />` (skeleton cards; `shape="row"`, `"slot"` or `"block"` for other shapes)           |
 | Items that arrive or leave while open    | `<MotionList>` or `useListMotion()` (new items slide in, removed ones fade out; first load is still) |
-| A pop-up panel                           | `<Sheet open={…}>` (slides up, reverses on close, moves focus in and back)                           |
+| A pop-up panel                           | `<Sheet open={…}>` (springs up, reverses on close, moves focus in and back)                          |
+| A selected option that slides            | `<SegmentedControl>`, or `<ChipGroup>` with sliding chips (a shared `layoutId`)                      |
+| A number that changes                    | `<AnimatedNumber value={…} />` (rolls; screen readers get the plain value)                           |
 | An instant response to a small toggle    | An optimistic mutation: see `useToggleVote` (fix-it), `useMarkRead`, `useSetRequestStatus`           |
 
-**Screen changes** use the browser's View Transitions API. `src/app/screenTransitions.ts`
-turns it on for every navigation and marks the direction on `<html data-nav>`. Screens
-fade (the design's "fade 200ms"); nothing slides. Switching tabs cross-fades, drilling
-into a detail page fades the new screen in over the old one, and going back fades the old
-one away. Because nothing moves, the tab bar is identical in both pictures and stays
-still. Taps pass straight through during a transition. Browsers without the API get a
-plain fade (`AppLayout`).
+**Screen changes** (`src/app/screenTransitions.ts`, used by `AppLayout`): drilling in
+(`/collab` → `/collab/123`) slides the new screen in from the right while the old one
+drifts left; coming back reverses it; switching tabs cross-fades. The leaving screen is
+lifted out of the page's flow (`AnimatePresence mode="popLayout"`), so nothing jumps.
+Only the screen moves: the tab bar is outside it, and screens move their own fixed chrome
+(the map, the booking bar) out of the sliding layer with `PageChrome`, so it fades in
+place. The browser's View Transitions API isn't used: an element with a
+`view-transition-name` can't blur what's behind it, which would turn the glass off.
+
+**The tab bar**: the active tab's raised lens is one element that springs between tabs
+(Motion `layoutId="tab-lens"`), and the search button grows into the search overlay and
+shrinks back when it closes (`SEARCH_MORPH_ID`). ⌘K / Ctrl+K opens search without
+animation: a keyboard shortcut should feel instant.
 
 **Reduced motion** (the design's "opacity only"). When the device asks for less motion,
-nothing slides, shrinks or spins, but things still fade: `--motion-shift` becomes 0 and
-`--press-scale` 1 (`tokens.css`), sheets fade instead of sliding, and Leaflet's zoom
-stops animating. `motionMs()` still returns the real durations, so code waits for the
-fades.
+nothing slides, shrinks or springs, but things still fade: `<MotionConfig
+reducedMotion="user">` (App.tsx) drops Motion's movement, `--motion-shift` becomes 0 and
+`--press-scale` 1, and Leaflet's zoom stops animating. `motionMs()` still returns the real
+durations, so code waits for the fades. **Reduced transparency** swaps every glass
+surface for a solid fill (`src/styles/glass.css`). The ambient glow behind the screens
+stays still on purpose: a moving backdrop would make every glass surface redraw its blur
+on each frame.
 
 ## Decisions worth knowing
 
