@@ -1,6 +1,6 @@
 /*
- * The floating tab bar. Floating chrome sits 16px in from the screen edges and
- * 18px up from the bottom (page 10), within the app's centred column.
+ * The floating tab bar, 18px up from the bottom (page 10) and 12px in from the
+ * screen edges (other floating chrome uses 16px), within the app's centred column.
  * The pill: radius 31, 5px padding, so the active lens is 31 − 5 = 26.
  */
 .bar {
@@ -10,10 +10,12 @@
   bottom: calc(var(--chrome-bottom) + env(safe-area-inset-bottom));
   z-index: 800;
   display: flex;
-  gap: 10px;
+  align-items: center;
+  gap: 8px;
   max-width: var(--content-max);
   margin: 0 auto;
-  padding: 0 var(--chrome-inset);
+  /* A little closer to the edges than other floating chrome, to give the tabs room. */
+  padding: 0 var(--space-3);
   pointer-events: none;
 }
 
@@ -72,17 +74,20 @@
   z-index: 1;
 }
 
+/* Only the colour changes on the active tab, as on iOS. The label keeps its
+   weight, so it doesn't widen and crowd its neighbours ("Approvals", the
+   widest, is 42px). */
 .active {
   color: var(--acc);
-  font-weight: 600;
 }
 
-/* The round search button: same glass, same height. */
+/* The round search button: same glass as the pill, a little smaller (50px;
+   44 is the smallest tap target) so the tabs get the room. */
 .search,
 .searchSpace {
   flex: none;
-  width: var(--height-tabbar);
-  height: var(--height-tabbar);
+  width: 50px;
+  height: 50px;
 }
 
 .search {
@@ -94,10 +99,12 @@
   pointer-events: auto;
 }
 
-/* Six tabs (staff) on a phone narrower than 375px: the tabs need the room,
-   so the search button moves into the Home header (HomeHeader.module.css). */
-@media (max-width: 374px) {
-  .crowded .search {
+/* Six tabs (staff) on a phone narrower than 390px: each tab needs about 50px
+   so no label touches the next, which leaves no room for the search button.
+   It moves into the Home header there (HomeHeader.module.css). */
+@media (max-width: 389px) {
+  .crowded .search,
+  .crowded .searchSpace {
     display: none;
   }
 }

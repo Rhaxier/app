@@ -41,7 +41,8 @@ export function HomeHeader() {
       <div className={styles.topRow}>
         <p className="label">{formatDate(now)}</p>
         <div className={styles.actions}>
-          {/* Only shown when six staff tabs crowd search out of the tab bar. */}
+          {/* Shown to staff on phones narrower than 390px, where six tabs crowd
+              search out of the tab bar. */}
           {isStaff(user) && (
             <button
               type="button"

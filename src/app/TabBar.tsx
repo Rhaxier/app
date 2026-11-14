@@ -8,7 +8,7 @@
 // overlay (SearchOverlay) and shrinks back into place when it closes.
 //
 // Students get five tabs; staff also get Approvals. On a phone narrower than
-// 375px six tabs leave no room for the search button, so it moves into the
+// 390px six tabs leave no room for the search button, so it moves into the
 // Home header there instead (`crowded`).
 import { motion } from 'motion/react';
 import { Link, useLocation } from 'react-router-dom';
@@ -23,7 +23,7 @@ import { isTabActive, tabsFor } from './tabs';
 import styles from './TabBar.module.css';
 
 /** The search button's size in px (its corner radius must be known for the morph). */
-const SEARCH_SIZE = 62;
+const SEARCH_SIZE = 50;
 
 export function TabBar() {
   const user = useCurrentUser();
