@@ -1,0 +1,5778 @@
+{
+ "floors": {
+  "G": {
+   "notes": [
+    "cut off from the main area (NO stair symbol): Multipurpose Hall, Male Washroom, Store, Female Washroom, Store",
+    "cut off from the main area (NO stair symbol): Canteen, PE Room, KG Swimming Pool",
+    "cut off from the main area (NO stair symbol): Swimming Pool",
+    "65 inferred doors; 3 door-to-corridor links cross a wall corner"
+   ],
+   "stairSymbols": [
+    {
+     "region": "G-R038",
+     "at": [
+      2979.0,
+      812.3
+     ]
+    },
+    {
+     "region": "G-R053",
+     "at": [
+      1739.0,
+      972.0
+     ]
+    },
+    {
+     "region": "G-R050",
+     "at": [
+      1221.5,
+      978.5
+     ]
+    },
+    {
+     "region": "G-R056",
+     "at": [
+      2600.5,
+      979.0
+     ]
+    },
+    {
+     "region": "G-R081",
+     "at": [
+      1166.0,
+      1397.5
+     ]
+    },
+    {
+     "region": "G-R099",
+     "at": [
+      792.7,
+      1576.0
+     ]
+    },
+    {
+     "region": "G-R116",
+     "at": [
+      1732.5,
+      1633.5
+     ]
+    },
+    {
+     "region": "G-R117",
+     "at": [
+      2083.5,
+      1637.0
+     ]
+    },
+    {
+     "region": "G-R166",
+     "at": [
+      786.3,
+      2248.7
+     ]
+    },
+    {
+     "region": "G-R183",
+     "at": [
+      2650.5,
+      2426.5
+     ]
+    }
+   ],
+   "regions": [
+    {
+     "id": "G-R001",
+     "kind": "room",
+     "name": null,
+     "page": [
+      1657,
+      546
+     ],
+     "area": 2379
+    },
+    {
+     "id": "G-R002",
+     "kind": "room",
+     "name": null,
+     "page": [
+      1726,
+      546
+     ],
+     "area": 3512
+    },
+    {
+     "id": "G-R003",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      1599,
+      612
+     ],
+     "area": 6447
+    },
+    {
+     "id": "G-R004",
+     "kind": "room",
+     "name": "Clinic",
+     "page": [
+      1663,
+      599
+     ],
+     "area": 3396
+    },
+    {
+     "id": "G-R005",
+     "kind": "room",
+     "name": null,
+     "page": [
+      1711,
+      611
+     ],
+     "area": 1377
+    },
+    {
+     "id": "G-R006",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      1768,
+      581
+     ],
+     "area": 1472
+    },
+    {
+     "id": "G-R007",
+     "kind": "room",
+     "name": null,
+     "page": [
+      1770,
+      611
+     ],
+     "area": 1377
+    },
+    {
+     "id": "G-R008",
+     "kind": "room",
+     "name": "Design and Technology Lab",
+     "page": [
+      2042,
+      611
+     ],
+     "area": 17977
+    },
+    {
+     "id": "G-R009",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      2221,
+      612
+     ],
+     "area": 6480
+    },
+    {
+     "id": "G-R010",
+     "kind": "room",
+     "name": null,
+     "page": [
+      917,
+      632
+     ],
+     "area": 1186
+    },
+    {
+     "id": "G-R011",
+     "kind": "room",
+     "name": null,
+     "page": [
+      953,
+      657
+     ],
+     "area": 1903
+    },
+    {
+     "id": "G-R012",
+     "kind": "room",
+     "name": null,
+     "page": [
+      2869,
+      658
+     ],
+     "area": 1887
+    },
+    {
+     "id": "G-R013",
+     "kind": "room",
+     "name": null,
+     "page": [
+      2905,
+      632
+     ],
+     "area": 1171
+    },
+    {
+     "id": "G-R014",
+     "kind": "void",
+     "name": null,
+     "page": [
+      391,
+      671
+     ],
+     "area": 976664
+    },
+    {
+     "id": "G-R015",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      889,
+      710
+     ],
+     "area": 10673
+    },
+    {
+     "id": "G-R016",
+     "kind": "room",
+     "name": "PYP3 H",
+     "page": [
+      1011,
+      713
+     ],
+     "area": 10903
+    },
+    {
+     "id": "G-R017",
+     "kind": "room",
+     "name": "MYP1 D",
+     "page": [
+      2801,
+      718
+     ],
+     "area": 11006
+    },
+    {
+     "id": "G-R018",
+     "kind": "room",
+     "name": "Art",
+     "page": [
+      2921,
+      710
+     ],
+     "area": 10640
+    },
+    {
+     "id": "G-R019",
+     "kind": "room",
+     "name": "Inclusion Unit",
+     "page": [
+      782,
+      774
+     ],
+     "area": 3734
+    },
+    {
+     "id": "G-R020",
+     "kind": "room",
+     "name": "PYP3 E",
+     "page": [
+      1120,
+      765
+     ],
+     "area": 11846
+    },
+    {
+     "id": "G-R021",
+     "kind": "room",
+     "name": null,
+     "page": [
+      1237,
+      769
+     ],
+     "area": 2236
+    },
+    {
+     "id": "G-R022",
+     "kind": "room",
+     "name": "PYP 3 Supervisor",
+     "page": [
+      1532,
+      763
+     ],
+     "area": 4797
+    },
+    {
+     "id": "G-R023",
+     "kind": "room",
+     "name": "Senior Library",
+     "page": [
+      1901,
+      779
+     ],
+     "area": 87203
+    },
+    {
+     "id": "G-R024",
+     "kind": "room",
+     "name": "Supervisor Teaching & Learning",
+     "page": [
+      2293,
+      759
+     ],
+     "area": 4948
+    },
+    {
+     "id": "G-R025",
+     "kind": "room",
+     "name": null,
+     "page": [
+      2584,
+      769
+     ],
+     "area": 1996
+    },
+    {
+     "id": "G-R026",
+     "kind": "room",
+     "name": "MYP1 C",
+     "page": [
+      2691,
+      770
+     ],
+     "area": 11873
+    },
+    {
+     "id": "G-R027",
+     "kind": "room",
+     "name": "Art",
+     "page": [
+      3021,
+      751
+     ],
+     "area": 4233
+    },
+    {
+     "id": "G-R028",
+     "kind": "room",
+     "name": null,
+     "page": [
+      750,
+      817
+     ],
+     "area": 1361
+    },
+    {
+     "id": "G-R029",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      859,
+      791
+     ],
+     "area": 8015
+    },
+    {
+     "id": "G-R030",
+     "kind": "room",
+     "name": "PYP3 B",
+     "page": [
+      1315,
+      797
+     ],
+     "area": 11479
+    },
+    {
+     "id": "G-R031",
+     "kind": "room",
+     "name": "PYP3 A",
+     "page": [
+      1441,
+      798
+     ],
+     "area": 11583
+    },
+    {
+     "id": "G-R032",
+     "kind": "room",
+     "name": "Male Washroom",
+     "page": [
+      1616,
+      781
+     ],
+     "area": 2142
+    },
+    {
+     "id": "G-R033",
+     "kind": "room",
+     "name": "Dean of Studies",
+     "page": [
+      1774,
+      781
+     ],
+     "area": 5596
+    },
+    {
+     "id": "G-R034",
+     "kind": "room",
+     "name": "Vice-Principal / Head Primary",
+     "page": [
+      2029,
+      803
+     ],
+     "area": 7221
+    },
+    {
+     "id": "G-R035",
+     "kind": "room",
+     "name": "Female Washroom",
+     "page": [
+      2230,
+      782
+     ],
+     "area": 1956
+    },
+    {
+     "id": "G-R036",
+     "kind": "room",
+     "name": "PYP3 I",
+     "page": [
+      2363,
+      798
+     ],
+     "area": 11384
+    },
+    {
+     "id": "G-R037",
+     "kind": "room",
+     "name": "MYP1 A",
+     "page": [
+      2487,
+      797
+     ],
+     "area": 11532
+    },
+    {
+     "id": "G-R038",
+     "kind": "stairwell",
+     "name": null,
+     "page": [
+      2940,
+      784
+     ],
+     "area": 7171
+    },
+    {
+     "id": "G-R039",
+     "kind": "room",
+     "name": null,
+     "page": [
+      3072,
+      817
+     ],
+     "area": 1374
+    },
+    {
+     "id": "G-R040",
+     "kind": "room",
+     "name": "Director Student Welfare",
+     "page": [
+      1613,
+      836
+     ],
+     "area": 2133
+    },
+    {
+     "id": "G-R041",
+     "kind": "room",
+     "name": "Digital Learning Center",
+     "page": [
+      1701,
+      837
+     ],
+     "area": 5178
+    },
+    {
+     "id": "G-R042",
+     "kind": "room",
+     "name": "Head of Senior School / Dean of Assessment and Data",
+     "page": [
+      2114,
+      843
+     ],
+     "area": 4082
+    },
+    {
+     "id": "G-R043",
+     "kind": "room",
+     "name": "Secretary",
+     "page": [
+      2231,
+      837
+     ],
+     "area": 2180
+    },
+    {
+     "id": "G-R044",
+     "kind": "room",
+     "name": null,
+     "page": [
+      2634,
+      829
+     ],
+     "area": 2171
+    },
+    {
+     "id": "G-R045",
+     "kind": "void",
+     "name": null,
+     "page": [
+      3900,
+      835
+     ],
+     "area": 1099280
+    },
+    {
+     "id": "G-R046",
+     "kind": "room",
+     "name": "PYP3 G",
+     "page": [
+      932,
+      866
+     ],
+     "area": 10930
+    },
+    {
+     "id": "G-R047",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      2585,
+      875
+     ],
+     "area": 40072
+    },
+    {
+     "id": "G-R048",
+     "kind": "room",
+     "name": "MYP1 F",
+     "page": [
+      2898,
+      862
+     ],
+     "area": 10904
+    },
+    {
+     "id": "G-R049",
+     "kind": "room",
+     "name": "PYP3 F",
+     "page": [
+      1045,
+      918
+     ],
+     "area": 11503
+    },
+    {
+     "id": "G-R050",
+     "kind": "stairwell",
+     "name": null,
+     "page": [
+      1200,
+      929
+     ],
+     "area": 9017
+    },
+    {
+     "id": "G-R051",
+     "kind": "room",
+     "name": "Canteen",
+     "page": [
+      1565,
+      937
+     ],
+     "area": 10314
+    },
+    {
+     "id": "G-R052",
+     "kind": "room",
+     "name": null,
+     "page": [
+      1690,
+      923
+     ],
+     "area": 3331
+    },
+    {
+     "id": "G-R053",
+     "kind": "stairwell",
+     "name": null,
+     "page": [
+      1760,
+      929
+     ],
+     "area": 7484
+    },
+    {
+     "id": "G-R054",
+     "kind": "room",
+     "name": null,
+     "page": [
+      1808,
+      937
+     ],
+     "area": 4917
+    },
+    {
+     "id": "G-R055",
+     "kind": "room",
+     "name": "Music",
+     "page": [
+      2262,
+      935
+     ],
+     "area": 10162
+    },
+    {
+     "id": "G-R056",
+     "kind": "stairwell",
+     "name": null,
+     "page": [
+      2621,
+      929
+     ],
+     "area": 9040
+    },
+    {
+     "id": "G-R057",
+     "kind": "room",
+     "name": "MYP1 E",
+     "page": [
+      2788,
+      911
+     ],
+     "area": 11665
+    },
+    {
+     "id": "G-R058",
+     "kind": "room",
+     "name": "PYP3 C",
+     "page": [
+      1336,
+      961
+     ],
+     "area": 10969
+    },
+    {
+     "id": "G-R059",
+     "kind": "room",
+     "name": "PYP3 D",
+     "page": [
+      1461,
+      961
+     ],
+     "area": 10976
+    },
+    {
+     "id": "G-R060",
+     "kind": "room",
+     "name": "Inclusion",
+     "page": [
+      1862,
+      962
+     ],
+     "area": 8948
+    },
+    {
+     "id": "G-R061",
+     "kind": "room",
+     "name": "SOR GF-1",
+     "page": [
+      2054,
+      950
+     ],
+     "area": 7758
+    },
+    {
+     "id": "G-R062",
+     "kind": "room",
+     "name": "PYP3 J",
+     "page": [
+      2383,
+      961
+     ],
+     "area": 11069
+    },
+    {
+     "id": "G-R063",
+     "kind": "room",
+     "name": "MYP1 B",
+     "page": [
+      2508,
+      962
+     ],
+     "area": 11004
+    },
+    {
+     "id": "G-R064",
+     "kind": "void",
+     "name": null,
+     "page": [
+      1095,
+      987
+     ],
+     "area": 4752
+    },
+    {
+     "id": "G-R065",
+     "kind": "room",
+     "name": null,
+     "page": [
+      1146,
+      1013
+     ],
+     "area": 5401
+    },
+    {
+     "id": "G-R066",
+     "kind": "room",
+     "name": null,
+     "page": [
+      2036,
+      1014
+     ],
+     "area": 1999
+    },
+    {
+     "id": "G-R067",
+     "kind": "room",
+     "name": null,
+     "page": [
+      2088,
+      1019
+     ],
+     "area": 2598
+    },
+    {
+     "id": "G-R068",
+     "kind": "room",
+     "name": null,
+     "page": [
+      2676,
+      1013
+     ],
+     "area": 5275
+    },
+    {
+     "id": "G-R069",
+     "kind": "room",
+     "name": null,
+     "page": [
+      2731,
+      995
+     ],
+     "area": 4268
+    },
+    {
+     "id": "G-R070",
+     "kind": "room",
+     "name": null,
+     "page": [
+      1569,
+      1169
+     ],
+     "area": 1437
+    },
+    {
+     "id": "G-R071",
+     "kind": "room",
+     "name": null,
+     "page": [
+      1569,
+      1213
+     ],
+     "area": 1497
+    },
+    {
+     "id": "G-R072",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      1528,
+      1250
+     ],
+     "area": 10128
+    },
+    {
+     "id": "G-R073",
+     "kind": "room",
+     "name": "Male Prayer Room",
+     "page": [
+      2292,
+      1251
+     ],
+     "area": 16339
+    },
+    {
+     "id": "G-R074",
+     "kind": "room",
+     "name": "Auditorium",
+     "page": [
+      1941,
+      1313
+     ],
+     "area": 136038
+    },
+    {
+     "id": "G-R075",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      1090,
+      1376
+     ],
+     "area": 6119
+    },
+    {
+     "id": "G-R076",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      2729,
+      1380
+     ],
+     "area": 6041
+    },
+    {
+     "id": "G-R077",
+     "kind": "room",
+     "name": null,
+     "page": [
+      1031,
+      1391
+     ],
+     "area": 3671
+    },
+    {
+     "id": "G-R078",
+     "kind": "room",
+     "name": null,
+     "page": [
+      1607,
+      1397
+     ],
+     "area": 2009
+    },
+    {
+     "id": "G-R079",
+     "kind": "room",
+     "name": null,
+     "page": [
+      2214,
+      1399
+     ],
+     "area": 1721
+    },
+    {
+     "id": "G-R080",
+     "kind": "room",
+     "name": null,
+     "page": [
+      2788,
+      1395
+     ],
+     "area": 3514
+    },
+    {
+     "id": "G-R081",
+     "kind": "stairwell",
+     "name": null,
+     "page": [
+      1150,
+      1449
+     ],
+     "area": 9068
+    },
+    {
+     "id": "G-R082",
+     "kind": "room",
+     "name": "PYP2 E",
+     "page": [
+      1238,
+      1431
+     ],
+     "area": 10078
+    },
+    {
+     "id": "G-R083",
+     "kind": "room",
+     "name": "PYP2 D",
+     "page": [
+      1429,
+      1435
+     ],
+     "area": 9076
+    },
+    {
+     "id": "G-R084",
+     "kind": "room",
+     "name": "PYP2 A",
+     "page": [
+      1484,
+      1434
+     ],
+     "area": 9958
+    },
+    {
+     "id": "G-R085",
+     "kind": "room",
+     "name": null,
+     "page": [
+      1605,
+      1446
+     ],
+     "area": 1901
+    },
+    {
+     "id": "G-R086",
+     "kind": "room",
+     "name": null,
+     "page": [
+      1764,
+      1460
+     ],
+     "area": 1050
+    },
+    {
+     "id": "G-R087",
+     "kind": "room",
+     "name": null,
+     "page": [
+      2057,
+      1437
+     ],
+     "area": 1090
+    },
+    {
+     "id": "G-R088",
+     "kind": "room",
+     "name": null,
+     "page": [
+      2214,
+      1448
+     ],
+     "area": 1845
+    },
+    {
+     "id": "G-R089",
+     "kind": "room",
+     "name": "PYP1 B",
+     "page": [
+      2387,
+      1445
+     ],
+     "area": 10400
+    },
+    {
+     "id": "G-R090",
+     "kind": "room",
+     "name": "PYP1 C",
+     "page": [
+      2515,
+      1444
+     ],
+     "area": 10263
+    },
+    {
+     "id": "G-R091",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      2672,
+      1460
+     ],
+     "area": 9384
+    },
+    {
+     "id": "G-R092",
+     "kind": "room",
+     "name": "IER",
+     "page": [
+      886,
+      1497
+     ],
+     "area": 10393
+    },
+    {
+     "id": "G-R093",
+     "kind": "room",
+     "name": "PYP2 F",
+     "page": [
+      948,
+      1491
+     ],
+     "area": 10016
+    },
+    {
+     "id": "G-R094",
+     "kind": "room",
+     "name": "Female Washroom",
+     "page": [
+      1731,
+      1462
+     ],
+     "area": 2094
+    },
+    {
+     "id": "G-R095",
+     "kind": "room",
+     "name": "Male Washroom",
+     "page": [
+      2113,
+      1462
+     ],
+     "area": 1943
+    },
+    {
+     "id": "G-R096",
+     "kind": "room",
+     "name": "Music Violin",
+     "page": [
+      2277,
+      1463
+     ],
+     "area": 10667
+    },
+    {
+     "id": "G-R097",
+     "kind": "room",
+     "name": "PYP1 E",
+     "page": [
+      2798,
+      1494
+     ],
+     "area": 10392
+    },
+    {
+     "id": "G-R098",
+     "kind": "room",
+     "name": null,
+     "page": [
+      2214,
+      1537
+     ],
+     "area": 5118
+    },
+    {
+     "id": "G-R099",
+     "kind": "room",
+     "name": "Facility Manager",
+     "page": [
+      753,
+      1552
+     ],
+     "area": 7895
+    },
+    {
+     "id": "G-R100",
+     "kind": "void",
+     "name": null,
+     "page": [
+      1188,
+      1564
+     ],
+     "area": 2096
+    },
+    {
+     "id": "G-R101",
+     "kind": "room",
+     "name": null,
+     "page": [
+      1721,
+      1542
+     ],
+     "area": 4076
+    },
+    {
+     "id": "G-R102",
+     "kind": "room",
+     "name": "Asst. MSO",
+     "page": [
+      2109,
+      1550
+     ],
+     "area": 3530
+    },
+    {
+     "id": "G-R103",
+     "kind": "room",
+     "name": null,
+     "page": [
+      2633,
+      1559
+     ],
+     "area": 2552
+    },
+    {
+     "id": "G-R104",
+     "kind": "room",
+     "name": "PYP1 G",
+     "page": [
+      2913,
+      1542
+     ],
+     "area": 9498
+    },
+    {
+     "id": "G-R105",
+     "kind": "room",
+     "name": "PYP Coordinator",
+     "page": [
+      3063,
+      1550
+     ],
+     "area": 6252
+    },
+    {
+     "id": "G-R106",
+     "kind": "room",
+     "name": "KG Music",
+     "page": [
+      1261,
+      1588
+     ],
+     "area": 11487
+    },
+    {
+     "id": "G-R107",
+     "kind": "room",
+     "name": "PYP2 C",
+     "page": [
+      1430,
+      1612
+     ],
+     "area": 9112
+    },
+    {
+     "id": "G-R108",
+     "kind": "room",
+     "name": "PYP2 B",
+     "page": [
+      1485,
+      1601
+     ],
+     "area": 9967
+    },
+    {
+     "id": "G-R109",
+     "kind": "room",
+     "name": "Music Room",
+     "page": [
+      1614,
+      1588
+     ],
+     "area": 5228
+    },
+    {
+     "id": "G-R110",
+     "kind": "room",
+     "name": "IT 1 GF",
+     "page": [
+      2262,
+      1597
+     ],
+     "area": 10909
+    },
+    {
+     "id": "G-R111",
+     "kind": "room",
+     "name": "PYP1 A",
+     "page": [
+      2390,
+      1612
+     ],
+     "area": 10339
+    },
+    {
+     "id": "G-R112",
+     "kind": "room",
+     "name": "PYP1 D",
+     "page": [
+      2514,
+      1611
+     ],
+     "area": 10092
+    },
+    {
+     "id": "G-R113",
+     "kind": "room",
+     "name": "PYP2 G",
+     "page": [
+      1038,
+      1639
+     ],
+     "area": 9839
+    },
+    {
+     "id": "G-R114",
+     "kind": "room",
+     "name": "PYP1 F",
+     "page": [
+      2711,
+      1640
+     ],
+     "area": 10528
+    },
+    {
+     "id": "G-R115",
+     "kind": "room",
+     "name": "PYP2 H",
+     "page": [
+      926,
+      1687
+     ],
+     "area": 9313
+    },
+    {
+     "id": "G-R116",
+     "kind": "room",
+     "name": "PYP 1 Supervisor",
+     "page": [
+      1713,
+      1684
+     ],
+     "area": 8834
+    },
+    {
+     "id": "G-R117",
+     "kind": "stairwell",
+     "name": null,
+     "page": [
+      2105,
+      1683
+     ],
+     "area": 9195
+    },
+    {
+     "id": "G-R118",
+     "kind": "room",
+     "name": "PYP1 H",
+     "page": [
+      2822,
+      1692
+     ],
+     "area": 9781
+    },
+    {
+     "id": "G-R119",
+     "kind": "room",
+     "name": null,
+     "page": [
+      902,
+      1733
+     ],
+     "area": 2970
+    },
+    {
+     "id": "G-R120",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      1224,
+      1717
+     ],
+     "area": 8596
+    },
+    {
+     "id": "G-R121",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      1347,
+      1720
+     ],
+     "area": 38337
+    },
+    {
+     "id": "G-R122",
+     "kind": "room",
+     "name": "Discovery Centre",
+     "page": [
+      2474,
+      1725
+     ],
+     "area": 136753
+    },
+    {
+     "id": "G-R123",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      3091,
+      1711
+     ],
+     "area": 6796
+    },
+    {
+     "id": "G-R124",
+     "kind": "void",
+     "name": null,
+     "page": [
+      3137,
+      1717
+     ],
+     "area": 1158
+    },
+    {
+     "id": "G-R125",
+     "kind": "void",
+     "name": null,
+     "page": [
+      3436,
+      1732
+     ],
+     "area": 3854
+    },
+    {
+     "id": "G-R126",
+     "kind": "room",
+     "name": "Store",
+     "page": [
+      3269,
+      1750
+     ],
+     "area": 1589
+    },
+    {
+     "id": "G-R127",
+     "kind": "room",
+     "name": "Male Washroom",
+     "page": [
+      3304,
+      1746
+     ],
+     "area": 1953
+    },
+    {
+     "id": "G-R128",
+     "kind": "room",
+     "name": "HR",
+     "page": [
+      962,
+      1803
+     ],
+     "area": 5318
+    },
+    {
+     "id": "G-R129",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      1096,
+      1786
+     ],
+     "area": 97692
+    },
+    {
+     "id": "G-R130",
+     "kind": "void",
+     "name": null,
+     "page": [
+      1421,
+      1802
+     ],
+     "area": 9618
+    },
+    {
+     "id": "G-R131",
+     "kind": "void",
+     "name": null,
+     "page": [
+      2401,
+      1805
+     ],
+     "area": 8313
+    },
+    {
+     "id": "G-R132",
+     "kind": "room",
+     "name": "Clinic",
+     "page": [
+      2908,
+      1793
+     ],
+     "area": 20328
+    },
+    {
+     "id": "G-R133",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      3265,
+      1840
+     ],
+     "area": 8867
+    },
+    {
+     "id": "G-R134",
+     "kind": "room",
+     "name": "Hindustani Music",
+     "page": [
+      978,
+      1863
+     ],
+     "area": 4934
+    },
+    {
+     "id": "G-R135",
+     "kind": "room",
+     "name": "Multipurpose Hall",
+     "page": [
+      3357,
+      1872
+     ],
+     "area": 38875
+    },
+    {
+     "id": "G-R136",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      2151,
+      1911
+     ],
+     "area": 710896
+    },
+    {
+     "id": "G-R137",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      2964,
+      1922
+     ],
+     "area": 145852
+    },
+    {
+     "id": "G-R138",
+     "kind": "room",
+     "name": "PLC",
+     "page": [
+      1247,
+      1959
+     ],
+     "area": 23939
+    },
+    {
+     "id": "G-R139",
+     "kind": "room",
+     "name": "STS",
+     "page": [
+      971,
+      1998
+     ],
+     "area": 6944
+    },
+    {
+     "id": "G-R140",
+     "kind": "room",
+     "name": "Female Washroom",
+     "page": [
+      3311,
+      1999
+     ],
+     "area": 1660
+    },
+    {
+     "id": "G-R141",
+     "kind": "void",
+     "name": null,
+     "page": [
+      1421,
+      2041
+     ],
+     "area": 10834
+    },
+    {
+     "id": "G-R142",
+     "kind": "void",
+     "name": null,
+     "page": [
+      2401,
+      2038
+     ],
+     "area": 8984
+    },
+    {
+     "id": "G-R143",
+     "kind": "room",
+     "name": "Store",
+     "page": [
+      3273,
+      2047
+     ],
+     "area": 1406
+    },
+    {
+     "id": "G-R144",
+     "kind": "room",
+     "name": null,
+     "page": [
+      902,
+      2097
+     ],
+     "area": 1269
+    },
+    {
+     "id": "G-R145",
+     "kind": "room",
+     "name": "KG 1 & 2 Supervisor",
+     "page": [
+      941,
+      2071
+     ],
+     "area": 3415
+    },
+    {
+     "id": "G-R146",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      1250,
+      2070
+     ],
+     "area": 7974
+    },
+    {
+     "id": "G-R147",
+     "kind": "room",
+     "name": "Learning Support Unit",
+     "page": [
+      2938,
+      2086
+     ],
+     "area": 15867
+    },
+    {
+     "id": "G-R148",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      1341,
+      2116
+     ],
+     "area": 36237
+    },
+    {
+     "id": "G-R149",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      2480,
+      2113
+     ],
+     "area": 71164
+    },
+    {
+     "id": "G-R150",
+     "kind": "void",
+     "name": null,
+     "page": [
+      2942,
+      2134
+     ],
+     "area": 904
+    },
+    {
+     "id": "G-R151",
+     "kind": "void",
+     "name": null,
+     "page": [
+      2974,
+      2123
+     ],
+     "area": 1262
+    },
+    {
+     "id": "G-R152",
+     "kind": "room",
+     "name": "Canteen",
+     "page": [
+      3364,
+      2139
+     ],
+     "area": 5322
+    },
+    {
+     "id": "G-R153",
+     "kind": "room",
+     "name": "PE Room",
+     "page": [
+      3414,
+      2132
+     ],
+     "area": 1480
+    },
+    {
+     "id": "G-R154",
+     "kind": "room",
+     "name": null,
+     "page": [
+      872,
+      2145
+     ],
+     "area": 1208
+    },
+    {
+     "id": "G-R155",
+     "kind": "room",
+     "name": "KG2 I",
+     "page": [
+      951,
+      2156
+     ],
+     "area": 10784
+    },
+    {
+     "id": "G-R156",
+     "kind": "room",
+     "name": "Pre KG C",
+     "page": [
+      2860,
+      2161
+     ],
+     "area": 10928
+    },
+    {
+     "id": "G-R157",
+     "kind": "room",
+     "name": "KG2 F",
+     "page": [
+      1070,
+      2215
+     ],
+     "area": 11577
+    },
+    {
+     "id": "G-R158",
+     "kind": "room",
+     "name": "Principal",
+     "page": [
+      2071,
+      2206
+     ],
+     "area": 6800
+    },
+    {
+     "id": "G-R159",
+     "kind": "room",
+     "name": "Pre KG D",
+     "page": [
+      2741,
+      2218
+     ],
+     "area": 11834
+    },
+    {
+     "id": "G-R160",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      3288,
+      2210
+     ],
+     "area": 8503
+    },
+    {
+     "id": "G-R161",
+     "kind": "room",
+     "name": "KG Swimming Pool",
+     "page": [
+      3339,
+      2210
+     ],
+     "area": 5336
+    },
+    {
+     "id": "G-R162",
+     "kind": "room",
+     "name": "KG2 E",
+     "page": [
+      1258,
+      2245
+     ],
+     "area": 11527
+    },
+    {
+     "id": "G-R163",
+     "kind": "room",
+     "name": "KG2 C",
+     "page": [
+      1399,
+      2245
+     ],
+     "area": 11607
+    },
+    {
+     "id": "G-R164",
+     "kind": "void",
+     "name": null,
+     "page": [
+      1893,
+      2245
+     ],
+     "area": 2190
+    },
+    {
+     "id": "G-R165",
+     "kind": "room",
+     "name": "Director",
+     "page": [
+      2123,
+      2221
+     ],
+     "area": 8501
+    },
+    {
+     "id": "G-R166",
+     "kind": "room",
+     "name": "GRE",
+     "page": [
+      744,
+      2281
+     ],
+     "area": 7833
+    },
+    {
+     "id": "G-R167",
+     "kind": "void",
+     "name": null,
+     "page": [
+      1182,
+      2266
+     ],
+     "area": 2507
+    },
+    {
+     "id": "G-R168",
+     "kind": "room",
+     "name": "KG1 G",
+     "page": [
+      1480,
+      2266
+     ],
+     "area": 10187
+    },
+    {
+     "id": "G-R169",
+     "kind": "room",
+     "name": null,
+     "page": [
+      2001,
+      2274
+     ],
+     "area": 839
+    },
+    {
+     "id": "G-R170",
+     "kind": "room",
+     "name": "Principal Secretary",
+     "page": [
+      2083,
+      2270
+     ],
+     "area": 2325
+    },
+    {
+     "id": "G-R171",
+     "kind": "room",
+     "name": "KG1 B",
+     "page": [
+      2264,
+      2268
+     ],
+     "area": 9546
+    },
+    {
+     "id": "G-R172",
+     "kind": "room",
+     "name": "KG1 D",
+     "page": [
+      2384,
+      2267
+     ],
+     "area": 10235
+    },
+    {
+     "id": "G-R173",
+     "kind": "room",
+     "name": "KG1 F",
+     "page": [
+      2583,
+      2263
+     ],
+     "area": 10161
+    },
+    {
+     "id": "G-R174",
+     "kind": "void",
+     "name": null,
+     "page": [
+      2631,
+      2269
+     ],
+     "area": 2321
+    },
+    {
+     "id": "G-R175",
+     "kind": "room",
+     "name": "KG2 H",
+     "page": [
+      862,
+      2303
+     ],
+     "area": 10900
+    },
+    {
+     "id": "G-R176",
+     "kind": "room",
+     "name": "Pre KG B",
+     "page": [
+      2947,
+      2310
+     ],
+     "area": 10834
+    },
+    {
+     "id": "G-R177",
+     "kind": "room",
+     "name": "Swimming Pool",
+     "page": [
+      3350,
+      2326
+     ],
+     "area": 8248
+    },
+    {
+     "id": "G-R178",
+     "kind": "room",
+     "name": "KG2 G",
+     "page": [
+      985,
+      2361
+     ],
+     "area": 11635
+    },
+    {
+     "id": "G-R179",
+     "kind": "room",
+     "name": "Female Washroom",
+     "page": [
+      1675,
+      2352
+     ],
+     "area": 2479
+    },
+    {
+     "id": "G-R180",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      1758,
+      2376
+     ],
+     "area": 6776
+    },
+    {
+     "id": "G-R181",
+     "kind": "room",
+     "name": "Accounts",
+     "page": [
+      2106,
+      2361
+     ],
+     "area": 5605
+    },
+    {
+     "id": "G-R182",
+     "kind": "room",
+     "name": "GSM",
+     "page": [
+      2154,
+      2349
+     ],
+     "area": 2113
+    },
+    {
+     "id": "G-R183",
+     "kind": "stairwell",
+     "name": null,
+     "page": [
+      2671,
+      2377
+     ],
+     "area": 8814
+    },
+    {
+     "id": "G-R184",
+     "kind": "room",
+     "name": "Pre KG A",
+     "page": [
+      2825,
+      2367
+     ],
+     "area": 11479
+    },
+    {
+     "id": "G-R185",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      3277,
+      2342
+     ],
+     "area": 13020
+    },
+    {
+     "id": "G-R186",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      1177,
+      2382
+     ],
+     "area": 8843
+    },
+    {
+     "id": "G-R187",
+     "kind": "room",
+     "name": "KG2 D",
+     "page": [
+      1256,
+      2409
+     ],
+     "area": 11234
+    },
+    {
+     "id": "G-R188",
+     "kind": "room",
+     "name": "KG2 B",
+     "page": [
+      1374,
+      2414
+     ],
+     "area": 10556
+    },
+    {
+     "id": "G-R189",
+     "kind": "room",
+     "name": "KG2 A",
+     "page": [
+      1523,
+      2409
+     ],
+     "area": 11380
+    },
+    {
+     "id": "G-R190",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      1909,
+      2389
+     ],
+     "area": 218201
+    },
+    {
+     "id": "G-R191",
+     "kind": "room",
+     "name": null,
+     "page": [
+      1036,
+      2427
+     ],
+     "area": 3724
+    },
+    {
+     "id": "G-R192",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      1086,
+      2458
+     ],
+     "area": 6217
+    },
+    {
+     "id": "G-R193",
+     "kind": "room",
+     "name": "Male Washroom",
+     "page": [
+      1690,
+      2430
+     ],
+     "area": 4016
+    },
+    {
+     "id": "G-R194",
+     "kind": "room",
+     "name": "MSO",
+     "page": [
+      2163,
+      2439
+     ],
+     "area": 3763
+    },
+    {
+     "id": "G-R195",
+     "kind": "room",
+     "name": "KG1 A",
+     "page": [
+      2333,
+      2433
+     ],
+     "area": 9234
+    },
+    {
+     "id": "G-R196",
+     "kind": "room",
+     "name": "KG1 C",
+     "page": [
+      2453,
+      2434
+     ],
+     "area": 9726
+    },
+    {
+     "id": "G-R197",
+     "kind": "room",
+     "name": "KG1 E",
+     "page": [
+      2579,
+      2433
+     ],
+     "area": 9701
+    },
+    {
+     "id": "G-R198",
+     "kind": "room",
+     "name": null,
+     "page": [
+      2784,
+      2448
+     ],
+     "area": 3588
+    },
+    {
+     "id": "G-R199",
+     "kind": "room",
+     "name": null,
+     "page": [
+      2725,
+      2461
+     ],
+     "area": 5921
+    },
+    {
+     "id": "G-R200",
+     "kind": "void",
+     "name": null,
+     "page": [
+      2936,
+      2465
+     ],
+     "area": 59847
+    },
+    {
+     "id": "G-R201",
+     "kind": "room",
+     "name": "Conference Room",
+     "page": [
+      1775,
+      2515
+     ],
+     "area": 8490
+    },
+    {
+     "id": "G-R202",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      1891,
+      2513
+     ],
+     "area": 1953
+    },
+    {
+     "id": "G-R203",
+     "kind": "room",
+     "name": "Registrar",
+     "page": [
+      2039,
+      2501
+     ],
+     "area": 6041
+    },
+    {
+     "id": "G-R204",
+     "kind": "void",
+     "name": null,
+     "page": [
+      2331,
+      2555
+     ],
+     "area": 65171
+    },
+    {
+     "id": "G-R205",
+     "kind": "void",
+     "name": null,
+     "page": [
+      1724,
+      2625
+     ],
+     "area": 11645
+    }
+   ]
+  },
+  "1": {
+   "notes": [
+    "inferred doors through another room: Pottery -> Budhayana Spark Lab; Art -> Budhayana Spark Lab; Female Prayer Room -> 6A; Physics Store -> Physics Lab",
+    "29 inferred doors; 0 door-to-corridor links cross a wall corner"
+   ],
+   "stairSymbols": [
+    {
+     "region": "1-R010",
+     "at": [
+      1597.7,
+      666.6
+     ]
+    },
+    {
+     "region": "1-R005",
+     "at": [
+      2228.0,
+      671.7
+     ]
+    },
+    {
+     "region": "1-R027",
+     "at": [
+      2979.9,
+      823.5
+     ]
+    },
+    {
+     "region": "1-R066",
+     "at": [
+      1736.6,
+      968.1
+     ]
+    },
+    {
+     "region": "1-R047",
+     "at": [
+      1221.4,
+      971.6
+     ]
+    },
+    {
+     "region": "1-R051",
+     "at": [
+      2600.8,
+      971.2
+     ]
+    },
+    {
+     "region": "1-R093",
+     "at": [
+      2650.3,
+      1405.0
+     ]
+    },
+    {
+     "region": "1-R087",
+     "at": [
+      1168.4,
+      1404.6
+     ]
+    },
+    {
+     "region": "1-R108",
+     "at": [
+      792.1,
+      1578.0
+     ]
+    },
+    {
+     "region": "1-R152",
+     "at": [
+      3023.9,
+      2251.3
+     ]
+    },
+    {
+     "region": "1-R154",
+     "at": [
+      2649.9,
+      2424.7
+     ]
+    }
+   ],
+   "regions": [
+    {
+     "id": "1-R001",
+     "kind": "room",
+     "name": "Sewing",
+     "page": [
+      1990,
+      287
+     ],
+     "area": 54489
+    },
+    {
+     "id": "1-R002",
+     "kind": "room",
+     "name": "Pottery",
+     "page": [
+      2125,
+      281
+     ],
+     "area": 17612
+    },
+    {
+     "id": "1-R003",
+     "kind": "room",
+     "name": "Art",
+     "page": [
+      2268,
+      296
+     ],
+     "area": 22825
+    },
+    {
+     "id": "1-R004",
+     "kind": "room",
+     "name": "IT Services",
+     "page": [
+      2432,
+      296
+     ],
+     "area": 28371
+    },
+    {
+     "id": "1-R005",
+     "kind": "stairwell",
+     "name": null,
+     "page": [
+      2580,
+      307
+     ],
+     "area": 8107
+    },
+    {
+     "id": "1-R006",
+     "kind": "room",
+     "name": null,
+     "page": [
+      1105,
+      346
+     ],
+     "area": 1927
+    },
+    {
+     "id": "1-R007",
+     "kind": "room",
+     "name": null,
+     "page": [
+      1165,
+      365
+     ],
+     "area": 555
+    },
+    {
+     "id": "1-R008",
+     "kind": "room",
+     "name": null,
+     "page": [
+      3331,
+      362
+     ],
+     "area": 1420
+    },
+    {
+     "id": "1-R009",
+     "kind": "void",
+     "name": null,
+     "page": [
+      1084,
+      395
+     ],
+     "area": 3692
+    },
+    {
+     "id": "1-R010",
+     "kind": "stairwell",
+     "name": null,
+     "page": [
+      1899,
+      394
+     ],
+     "area": 7856
+    },
+    {
+     "id": "1-R011",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      3333,
+      402
+     ],
+     "area": 1663
+    },
+    {
+     "id": "1-R012",
+     "kind": "void",
+     "name": null,
+     "page": [
+      3399,
+      410
+     ],
+     "area": 3483
+    },
+    {
+     "id": "1-R013",
+     "kind": "void",
+     "name": null,
+     "page": [
+      305,
+      454
+     ],
+     "area": 1222008
+    },
+    {
+     "id": "1-R014",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      1002,
+      423
+     ],
+     "area": 7920
+    },
+    {
+     "id": "1-R015",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      1121,
+      430
+     ],
+     "area": 2718
+    },
+    {
+     "id": "1-R016",
+     "kind": "room",
+     "name": "MYP4 G",
+     "page": [
+      1211,
+      436
+     ],
+     "area": 14582
+    },
+    {
+     "id": "1-R017",
+     "kind": "room",
+     "name": "6D",
+     "page": [
+      3257,
+      442
+     ],
+     "area": 14412
+    },
+    {
+     "id": "1-R018",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      3475,
+      423
+     ],
+     "area": 7759
+    },
+    {
+     "id": "1-R019",
+     "kind": "room",
+     "name": "MYP Coordinator",
+     "page": [
+      971,
+      483
+     ],
+     "area": 8236
+    },
+    {
+     "id": "1-R020",
+     "kind": "room",
+     "name": "MYP2 C",
+     "page": [
+      1335,
+      494
+     ],
+     "area": 15717
+    },
+    {
+     "id": "1-R021",
+     "kind": "room",
+     "name": "Budhayana Spark Lab",
+     "page": [
+      2087,
+      482
+     ],
+     "area": 111037
+    },
+    {
+     "id": "1-R022",
+     "kind": "room",
+     "name": "6A",
+     "page": [
+      3129,
+      500
+     ],
+     "area": 15515
+    },
+    {
+     "id": "1-R023",
+     "kind": "room",
+     "name": "Male Prayer Room",
+     "page": [
+      1459,
+      514
+     ],
+     "area": 5183
+    },
+    {
+     "id": "1-R024",
+     "kind": "room",
+     "name": "MYP2 D",
+     "page": [
+      1558,
+      532
+     ],
+     "area": 15213
+    },
+    {
+     "id": "1-R025",
+     "kind": "room",
+     "name": "CPR",
+     "page": [
+      1782,
+      532
+     ],
+     "area": 31823
+    },
+    {
+     "id": "1-R026",
+     "kind": "room",
+     "name": "Female Prayer Room",
+     "page": [
+      3016,
+      511
+     ],
+     "area": 5077
+    },
+    {
+     "id": "1-R027",
+     "kind": "stairwell",
+     "name": null,
+     "page": [
+      3413,
+      517
+     ],
+     "area": 9703
+    },
+    {
+     "id": "1-R028",
+     "kind": "room",
+     "name": "Supervisor Grade 6 & MYP 1",
+     "page": [
+      3538,
+      539
+     ],
+     "area": 8305
+    },
+    {
+     "id": "1-R029",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      1282,
+      578
+     ],
+     "area": 13096
+    },
+    {
+     "id": "1-R030",
+     "kind": "room",
+     "name": null,
+     "page": [
+      1412,
+      568
+     ],
+     "area": 2731
+    },
+    {
+     "id": "1-R031",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      1478,
+      569
+     ],
+     "area": 1075
+    },
+    {
+     "id": "1-R032",
+     "kind": "room",
+     "name": "9A",
+     "page": [
+      2586,
+      562
+     ],
+     "area": 13603
+    },
+    {
+     "id": "1-R033",
+     "kind": "room",
+     "name": "9C",
+     "page": [
+      2724,
+      563
+     ],
+     "area": 14379
+    },
+    {
+     "id": "1-R034",
+     "kind": "room",
+     "name": "9E",
+     "page": [
+      2869,
+      561
+     ],
+     "area": 14461
+    },
+    {
+     "id": "1-R035",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      3000,
+      571
+     ],
+     "area": 2025
+    },
+    {
+     "id": "1-R036",
+     "kind": "room",
+     "name": null,
+     "page": [
+      3064,
+      569
+     ],
+     "area": 1933
+    },
+    {
+     "id": "1-R037",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      3213,
+      569
+     ],
+     "area": 12203
+    },
+    {
+     "id": "1-R038",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      985,
+      583
+     ],
+     "area": 10111
+    },
+    {
+     "id": "1-R039",
+     "kind": "room",
+     "name": "MYP2 A",
+     "page": [
+      1121,
+      610
+     ],
+     "area": 14624
+    },
+    {
+     "id": "1-R040",
+     "kind": "room",
+     "name": null,
+     "page": [
+      2244,
+      599
+     ],
+     "area": 600
+    },
+    {
+     "id": "1-R041",
+     "kind": "room",
+     "name": "6C",
+     "page": [
+      3365,
+      606
+     ],
+     "area": 14250
+    },
+    {
+     "id": "1-R042",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      1393,
+      625
+     ],
+     "area": 26571
+    },
+    {
+     "id": "1-R043",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      2286,
+      624
+     ],
+     "area": 25982
+    },
+    {
+     "id": "1-R044",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      2588,
+      626
+     ],
+     "area": 10187
+    },
+    {
+     "id": "1-R045",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      3099,
+      629
+     ],
+     "area": 26390
+    },
+    {
+     "id": "1-R046",
+     "kind": "room",
+     "name": "MYP2 B",
+     "page": [
+      1250,
+      670
+     ],
+     "area": 15370
+    },
+    {
+     "id": "1-R047",
+     "kind": "stairwell",
+     "name": null,
+     "page": [
+      1427,
+      683
+     ],
+     "area": 12033
+    },
+    {
+     "id": "1-R048",
+     "kind": "room",
+     "name": "Head of Middle School & Teaching Learning Coach",
+     "page": [
+      2124,
+      696
+     ],
+     "area": 13349
+    },
+    {
+     "id": "1-R049",
+     "kind": "room",
+     "name": "Female Washroom",
+     "page": [
+      2326,
+      693
+     ],
+     "area": 4198
+    },
+    {
+     "id": "1-R050",
+     "kind": "room",
+     "name": "Supervisor Grade 9 ICSE",
+     "page": [
+      2398,
+      696
+     ],
+     "area": 7136
+    },
+    {
+     "id": "1-R051",
+     "kind": "stairwell",
+     "name": null,
+     "page": [
+      3049,
+      682
+     ],
+     "area": 12132
+    },
+    {
+     "id": "1-R052",
+     "kind": "room",
+     "name": "6B",
+     "page": [
+      3238,
+      663
+     ],
+     "area": 15263
+    },
+    {
+     "id": "1-R053",
+     "kind": "room",
+     "name": "MYP2 E",
+     "page": [
+      1580,
+      720
+     ],
+     "area": 14553
+    },
+    {
+     "id": "1-R054",
+     "kind": "room",
+     "name": "MYP2 F",
+     "page": [
+      1724,
+      719
+     ],
+     "area": 14670
+    },
+    {
+     "id": "1-R055",
+     "kind": "room",
+     "name": "MYP1 G",
+     "page": [
+      2920,
+      720
+     ],
+     "area": 14520
+    },
+    {
+     "id": "1-R056",
+     "kind": "void",
+     "name": null,
+     "page": [
+      3973,
+      720
+     ],
+     "area": 731633
+    },
+    {
+     "id": "1-R057",
+     "kind": "void",
+     "name": null,
+     "page": [
+      1297,
+      764
+     ],
+     "area": 6439
+    },
+    {
+     "id": "1-R058",
+     "kind": "void",
+     "name": null,
+     "page": [
+      1365,
+      778
+     ],
+     "area": 7231
+    },
+    {
+     "id": "1-R059",
+     "kind": "room",
+     "name": "9F",
+     "page": [
+      1883,
+      742
+     ],
+     "area": 13229
+    },
+    {
+     "id": "1-R060",
+     "kind": "room",
+     "name": "Male Washroom",
+     "page": [
+      2362,
+      770
+     ],
+     "area": 5529
+    },
+    {
+     "id": "1-R061",
+     "kind": "room",
+     "name": "Exam Photocopy",
+     "page": [
+      2435,
+      772
+     ],
+     "area": 5809
+    },
+    {
+     "id": "1-R062",
+     "kind": "room",
+     "name": "9B",
+     "page": [
+      2662,
+      748
+     ],
+     "area": 13171
+    },
+    {
+     "id": "1-R063",
+     "kind": "room",
+     "name": "9D",
+     "page": [
+      2806,
+      748
+     ],
+     "area": 13650
+    },
+    {
+     "id": "1-R064",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      3111,
+      778
+     ],
+     "area": 7095
+    },
+    {
+     "id": "1-R065",
+     "kind": "room",
+     "name": null,
+     "page": [
+      3176,
+      760
+     ],
+     "area": 5782
+    },
+    {
+     "id": "1-R066",
+     "kind": "stairwell",
+     "name": null,
+     "page": [
+      2058,
+      799
+     ],
+     "area": 11413
+    },
+    {
+     "id": "1-R067",
+     "kind": "room",
+     "name": "School Counselor",
+     "page": [
+      2134,
+      781
+     ],
+     "area": 7842
+    },
+    {
+     "id": "1-R068",
+     "kind": "room",
+     "name": "Examination Center",
+     "page": [
+      2232,
+      782
+     ],
+     "area": 11570
+    },
+    {
+     "id": "1-R069",
+     "kind": "room",
+     "name": "Counsellors Room",
+     "page": [
+      2044,
+      921
+     ],
+     "area": 10708
+    },
+    {
+     "id": "1-R070",
+     "kind": "room",
+     "name": "Arabic & Islamic Education Supervisors",
+     "page": [
+      2430,
+      921
+     ],
+     "area": 10629
+    },
+    {
+     "id": "1-R071",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      1880,
+      1019
+     ],
+     "area": 266810
+    },
+    {
+     "id": "1-R072",
+     "kind": "room",
+     "name": "Female Prayer Room",
+     "page": [
+      2600,
+      1010
+     ],
+     "area": 9236
+    },
+    {
+     "id": "1-R073",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      1301,
+      1253
+     ],
+     "area": 9021
+    },
+    {
+     "id": "1-R074",
+     "kind": "void",
+     "name": null,
+     "page": [
+      2235,
+      1251
+     ],
+     "area": 262417
+    },
+    {
+     "id": "1-R075",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      3170,
+      1256
+     ],
+     "area": 9216
+    },
+    {
+     "id": "1-R076",
+     "kind": "room",
+     "name": null,
+     "page": [
+      1235,
+      1273
+     ],
+     "area": 5553
+    },
+    {
+     "id": "1-R077",
+     "kind": "room",
+     "name": null,
+     "page": [
+      1888,
+      1280
+     ],
+     "area": 2234
+    },
+    {
+     "id": "1-R078",
+     "kind": "room",
+     "name": null,
+     "page": [
+      2585,
+      1281
+     ],
+     "area": 2148
+    },
+    {
+     "id": "1-R079",
+     "kind": "room",
+     "name": null,
+     "page": [
+      3236,
+      1278
+     ],
+     "area": 5457
+    },
+    {
+     "id": "1-R080",
+     "kind": "room",
+     "name": "MYP3 E",
+     "page": [
+      1508,
+      1321
+     ],
+     "area": 17639
+    },
+    {
+     "id": "1-R081",
+     "kind": "room",
+     "name": "MYP3 F",
+     "page": [
+      1639,
+      1313
+     ],
+     "area": 16833
+    },
+    {
+     "id": "1-R082",
+     "kind": "room",
+     "name": "SOR FF-4",
+     "page": [
+      1801,
+      1312
+     ],
+     "area": 16163
+    },
+    {
+     "id": "1-R083",
+     "kind": "room",
+     "name": null,
+     "page": [
+      1898,
+      1327
+     ],
+     "area": 1825
+    },
+    {
+     "id": "1-R084",
+     "kind": "room",
+     "name": null,
+     "page": [
+      2578,
+      1330
+     ],
+     "area": 2004
+    },
+    {
+     "id": "1-R085",
+     "kind": "room",
+     "name": "Physics Store",
+     "page": [
+      2660,
+      1302
+     ],
+     "area": 12197
+    },
+    {
+     "id": "1-R086",
+     "kind": "room",
+     "name": "Physics Lab",
+     "page": [
+      2852,
+      1323
+     ],
+     "area": 35714
+    },
+    {
+     "id": "1-R087",
+     "kind": "stairwell",
+     "name": null,
+     "page": [
+      1369,
+      1358
+     ],
+     "area": 14101
+    },
+    {
+     "id": "1-R088",
+     "kind": "void",
+     "name": null,
+     "page": [
+      1731,
+      1379
+     ],
+     "area": 1595
+    },
+    {
+     "id": "1-R089",
+     "kind": "void",
+     "name": null,
+     "page": [
+      1890,
+      1370
+     ],
+     "area": 1969
+    },
+    {
+     "id": "1-R090",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      2573,
+      1374
+     ],
+     "area": 1518
+    },
+    {
+     "id": "1-R091",
+     "kind": "room",
+     "name": "Grade 5 AC",
+     "page": [
+      2630,
+      1374
+     ],
+     "area": 4075
+    },
+    {
+     "id": "1-R092",
+     "kind": "void",
+     "name": null,
+     "page": [
+      2760,
+      1380
+     ],
+     "area": 717
+    },
+    {
+     "id": "1-R093",
+     "kind": "stairwell",
+     "name": null,
+     "page": [
+      3101,
+      1362
+     ],
+     "area": 14089
+    },
+    {
+     "id": "1-R094",
+     "kind": "room",
+     "name": "MYP3 D",
+     "page": [
+      1184,
+      1385
+     ],
+     "area": 17530
+    },
+    {
+     "id": "1-R095",
+     "kind": "room",
+     "name": "MYP3 A",
+     "page": [
+      1057,
+      1451
+     ],
+     "area": 16491
+    },
+    {
+     "id": "1-R096",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      1374,
+      1456
+     ],
+     "area": 61721
+    },
+    {
+     "id": "1-R097",
+     "kind": "room",
+     "name": "Physics Lab",
+     "page": [
+      3380,
+      1435
+     ],
+     "area": 34320
+    },
+    {
+     "id": "1-R098",
+     "kind": "room",
+     "name": "7E",
+     "page": [
+      1475,
+      1493
+     ],
+     "area": 17617
+    },
+    {
+     "id": "1-R099",
+     "kind": "room",
+     "name": "Male Washroom",
+     "page": [
+      2581,
+      1496
+     ],
+     "area": 6069
+    },
+    {
+     "id": "1-R100",
+     "kind": "void",
+     "name": null,
+     "page": [
+      2863,
+      1472
+     ],
+     "area": 646
+    },
+    {
+     "id": "1-R101",
+     "kind": "room",
+     "name": "Physics Store",
+     "page": [
+      3521,
+      1471
+     ],
+     "area": 9223
+    },
+    {
+     "id": "1-R102",
+     "kind": "room",
+     "name": "Mind Spark Lab",
+     "page": [
+      1790,
+      1524
+     ],
+     "area": 17167
+    },
+    {
+     "id": "1-R103",
+     "kind": "room",
+     "name": "Female Washroom",
+     "page": [
+      1889,
+      1532
+     ],
+     "area": 6541
+    },
+    {
+     "id": "1-R104",
+     "kind": "room",
+     "name": "SOR FF-3",
+     "page": [
+      2679,
+      1528
+     ],
+     "area": 16877
+    },
+    {
+     "id": "1-R105",
+     "kind": "room",
+     "name": "PYP5 I",
+     "page": [
+      2811,
+      1535
+     ],
+     "area": 17176
+    },
+    {
+     "id": "1-R106",
+     "kind": "room",
+     "name": "PYP5 J",
+     "page": [
+      2965,
+      1529
+     ],
+     "area": 17146
+    },
+    {
+     "id": "1-R107",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      3489,
+      1532
+     ],
+     "area": 8063
+    },
+    {
+     "id": "1-R108",
+     "kind": "stairwell",
+     "name": null,
+     "page": [
+      968,
+      1579
+     ],
+     "area": 12816
+    },
+    {
+     "id": "1-R109",
+     "kind": "room",
+     "name": "MYP3 C",
+     "page": [
+      1277,
+      1571
+     ],
+     "area": 17527
+    },
+    {
+     "id": "1-R110",
+     "kind": "room",
+     "name": "7F",
+     "page": [
+      1684,
+      1558
+     ],
+     "area": 18012
+    },
+    {
+     "id": "1-R111",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      2037,
+      1542
+     ],
+     "area": 15835
+    },
+    {
+     "id": "1-R112",
+     "kind": "room",
+     "name": null,
+     "page": [
+      2128,
+      1556
+     ],
+     "area": 3360
+    },
+    {
+     "id": "1-R113",
+     "kind": "void",
+     "name": null,
+     "page": [
+      2204,
+      1541
+     ],
+     "area": 11387
+    },
+    {
+     "id": "1-R114",
+     "kind": "room",
+     "name": null,
+     "page": [
+      2340,
+      1555
+     ],
+     "area": 3297
+    },
+    {
+     "id": "1-R115",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      2434,
+      1541
+     ],
+     "area": 15768
+    },
+    {
+     "id": "1-R116",
+     "kind": "room",
+     "name": "Biology Lab",
+     "page": [
+      3197,
+      1574
+     ],
+     "area": 35375
+    },
+    {
+     "id": "1-R117",
+     "kind": "room",
+     "name": "MYP3 B",
+     "page": [
+      1155,
+      1635
+     ],
+     "area": 16323
+    },
+    {
+     "id": "1-R118",
+     "kind": "void",
+     "name": null,
+     "page": [
+      3421,
+      1642
+     ],
+     "area": 2921
+    },
+    {
+     "id": "1-R119",
+     "kind": "room",
+     "name": "MYP 2&3 Supervisor",
+     "page": [
+      1046,
+      1679
+     ],
+     "area": 10625
+    },
+    {
+     "id": "1-R120",
+     "kind": "room",
+     "name": "Biology Store",
+     "page": [
+      3497,
+      1697
+     ],
+     "area": 7631
+    },
+    {
+     "id": "1-R121",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      3636,
+      1687
+     ],
+     "area": 85278
+    },
+    {
+     "id": "1-R122",
+     "kind": "room",
+     "name": null,
+     "page": [
+      3403,
+      1704
+     ],
+     "area": 4761
+    },
+    {
+     "id": "1-R123",
+     "kind": "void",
+     "name": null,
+     "page": [
+      1252,
+      1948
+     ],
+     "area": 231193
+    },
+    {
+     "id": "1-R124",
+     "kind": "void",
+     "name": null,
+     "page": [
+      3230,
+      1950
+     ],
+     "area": 258324
+    },
+    {
+     "id": "1-R125",
+     "kind": "void",
+     "name": null,
+     "page": [
+      2628,
+      2009
+     ],
+     "area": 936889
+    },
+    {
+     "id": "1-R126",
+     "kind": "room",
+     "name": null,
+     "page": [
+      1090,
+      2180
+     ],
+     "area": 2149
+    },
+    {
+     "id": "1-R127",
+     "kind": "room",
+     "name": null,
+     "page": [
+      3449,
+      2209
+     ],
+     "area": 1789
+    },
+    {
+     "id": "1-R128",
+     "kind": "room",
+     "name": "Resource Room",
+     "page": [
+      1023,
+      2220
+     ],
+     "area": 3143
+    },
+    {
+     "id": "1-R129",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      1072,
+      2230
+     ],
+     "area": 1528
+    },
+    {
+     "id": "1-R130",
+     "kind": "void",
+     "name": null,
+     "page": [
+      3410,
+      2223
+     ],
+     "area": 1284
+    },
+    {
+     "id": "1-R131",
+     "kind": "void",
+     "name": null,
+     "page": [
+      988,
+      2269
+     ],
+     "area": 1445
+    },
+    {
+     "id": "1-R132",
+     "kind": "room",
+     "name": "General Science Lab",
+     "page": [
+      3277,
+      2284
+     ],
+     "area": 35260
+    },
+    {
+     "id": "1-R133",
+     "kind": "void",
+     "name": null,
+     "page": [
+      3480,
+      2271
+     ],
+     "area": 1656
+    },
+    {
+     "id": "1-R134",
+     "kind": "room",
+     "name": "PYP4 I",
+     "page": [
+      1164,
+      2300
+     ],
+     "area": 15618
+    },
+    {
+     "id": "1-R135",
+     "kind": "void",
+     "name": null,
+     "page": [
+      3001,
+      2336
+     ],
+     "area": 6840
+    },
+    {
+     "id": "1-R136",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      3068,
+      2327
+     ],
+     "area": 44197
+    },
+    {
+     "id": "1-R137",
+     "kind": "room",
+     "name": "PYP4 H",
+     "page": [
+      1310,
+      2348
+     ],
+     "area": 16303
+    },
+    {
+     "id": "1-R138",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      1396,
+      2343
+     ],
+     "area": 47348
+    },
+    {
+     "id": "1-R139",
+     "kind": "room",
+     "name": "SOR FF-2",
+     "page": [
+      1939,
+      2367
+     ],
+     "area": 16898
+    },
+    {
+     "id": "1-R140",
+     "kind": "room",
+     "name": "PYP5 H",
+     "page": [
+      2074,
+      2364
+     ],
+     "area": 18358
+    },
+    {
+     "id": "1-R141",
+     "kind": "room",
+     "name": "PYP5 K",
+     "page": [
+      2398,
+      2363
+     ],
+     "area": 17521
+    },
+    {
+     "id": "1-R142",
+     "kind": "room",
+     "name": "PYP5 G",
+     "page": [
+      2527,
+      2366
+     ],
+     "area": 14219
+    },
+    {
+     "id": "1-R143",
+     "kind": "room",
+     "name": "PYP5 F",
+     "page": [
+      2648,
+      2360
+     ],
+     "area": 12700
+    },
+    {
+     "id": "1-R144",
+     "kind": "room",
+     "name": "Staff Room",
+     "page": [
+      2841,
+      2367
+     ],
+     "area": 30832
+    },
+    {
+     "id": "1-R145",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      941,
+      2409
+     ],
+     "area": 14193
+    },
+    {
+     "id": "1-R146",
+     "kind": "room",
+     "name": "PYP4 J",
+     "page": [
+      1041,
+      2399
+     ],
+     "area": 15535
+    },
+    {
+     "id": "1-R147",
+     "kind": "room",
+     "name": "PYP4 E",
+     "page": [
+      1476,
+      2398
+     ],
+     "area": 16617
+    },
+    {
+     "id": "1-R148",
+     "kind": "room",
+     "name": "PYP4 D",
+     "page": [
+      1613,
+      2394
+     ],
+     "area": 17680
+    },
+    {
+     "id": "1-R149",
+     "kind": "room",
+     "name": "PYP4 A",
+     "page": [
+      1757,
+      2390
+     ],
+     "area": 16020
+    },
+    {
+     "id": "1-R150",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      3096,
+      2443
+     ],
+     "area": 167715
+    },
+    {
+     "id": "1-R151",
+     "kind": "room",
+     "name": "PYP5 A",
+     "page": [
+      3413,
+      2446
+     ],
+     "area": 16470
+    },
+    {
+     "id": "1-R152",
+     "kind": "stairwell",
+     "name": null,
+     "page": [
+      3555,
+      2421
+     ],
+     "area": 13048
+    },
+    {
+     "id": "1-R153",
+     "kind": "room",
+     "name": "PYP4 G",
+     "page": [
+      1163,
+      2461
+     ],
+     "area": 16409
+    },
+    {
+     "id": "1-R154",
+     "kind": "stairwell",
+     "name": null,
+     "page": [
+      3102,
+      2538
+     ],
+     "area": 14420
+    },
+    {
+     "id": "1-R155",
+     "kind": "room",
+     "name": "PYP5 B",
+     "page": [
+      3291,
+      2512
+     ],
+     "area": 17511
+    },
+    {
+     "id": "1-R156",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      1388,
+      2562
+     ],
+     "area": 15214
+    },
+    {
+     "id": "1-R157",
+     "kind": "room",
+     "name": "STEAM Studio",
+     "page": [
+      1929,
+      2577
+     ],
+     "area": 33861
+    },
+    {
+     "id": "1-R158",
+     "kind": "room",
+     "name": "PYP 4&5 Supervisors",
+     "page": [
+      2408,
+      2561
+     ],
+     "area": 13966
+    },
+    {
+     "id": "1-R159",
+     "kind": "room",
+     "name": "PYP5 E",
+     "page": [
+      2534,
+      2577
+     ],
+     "area": 18498
+    },
+    {
+     "id": "1-R160",
+     "kind": "room",
+     "name": "PYP5 D",
+     "page": [
+      2676,
+      2572
+     ],
+     "area": 16963
+    },
+    {
+     "id": "1-R161",
+     "kind": "room",
+     "name": "PYP5 C",
+     "page": [
+      2828,
+      2577
+     ],
+     "area": 20680
+    },
+    {
+     "id": "1-R162",
+     "kind": "room",
+     "name": "IT FF2",
+     "page": [
+      2968,
+      2571
+     ],
+     "area": 15985
+    },
+    {
+     "id": "1-R163",
+     "kind": "room",
+     "name": null,
+     "page": [
+      1245,
+      2601
+     ],
+     "area": 5389
+    },
+    {
+     "id": "1-R164",
+     "kind": "room",
+     "name": "PYP4 F",
+     "page": [
+      1478,
+      2604
+     ],
+     "area": 16585
+    },
+    {
+     "id": "1-R165",
+     "kind": "room",
+     "name": "PYP4 C",
+     "page": [
+      1614,
+      2610
+     ],
+     "area": 17361
+    },
+    {
+     "id": "1-R166",
+     "kind": "room",
+     "name": "PYP4 B",
+     "page": [
+      1756,
+      2601
+     ],
+     "area": 16077
+    },
+    {
+     "id": "1-R167",
+     "kind": "room",
+     "name": null,
+     "page": [
+      3231,
+      2615
+     ],
+     "area": 5572
+    },
+    {
+     "id": "1-R168",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      1299,
+      2644
+     ],
+     "area": 9079
+    },
+    {
+     "id": "1-R169",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      3170,
+      2646
+     ],
+     "area": 8941
+    }
+   ]
+  },
+  "2": {
+   "notes": [
+    "cut off from the main area (has its own stair symbol): Agile Learning Center, Agile Learning Center",
+    "inferred doors through another room: Store -> Chem Lab 2",
+    "21 inferred doors; 0 door-to-corridor links cross a wall corner"
+   ],
+   "stairSymbols": [
+    {
+     "region": "2-R002",
+     "at": [
+      1596.7,
+      668.8
+     ]
+    },
+    {
+     "region": "2-R003",
+     "at": [
+      2216.6,
+      670.3
+     ]
+    },
+    {
+     "region": "2-R038",
+     "at": [
+      2979.3,
+      823.7
+     ]
+    },
+    {
+     "region": "2-R052",
+     "at": [
+      2600.2,
+      971.6
+     ]
+    },
+    {
+     "region": "2-R047",
+     "at": [
+      1219.5,
+      971.9
+     ]
+    },
+    {
+     "region": "2-R110",
+     "at": [
+      793.8,
+      1577.2
+     ]
+    },
+    {
+     "region": "2-R100",
+     "at": [
+      1733.9,
+      1637.4
+     ]
+    },
+    {
+     "region": "2-R102",
+     "at": [
+      2083.0,
+      1634.5
+     ]
+    }
+   ],
+   "regions": [
+    {
+     "id": "2-R001",
+     "kind": "void",
+     "name": null,
+     "page": [
+      4141,
+      246
+     ],
+     "area": 615
+    },
+    {
+     "id": "2-R002",
+     "kind": "stairwell",
+     "name": null,
+     "page": [
+      1755,
+      357
+     ],
+     "area": 8424
+    },
+    {
+     "id": "2-R003",
+     "kind": "stairwell",
+     "name": null,
+     "page": [
+      2522,
+      359
+     ],
+     "area": 8518
+    },
+    {
+     "id": "2-R004",
+     "kind": "room",
+     "name": null,
+     "page": [
+      890,
+      409
+     ],
+     "area": 2290
+    },
+    {
+     "id": "2-R005",
+     "kind": "room",
+     "name": "Agile Learning Center",
+     "page": [
+      1913,
+      404
+     ],
+     "area": 89260
+    },
+    {
+     "id": "2-R006",
+     "kind": "room",
+     "name": "Agile Learning Center",
+     "page": [
+      2265,
+      404
+     ],
+     "area": 85816
+    },
+    {
+     "id": "2-R007",
+     "kind": "room",
+     "name": null,
+     "page": [
+      3343,
+      408
+     ],
+     "area": 2362
+    },
+    {
+     "id": "2-R008",
+     "kind": "room",
+     "name": null,
+     "page": [
+      942,
+      425
+     ],
+     "area": 1899
+    },
+    {
+     "id": "2-R009",
+     "kind": "room",
+     "name": null,
+     "page": [
+      3295,
+      425
+     ],
+     "area": 1517
+    },
+    {
+     "id": "2-R010",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      787,
+      478
+     ],
+     "area": 12725
+    },
+    {
+     "id": "2-R011",
+     "kind": "void",
+     "name": null,
+     "page": [
+      868,
+      476
+     ],
+     "area": 4142
+    },
+    {
+     "id": "2-R012",
+     "kind": "room",
+     "name": "Geography Lab",
+     "page": [
+      3373,
+      475
+     ],
+     "area": 4300
+    },
+    {
+     "id": "2-R013",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      3465,
+      500
+     ],
+     "area": 12779
+    },
+    {
+     "id": "2-R014",
+     "kind": "void",
+     "name": null,
+     "page": [
+      3990,
+      478
+     ],
+     "area": 1186838
+    },
+    {
+     "id": "2-R015",
+     "kind": "room",
+     "name": "MYP4 A",
+     "page": [
+      1010,
+      502
+     ],
+     "area": 17042
+    },
+    {
+     "id": "2-R016",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      879,
+      547
+     ],
+     "area": 5718
+    },
+    {
+     "id": "2-R017",
+     "kind": "room",
+     "name": "MYP4 B",
+     "page": [
+      1144,
+      566
+     ],
+     "area": 18301
+    },
+    {
+     "id": "2-R018",
+     "kind": "room",
+     "name": null,
+     "page": [
+      1279,
+      576
+     ],
+     "area": 4893
+    },
+    {
+     "id": "2-R019",
+     "kind": "room",
+     "name": "ISC Lounge",
+     "page": [
+      2200,
+      578
+     ],
+     "area": 22214
+    },
+    {
+     "id": "2-R020",
+     "kind": "room",
+     "name": null,
+     "page": [
+      2950,
+      572
+     ],
+     "area": 4013
+    },
+    {
+     "id": "2-R021",
+     "kind": "room",
+     "name": "10 C",
+     "page": [
+      3207,
+      554
+     ],
+     "area": 15909
+    },
+    {
+     "id": "2-R022",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      3364,
+      545
+     ],
+     "area": 5812
+    },
+    {
+     "id": "2-R023",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      812,
+      601
+     ],
+     "area": 14650
+    },
+    {
+     "id": "2-R024",
+     "kind": "room",
+     "name": "MYP4 E",
+     "page": [
+      1385,
+      606
+     ],
+     "area": 17990
+    },
+    {
+     "id": "2-R025",
+     "kind": "room",
+     "name": "MYP5 A",
+     "page": [
+      1540,
+      607
+     ],
+     "area": 18892
+    },
+    {
+     "id": "2-R026",
+     "kind": "room",
+     "name": "MYP5 B",
+     "page": [
+      1694,
+      606
+     ],
+     "area": 17953
+    },
+    {
+     "id": "2-R027",
+     "kind": "room",
+     "name": "MYP5 D",
+     "page": [
+      1842,
+      606
+     ],
+     "area": 26556
+    },
+    {
+     "id": "2-R028",
+     "kind": "room",
+     "name": "MYP5 E",
+     "page": [
+      2303,
+      606
+     ],
+     "area": 28160
+    },
+    {
+     "id": "2-R029",
+     "kind": "room",
+     "name": "10 B",
+     "page": [
+      3069,
+      614
+     ],
+     "area": 16998
+    },
+    {
+     "id": "2-R030",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      1087,
+      656
+     ],
+     "area": 15209
+    },
+    {
+     "id": "2-R031",
+     "kind": "room",
+     "name": "MYP 4 & 5 Supervisor",
+     "page": [
+      1234,
+      642
+     ],
+     "area": 5948
+    },
+    {
+     "id": "2-R032",
+     "kind": "room",
+     "name": "DP 9",
+     "page": [
+      2500,
+      636
+     ],
+     "area": 16235
+    },
+    {
+     "id": "2-R033",
+     "kind": "room",
+     "name": "DP 10",
+     "page": [
+      2689,
+      638
+     ],
+     "area": 17075
+    },
+    {
+     "id": "2-R034",
+     "kind": "room",
+     "name": "DP 12",
+     "page": [
+      2830,
+      641
+     ],
+     "area": 16452
+    },
+    {
+     "id": "2-R035",
+     "kind": "room",
+     "name": "Grade 9 & 10 Supervisor",
+     "page": [
+      2954,
+      638
+     ],
+     "area": 6814
+    },
+    {
+     "id": "2-R036",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      3164,
+      650
+     ],
+     "area": 14801
+    },
+    {
+     "id": "2-R037",
+     "kind": "room",
+     "name": "10 D",
+     "page": [
+      3345,
+      649
+     ],
+     "area": 15619
+    },
+    {
+     "id": "2-R038",
+     "kind": "stairwell",
+     "name": null,
+     "page": [
+      3487,
+      654
+     ],
+     "area": 13470
+    },
+    {
+     "id": "2-R039",
+     "kind": "void",
+     "name": null,
+     "page": [
+      335,
+      667
+     ],
+     "area": 1054950
+    },
+    {
+     "id": "2-R040",
+     "kind": "room",
+     "name": "11 E",
+     "page": [
+      913,
+      691
+     ],
+     "area": 16986
+    },
+    {
+     "id": "2-R041",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      2053,
+      696
+     ],
+     "area": 55806
+    },
+    {
+     "id": "2-R042",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      1208,
+      707
+     ],
+     "area": 31026
+    },
+    {
+     "id": "2-R043",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      2497,
+      708
+     ],
+     "area": 11712
+    },
+    {
+     "id": "2-R044",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      3048,
+      710
+     ],
+     "area": 29954
+    },
+    {
+     "id": "2-R045",
+     "kind": "room",
+     "name": "10 A",
+     "page": [
+      3212,
+      713
+     ],
+     "area": 16577
+    },
+    {
+     "id": "2-R046",
+     "kind": "room",
+     "name": "MYP4 C",
+     "page": [
+      1053,
+      755
+     ],
+     "area": 18112
+    },
+    {
+     "id": "2-R047",
+     "kind": "stairwell",
+     "name": null,
+     "page": [
+      1244,
+      769
+     ],
+     "area": 13994
+    },
+    {
+     "id": "2-R048",
+     "kind": "room",
+     "name": null,
+     "page": [
+      2019,
+      765
+     ],
+     "area": 2551
+    },
+    {
+     "id": "2-R049",
+     "kind": "void",
+     "name": null,
+     "page": [
+      2621,
+      753
+     ],
+     "area": 571
+    },
+    {
+     "id": "2-R050",
+     "kind": "room",
+     "name": "DP 11",
+     "page": [
+      2734,
+      774
+     ],
+     "area": 16541
+    },
+    {
+     "id": "2-R051",
+     "kind": "room",
+     "name": "DP 13",
+     "page": [
+      2883,
+      778
+     ],
+     "area": 15885
+    },
+    {
+     "id": "2-R052",
+     "kind": "stairwell",
+     "name": null,
+     "page": [
+      2995,
+      769
+     ],
+     "area": 14234
+    },
+    {
+     "id": "2-R053",
+     "kind": "room",
+     "name": "MYP4 D",
+     "page": [
+      1409,
+      809
+     ],
+     "area": 17155
+    },
+    {
+     "id": "2-R054",
+     "kind": "room",
+     "name": "MYP4 F",
+     "page": [
+      1564,
+      809
+     ],
+     "area": 17339
+    },
+    {
+     "id": "2-R055",
+     "kind": "room",
+     "name": "MYP5 C",
+     "page": [
+      1692,
+      807
+     ],
+     "area": 17303
+    },
+    {
+     "id": "2-R056",
+     "kind": "room",
+     "name": "Senior School AS/AC",
+     "page": [
+      1905,
+      784
+     ],
+     "area": 9125
+    },
+    {
+     "id": "2-R057",
+     "kind": "room",
+     "name": "ICT Engineer",
+     "page": [
+      2334,
+      783
+     ],
+     "area": 5295
+    },
+    {
+     "id": "2-R058",
+     "kind": "room",
+     "name": "Cookery Lab",
+     "page": [
+      2548,
+      810
+     ],
+     "area": 16285
+    },
+    {
+     "id": "2-R059",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      1114,
+      839
+     ],
+     "area": 7477
+    },
+    {
+     "id": "2-R060",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      2139,
+      847
+     ],
+     "area": 170105
+    },
+    {
+     "id": "2-R061",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      3130,
+      849
+     ],
+     "area": 6714
+    },
+    {
+     "id": "2-R062",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      1176,
+      872
+     ],
+     "area": 8348
+    },
+    {
+     "id": "2-R063",
+     "kind": "void",
+     "name": null,
+     "page": [
+      2027,
+      874
+     ],
+     "area": 604
+    },
+    {
+     "id": "2-R064",
+     "kind": "void",
+     "name": null,
+     "page": [
+      2243,
+      876
+     ],
+     "area": 604
+    },
+    {
+     "id": "2-R065",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      3062,
+      872
+     ],
+     "area": 8241
+    },
+    {
+     "id": "2-R066",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      1967,
+      923
+     ],
+     "area": 12766
+    },
+    {
+     "id": "2-R067",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      2290,
+      908
+     ],
+     "area": 9040
+    },
+    {
+     "id": "2-R068",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      1825,
+      1095
+     ],
+     "area": 114986
+    },
+    {
+     "id": "2-R069",
+     "kind": "room",
+     "name": "Dance Studio",
+     "page": [
+      2015,
+      1064
+     ],
+     "area": 65337
+    },
+    {
+     "id": "2-R070",
+     "kind": "room",
+     "name": null,
+     "page": [
+      1705,
+      1101
+     ],
+     "area": 3042
+    },
+    {
+     "id": "2-R071",
+     "kind": "room",
+     "name": "AV Hub",
+     "page": [
+      2512,
+      1123
+     ],
+     "area": 10656
+    },
+    {
+     "id": "2-R072",
+     "kind": "room",
+     "name": null,
+     "page": [
+      1704,
+      1162
+     ],
+     "area": 2929
+    },
+    {
+     "id": "2-R073",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      1040,
+      1405
+     ],
+     "area": 6422
+    },
+    {
+     "id": "2-R074",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      1112,
+      1384
+     ],
+     "area": 10217
+    },
+    {
+     "id": "2-R075",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      1207,
+      1390
+     ],
+     "area": 17983
+    },
+    {
+     "id": "2-R076",
+     "kind": "room",
+     "name": null,
+     "page": [
+      1744,
+      1412
+     ],
+     "area": 2548
+    },
+    {
+     "id": "2-R077",
+     "kind": "void",
+     "name": null,
+     "page": [
+      2101,
+      1399
+     ],
+     "area": 256215
+    },
+    {
+     "id": "2-R078",
+     "kind": "room",
+     "name": null,
+     "page": [
+      2496,
+      1411
+     ],
+     "area": 2461
+    },
+    {
+     "id": "2-R079",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      3030,
+      1394
+     ],
+     "area": 18022
+    },
+    {
+     "id": "2-R080",
+     "kind": "room",
+     "name": "8 D",
+     "page": [
+      1319,
+      1428
+     ],
+     "area": 20425
+    },
+    {
+     "id": "2-R081",
+     "kind": "room",
+     "name": "8 E",
+     "page": [
+      1458,
+      1431
+     ],
+     "area": 20992
+    },
+    {
+     "id": "2-R082",
+     "kind": "room",
+     "name": "SOR SF-6",
+     "page": [
+      1640,
+      1458
+     ],
+     "area": 20419
+    },
+    {
+     "id": "2-R083",
+     "kind": "room",
+     "name": "Store",
+     "page": [
+      2577,
+      1437
+     ],
+     "area": 14121
+    },
+    {
+     "id": "2-R084",
+     "kind": "room",
+     "name": "Chem Lab 2",
+     "page": [
+      2783,
+      1459
+     ],
+     "area": 41510
+    },
+    {
+     "id": "2-R085",
+     "kind": "room",
+     "name": "7 A",
+     "page": [
+      1001,
+      1478
+     ],
+     "area": 19744
+    },
+    {
+     "id": "2-R086",
+     "kind": "room",
+     "name": null,
+     "page": [
+      1738,
+      1464
+     ],
+     "area": 2109
+    },
+    {
+     "id": "2-R087",
+     "kind": "room",
+     "name": null,
+     "page": [
+      2489,
+      1468
+     ],
+     "area": 2408
+    },
+    {
+     "id": "2-R088",
+     "kind": "void",
+     "name": null,
+     "page": [
+      1741,
+      1510
+     ],
+     "area": 2228
+    },
+    {
+     "id": "2-R089",
+     "kind": "void",
+     "name": null,
+     "page": [
+      2480,
+      1515
+     ],
+     "area": 1581
+    },
+    {
+     "id": "2-R090",
+     "kind": "room",
+     "name": null,
+     "page": [
+      2547,
+      1514
+     ],
+     "area": 4851
+    },
+    {
+     "id": "2-R091",
+     "kind": "void",
+     "name": null,
+     "page": [
+      2685,
+      1521
+     ],
+     "area": 798
+    },
+    {
+     "id": "2-R092",
+     "kind": "room",
+     "name": "Bio Lab / Chem Lab / Bio Store / Chem Store",
+     "page": [
+      3256,
+      1529
+     ],
+     "area": 219169
+    },
+    {
+     "id": "2-R093",
+     "kind": "room",
+     "name": "7 D",
+     "page": [
+      862,
+      1550
+     ],
+     "area": 18617
+    },
+    {
+     "id": "2-R094",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      1127,
+      1567
+     ],
+     "area": 57308
+    },
+    {
+     "id": "2-R095",
+     "kind": "room",
+     "name": "Grade 8 Supervisor",
+     "page": [
+      1203,
+      1656
+     ],
+     "area": 13546
+    },
+    {
+     "id": "2-R096",
+     "kind": "room",
+     "name": "8 C",
+     "page": [
+      1305,
+      1648
+     ],
+     "area": 20931
+    },
+    {
+     "id": "2-R097",
+     "kind": "room",
+     "name": "Female Washroom",
+     "page": [
+      1745,
+      1648
+     ],
+     "area": 3557
+    },
+    {
+     "id": "2-R098",
+     "kind": "room",
+     "name": "Female Washroom",
+     "page": [
+      2492,
+      1646
+     ],
+     "area": 3327
+    },
+    {
+     "id": "2-R099",
+     "kind": "room",
+     "name": "7 B",
+     "page": [
+      1104,
+      1678
+     ],
+     "area": 19792
+    },
+    {
+     "id": "2-R100",
+     "kind": "stairwell",
+     "name": null,
+     "page": [
+      1886,
+      1671
+     ],
+     "area": 16957
+    },
+    {
+     "id": "2-R101",
+     "kind": "void",
+     "name": null,
+     "page": [
+      2086,
+      1694
+     ],
+     "area": 13120
+    },
+    {
+     "id": "2-R102",
+     "kind": "stairwell",
+     "name": null,
+     "page": [
+      2351,
+      1672
+     ],
+     "area": 16781
+    },
+    {
+     "id": "2-R103",
+     "kind": "room",
+     "name": "IER 2",
+     "page": [
+      2597,
+      1680
+     ],
+     "area": 19522
+    },
+    {
+     "id": "2-R104",
+     "kind": "room",
+     "name": "Music Room",
+     "page": [
+      2746,
+      1681
+     ],
+     "area": 42303
+    },
+    {
+     "id": "2-R105",
+     "kind": "room",
+     "name": "SOR SF-5",
+     "page": [
+      3034,
+      1661
+     ],
+     "area": 13391
+    },
+    {
+     "id": "2-R106",
+     "kind": "room",
+     "name": "8 B",
+     "page": [
+      1455,
+      1708
+     ],
+     "area": 21292
+    },
+    {
+     "id": "2-R107",
+     "kind": "room",
+     "name": "8 A",
+     "page": [
+      1660,
+      1713
+     ],
+     "area": 19921
+    },
+    {
+     "id": "2-R108",
+     "kind": "room",
+     "name": "Male Washroom",
+     "page": [
+      1745,
+      1717
+     ],
+     "area": 3560
+    },
+    {
+     "id": "2-R109",
+     "kind": "room",
+     "name": "Male Washroom",
+     "page": [
+      2492,
+      1714
+     ],
+     "area": 3264
+    },
+    {
+     "id": "2-R110",
+     "kind": "stairwell",
+     "name": null,
+     "page": [
+      786,
+      1754
+     ],
+     "area": 19774
+    },
+    {
+     "id": "2-R111",
+     "kind": "void",
+     "name": null,
+     "page": [
+      2032,
+      1817
+     ],
+     "area": 71344
+    },
+    {
+     "id": "2-R112",
+     "kind": "void",
+     "name": null,
+     "page": [
+      3398,
+      1804
+     ],
+     "area": 3355
+    },
+    {
+     "id": "2-R113",
+     "kind": "void",
+     "name": null,
+     "page": [
+      861,
+      1825
+     ],
+     "area": 2668
+    },
+    {
+     "id": "2-R114",
+     "kind": "room",
+     "name": "7 C",
+     "page": [
+      940,
+      1843
+     ],
+     "area": 18471
+    },
+    {
+     "id": "2-R115",
+     "kind": "void",
+     "name": null,
+     "page": [
+      3627,
+      1849
+     ],
+     "area": 2412
+    },
+    {
+     "id": "2-R116",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      845,
+      1899
+     ],
+     "area": 8384
+    },
+    {
+     "id": "2-R117",
+     "kind": "void",
+     "name": null,
+     "page": [
+      3167,
+      2171
+     ],
+     "area": 1732380
+    },
+    {
+     "id": "2-R118",
+     "kind": "void",
+     "name": null,
+     "page": [
+      2545,
+      2198
+     ],
+     "area": 1062807
+    }
+   ]
+  },
+  "3": {
+   "notes": [
+    "13 inferred doors; 0 door-to-corridor links cross a wall corner"
+   ],
+   "stairSymbols": [
+    {
+     "region": "3-R031",
+     "at": [
+      1221.2,
+      978.8
+     ]
+    },
+    {
+     "region": "3-R037",
+     "at": [
+      2601.7,
+      978.8
+     ]
+    }
+   ],
+   "regions": [
+    {
+     "id": "3-R001",
+     "kind": "void",
+     "name": null,
+     "page": [
+      956,
+      374
+     ],
+     "area": 3135
+    },
+    {
+     "id": "3-R002",
+     "kind": "void",
+     "name": null,
+     "page": [
+      1007,
+      358
+     ],
+     "area": 882
+    },
+    {
+     "id": "3-R003",
+     "kind": "room",
+     "name": null,
+     "page": [
+      3091,
+      358
+     ],
+     "area": 880
+    },
+    {
+     "id": "3-R004",
+     "kind": "room",
+     "name": null,
+     "page": [
+      3141,
+      373
+     ],
+     "area": 3139
+    },
+    {
+     "id": "3-R005",
+     "kind": "void",
+     "name": null,
+     "page": [
+      997,
+      399
+     ],
+     "area": 1342
+    },
+    {
+     "id": "3-R006",
+     "kind": "room",
+     "name": "DP 8",
+     "page": [
+      3038,
+      405
+     ],
+     "area": 12997
+    },
+    {
+     "id": "3-R007",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      3102,
+      402
+     ],
+     "area": 1349
+    },
+    {
+     "id": "3-R008",
+     "kind": "room",
+     "name": null,
+     "page": [
+      924,
+      432
+     ],
+     "area": 3030
+    },
+    {
+     "id": "3-R009",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      966,
+      455
+     ],
+     "area": 2017
+    },
+    {
+     "id": "3-R010",
+     "kind": "room",
+     "name": "11 C",
+     "page": [
+      1068,
+      438
+     ],
+     "area": 14112
+    },
+    {
+     "id": "3-R011",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      3132,
+      456
+     ],
+     "area": 2021
+    },
+    {
+     "id": "3-R012",
+     "kind": "room",
+     "name": null,
+     "page": [
+      3170,
+      426
+     ],
+     "area": 3035
+    },
+    {
+     "id": "3-R013",
+     "kind": "room",
+     "name": "11 B",
+     "page": [
+      1186,
+      498
+     ],
+     "area": 15321
+    },
+    {
+     "id": "3-R014",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      897,
+      502
+     ],
+     "area": 12383
+    },
+    {
+     "id": "3-R015",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      997,
+      514
+     ],
+     "area": 12752
+    },
+    {
+     "id": "3-R016",
+     "kind": "room",
+     "name": "DP 1",
+     "page": [
+      2436,
+      502
+     ],
+     "area": 13700
+    },
+    {
+     "id": "3-R017",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      3102,
+      513
+     ],
+     "area": 12164
+    },
+    {
+     "id": "3-R018",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      3200,
+      502
+     ],
+     "area": 12447
+    },
+    {
+     "id": "3-R019",
+     "kind": "room",
+     "name": "11 & 12 Supervisors",
+     "page": [
+      1295,
+      551
+     ],
+     "area": 9513
+    },
+    {
+     "id": "3-R020",
+     "kind": "room",
+     "name": "12 A",
+     "page": [
+      1405,
+      570
+     ],
+     "area": 13647
+    },
+    {
+     "id": "3-R021",
+     "kind": "room",
+     "name": "12 D",
+     "page": [
+      1540,
+      570
+     ],
+     "area": 13204
+    },
+    {
+     "id": "3-R022",
+     "kind": "room",
+     "name": "12 E",
+     "page": [
+      1685,
+      570
+     ],
+     "area": 14368
+    },
+    {
+     "id": "3-R023",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      2579,
+      569
+     ],
+     "area": 68635
+    },
+    {
+     "id": "3-R024",
+     "kind": "room",
+     "name": "IBDP Coordinator / Asst. DP Coordinator",
+     "page": [
+      2802,
+      552
+     ],
+     "area": 9514
+    },
+    {
+     "id": "3-R025",
+     "kind": "room",
+     "name": "DP 7",
+     "page": [
+      2890,
+      543
+     ],
+     "area": 14396
+    },
+    {
+     "id": "3-R026",
+     "kind": "room",
+     "name": "DP 6",
+     "page": [
+      3134,
+      574
+     ],
+     "area": 12992
+    },
+    {
+     "id": "3-R027",
+     "kind": "room",
+     "name": "11 D",
+     "page": [
+      978,
+      615
+     ],
+     "area": 14149
+    },
+    {
+     "id": "3-R028",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      1240,
+      629
+     ],
+     "area": 33393
+    },
+    {
+     "id": "3-R029",
+     "kind": "room",
+     "name": "DP 5",
+     "page": [
+      3014,
+      635
+     ],
+     "area": 13985
+    },
+    {
+     "id": "3-R030",
+     "kind": "room",
+     "name": "11 A",
+     "page": [
+      1102,
+      676
+     ],
+     "area": 14882
+    },
+    {
+     "id": "3-R031",
+     "kind": "stairwell",
+     "name": null,
+     "page": [
+      1273,
+      688
+     ],
+     "area": 11637
+    },
+    {
+     "id": "3-R032",
+     "kind": "void",
+     "name": null,
+     "page": [
+      1844,
+      689
+     ],
+     "area": 5374
+    },
+    {
+     "id": "3-R033",
+     "kind": "room",
+     "name": null,
+     "page": [
+      2238,
+      683
+     ],
+     "area": 1159
+    },
+    {
+     "id": "3-R034",
+     "kind": "room",
+     "name": "DP 2",
+     "page": [
+      2381,
+      694
+     ],
+     "area": 12518
+    },
+    {
+     "id": "3-R035",
+     "kind": "room",
+     "name": "DP 3",
+     "page": [
+      2561,
+      696
+     ],
+     "area": 13204
+    },
+    {
+     "id": "3-R036",
+     "kind": "room",
+     "name": "DP 4",
+     "page": [
+      2703,
+      697
+     ],
+     "area": 13196
+    },
+    {
+     "id": "3-R037",
+     "kind": "stairwell",
+     "name": null,
+     "page": [
+      2823,
+      688
+     ],
+     "area": 11823
+    },
+    {
+     "id": "3-R038",
+     "kind": "room",
+     "name": null,
+     "page": [
+      2248,
+      727
+     ],
+     "area": 2121
+    },
+    {
+     "id": "3-R039",
+     "kind": "room",
+     "name": "Career Counsellor",
+     "page": [
+      2313,
+      716
+     ],
+     "area": 9350
+    },
+    {
+     "id": "3-R040",
+     "kind": "void",
+     "name": null,
+     "page": [
+      3954,
+      706
+     ],
+     "area": 1055030
+    },
+    {
+     "id": "3-R041",
+     "kind": "void",
+     "name": null,
+     "page": [
+      371,
+      761
+     ],
+     "area": 1342383
+    },
+    {
+     "id": "3-R042",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      1156,
+      759
+     ],
+     "area": 6133
+    },
+    {
+     "id": "3-R043",
+     "kind": "room",
+     "name": "12 B",
+     "page": [
+      1406,
+      759
+     ],
+     "area": 12938
+    },
+    {
+     "id": "3-R044",
+     "kind": "room",
+     "name": "12 C",
+     "page": [
+      1540,
+      760
+     ],
+     "area": 12883
+    },
+    {
+     "id": "3-R045",
+     "kind": "room",
+     "name": "12 F",
+     "page": [
+      1678,
+      760
+     ],
+     "area": 12749
+    },
+    {
+     "id": "3-R046",
+     "kind": "room",
+     "name": "IB Secretary",
+     "page": [
+      1854,
+      746
+     ],
+     "area": 7860
+    },
+    {
+     "id": "3-R047",
+     "kind": "room",
+     "name": "Staff Room",
+     "page": [
+      2056,
+      763
+     ],
+     "area": 41762
+    },
+    {
+     "id": "3-R048",
+     "kind": "room",
+     "name": null,
+     "page": [
+      2944,
+      766
+     ],
+     "area": 5505
+    },
+    {
+     "id": "3-R049",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      1213,
+      788
+     ],
+     "area": 6905
+    },
+    {
+     "id": "3-R050",
+     "kind": "room",
+     "name": "SOR TF-7",
+     "page": [
+      1840,
+      804
+     ],
+     "area": 4061
+    },
+    {
+     "id": "3-R051",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      2210,
+      786
+     ],
+     "area": 6302
+    },
+    {
+     "id": "3-R052",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      2883,
+      787
+     ],
+     "area": 6778
+    },
+    {
+     "id": "3-R053",
+     "kind": "corridor",
+     "name": null,
+     "page": [
+      1785,
+      1029
+     ],
+     "area": 104307
+    },
+    {
+     "id": "3-R054",
+     "kind": "void",
+     "name": null,
+     "page": [
+      2047,
+      1392
+     ],
+     "area": 1227574
+    },
+    {
+     "id": "3-R055",
+     "kind": "void",
+     "name": null,
+     "page": [
+      2977,
+      1974
+     ],
+     "area": 1454245
+    },
+    {
+     "id": "3-R056",
+     "kind": "void",
+     "name": null,
+     "page": [
+      2408,
+      2017
+     ],
+     "area": 892217
+    }
+   ]
+  }
+ },
+ "transforms": {
+  "1": {
+   "sx": 0.8760542069330722,
+   "sy": 0.7801470797302879,
+   "tx": -49.27005834848068,
+   "ty": 395.09988597283643,
+   "landmarks": 7,
+   "max_error_px": 11.235031751597383,
+   "mean_error_px": 6.008853196301814
+  },
+  "2": {
+   "sx": 0.8119400599056806,
+   "sy": 0.7225492232939814,
+   "tx": 189.15473757457661,
+   "ty": 372.2059924276102,
+   "landmarks": 6,
+   "max_error_px": 11.388954588451938,
+   "mean_error_px": 5.671069578671673
+  },
+  "3": {
+   "sx": 0.9167077985383508,
+   "sy": 0.7769189765458425,
+   "tx": 34.02243767795477,
+   "ty": 398.7799840085291,
+   "landmarks": 3,
+   "max_error_px": 1.246312777664573,
+   "mean_error_px": 0.8497087678878005
+  },
+  "G": {
+   "sx": 1,
+   "sy": 1,
+   "tx": 0,
+   "ty": 0
+  }
+ }
+}
