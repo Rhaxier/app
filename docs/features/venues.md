@@ -5,6 +5,14 @@ Same shape as announcements; read [`announcements.md`](announcements.md) first.
 
 ## What it does
 
+- **After school** (migration `20261114120000_after_school_booking.sql`): below the
+  periods, an "After School Hours" line, then blocks of `after_school_block_minutes`
+  (default 30) from the day's last period, rounded up to the block (15:00 Mon/Tue, 16:00
+  Wed/Thu, 11:30 Fri), until `after_school_until` (default 18:00) or the venue's own
+  closing time. Same cards and flow; a run is all periods or all blocks, never both. The
+  database accepts these without custom times (`booking_period_problem()`); both settings
+  are in Admin › Venues. Until the migration is pushed, the list simply has no
+  after-school part.
 - **The school's real timetable (2026–27)** is loaded as the periods: see
   [`docs/timetable/README.md`](../timetable/README.md) for every period, break and lunch,
   the CSV files to re-upload (Admin › Upload bell times), and the Term 3 version. Breaks

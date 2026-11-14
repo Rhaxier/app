@@ -17,10 +17,71 @@ export type SlotSettings = Pick<AppSettings, 'school_days'>;
 /** One period on one date: what the booking list shows and people pick. */
 export interface Slot {
   index: number;
-  /** The period's name, e.g. "Period 3". */
+  /** The period's name, e.g. "Period 3" ("After school" for an after-school block). */
   name: string;
   start: Date;
   end: Date;
+  /** An after-school block (afterSchoolSlots), listed below the periods. */
+  afterSchool?: true;
+}
+
+/** The after-school settings (Admin > Venues): how long each block is, and the latest end. */
+export interface AfterSchoolSettings {
+  blockMinutes: number;
+  /** "18:00" */
+  until: string;
+}
+
+/**
+ * The after-school settings from app_settings, or null when the database
+ * doesn't have them yet (its after-school migration isn't applied): then
+ * there's no after-school list, matching what the database accepts.
+ */
+export function afterSchoolSettings(settings: {
+  after_school_block_minutes?: number | null;
+  after_school_until?: string | null;
+}): AfterSchoolSettings | null {
+  if (!settings.after_school_block_minutes || !settings.after_school_until) return null;
+  return {
+    blockMinutes: settings.after_school_block_minutes,
+    until: settings.after_school_until.slice(0, 5),
+  };
+}
+
+const minutesOf = (hhmm: string) => Number(hhmm.slice(0, 2)) * 60 + Number(hhmm.slice(3, 5));
+const hhmmOf = (minutes: number) =>
+  `${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`;
+
+/**
+ * After-school blocks for a date. They start when the day's last period ends,
+ * rounded up to the block length (15:00 Mon/Tue, 16:00 Wed/Thu, 11:30 Fri with
+ * 30-minute blocks), and run until the latest time, or the venue's own
+ * closing time if that's earlier. The same rule as booking_period_problem()
+ * in the database, so every block offered can really be booked.
+ */
+export function afterSchoolSlots(
+  day: string,
+  periods: Period[],
+  settings: AfterSchoolSettings | null,
+  venueUntil?: string | null,
+): Slot[] {
+  const school = periodsOn(day, periods);
+  if (!settings || school.length === 0) return [];
+  const block = settings.blockMinutes;
+  const lastEnd = Math.max(...school.map((period) => minutesOf(period.ends_at)));
+  const from = Math.ceil(lastEnd / block) * block;
+  const until = Math.min(minutesOf(settings.until), venueUntil ? minutesOf(venueUntil) : 24 * 60);
+  const slots: Slot[] = [];
+  for (let start = from; start + block <= until; start += block) {
+    slots.push({
+      index: school.length + slots.length,
+      name: 'After school',
+      start: atSchoolTime(day, hhmmOf(start)),
+      end: atSchoolTime(day, hhmmOf(start + block)),
+      afterSchool: true,
+    });
+  }
+  return slots;
 }
 
 /** The periods of one date, in time order, e.g. Period 1 07:30–09:00, Period 2… */
@@ -107,10 +168,19 @@ export function nextSelection(
   selection: Selection | null,
   index: number,
   states: SlotState[],
+  slots?: Slot[],
 ): Selection | null {
   const kind = states[index]?.kind;
   if (kind !== 'available' && kind !== 'selected') return selection;
   if (!selection) return { first: index, last: index };
+  // A run is all periods or all after-school blocks, never both: tapping the
+  // other kind starts a new selection.
+  if (
+    slots &&
+    Boolean(slots[index]?.afterSchool) !== Boolean(slots[selection.first]?.afterSchool)
+  ) {
+    return { first: index, last: index };
+  }
 
   const inside = index >= selection.first && index <= selection.last;
   if (inside) {
@@ -160,6 +230,7 @@ export function gapBetween(
 
 /** "Period 2" or "Period 2 to Period 3": the names of a run. */
 export function runLabel(slots: Slot[], selection: Selection): string {
+  if (slots[selection.first].afterSchool) return 'After school';
   const first = slots[selection.first].name;
   const last = slots[selection.last].name;
   return first === last ? first : `${first} to ${last}`;
@@ -169,8 +240,14 @@ export function runLabel(slots: Slot[], selection: Selection): string {
  * The periods a booking covers, in words ("Period 2 to Period 3"), or null
  * when it doesn't line up with that day's periods (a custom time).
  */
-export function periodsLabel(start: Date, end: Date, periods: Period[]): string | null {
-  const slots = buildSlots(dayKey(start), periods);
+export function periodsLabel(
+  start: Date,
+  end: Date,
+  periods: Period[],
+  afterSchool: AfterSchoolSettings | null = null,
+): string | null {
+  const day = dayKey(start);
+  const slots = [...buildSlots(day, periods), ...afterSchoolSlots(day, periods, afterSchool)];
   const first = slots.findIndex((slot) => slot.start.getTime() === start.getTime());
   const last = slots.findIndex((slot) => slot.end.getTime() === end.getTime());
   if (first === -1 || last < first) return null;

@@ -85,6 +85,8 @@ export type Database = {
       app_settings: {
         Row: {
           accent_color: string;
+          after_school_block_minutes: number;
+          after_school_until: string;
           allow_custom_booking_times: boolean;
           allow_dev_accounts: boolean;
           announcement_default_expiry_days: number | null;
@@ -113,6 +115,8 @@ export type Database = {
         ComputedFields: never;
         Insert: {
           accent_color?: string;
+          after_school_block_minutes?: number;
+          after_school_until?: string;
           allow_custom_booking_times?: boolean;
           allow_dev_accounts?: boolean;
           announcement_default_expiry_days?: number | null;
@@ -140,6 +144,8 @@ export type Database = {
         };
         Update: {
           accent_color?: string;
+          after_school_block_minutes?: number;
+          after_school_until?: string;
           allow_custom_booking_times?: boolean;
           allow_dev_accounts?: boolean;
           announcement_default_expiry_days?: number | null;

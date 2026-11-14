@@ -16,7 +16,7 @@ import type { Venue } from '@/features/venues/api';
 import { useVenues } from '@/features/venues/hooks';
 import { errorMessage } from '@/lib/errors';
 import { AdminPage } from '../components/AdminPage';
-import { SettingNumber, SettingSwitch } from '../components/SettingControls';
+import { SettingNumber, SettingTime, SettingSwitch } from '../components/SettingControls';
 import { useSaveVenue } from '../hooks';
 import { validateVenue, type VenueFormValues } from '../logic';
 import styles from './VenuesAdminPage.module.css';
@@ -59,6 +59,13 @@ export function VenuesAdminPage() {
           label="Allow custom booking times"
           hint="Off: bookings follow the bell times (one period, or several in a row). On: people can also pick any start and end, e.g. after school. Each venue's limits still apply."
         />
+        <SettingNumber
+          setting="after_school_block_minutes"
+          label="After-school booking blocks (minutes)"
+          min={15}
+          max={120}
+        />
+        <SettingTime setting="after_school_until" label="Latest after-school booking ends at" />
         <p className="meta">Remind venue staff about a waiting request when (Q10):</p>
         <SettingNumber
           setting="venue_reminder_hours"

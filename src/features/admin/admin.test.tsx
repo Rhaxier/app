@@ -20,6 +20,8 @@ const settings: AppSettings = {
   allow_dev_accounts: true,
   staff_email_pattern: null,
   students_can_request_venues: true,
+  after_school_block_minutes: 30,
+  after_school_until: '18:00:00',
   allow_custom_booking_times: false,
   collab_requires_teacher: false,
   teachers_post_any_grade: true,

@@ -26,6 +26,8 @@ import type { Venue } from '../api';
 import { PeriodList } from '../components/PeriodList';
 import { useApprovedBookings, useLiveBookings, useVenues, useWaitingRequests } from '../hooks';
 import {
+  afterSchoolSettings,
+  afterSchoolSlots,
   buildSlots,
   customTimesProblem,
   firstBookableDay,
@@ -34,6 +36,7 @@ import {
   runLabel,
   selectionTimes,
   slotStates,
+  type AfterSchoolSettings,
   type CustomTimes,
   type Selection,
   type SlotSettings,
@@ -79,6 +82,7 @@ export function BookPage() {
     <BookingCalendar
       settings={settings.data}
       allowCustomTimes={settings.data.allow_custom_booking_times}
+      afterSchool={afterSchoolSettings(settings.data)}
       periods={periods.data}
       calendar={calendar}
       venues={active}
@@ -90,6 +94,8 @@ interface BookingCalendarProps {
   settings: SlotSettings;
   /** Admin > Venues: people may also request times that aren't periods. */
   allowCustomTimes: boolean;
+  /** Admin > Venues: after-school blocks, listed below the periods (null: none yet). */
+  afterSchool: AfterSchoolSettings | null;
   periods: Period[];
   calendar: CalendarData;
   venues: Venue[];
@@ -99,6 +105,7 @@ interface BookingCalendarProps {
 function BookingCalendar({
   settings,
   allowCustomTimes,
+  afterSchool,
   periods,
   calendar,
   venues,
@@ -131,7 +138,12 @@ function BookingCalendar({
   const approved = useApprovedBookings(start, end, venue.id);
   const waiting = useWaitingRequests(venue.id, start, end);
 
-  const slots = buildSlots(day, periods);
+  // The day's periods, then after-school blocks up to the latest time (or the
+  // venue's closing time), all in one list.
+  const slots = [
+    ...buildSlots(day, periods),
+    ...afterSchoolSlots(day, periods, afterSchool, venue.bookable_until),
+  ];
   const closedReason = isBlocked(day) ? (dayNote(day, calendar, venue.id)?.text ?? null) : null;
   const states = slotStates(
     slots,
@@ -172,7 +184,7 @@ function BookingCalendar({
 
   function togglePeriod(index: number) {
     setCustom(noCustomTimes);
-    setSelection(nextSelection(selection, index, states));
+    setSelection(nextSelection(selection, index, states, slots));
   }
 
   function changeCustom(changes: Partial<CustomTimes>) {

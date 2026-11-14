@@ -2,7 +2,8 @@
 // rather than on one long settings form:
 //   <SettingSwitch setting="students_can_request_venues" label="…" />
 //   <SettingNumber setting="collab_max_team_size" label="…" min={2} max={51} />
-// A switch saves as soon as it's flipped; a number saves with its button.
+//   <SettingTime setting="after_school_until" label="…" />
+// A switch saves as soon as it's flipped; a number or a time saves with its button.
 // Every change is written to the audit log by a database trigger.
 import { useState } from 'react';
 import { Button } from '@/components/Button';
@@ -20,6 +21,9 @@ type BooleanSetting = {
 type NumberSetting = {
   [K in keyof AppSettings]: AppSettings[K] extends number | null ? K : never;
 }[keyof AppSettings];
+
+/** Settings that hold a time of day ("18:00:00" in the database). */
+type TimeSetting = 'after_school_until';
 
 interface SettingSwitchProps {
   setting: BooleanSetting;
@@ -54,7 +58,8 @@ interface SettingNumberProps {
 
 export function SettingNumber(props: SettingNumberProps) {
   const settings = useAppSettings();
-  if (!settings.data) return null;
+  // Shown once the database has the setting (a newer one may need its migration).
+  if (!settings.data || settings.data[props.setting] === undefined) return null;
   // Keyed by the saved value, so the field resets after each save.
   const saved = settings.data[props.setting];
   return <NumberForm key={String(saved)} {...props} saved={saved} />;
@@ -98,6 +103,44 @@ function NumberForm({
         disabled={Boolean(problem) || value === (saved === null ? '' : String(saved))}
         loading={save.isPending}
         onClick={() => save.mutate({ [setting]: empty ? null : number })}
+      >
+        Save
+      </Button>
+    </div>
+  );
+}
+
+interface SettingTimeProps {
+  setting: TimeSetting;
+  label: string;
+  hint?: string;
+}
+
+export function SettingTime(props: SettingTimeProps) {
+  const settings = useAppSettings();
+  // Shown once the database has the setting (its migration is applied).
+  const saved = settings.data?.[props.setting];
+  if (!saved) return null;
+  return <TimeForm key={saved} {...props} saved={saved.slice(0, 5)} />;
+}
+
+function TimeForm({ setting, label, hint, saved }: SettingTimeProps & { saved: string }) {
+  const save = useUpdateSettings();
+  const [value, setValue] = useState(saved);
+  return (
+    <div className={styles.addRow}>
+      <TextField
+        label={label}
+        hint={hint}
+        type="time"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+      />
+      <Button
+        variant="secondary"
+        disabled={!value || value === saved}
+        loading={save.isPending}
+        onClick={() => save.mutate({ [setting]: value })}
       >
         Save
       </Button>

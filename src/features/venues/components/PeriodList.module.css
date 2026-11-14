@@ -179,7 +179,8 @@
 }
 
 .inRun:not(.runEnd) {
-  border-bottom-color: transparent;
+  /* No divider at all inside a run: a transparent one still leaves a 1px seam. */
+  border-bottom: 0;
 }
 
 .runStart .selected {
@@ -197,4 +198,33 @@
 /* Inside a run, only the top piece keeps the highlight. */
 .inRun:not(.runStart) .selected {
   box-shadow: var(--selglow);
+}
+
+/* After school: the block's times take both the period and start columns. */
+.afterRow .name {
+  grid-column: span 2;
+  font-variant-numeric: tabular-nums;
+}
+
+/* "After School Hours": a labelled line across the list. */
+.afterSchool {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 40px;
+  padding: 0 2px;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink2);
+  font-size: var(--text-caps);
+  font-weight: 600;
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+}
+
+.afterSchool::before,
+.afterSchool::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--hair);
 }
