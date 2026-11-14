@@ -1,7 +1,7 @@
 // Collab finder (reference screen 6; design PDF page 8): posts from every
 // grade, filtered by skill with a row of chips that scrolls sideways.
 import { useState } from 'react';
-import { FilterChip } from '@/components/Chip';
+import { ChipGroup, FilterChip } from '@/components/Chip';
 import { Fab } from '@/components/Fab';
 import { PageHeader } from '@/components/PageHeader';
 import { EmptyState, ErrorState, LoadingState } from '@/components/States';
@@ -29,7 +29,7 @@ export function CollabPage() {
         title="Collab finder"
         action={<Fab to="/collab/new" label="Post a project" />}
       />
-      <div className="scroll-row" role="group" aria-label="Filter by skill">
+      <ChipGroup className="scroll-row" label="Filter by skill">
         <FilterChip selected={skill === null} onClick={() => setSkill(null)}>
           All skills
         </FilterChip>
@@ -38,7 +38,7 @@ export function CollabPage() {
             {name}
           </FilterChip>
         ))}
-      </div>
+      </ChipGroup>
 
       {posts.isPending && <LoadingState />}
       {posts.isError && <ErrorState error={posts.error} onRetry={() => posts.refetch()} />}
@@ -47,7 +47,7 @@ export function CollabPage() {
           Post your project to find teammates.
         </EmptyState>
       )}
-      <div className="stack-tight">
+      <div className="stack-tight stagger">
         {shown.map((post) => (
           <PostCard
             key={post.id}

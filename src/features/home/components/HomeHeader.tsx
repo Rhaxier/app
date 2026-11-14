@@ -2,11 +2,13 @@
 // avatar (to "Me"), then a two-line greeting with your name in grey, and a
 // line saying who you are and what's new for you.
 import { Link } from 'react-router-dom';
+import { AnimatedNumber } from '@/components/AnimatedNumber';
 import { Avatar } from '@/components/Avatar';
 import { Icon } from '@/components/Icon';
 import type { CurrentUser } from '@/features/auth/api';
 import { useCurrentUser } from '@/features/auth/hooks';
 import { NotificationBell } from '@/features/notifications/components/NotificationBell';
+import { useSearchOverlay } from '@/features/search/hooks';
 import { useUnreadCount } from '@/features/notifications/hooks';
 import { formatDate, greeting } from '@/lib/dates';
 import { isStaff } from '@/lib/permissions';
@@ -30,6 +32,7 @@ function whoLine(user: CurrentUser): string {
 export function HomeHeader() {
   const user = useCurrentUser();
   const { data: unread = 0 } = useUnreadCount();
+  const search = useSearchOverlay();
   const now = new Date();
   const who = whoLine(user);
 
@@ -40,9 +43,15 @@ export function HomeHeader() {
         <div className={styles.actions}>
           {/* Only shown when six staff tabs crowd search out of the tab bar. */}
           {isStaff(user) && (
-            <Link to="/search" className={`glass ${styles.search} pressable`} aria-label="Search">
+            <button
+              type="button"
+              className={`glass ${styles.search} pressable`}
+              aria-label="Search"
+              aria-haspopup="dialog"
+              onClick={() => search.openSearch('link')}
+            >
               <Icon name="search" size={20} />
-            </Link>
+            </button>
           )}
           <NotificationBell />
           <Link to="/me" className={`${styles.me} pressable`} aria-label={`Me: ${user.full_name}`}>
@@ -59,7 +68,7 @@ export function HomeHeader() {
         {who && unread > 0 && ' · '}
         {unread > 0 && (
           <Link to="/notifications" className={styles.unread}>
-            {unread} new for you
+            <AnimatedNumber value={unread} /> new for you
           </Link>
         )}
       </p>

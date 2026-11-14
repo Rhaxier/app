@@ -1,13 +1,15 @@
 /*
  * Motion shared by the whole app (see "Motion" in docs/ARCHITECTURE.md).
  *
- * Components with their own animation (Sheet, Toast, skeletons) keep their
- * keyframes in their CSS module. This file holds what many components share:
- *   .pressable      press feedback for anything tappable
+ * CSS handles the predetermined motion (it runs on the compositor, smooth
+ * even while the page is busy); Motion (`motion/react`) handles springs,
+ * shared-layout indicators and exits. This file holds what many components share:
+ *   .pressable      press feedback (and mouse hover) for anything tappable
  *   .reveal         content fading in (e.g. replacing a loading skeleton)
  *   .enter, .leave  a list item arriving or leaving (src/lib/useListMotion.ts)
- *   screen changes  the View Transitions API (src/app/screenTransitions.ts)
- * Every duration and curve comes from the motion tokens in tokens.css.
+ *   .stagger        a list's items fading up one after another
+ * Screen changes are Motion (src/app/screenTransitions.ts). Every duration and
+ * curve comes from the motion tokens in src/lib/motion.ts.
  */
 
 /* ---------------------------------------------------------------------------
@@ -73,62 +75,66 @@
 }
 
 /* ---------------------------------------------------------------------------
-   Screen changes (View Transitions API).
-   The browser takes a picture of the old screen, the app draws the new one,
-   and these rules animate between the two pictures. The design's motion is
-   "fade 200ms" (page 11), so screens fade; nothing slides.
-   src/app/screenTransitions.ts sets data-nav on <html> so we know which way
-   the person is going, and the fade shows depth:
-     fade     another tab or an unrelated screen: a cross-fade
-     forward  drilling into a detail page: the new screen fades in over the old
-     back     going back: the old screen fades away, uncovering the new one
-   Because nothing moves, the tab bar is the same in both pictures and stays
-   put. (It can't have a view-transition-name of its own: that would make it a
-   "backdrop root", and its glass couldn't blur the screen behind it.)
+   Lists arriving: items fade up one after another, 40ms apart, so a screen
+   reads as a sequence rather than a block. Add className="stagger" to the
+   list. After the eighth item they arrive together, so long lists don't drag.
    --------------------------------------------------------------------------- */
-
-/* The pictures sit on top of the page; let taps go through to the real page. */
-::view-transition {
-  pointer-events: none;
+.stagger > :not(.enter, .leave) {
+  animation: motion-enter var(--motion-slow) var(--ease-out) both;
 }
 
-::view-transition-old(root) {
-  animation: motion-vt-out var(--motion-base) var(--ease-in-out) both;
+.stagger > :nth-child(2) {
+  animation-delay: 40ms;
 }
 
-::view-transition-new(root) {
-  animation: motion-vt-in var(--motion-base) var(--ease-out) both;
+.stagger > :nth-child(3) {
+  animation-delay: 80ms;
 }
 
-/* Forward: the old screen stays underneath while the new one fades in. */
-html[data-nav='forward']::view-transition-old(root) {
-  animation: none;
+.stagger > :nth-child(4) {
+  animation-delay: 120ms;
 }
 
-/* Back: the new screen is already underneath; the old one fades off the top. */
-html[data-nav='back']::view-transition-new(root) {
-  animation: none;
+.stagger > :nth-child(5) {
+  animation-delay: 160ms;
 }
 
-html[data-nav='back']::view-transition-old(root) {
-  z-index: 1;
+.stagger > :nth-child(6) {
+  animation-delay: 200ms;
 }
 
-@keyframes motion-vt-in {
-  from {
-    opacity: 0;
-  }
+.stagger > :nth-child(7) {
+  animation-delay: 240ms;
 }
 
-@keyframes motion-vt-out {
-  to {
-    opacity: 0;
+.stagger > :nth-child(n + 8) {
+  animation-delay: 280ms;
+}
+
+/* A card whose whole surface is a link (an event, a post): it presses in
+   while any link inside it is pressed. */
+.pressable-card {
+  transition:
+    transform var(--motion-fast) var(--ease-out),
+    filter var(--motion-fast) var(--ease-out);
+}
+
+.pressable-card:has(a:active) {
+  transform: scale(var(--press-scale));
+  filter: brightness(var(--press-dim));
+}
+
+/* Hover (a mouse or trackpad only: touch fires false hovers on tap). */
+@media (hover: hover) and (pointer: fine) {
+  .pressable:hover:not(:disabled):not([aria-disabled='true']),
+  .pressable-card:has(a:hover) {
+    filter: brightness(var(--hover-bright));
   }
 }
 
 /* ---------------------------------------------------------------------------
    Reduced motion (page 11: "opacity only"). Nothing slides, shrinks or
    spins; things still fade, because a fade tells you something changed
-   without moving it. tokens.css sets --motion-shift to 0 and --press-scale to
-   1, which covers every keyframe above. Screen changes are fades already.
+   without moving it. src/lib/motion.ts sets --motion-shift to 0 and
+   --press-scale to 1, which covers every keyframe above.
    --------------------------------------------------------------------------- */

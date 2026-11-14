@@ -1,0 +1,15 @@
+.number {
+  display: inline-flex;
+}
+
+/* Clips the digits as they roll in and out. */
+.roll {
+  position: relative;
+  display: inline-flex;
+  overflow: hidden;
+}
+
+.digit {
+  display: inline-block;
+  font-variant-numeric: tabular-nums;
+}

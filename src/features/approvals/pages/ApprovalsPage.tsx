@@ -12,7 +12,8 @@
 // The student screens are unchanged: this is added on top. Handled items fade
 // out of the queue and new ones slide in (MotionList).
 import { useState, type ReactNode } from 'react';
-import { ButtonLink } from '@/components/Button';
+import { AnimatedNumber } from '@/components/AnimatedNumber';
+import { Button, ButtonLink } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Icon } from '@/components/Icon';
 import { MotionList } from '@/components/MotionList';
@@ -22,6 +23,7 @@ import { SupwExportButton } from '@/features/admin/components/SupwExportButton';
 import { useContentReports } from '@/features/admin/hooks';
 import { useCurrentUser } from '@/features/auth/hooks';
 import { useReports } from '@/features/fixit/hooks';
+import { useSearchOverlay } from '@/features/search/hooks';
 import { isOpen } from '@/features/fixit/logic';
 import { useLiveBookings, usePendingForReview, useToSupervise } from '@/features/venues/hooks';
 import { useEvents, useHoursToConfirm } from '@/features/volunteering/hooks';
@@ -53,6 +55,7 @@ export function ApprovalsPage() {
   const contentReports = useContentReports();
   useLiveBookings();
   const [filter, setFilter] = useState<'all' | QueueType>('all');
+  const search = useSearchOverlay();
 
   const eventsToApprove = (events.data ?? []).filter(
     (event) => event.status === 'awaiting_approval' && event.creator_id !== user.id,
@@ -121,12 +124,18 @@ export function ApprovalsPage() {
         <div className={styles.topRow}>
           <p className="label">Staff · Approvals</p>
           <div className={styles.headerActions}>
-            {/* ⌘K / Ctrl+K also opens search from anywhere (AppLayout). */}
-            <ButtonLink to="/search" variant="quiet" size="small" className={styles.jump}>
+            {/* ⌘K / Ctrl+K also opens search from anywhere (SearchOverlayProvider). */}
+            <Button
+              variant="quiet"
+              size="small"
+              className={styles.jump}
+              aria-haspopup="dialog"
+              onClick={() => search.openSearch('link')}
+            >
               <Icon name="search" size={16} />
               Search or jump to…
               <kbd className={styles.kbd}>⌘K</kbd>
-            </ButtonLink>
+            </Button>
             {isAdmin(user) && (
               <ButtonLink to="/admin" variant="secondary" size="small" icon="shield">
                 Admin
@@ -144,27 +153,35 @@ export function ApprovalsPage() {
         <div className={styles.stat}>
           <dt>Waiting on you</dt>
           <dd>
-            <span className={styles.number}>{queue.length}</span>
+            <span className={styles.number}>
+              <AnimatedNumber value={queue.length} />
+            </span>
             {queue[0] && <span className={styles.flag}>oldest {shortWait(queue[0].since)}</span>}
           </dd>
         </div>
         <div className={styles.stat}>
           <dt>Open fix-it</dt>
           <dd>
-            <span className={styles.number}>{routedReports.length}</span>
+            <span className={styles.number}>
+              <AnimatedNumber value={routedReports.length} />
+            </span>
             {urgent > 0 && <span className={styles.flag}>{urgent} urgent</span>}
           </dd>
         </div>
         <div className={styles.stat}>
           <dt>Venue requests</dt>
           <dd>
-            <span className={styles.number}>{venueCount}</span>
+            <span className={styles.number}>
+              <AnimatedNumber value={venueCount} />
+            </span>
           </dd>
         </div>
         <div className={styles.stat}>
           <dt>Hours to confirm</dt>
           <dd>
-            <span className={styles.number}>{hours.data?.length ?? 0}</span>
+            <span className={styles.number}>
+              <AnimatedNumber value={hours.data?.length ?? 0} />
+            </span>
           </dd>
         </div>
       </dl>
@@ -172,7 +189,10 @@ export function ApprovalsPage() {
       <section className="stack-tight" aria-labelledby="queue-heading">
         <div className={styles.queueHeader}>
           <h2 id="queue-heading" className={styles.queueTitle}>
-            Approvals queue <span className={styles.queueCount}>{queue.length}</span>
+            Approvals queue{' '}
+            <span className={styles.queueCount}>
+              <AnimatedNumber value={queue.length} />
+            </span>
           </h2>
           {filters.length > 2 && (
             <SegmentedControl
@@ -194,7 +214,11 @@ export function ApprovalsPage() {
         {queue.length > 0 && (
           <div className={styles.queue}>
             <QueueHeading />
-            <MotionList items={shown} keyOf={(item) => item.key} className={styles.rows}>
+            <MotionList
+              items={shown}
+              keyOf={(item) => item.key}
+              className={`${styles.rows} stagger`}
+            >
               {(item) => item.row(item.key === oldestKey)}
             </MotionList>
           </div>

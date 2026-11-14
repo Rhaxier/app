@@ -3,12 +3,19 @@
 }
 
 .main {
+  /* The leaving screen is positioned against this while it animates out. */
+  position: relative;
   max-width: var(--content-max);
   margin: 0 auto;
   /* Screen margin 20 (page 10). Room at the bottom so the last card can
      scroll clear of the floating tab bar. */
   padding: calc(var(--space-3) + env(safe-area-inset-top)) var(--screen-margin)
     calc(var(--tabbar-space) + var(--space-8));
+}
+
+/* One screen (two, briefly, while one leaves: see AppLayout.tsx). */
+.screen {
+  min-width: 0;
 }
 
 /* The admin dashboard is desktop-first: a side menu plus content needs room. */

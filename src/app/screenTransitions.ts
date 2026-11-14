@@ -1,18 +1,16 @@
-// Screen changes, animated with the browser's View Transitions API.
-//
-// The animations themselves are CSS (the "Screen changes" part of
-// src/styles/motion.css). This file does two small jobs for them:
-//   1. Ask React Router to use a view transition for every navigation.
-//   2. Before each new screen is drawn, write the direction on <html data-nav>:
-//        fade     switching tabs, or between unrelated screens
-//        forward  drilling in, e.g. /collab → /collab/123
-//        back     coming back out, e.g. /collab/123 → /collab
-// Browsers without the API simply change screens with no animation; AppLayout
-// adds a plain fade for them. Nothing here ever waits or blocks a tap.
-import type { createBrowserRouter, RouterNavigateOptions, To } from 'react-router-dom';
+// Screen changes: which way is the person going? AppLayout animates each
+// change with Motion (iOS-style):
+//   fade     switching tabs, or between unrelated screens: a cross-fade
+//   forward  drilling in, e.g. /collab → /collab/123: the new screen slides in
+//            from the right while the old one drifts left and fades
+//   back     coming back out, e.g. /collab/123 → /collab: the same, reversed
+// Only the screen moves. The tab bar sits outside it and stays put, and
+// screens move their fixed chrome (the map, the booking bar) out of the
+// sliding layer with PageChrome, so it fades in place instead.
+import { useState } from 'react';
+import type { Variants } from 'motion/react';
+import { distance, spring } from '@/lib/motion';
 import { tabOf } from './tabs';
-
-type AppRouter = ReturnType<typeof createBrowserRouter>;
 
 export type ScreenTransition = 'fade' | 'forward' | 'back';
 
@@ -28,24 +26,32 @@ export function transitionKind(from: string, to: string): ScreenTransition {
   return 'fade';
 }
 
-export function enableScreenTransitions(router: AppRouter): void {
-  // 1. React Router animates a navigation only when asked to
-  //    (<Link viewTransition>). Rather than remembering that on every link in
-  //    the app, we wrap the router's navigate() once so it always asks.
-  //    (navigate(-1) means "go back" and takes no options.)
-  const navigate = router.navigate.bind(router);
-  router.navigate = ((to: To | number | null, options?: RouterNavigateOptions) =>
-    typeof to === 'number'
-      ? navigate(to)
-      : navigate(to, { viewTransition: true, ...options })) as AppRouter['navigate'];
-
-  // 2. The router tells its listeners about each new screen just before it is
-  //    drawn, which is the moment the CSS needs to know the direction.
-  let current = router.state.location.pathname;
-  router.subscribe((state) => {
-    const next = state.location.pathname;
-    if (next === current) return;
-    document.documentElement.dataset.nav = transitionKind(current, next);
-    current = next;
-  });
+/** The kind of the latest screen change (works for the browser's back button too). */
+export function useScreenTransition(pathname: string): ScreenTransition {
+  // React's "adjust state while rendering" pattern: when the address changes,
+  // work out the direction straight away, before the new screen is drawn.
+  const [state, setState] = useState({ pathname, kind: 'fade' as ScreenTransition });
+  if (state.pathname !== pathname) {
+    setState({ pathname, kind: transitionKind(state.pathname, pathname) });
+  }
+  return state.pathname === pathname ? state.kind : transitionKind(state.pathname, pathname);
 }
+
+/**
+ * How a screen enters and leaves, given the kind (Motion's `custom` value).
+ * The leaving screen moves half as far, like the parallax on iOS.
+ */
+export const screenVariants: Variants = {
+  enter: (kind: ScreenTransition) => ({
+    opacity: 0,
+    x: kind === 'forward' ? distance.page : kind === 'back' ? -distance.page : 0,
+  }),
+  shown: { opacity: 1, x: 0, transition: spring.page },
+  leave: (kind: ScreenTransition) => ({
+    opacity: 0,
+    // The leaving screen can't be tapped while it fades.
+    pointerEvents: 'none',
+    x: kind === 'forward' ? -distance.page / 2 : kind === 'back' ? distance.page : 0,
+    transition: { ...spring.page, duration: 0.22 },
+  }),
+};

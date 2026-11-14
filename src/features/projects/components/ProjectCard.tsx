@@ -22,7 +22,7 @@ interface ProjectCardProps {
 export function ProjectCard({ project, showOwner, canShare }: ProjectCardProps) {
   const latest = project.feedback[0];
   return (
-    <article className={styles.row}>
+    <article className={`${styles.row} pressable-card`}>
       <div className={styles.top}>
         <div className={styles.titles}>
           <h3 className={styles.title}>

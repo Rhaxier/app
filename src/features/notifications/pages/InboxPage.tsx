@@ -61,7 +61,7 @@ export function InboxPage() {
       )}
 
       {rows.length > 0 && (
-        <ul className={`${styles.list} reveal`}>
+        <ul className={`${styles.list} reveal stagger`}>
           {rows.map(({ item, key, motion }) => (
             <li key={key} className={motion}>
               <button

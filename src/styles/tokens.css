@@ -11,7 +11,8 @@
  * Light mode is designed, not inverted (page 5): a grey grouped canvas, navy
  * shadows, brighter glass, darker status text, and a black primary button.
  *
- * Every colour, size and radius in the app comes from here. Components use
+ * Every colour, size and radius in the app comes from here (motion timing
+ * lives in src/lib/motion.ts). Components use
  * var(--token), never a raw colour, so a design change is a one-line edit.
  */
 
@@ -131,6 +132,7 @@
   ); /* text fields: a translucent fill works on canvas, cards and glass */
   --scrim: rgba(0, 0, 0, 0.5); /* behind an open sheet */
   --press-dim: 0.94; /* press: darken 6% (page 11) */
+  --hover-bright: 1.08; /* hover with a mouse: a touch lighter on dark */
   --hatch: #2a2a2f; /* corridor hatch lines (page 11) */
   --selroom: #64b5ff; /* a selected room's code (page 11) */
   /* The placeholder floor plans (public/floorplans) are drawn light, like most
@@ -211,20 +213,10 @@
   /* Focus: 0 0 0 3px accent at 45%, offset 2px, keyboard only (see globals.css). */
   --focus: color-mix(in srgb, var(--acc) 45%, transparent);
 
-  /*
-   * ---- Motion (page 11; "Motion" in docs/ARCHITECTURE.md) -------------------
-   * fade 200ms · sheet 280ms · cubic-bezier(.2,0,0,1). Only opacity and
-   * transform ever animate. With reduced motion, things fade but don't move
-   * (--motion-shift becomes 0). src/lib/motion.ts reads these, so JS waits
-   * exactly as long as the CSS runs.
-   */
-  --motion-fast: 120ms; /* press feedback */
-  --motion-base: 200ms; /* fades */
-  --motion-slow: 280ms; /* sheets, screen transitions */
-  --ease-out: cubic-bezier(0.2, 0, 0, 1); /* the deck's curve: things arriving */
-  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1); /* things leaving or moving */
-  --motion-shift: 8px; /* how far things travel as they fade in */
-  --press-scale: 0.97;
+  /* ---- Motion ------------------------------------------------------------
+     Durations, curves and distances (--motion-fast, --ease-out,
+     --motion-shift…) live with Motion's springs in src/lib/motion.ts, the one
+     motion tokens file; it writes them on <html> at start-up. */
 }
 
 /* ---------------------------------------------------------------------------
@@ -297,16 +289,9 @@
   --field: rgba(118, 118, 128, 0.12);
   --scrim: rgba(16, 24, 40, 0.28); /* navy-tinted, like the shadows */
   --press-dim: 0.96; /* press: darken 4% in light mode */
+  --hover-bright: 0.98; /* hover: a touch darker on light */
   --hatch: #e3e3e8;
   --selroom: var(--on-accsoft);
   --plan-filter: none;
   --chevron-down: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%238a8a8e' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-}
-
-/* Reduced motion (page 11): opacity only. Things still fade; nothing moves. */
-@media (prefers-reduced-motion: reduce) {
-  :root {
-    --motion-shift: 0px;
-    --press-scale: 1;
-  }
 }

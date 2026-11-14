@@ -36,6 +36,7 @@
 }
 
 .tab {
+  position: relative;
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -43,9 +44,13 @@
   justify-content: center;
   gap: 2px;
   min-width: var(--touch-min);
-  border: 0.5px solid transparent;
   border-radius: var(--r-lens);
   color: var(--tabtext);
+  /* The icon and label colours cross-fade as the lens arrives. */
+  transition:
+    color var(--motion-base) var(--ease-out),
+    transform var(--motion-fast) var(--ease-out),
+    filter var(--motion-fast) var(--ease-out);
   font-size: var(--text-tab);
   font-weight: 500;
   line-height: 12px;
@@ -53,26 +58,40 @@
   white-space: nowrap;
 }
 
-/* 6 · The raised lens (the global .lens class draws it) and the accent. */
+/* 6 · The raised lens (the global .lens class draws it), one element that
+   springs from tab to tab (TabBar.tsx), behind the icon and label. */
+.lens {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.icon,
+.label {
+  position: relative;
+  z-index: 1;
+}
+
 .active {
   color: var(--acc);
   font-weight: 600;
 }
 
 /* The round search button: same glass, same height. */
-.search {
-  display: grid;
+.search,
+.searchSpace {
   flex: none;
-  place-items: center;
   width: var(--height-tabbar);
   height: var(--height-tabbar);
-  border-radius: 50%;
-  color: var(--ink);
-  pointer-events: auto;
 }
 
-.searching {
-  color: var(--acc);
+.search {
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--ink);
+  cursor: pointer;
+  pointer-events: auto;
 }
 
 /* Six tabs (staff) on a phone narrower than 375px: the tabs need the room,

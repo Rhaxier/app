@@ -10,6 +10,7 @@ import { Button, ButtonLink } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { DateStrip } from '@/components/DateStrip';
 import { Icon } from '@/components/Icon';
+import { PageChrome } from '@/components/PageChrome';
 import { FieldRow, TextField } from '@/components/Input';
 import { PageHeader } from '@/components/PageHeader';
 import { EmptyState, ErrorState, LoadingState } from '@/components/States';
@@ -323,20 +324,22 @@ function BookingCalendar({
 
       {/* One next step (design PDF page 7): a floating bar with the exact
           times and one Request button, above the tab bar. */}
-      <div className={`glass thick ${styles.bar}`} aria-live="polite">
-        <div className={styles.barText}>
-          <p className={chosen ? styles.barTimes : styles.barPrompt}>{chosenLabel}</p>
-          <p className="meta">{caption}</p>
+      <PageChrome>
+        <div className={`glass thick ${styles.bar}`} aria-live="polite">
+          <div className={styles.barText}>
+            <p className={chosen ? styles.barTimes : styles.barPrompt}>{chosenLabel}</p>
+            <p className="meta">{caption}</p>
+          </div>
+          <Button
+            variant="accent"
+            disabled={!chosen}
+            aria-label={chosen ? `Request ${chosenLabel}` : undefined}
+            onClick={request}
+          >
+            Request
+          </Button>
         </div>
-        <Button
-          variant="accent"
-          disabled={!chosen}
-          aria-label={chosen ? `Request ${chosenLabel}` : undefined}
-          onClick={request}
-        >
-          Request
-        </Button>
-      </div>
+      </PageChrome>
     </div>
   );
 }

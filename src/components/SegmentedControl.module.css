@@ -15,17 +15,21 @@
 
 .thumb {
   position: absolute;
-  top: 2px;
-  bottom: 2px;
-  left: 2px;
-  width: calc((100% - 4px) / var(--count));
+  inset: 0;
+  z-index: 0;
   border-radius: var(--r-seg-thumb);
   background: linear-gradient(180deg, var(--s-spec), transparent 60%), var(--segon);
   box-shadow:
     inset 0 1px 0 var(--s-rim),
     var(--seg-shadow);
-  transform: translateX(calc(100% * var(--index)));
-  transition: transform var(--motion-slow) var(--ease-out);
+}
+
+.optionLabel {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .option {
@@ -78,10 +82,6 @@
 }
 
 .floating .thumb {
-  top: 4px;
-  bottom: 4px;
-  left: 4px;
-  width: calc((100% - 8px) / var(--count));
   border-radius: var(--radius-pill);
   background: var(--pribg);
 }
@@ -100,11 +100,4 @@
 
 .floating .option[aria-pressed='true'] {
   color: var(--prifg);
-}
-
-/* Reduced motion: the thumb jumps instead of sliding. */
-@media (prefers-reduced-motion: reduce) {
-  .thumb {
-    transition: none;
-  }
 }
