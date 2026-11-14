@@ -36,6 +36,22 @@ export type DoorKind =
   | 'opening' // drawn as a red line across a corridor (meaning to be confirmed)
   | 'inferred'; // not drawn; placed on the wall the room shares with its corridor
 
+/**
+ * A named spot that has no walls of its own, e.g. a lounge that is part of a
+ * corridor. Students can search for it and routes can end there. Its name
+ * lives in the assignments, keyed by this id, exactly like a room's.
+ */
+export type Place = {
+  id: string; // e.g. "G-P01"
+  floor: FloorId;
+  x: number;
+  y: number;
+  /** The walkable region the spot stands in. */
+  region: string;
+  /** The text printed on the layout PDF, kept only as a tracing aid. */
+  sourceLabel?: string;
+};
+
 export type Door = {
   id: string;
   floor: FloorId;
@@ -47,7 +63,7 @@ export type Door = {
   b: string;
 };
 
-export type NodeKind = 'corridor' | 'door' | 'room' | 'connector' | 'snap';
+export type NodeKind = 'corridor' | 'door' | 'room' | 'place' | 'connector' | 'snap';
 
 export type NavNode = {
   id: string;
@@ -58,6 +74,7 @@ export type NavNode = {
   /** The region this node stands in (a door node uses its `a` side). */
   region?: string;
   door?: string;
+  place?: string;
   connector?: string;
 };
 
@@ -94,6 +111,7 @@ export type Geometry = {
   bounds: { minX: number; minY: number; maxX: number; maxY: number };
   floors: Floor[];
   regions: Region[];
+  places: Place[];
   doors: Door[];
   nodes: NavNode[];
   edges: NavEdge[];
@@ -166,7 +184,8 @@ export type ProblemCode =
   | 'room-without-door'
   | 'room-without-node'
   | 'floor-area-split'
-  | 'area-needs-connector';
+  | 'area-needs-connector'
+  | 'place-without-node';
 
 export type Problem = {
   severity: 'error' | 'warning';

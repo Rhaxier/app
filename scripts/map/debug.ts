@@ -67,6 +67,15 @@ function floorSvg(floorId: string): string {
       `<text class="id" x="${x}" y="${y + 11}">${region.id.split('-')[1]}${region.kind === 'stairwell' ? ' stairs?' : ''}</text>`,
     );
   }
+  for (const place of geometry.places) {
+    if (place.floor === floorId) {
+      const label = nameOf.get(place.id) ?? place.sourceLabel ?? '';
+      parts.push(
+        `<circle class="place" cx="${place.x}" cy="${place.y}" r="7"><title>${place.id}</title></circle>`,
+      );
+      parts.push(`<text class="name" x="${place.x}" y="${place.y - 11}">${escape(label)}</text>`);
+    }
+  }
   parts.push('</g><g class="connectors">');
   for (const stop of graph.link.stops) {
     if (stop.floor === floorId) {
@@ -95,6 +104,8 @@ label{margin-left:8px}
 .region{stroke:#222;stroke-width:2}
 .region.room{fill:#fde9c8}.region.corridor{fill:#dcebfb}.region.stairwell{fill:#f7c6d9}.region.void{fill:#eee;stroke:#bbb;stroke-dasharray:6 6}
 .edge{stroke:#0b5cad;stroke-width:1.6}.edge.through-door{stroke:#1a8a3a}.edge.to-connector{stroke:#c0168a;stroke-width:3}
+.place{fill:#e08a00;stroke:#fff;stroke-width:2}
+.node.place{fill:none}
 .node.corridor{fill:#0b5cad}.node.room{fill:#b35c00}.node.snap{fill:#c0168a}
 .door.door{fill:#18a558}.door.opening{fill:#d22}.door.inferred{fill:#fff;stroke:#18a558;stroke-width:2.5}.door.exit{stroke:#000;stroke-width:2.5}
 .connector{fill:#c0168a;stroke:#fff;stroke-width:3}.connector.lift{fill:#6a2bd9}
@@ -117,6 +128,7 @@ const legend = `<div class="legend">${[
   swatch('background:#d22', 'red line in PDF'),
   swatch('background:#18a558;border:2px solid #000', 'door to outside'),
   swatch('background:#0b5cad', 'walkable graph'),
+  swatch('background:#e08a00;border-radius:50%', 'named place without walls'),
   swatch('background:#c0168a', 'connector'),
 ].join('')}</div>`;
 const buttons = geometry.floors

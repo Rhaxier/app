@@ -40,8 +40,8 @@ OUT_DIR = os.path.join(ROOT, "src", "features", "map", "nav", "data")
 REPORT = os.path.join(os.path.dirname(__file__), "report.json")
 
 FLOORS = [("G", "Ground Floor"), ("1", "First Floor"), ("2", "Second Floor"), ("3", "Third Floor")]
-# An estimate: a standard classroom on the plan is about 135 px wide and assumed to be about 7.5 m.
-METRES_PER_UNIT = 0.055
+# The school says corridors are 2.5 m wide. On the plan they measure about 54 units wall to wall.
+METRES_PER_UNIT = 0.046
 
 MIN_REGION = 500  # px; smaller enclosed specks are text holes and door recesses
 GROW = 5  # walls are thickened by 2 px each side before labelling, to close hairline gaps
@@ -258,6 +258,10 @@ def trace_floor(fi, rgb, labels):
             rid = int(np.bincount(patch).argmax()) if len(patch) else 0
         return rid if rid in regions else None
 
+    def region_at_exact(pt):
+        x, y = int(round(pt[0])), int(round(pt[1]))
+        return int(lab[y, x]) if 0 <= y < H and 0 <= x < W else 0
+
     # --- names and manual kinds from labels.json (keyed by a point inside the region)
     for r in regions.values():
         r.update(kind=None, name=None, type=None, stair=False)
@@ -358,9 +362,9 @@ def trace_floor(fi, rgb, labels):
         regions[other]["doors"].append(len(doors) - 1)
         inferred += 1
 
-    def best_neighbour(r, kinds, allowed=None):
+    def best_neighbour(r, kinds, allowed=None, reaches=(9, 15)):
         """The neighbour to put an inferred door to: a door recess wins, then a known corridor, then the longest wall."""
-        for reach in (9, 15):  # second try reaches across double-drawn walls
+        for reach in reaches:  # later tries reach across double-drawn walls
             options = [(k, v) for k, v in neighbours(r, reach).items() if regions[k]["kind"] in kinds and (allowed is None or allowed(k)) and v[0] >= 25]
             if options:
                 other, (shared, mid, touches) = max(options, key=lambda o: (o[1][2], regions[o[0]]["kind"] == "corridor", o[1][0]))
@@ -377,6 +381,24 @@ def trace_floor(fi, rgb, labels):
     for r in regions.values():
         if r["kind"] == "pending":
             r["kind"] = "void"
+
+    # Doors the school confirmed but the plan does not draw: pairs of points, one in each room.
+    for a_pt, b_pt in labels.get("doors", []):
+        ra, rb = region_at(a_pt), region_at(b_pt)
+        found = None
+        if ra is not None and rb is not None and ra != rb:
+            found = best_neighbour(regions[ra], ("room", "corridor", "stairwell"), lambda k: k == rb, reaches=(9, 15, 25, 40))
+        if found:
+            add_inferred(regions[ra], *found)
+        elif ra is not None and rb is not None and ra != rb:
+            # Not side by side (a lobby or cupboard lies between): put the door where the
+            # straight line from the first point to the second leaves the first room.
+            steps = int(math.hypot(b_pt[0] - a_pt[0], b_pt[1] - a_pt[1]))
+            inside = [t for t in range(steps + 1) if region_at_exact((a_pt[0] + (b_pt[0] - a_pt[0]) * t / steps, a_pt[1] + (b_pt[1] - a_pt[1]) * t / steps)) == ra]
+            t = (inside[-1] + 4) / steps
+            add_inferred(regions[ra], rb, (a_pt[0] + (b_pt[0] - a_pt[0]) * t, a_pt[1] + (b_pt[1] - a_pt[1]) * t))
+        else:
+            notes.append(f"confirmed door {a_pt}-{b_pt} could not be placed")
 
     # Second pass: groups of rooms that still cannot reach the floor's main walkable area.
     def groups():
@@ -409,7 +431,7 @@ def trace_floor(fi, rgb, labels):
             if any(regions[i]["kind"] == "stairwell" for i in g):
                 continue
             for i in sorted(g, key=lambda i: (not regions[i]["name"], -regions[i]["area"])):
-                found = best_neighbour(regions[i], ("corridor",), lambda k: k in main)
+                found = best_neighbour(regions[i], ("corridor",), lambda k: k in main, reaches=(9, 15, 25, 40))
                 kind = "corridor"
                 if not found:
                     found = best_neighbour(regions[i], ("room",), lambda k: k in main)
@@ -546,6 +568,21 @@ def trace_floor(fi, rgb, labels):
                 add_edge(dn, r["node"], di)
             elif r["kind"] == "corridor":
                 attach(dn, side, di)
+    # Named spots with no walls of their own (a lounge in a corridor, a lab bench area).
+    places = []
+    for entry in labels.get("places", []):
+        rid = region_at(entry["at"])
+        if rid is None or regions[rid]["kind"] not in ("room", "corridor", "stairwell"):
+            notes.append(f"place {entry['name']!r} at {entry['at']} is not in a walkable region")
+            continue
+        pn = add_node(entry["at"][0], entry["at"][1], "place", rid)
+        nodes[pn]["place"] = len(places)
+        places.append(dict(x=entry["at"][0], y=entry["at"][1], region=rid, name=entry["name"], type=entry.get("type", "other")))
+        if regions[rid]["kind"] == "corridor":
+            attach(pn, rid, None)
+        else:
+            add_edge(pn, regions[rid]["node"])
+
     # Outdoor walks between buildings, given in labels.json as pairs of points near exterior doors.
     exterior = [i for i, nd in enumerate(nodes) if nd["kind"] == "door" and regions[doors[nd["door"]]["b"]]["kind"] == "outside"]
     for a, b in labels.get("outdoor", []):
@@ -556,7 +593,7 @@ def trace_floor(fi, rgb, labels):
             notes.append(f"outdoor link {a}-{b} found no exterior doors")
     notes.append(f"{inferred} inferred doors; {blocked} door-to-corridor links cross a wall corner")
     bars = [b for b in bars if b["region"] in out_regions]
-    return dict(regions=out_regions, doors=doors, nodes=nodes, edges=edges, bars=bars, notes=notes, kinds={r["id"]: r["kind"] for r in regions.values()})
+    return dict(places=places, regions=out_regions, doors=doors, nodes=nodes, edges=edges, bars=bars, notes=notes, kinds={r["id"]: r["kind"] for r in regions.values()})
 
 
 # ---------------------------------------------------------------- step 6: one coordinate system
@@ -616,7 +653,7 @@ def main():
         report["transforms"][FLOORS[i][0]] = dict(sx=transforms[i][0], sy=transforms[i][1], tx=transforms[i][2], ty=transforms[i][3], landmarks=used, max_error_px=max(errors, default=None), mean_error_px=(sum(errors) / len(errors) if errors else None))
     report["transforms"]["G"] = dict(sx=1, sy=1, tx=0, ty=0)
 
-    geometry = dict(version=1, metresPerUnit=METRES_PER_UNIT, bounds=None, floors=[], regions=[], doors=[], nodes=[], edges=[])
+    geometry = dict(version=1, metresPerUnit=METRES_PER_UNIT, bounds=None, floors=[], regions=[], places=[], doors=[], nodes=[], edges=[])
     assignments = []
     xs, ys = [], []
     for i, floor in enumerate(traced):
@@ -639,6 +676,12 @@ def main():
                 ys += [p[1] for p in entry["polygon"]]
             if r["kind"] == "room" and r["name"]:
                 assignments.append((rid_of[rid], r["name"], r["type"] or "other"))
+        place_id = {}
+        for pi, pl in enumerate(floor["places"]):
+            place_id[pi] = f"{fid}-P{pi + 1:02d}"
+            x, y = T((pl["x"], pl["y"]))
+            geometry["places"].append(dict(id=place_id[pi], floor=fid, x=x, y=y, region=rid_of[pl["region"]], sourceLabel=pl["name"]))
+            assignments.append((place_id[pi], pl["name"], pl["type"]))
         door_id = {}
         for di, d in enumerate(floor["doors"]):
             door_id[di] = f"{fid}-D{di + 1:03d}"
@@ -651,6 +694,8 @@ def main():
             entry = dict(id=node_id[ni], floor=fid, x=x, y=y, kind=nd["kind"], region=rid_of.get(nd["region"]))
             if nd["door"] is not None:
                 entry["door"] = door_id[nd["door"]]
+            if nd.get("place") is not None:
+                entry["place"] = place_id[nd["place"]]
             geometry["nodes"].append(entry)
         placed = {n["id"]: n for n in geometry["nodes"] if n["floor"] == fid}
         for ei, e in enumerate(floor["edges"]):
@@ -674,6 +719,19 @@ def main():
         json.dump(geometry, f, separators=(",", ":"))
     with open(os.path.join(OUT_DIR, "assignments.csv"), "w", newline="") as f:
         f.write("room_id,name,subject,teacher,type\n")
+        # Names printed more than once (two "Clinic" rooms, a washroom per floor) get a short
+        # suffix so every destination is unique in search. An admin can rename them later.
+        total, seen = {}, {}
+        for _, name, _ in assignments:
+            total[name] = total.get(name, 0) + 1
+        unique = []
+        for rid, name, kind in assignments:
+            if total[name] > 1:
+                key = (name, rid.split("-")[0])
+                seen[key] = seen.get(key, 0) + 1
+                name = f"{name} ({key[1]}-{seen[key]})"
+            unique.append((rid, name, kind))
+        assignments = unique
         for rid, name, kind in assignments:
             cell = '"' + name.replace('"', '""') + '"' if "," in name or '"' in name else name
             f.write(f"{rid},{cell},,,{kind}\n")

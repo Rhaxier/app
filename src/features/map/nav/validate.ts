@@ -33,7 +33,7 @@ export function geometryProblems(index: GeometryIndex, graph: NavGraph): Problem
   }
   const nodesOf = new Map<string, number>();
   for (const node of geometry.nodes) {
-    if (node.region && node.kind !== 'door') {
+    if (node.region && node.kind !== 'door' && node.kind !== 'place') {
       nodesOf.set(node.region, (nodesOf.get(node.region) ?? 0) + 1);
     }
   }
@@ -58,6 +58,18 @@ export function geometryProblems(index: GeometryIndex, graph: NavGraph): Problem
         floor: region.floor,
         region: region.id,
         message: `${name} has no graph node.`,
+      });
+    }
+  }
+
+  const placeNodes = new Set(geometry.nodes.map((node) => node.place));
+  for (const place of geometry.places) {
+    if (!placeNodes.has(place.id)) {
+      problems.push({
+        severity: 'error',
+        code: 'place-without-node',
+        floor: place.floor,
+        message: `${place.id} (${place.sourceLabel ?? 'place'}) has no graph node.`,
       });
     }
   }
@@ -157,6 +169,9 @@ export function summariseMap(
     );
     lines.push(
       `  doors: ${doors.length} (drawn ${doorCount('door')}, red-line openings ${doorCount('opening')}, inferred ${doorCount('inferred')}; ${exits} lead outside)`,
+    );
+    lines.push(
+      `  named places without walls: ${geometry.places.filter((place) => place.floor === floor.id).length}`,
     );
     lines.push(`  graph: ${geometry.nodes.filter((node) => node.floor === floor.id).length} nodes`);
     lines.push(`  connectors: ${stops.length}`);

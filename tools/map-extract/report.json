@@ -2134,8 +2134,8 @@
   },
   "1": {
    "notes": [
-    "inferred doors through another room: Pottery -> Budhayana Spark Lab; Art -> Budhayana Spark Lab; Female Prayer Room -> 6A; Physics Store -> Physics Lab",
-    "29 inferred doors; 0 door-to-corridor links cross a wall corner"
+    "inferred doors through another room: Pottery -> Budhayana Spark Lab; Art -> Budhayana Spark Lab",
+    "29 inferred doors; 2 door-to-corridor links cross a wall corner"
    ],
    "stairSymbols": [
     {
@@ -3911,9 +3911,7 @@
   },
   "2": {
    "notes": [
-    "cut off from the main area (has its own stair symbol): Agile Learning Center, Agile Learning Center",
-    "inferred doors through another room: Store -> Chem Lab 2",
-    "21 inferred doors; 0 door-to-corridor links cross a wall corner"
+    "24 inferred doors; 1 door-to-corridor links cross a wall corner"
    ],
    "stairSymbols": [
     {
@@ -4886,8 +4884,8 @@
     },
     {
      "id": "2-R092",
-     "kind": "room",
-     "name": "Bio Lab / Chem Lab / Bio Store / Chem Store",
+     "kind": "corridor",
+     "name": null,
      "page": [
       3256,
       1529

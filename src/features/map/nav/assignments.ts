@@ -115,11 +115,8 @@ function checkAssignments(
   geometry: Geometry | undefined,
   issues: string[],
 ): AssignmentLoad {
-  const rooms = geometry
-    ? new Set(
-        geometry.regions.filter((region) => region.kind === 'room').map((region) => region.id),
-      )
-    : undefined;
+  // Rooms and wall-less places are both valid targets for a name.
+  const rooms = geometry ? new Set(destinationIds(geometry)) : undefined;
   const seen = new Set<string>();
   const assignments: Assignment[] = [];
   for (const row of rows) {
@@ -162,6 +159,44 @@ export function assignmentsToCsv(assignments: Assignment[]): string {
 }
 
 /** Renames or re-assigns a single room, leaving the rest of the set as it is. */
+/** Ids of everything that can be given a name: rooms and wall-less places. */
+export function destinationIds(geometry: Geometry): string[] {
+  const rooms = geometry.regions
+    .filter((region) => region.kind === 'room')
+    .map((region) => region.id);
+  return [...rooms, ...geometry.places.map((place) => place.id)];
+}
+
+export type Destination = Assignment & { floor: string; kind: 'room' | 'place' };
+
+/**
+ * What student search should list: every room or place that has a name.
+ * Unnamed rooms (small stores, cubicles) stay in the data so an admin can
+ * name them later, but they are left out here on purpose.
+ */
+export function searchableDestinations(
+  geometry: Geometry,
+  assignments: Assignment[],
+): Destination[] {
+  const floorOf = new Map<string, { floor: string; kind: 'room' | 'place' }>();
+  for (const region of geometry.regions) {
+    if (region.kind === 'room') {
+      floorOf.set(region.id, { floor: region.floor, kind: 'room' });
+    }
+  }
+  for (const place of geometry.places) {
+    floorOf.set(place.id, { floor: place.floor, kind: 'place' });
+  }
+  const list: Destination[] = [];
+  for (const assignment of assignments) {
+    const where = floorOf.get(assignment.roomId);
+    if (where && assignment.name.trim() !== '') {
+      list.push({ ...assignment, ...where });
+    }
+  }
+  return list;
+}
+
 export function updateAssignment(
   assignments: Assignment[],
   roomId: string,
