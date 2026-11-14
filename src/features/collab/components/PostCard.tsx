@@ -33,7 +33,7 @@ export function PostCard({ post, state }: { post: CollabPost; state: JoinState }
   const filled = Math.min(post.accepted_count, post.spots_wanted);
 
   return (
-    <article className={styles.card}>
+    <article className={`${styles.card} pressable-card`}>
       <div className={styles.header}>
         <Avatar name={owner} initials={post.owner?.avatar_initials} size="small" tone="quiet" />
         <p className={styles.name}>{owner}</p>

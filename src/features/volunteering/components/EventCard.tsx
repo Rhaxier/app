@@ -33,7 +33,7 @@ export function EventCard({ event, signup }: EventCardProps) {
   const chosen = signup?.status === 'selected';
 
   return (
-    <article className={styles.card}>
+    <article className={`${styles.card} pressable-card`}>
       <div className={styles.row}>
         <DateBlock date={event.starts_at} />
         <div className={styles.content}>

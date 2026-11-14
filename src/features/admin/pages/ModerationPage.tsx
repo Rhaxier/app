@@ -17,6 +17,7 @@ import { relativeTime } from '@/lib/dates';
 import { errorMessage } from '@/lib/errors';
 import type { ModerationItem, ModeratedTable } from '../api';
 import { AdminPage } from '../components/AdminPage';
+import { pageIntros } from '../strings';
 import { useModerate, useModerationQueue } from '../hooks';
 import styles from './ModerationPage.module.css';
 
@@ -41,7 +42,7 @@ export function ModerationPage() {
   const shown = queue.data?.filter((item) => item.kind === show);
 
   return (
-    <AdminPage title="Moderation" description="Reported, hidden and removed content.">
+    <AdminPage title="Moderation" description={pageIntros.moderation}>
       <SegmentedControl
         label="Show"
         value={show}

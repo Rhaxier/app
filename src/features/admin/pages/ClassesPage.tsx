@@ -26,6 +26,7 @@ import { sectionLabel } from '@/features/school/logic';
 import { useAppSettings } from '@/features/settings/hooks';
 import { errorMessage } from '@/lib/errors';
 import { AdminPage } from '../components/AdminPage';
+import { footnotes, pageIntros } from '../strings';
 import { useUpdateSettings, useUsers } from '../hooks';
 import { validateClass, type ClassFormValues } from '../logic';
 import styles from './ClassesPage.module.css';
@@ -50,7 +51,7 @@ export function ClassesPage() {
   return (
     <AdminPage
       title="Classes"
-      description="Who teaches whom. Used to limit who teachers can announce to."
+      description={pageIntros.classes}
       actions={
         <Button size="small" icon="plus" onClick={() => setEditing(null)}>
           New class
@@ -133,7 +134,7 @@ function PostingRule() {
     <Card>
       <Switch
         label="Teachers may announce to any grade"
-        hint="Turn off once classes are set up: teachers then post only to the grades and sections they teach."
+        hint={footnotes.classes.anyGrade}
         checked={settings.data.teachers_post_any_grade}
         disabled={save.isPending}
         onChange={(on) => save.mutate({ teachers_post_any_grade: on })}

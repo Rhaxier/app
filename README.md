@@ -124,8 +124,10 @@ Dev accounts only work while `app_settings.allow_dev_accounts` is on
 ```
 src/
   app/          router, layout, tab bar, route guards, dev role switcher
-  styles/       tokens.css (design tokens), glass.css (liquid glass), globals.css, motion.css
+  styles/       tokens.css (design tokens), glass.css (liquid glass), globals.css, motion.css,
+                tailwind.css (Tailwind, for shadcn/ui components only)
   components/   shared UI: Button, Card, Chip, Badge, Input, SegmentedControl, Sheet, ...
+    ui/         shadcn/ui components (`npx shadcn add <name>`)
   lib/          supabase client, query client, dates (Asia/Dubai), errors, statuses, CSV
   config/       static school text (placeholders)
   features/     one folder per feature, all the same shape:

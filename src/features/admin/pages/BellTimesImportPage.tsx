@@ -23,6 +23,7 @@ import {
 import { downloadCsv, toCsv } from '@/lib/csv';
 import { errorMessage } from '@/lib/errors';
 import { AdminPage } from '../components/AdminPage';
+import { footnotes, pageIntros } from '../strings';
 import { PeriodImportPreview } from '../components/PeriodImportPreview';
 
 function templateCsv(rows: PeriodCsvRow[]): string {
@@ -65,17 +66,10 @@ export function BellTimesImportPage() {
   }
 
   return (
-    <AdminPage
-      title="Upload bell times"
-      description="Replace the periods of whole weekdays from a CSV file."
-    >
+    <AdminPage title="Upload bell times" description={pageIntros['bell-times']}>
       <Card className="stack-tight">
         <h3>1. Download the template</h3>
-        <p className="meta">
-          It holds today's periods: one line per period per weekday, with the columns{' '}
-          {PERIOD_CSV_COLUMNS.join(', ')}. Times look like 07:30. Order is 1 for the first period of
-          the day. Leave out a weekday to keep its periods as they are.
-        </p>
+        <p className="meta">{footnotes.bellTimes.template(PERIOD_CSV_COLUMNS.join(', '))}</p>
         <Button
           variant="secondary"
           icon="download"
@@ -127,7 +121,7 @@ export function BellTimesImportPage() {
         <Card className="stack-tight" aria-live="polite">
           <h3>Imported</h3>
           <p>New periods for {importedWeekdays(done)}. Bookings from now on follow them.</p>
-          <p className="meta">Bookings made before stay as they were.</p>
+          <p className="meta">{footnotes.bellTimes.after}</p>
           <div className="row-wrap">
             <ButtonLink to="/bell-times" variant="secondary">
               See the bell times

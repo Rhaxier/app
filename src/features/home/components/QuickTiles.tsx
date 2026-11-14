@@ -35,7 +35,7 @@ export function QuickTiles() {
   const hints = useToolHints();
   return (
     <nav aria-label="Tools">
-      <ul className={styles.grid}>
+      <ul className={`${styles.grid} stagger`}>
         {tiles
           .filter((tile) => visible(tile.feature))
           .map((tile) => {

@@ -1,0 +1,35 @@
+weekday,period_name,start_time,end_time,order
+Monday,Extended zero period,07:40,08:45,1
+Monday,Period 1,08:45,09:25,2
+Monday,Period 2,09:25,10:05,3
+Monday,Period 3,10:20,11:00,4
+Monday,Period 4,11:00,11:40,5
+Monday,Period 5,11:40,12:25,6
+Monday,Period 6,12:25,13:05,7
+Monday,Period 7,13:35,14:20,8
+Monday,Period 8,14:20,15:00,9
+Tuesday,Extended zero period,07:40,08:45,1
+Tuesday,Period 1,08:45,09:25,2
+Tuesday,Period 2,09:25,10:05,3
+Tuesday,Period 3,10:20,11:00,4
+Tuesday,Period 4,11:00,11:40,5
+Tuesday,Period 5,11:40,12:25,6
+Tuesday,Period 6,12:25,13:05,7
+Tuesday,Period 7,13:35,14:20,8
+Tuesday,Period 8,14:20,15:00,9
+Wednesday,Extended zero period,07:40,08:40,1
+Wednesday,Period 1,08:40,09:20,2
+Wednesday,Period 2,09:20,10:00,3
+Wednesday,Period 3,10:15,10:55,4
+Wednesday,Period 4,10:55,11:35,5
+Wednesday,Period 5,12:05,12:45,6
+Wednesday,Period 6,12:45,13:25,7
+Wednesday,Period 7,13:25,14:05,8
+Thursday,Extended zero period,07:40,08:40,1
+Thursday,Period 1,08:40,09:20,2
+Thursday,Period 2,09:20,10:00,3
+Thursday,Period 3,10:15,10:55,4
+Thursday,Period 4,10:55,11:35,5
+Thursday,Period 5,12:05,12:45,6
+Thursday,Period 6,12:45,13:25,7
+Thursday,Period 7,13:25,14:05,8

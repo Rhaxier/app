@@ -30,18 +30,20 @@
 }
 
 .link {
+  composes: surface from global;
   display: flex;
   align-items: center;
   gap: var(--space-3);
   min-height: 64px;
   padding: var(--space-3) var(--space-4);
   border-radius: var(--r-card);
-  background: var(--card);
   color: var(--ink);
   text-decoration: none;
 }
 
 .compact .link {
+  /* A subtitle can wrap onto a second line, so the icon sits by the title. */
+  align-items: flex-start;
   min-height: var(--touch-min);
   padding: var(--space-2) var(--space-3);
   border-radius: var(--r-tag);
@@ -50,7 +52,7 @@
 }
 
 .compact .link:hover {
-  background: var(--card);
+  background: var(--segbg);
 }
 
 /* NavLink marks the current section with aria-current="page". */
@@ -91,4 +93,16 @@
 
 .compact .title {
   font-weight: inherit;
+  line-height: 18px;
+}
+
+/* The grey line under each title. It stays grey and regular weight on the
+   highlighted (current) row, as on iPhone. */
+.subtitle {
+  font-weight: 400;
+  overflow-wrap: anywhere;
+}
+
+.compact .subtitle {
+  margin-top: 1px;
 }

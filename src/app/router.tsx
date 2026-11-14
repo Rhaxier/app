@@ -18,7 +18,6 @@ import { RequireAuth, RequireFeature, RequireRole } from './guards';
 import { lazyPage } from './lazyPage';
 import { NotFoundPage } from './NotFoundPage';
 import { RootLayout } from './RootLayout';
-import { enableScreenTransitions } from './screenTransitions';
 
 const announcements = () => import('@/features/announcements/pages/AnnouncementsPage');
 const announcement = () => import('@/features/announcements/pages/AnnouncementDetailPage');
@@ -148,6 +147,3 @@ export const router = createBrowserRouter([
     ],
   },
 ]);
-
-// Every screen change animates (see src/app/screenTransitions.ts).
-enableScreenTransitions(router);

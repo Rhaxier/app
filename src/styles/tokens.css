@@ -11,9 +11,25 @@
  * Light mode is designed, not inverted (page 5): a grey grouped canvas, navy
  * shadows, brighter glass, darker status text, and a black primary button.
  *
- * Every colour, size and radius in the app comes from here. Components use
+ * Every colour, size and radius in the app comes from here (motion timing
+ * lives in src/lib/motion.ts). Components use
  * var(--token), never a raw colour, so a design change is a one-line edit.
  */
+
+/*
+ * Cascade layers, lowest priority first. This is the first stylesheet the app
+ * loads, so it fixes the order for everything after it:
+ *   theme       Tailwind's and shadcn's variables (tailwind.css)
+ *   base        the app's element defaults (globals.css) and shadcn's resets
+ *   components  (unused for now)
+ *   utilities   Tailwind classes on shadcn/ui components
+ * Anything not in a layer (these tokens, CSS Modules, glass.css, motion.css)
+ * beats every layer, so the app's own components look exactly as designed,
+ * and a Tailwind class on a shadcn component can still override an element
+ * default such as the link colour.
+ */
+@layer theme, base, components, utilities;
+
 :root {
   /* Native form controls, scrollbars and date pickers follow the theme. */
   color-scheme: dark;
@@ -45,10 +61,17 @@
   --segbg: rgba(118, 118, 128, 0.24);
   --segon: #636366;
   --tabtext: rgba(235, 235, 245, 0.72);
-  /* Ambient glow behind every screen (page 10): blue from the top, violet bloom on the right. */
+  /* Ambient glow behind every screen (page 10): blue from the top and a violet
+     bloom on the right, plus three fainter ones so the glass has colour to
+     pick up wherever it sits: rose top-left, teal low on the right edge, amber
+     bottom-left (behind the tab bar). Each is large, soft and at most 11%
+     strong, so text keeps its contrast (checked against the darkest overlap). */
   --glow:
     radial-gradient(90% 38% at 50% -6%, rgba(10, 132, 255, 0.28), transparent 70%),
-    radial-gradient(60% 30% at 100% 30%, rgba(94, 92, 230, 0.12), transparent 70%);
+    radial-gradient(60% 30% at 100% 30%, rgba(94, 92, 230, 0.12), transparent 70%),
+    radial-gradient(55% 28% at 0% 6%, rgba(255, 55, 95, 0.1), transparent 70%),
+    radial-gradient(50% 34% at 104% 74%, rgba(64, 200, 224, 0.09), transparent 70%),
+    radial-gradient(75% 36% at 0% 104%, rgba(255, 159, 10, 0.11), transparent 70%);
 
   /* ---- Liquid glass (pages 4, 10, 12; used by src/styles/glass.css) ------- */
   --g-tint: rgba(38, 38, 42, 0.55); /* Regular: tab bar, search, FAB, floor switch */
@@ -65,6 +88,21 @@
   --g-tint-thin: rgba(38, 38, 42, 0.45); /* map chips, overlays */
   /* Browsers without backdrop-filter get a nearly solid tint instead, so text stays readable. */
   --g-tint-solid: rgba(38, 38, 42, 0.96);
+
+  /* ---- Content surfaces (glass.css: .surface, .surface-control) ----------
+     A lighter glass than the floating controls, for cards, grouped lists and
+     tiles: thin blur, faint tint, top sheen, 1px rim highlight, soft lift.
+     Controls inside them (fields, chips, segmented tracks) get the same look
+     without a blur of their own, so blurs are never nested. */
+  --s-tint: rgba(28, 28, 30, 0.64);
+  --s-tint-solid: #1c1c1e; /* no blur available, or reduced transparency */
+  --s-spec: rgba(255, 255, 255, 0.05);
+  --s-rim: rgba(255, 255, 255, 0.08);
+  --s-blur: 16px; /* the "thin" material */
+  --s-lift: 0 14px 34px -20px rgba(0, 0, 0, 0.75);
+  --c-tint: rgba(44, 44, 46, 0.52);
+  --c-tint-solid: #2c2c2e;
+  --c-rim: rgba(255, 255, 255, 0.06);
 
   /* ---- Elevation (page 10) ------------------------------------------------ */
   --e1: 0 0 0 0.5px rgba(255, 255, 255, 0.06); /* resting: cards, lists */
@@ -101,6 +139,7 @@
   ); /* text fields: a translucent fill works on canvas, cards and glass */
   --scrim: rgba(0, 0, 0, 0.5); /* behind an open sheet */
   --press-dim: 0.94; /* press: darken 6% (page 11) */
+  --hover-bright: 1.08; /* hover with a mouse: a touch lighter on dark */
   --hatch: #2a2a2f; /* corridor hatch lines (page 11) */
   --selroom: #64b5ff; /* a selected room's code (page 11) */
   /* The placeholder floor plans (public/floorplans) are drawn light, like most
@@ -181,20 +220,10 @@
   /* Focus: 0 0 0 3px accent at 45%, offset 2px, keyboard only (see globals.css). */
   --focus: color-mix(in srgb, var(--acc) 45%, transparent);
 
-  /*
-   * ---- Motion (page 11; "Motion" in docs/ARCHITECTURE.md) -------------------
-   * fade 200ms · sheet 280ms · cubic-bezier(.2,0,0,1). Only opacity and
-   * transform ever animate. With reduced motion, things fade but don't move
-   * (--motion-shift becomes 0). src/lib/motion.ts reads these, so JS waits
-   * exactly as long as the CSS runs.
-   */
-  --motion-fast: 120ms; /* press feedback */
-  --motion-base: 200ms; /* fades */
-  --motion-slow: 280ms; /* sheets, screen transitions */
-  --ease-out: cubic-bezier(0.2, 0, 0, 1); /* the deck's curve: things arriving */
-  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1); /* things leaving or moving */
-  --motion-shift: 8px; /* how far things travel as they fade in */
-  --press-scale: 0.97;
+  /* ---- Motion ------------------------------------------------------------
+     Durations, curves and distances (--motion-fast, --ease-out,
+     --motion-shift…) live with Motion's springs in src/lib/motion.ts, the one
+     motion tokens file; it writes them on <html> at start-up. */
 }
 
 /* ---------------------------------------------------------------------------
@@ -227,9 +256,14 @@
   --segbg: rgba(118, 118, 128, 0.12);
   --segon: #ffffff;
   --tabtext: rgba(60, 60, 67, 0.78);
+  /* The same five glows, as pastels: on a light page strong colour reads as a
+     stain, so each is weaker (at most 8%) and uses the light-mode hue. */
   --glow:
     radial-gradient(90% 36% at 50% -6%, rgba(0, 122, 255, 0.16), transparent 70%),
-    radial-gradient(60% 30% at 100% 28%, rgba(175, 82, 222, 0.07), transparent 70%);
+    radial-gradient(60% 30% at 100% 28%, rgba(175, 82, 222, 0.07), transparent 70%),
+    radial-gradient(55% 28% at 0% 6%, rgba(255, 45, 85, 0.06), transparent 70%),
+    radial-gradient(50% 34% at 104% 74%, rgba(48, 176, 199, 0.08), transparent 70%),
+    radial-gradient(75% 36% at 0% 104%, rgba(255, 149, 0, 0.08), transparent 70%);
 
   --g-tint: rgba(255, 255, 255, 0.58);
   --g-blur: 24px;
@@ -243,6 +277,15 @@
   --g-tint-thick: rgba(255, 255, 255, 0.76);
   --g-tint-thin: rgba(255, 255, 255, 0.5);
   --g-tint-solid: rgba(255, 255, 255, 0.97);
+
+  --s-tint: rgba(255, 255, 255, 0.78);
+  --s-tint-solid: #ffffff;
+  --s-spec: rgba(255, 255, 255, 0.6);
+  --s-rim: rgba(255, 255, 255, 0.95);
+  --s-lift: 0 12px 30px -18px rgba(28, 40, 90, 0.2);
+  --c-tint: rgba(255, 255, 255, 0.6);
+  --c-tint-solid: #ffffff;
+  --c-rim: rgba(16, 24, 40, 0.08);
 
   --e1: 0 1px 2px rgba(16, 24, 40, 0.04), 0 0 0 0.5px rgba(16, 24, 40, 0.06);
   --e2: 0 10px 28px -12px rgba(28, 40, 90, 0.22);
@@ -258,16 +301,9 @@
   --field: rgba(118, 118, 128, 0.12);
   --scrim: rgba(16, 24, 40, 0.28); /* navy-tinted, like the shadows */
   --press-dim: 0.96; /* press: darken 4% in light mode */
+  --hover-bright: 0.98; /* hover: a touch darker on light */
   --hatch: #e3e3e8;
   --selroom: var(--on-accsoft);
   --plan-filter: none;
   --chevron-down: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%238a8a8e' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-}
-
-/* Reduced motion (page 11): opacity only. Things still fade; nothing moves. */
-@media (prefers-reduced-motion: reduce) {
-  :root {
-    --motion-shift: 0px;
-    --press-scale: 1;
-  }
 }

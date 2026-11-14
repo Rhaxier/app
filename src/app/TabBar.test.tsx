@@ -1,10 +1,21 @@
 // The Approvals tab is for staff only. (The database also refuses students
 // the data behind it; this checks the UI hides the tab.)
 import { screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { makeUser, renderWithProviders, teacher } from '@/test/utils';
 import type { CurrentUser } from '@/features/auth/api';
-import { TabBar } from './TabBar';
+import { SearchOverlayProvider } from '@/features/search/SearchOverlayProvider';
+import { TabBar as Bar } from './TabBar';
+
+// The tab bar's search button opens the search overlay, which lives in the app layout.
+function TabBar() {
+  return (
+    <SearchOverlayProvider>
+      <Bar />
+    </SearchOverlayProvider>
+  );
+}
 import { isTabActive, tabsFor } from './tabs';
 
 // Replace the real "who is signed in" hook with one the test controls.
@@ -28,9 +39,11 @@ describe('TabBar', () => {
     ]);
   });
 
-  it('has the round search button beside the tabs', () => {
+  it('has the round search button beside the tabs, which opens search', async () => {
     renderWithProviders(<TabBar />);
-    expect(screen.getByRole('link', { name: 'Search' })).toHaveAttribute('href', '/search');
+    await userEvent.click(screen.getByRole('button', { name: 'Search' }));
+    expect(screen.getByRole('dialog', { name: 'Search' })).toBeInTheDocument();
+    expect(screen.getByLabelText('Search rooms, events, posts')).toHaveFocus();
   });
 
   it('adds an Approvals tab for teachers', () => {

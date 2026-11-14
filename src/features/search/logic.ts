@@ -24,11 +24,10 @@ export function matches(text: string, query: string): boolean {
     .every((word) => haystack.includes(word));
 }
 
-export function searchAll(
-  query: string,
-  sources: Record<SearchGroup['kind'], { item: SearchItem; text: string }[]>,
-  limitPerGroup = 5,
-): SearchGroup[] {
+/** What can be searched: every item, with the text it's matched against. */
+export type SearchSources = Record<SearchGroup['kind'], { item: SearchItem; text: string }[]>;
+
+export function searchAll(query: string, sources: SearchSources, limitPerGroup = 5): SearchGroup[] {
   if (!query.trim()) return [];
   const labels: Record<SearchGroup['kind'], string> = {
     rooms: 'Rooms',

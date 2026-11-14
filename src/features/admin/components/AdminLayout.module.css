@@ -1,6 +1,7 @@
 .layout {
   display: grid;
-  grid-template-columns: 240px minmax(0, 1fr);
+  /* Wide enough for the menu's subtitles to wrap onto two lines at most. */
+  grid-template-columns: 288px minmax(0, 1fr);
   gap: var(--space-8);
   align-items: start;
 }

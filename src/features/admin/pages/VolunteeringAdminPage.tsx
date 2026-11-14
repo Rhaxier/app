@@ -14,6 +14,7 @@ import {
   useVolunteerCategories,
 } from '@/features/volunteering/hooks';
 import { AdminPage } from '../components/AdminPage';
+import { footnotes, pageIntros } from '../strings';
 import { NameListEditor } from '../components/NameListEditor';
 import { SettingSwitch } from '../components/SettingControls';
 import styles from './ListPage.module.css';
@@ -23,18 +24,18 @@ export function VolunteeringAdminPage() {
   const saveCategory = useSaveCategory();
 
   return (
-    <AdminPage title="Volunteering" description="Approval, categories and SUPW targets.">
+    <AdminPage title="Volunteering" description={pageIntros.volunteering}>
       <Card className="stack-tight">
         <SettingSwitch
           setting="student_events_need_approval"
           label="Student events need a teacher's approval"
-          hint="The plan says yes. Off: events students create go live straight away."
+          hint={footnotes.volunteering.studentApproval}
         />
       </Card>
 
       <Card className="stack-tight">
         <h2 className={styles.cardTitle}>Categories</h2>
-        <p className="meta">Students filter events by these on the Volunteer tab.</p>
+        <p className="meta">{footnotes.volunteering.categories}</p>
         {categories.isPending && <LoadingState shape="row" />}
         {categories.data && (
           <NameListEditor
@@ -82,7 +83,7 @@ function SupwTargets() {
   return (
     <Card className="stack-tight">
       <h2 className={styles.cardTitle}>SUPW hours target by grade</h2>
-      <p className="meta">Empty = no target for that grade (Q9).</p>
+      <p className="meta">{footnotes.volunteering.targets}</p>
       {targets.isPending && <LoadingState shape="row" />}
       {targets.data &&
         grades.map((grade) => (

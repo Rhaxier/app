@@ -16,6 +16,7 @@ import {
 } from '@/features/collab/hooks';
 import { relativeTime } from '@/lib/dates';
 import { AdminPage } from '../components/AdminPage';
+import { footnotes, pageIntros } from '../strings';
 import { NameListEditor } from '../components/NameListEditor';
 import { SettingNumber, SettingSwitch } from '../components/SettingControls';
 import styles from './ListPage.module.css';
@@ -26,17 +27,18 @@ export function CollabAdminPage() {
   const suggestions = usePendingSuggestions();
 
   return (
-    <AdminPage title="Collab" description="Team rules and the skills students choose from.">
+    <AdminPage title="Collab" description={pageIntros.collab}>
       <Card className="stack-tight">
         <h2 className={styles.cardTitle}>Teams</h2>
         <SettingSwitch
           setting="collab_requires_teacher"
           label="Posts need a supervising teacher"
-          hint="Q4. When on, students must choose a teacher before posting."
+          hint={footnotes.collab.requiresTeacher}
         />
         <SettingNumber
           setting="collab_max_team_size"
           label="Biggest team (people, including the owner)"
+          hint={footnotes.collab.maxTeam}
           min={2}
           max={51}
         />

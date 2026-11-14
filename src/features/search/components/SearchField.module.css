@@ -1,17 +1,21 @@
+/* A pill-shaped field in the control glass (sheen and rim, no blur of its
+   own), so it works on the canvas and inside the search overlay's glass. */
 .box {
+  composes: surface-control from global;
   display: flex;
+  flex: 1;
   align-items: center;
-  gap: var(--space-3);
+  gap: 10px;
+  min-width: 0;
   min-height: var(--touch-min);
   padding: 0 var(--space-4);
-  border: 1px solid var(--line);
   border-radius: var(--radius-pill);
-  background: var(--card);
   color: var(--muted);
 }
 
 .box:focus-within {
-  box-shadow: var(--focus-ring);
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
 }
 
 .input {
@@ -21,6 +25,7 @@
   border: 0;
   background: transparent;
   color: var(--ink);
+  font-size: var(--text-input);
   outline: none;
 }
 

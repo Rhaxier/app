@@ -1,0 +1,11 @@
+# What `vercel deploy` from this folder must not upload. Keys stay on this
+# machine: the Vercel project has its own (Settings > Environment Variables).
+.env
+.env.*
+!.env.example
+supabase/.env
+node_modules
+dist
+coverage
+android
+ios

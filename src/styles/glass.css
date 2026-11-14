@@ -22,6 +22,43 @@
  *     of the background here, and browsers that can't blur get a nearly solid
  *     tint instead (the @supports rule at the end).
  */
+/* The content surfaces come first, so that the floating glass below wins on
+   an element that is both (a map chip is glass and a chip). */
+/* ---------------------------------------------------------------------------
+   Content surfaces: cards, grouped lists, tiles, date pills. A lighter glass
+   than the floating controls above: a thin blur over the ambient glow, a
+   faint tint, a top sheen, a 1px rim highlight and a soft lift. In a CSS
+   Module: `composes: surface from global;`. The bottom nav and sheets stay
+   the strongest glass.
+   --------------------------------------------------------------------------- */
+.surface {
+  background: linear-gradient(180deg, var(--s-spec), transparent 42%), var(--s-tint);
+  -webkit-backdrop-filter: blur(var(--s-blur)) saturate(var(--g-sat));
+  backdrop-filter: blur(var(--s-blur)) saturate(var(--g-sat));
+  box-shadow:
+    inset 0 1px 0 var(--s-rim),
+    var(--e1),
+    var(--s-lift);
+}
+
+/* Never glass on glass: inside a sheet or another surface, a surface keeps
+   its look but doesn't blur a second time. */
+.glass .surface,
+.surface .surface {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+/* Controls on or inside surfaces: fields, chips, segmented tracks. The same
+   sheen and rim, with no blur of their own. In a CSS Module:
+   `composes: surface-control from global;`. */
+.surface-control {
+  background: linear-gradient(180deg, var(--s-spec), transparent 60%), var(--c-tint);
+  box-shadow:
+    inset 0 1px 0 var(--s-rim),
+    inset 0 0 0 0.5px var(--c-rim);
+}
+
 .glass {
   background: linear-gradient(180deg, var(--g-spec), transparent 46%), var(--g-tint);
   -webkit-backdrop-filter: blur(var(--g-blur)) saturate(var(--g-sat)) brightness(var(--g-bright));
@@ -81,5 +118,33 @@
   .thick,
   .thin {
     --g-tint: var(--g-tint-solid);
+  }
+
+  .surface {
+    --s-tint: var(--s-tint-solid);
+  }
+}
+
+/* Reduced transparency (a system setting): solid tints, no blur anywhere. */
+@media (prefers-reduced-transparency: reduce) {
+  .glass,
+  .thick,
+  .thin {
+    --g-tint: var(--g-tint-solid);
+  }
+
+  .surface {
+    --s-tint: var(--s-tint-solid);
+  }
+
+  .surface-control {
+    --c-tint: var(--c-tint-solid);
+  }
+
+  .glass,
+  .surface,
+  .leaflet-control-zoom {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
   }
 }

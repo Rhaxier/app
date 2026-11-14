@@ -5,10 +5,12 @@
 // `floating` is the map's floor switch (G / 1 / 2): a glass pill floating over
 // the plan, with a round primary thumb.
 //
-// The thumb is one element moved with CSS: every option is the same width, so
-// option n starts at n × 100% of the thumb's own width. --count and --index
-// tell the CSS how many there are and which is chosen.
-import type { CSSProperties } from 'react';
+// The thumb is one element shared between the options (Motion's layoutId,
+// scoped to this control by LayoutGroup), so it springs from the old choice
+// to the new one. With reduced motion it simply jumps.
+import { LayoutGroup, motion } from 'motion/react';
+import { useId } from 'react';
+import { spring } from '@/lib/motion';
 import styles from './SegmentedControl.module.css';
 
 interface Option<T extends string> {
@@ -38,31 +40,40 @@ export function SegmentedControl<T extends string>({
   compact,
   floating,
 }: SegmentedControlProps<T>) {
-  const index = options.findIndex((option) => option.value === value);
-  const position = { '--count': options.length, '--index': index } as CSSProperties;
+  const group = useId();
 
   return (
-    <div
-      className={[styles.group, compact && styles.compact, floating && `glass ${styles.floating}`]
-        .filter(Boolean)
-        .join(' ')}
-      role="group"
-      aria-label={label}
-      style={position}
-    >
-      {index >= 0 && <span className={styles.thumb} aria-hidden="true" />}
-      {options.map((option) => (
-        <button
-          key={option.value}
-          type="button"
-          className={`${styles.option} pressable`}
-          aria-pressed={option.value === value}
-          onClick={() => onChange(option.value)}
-        >
-          {option.label}
-          {option.count !== undefined && <span className={styles.count}>{option.count}</span>}
-        </button>
-      ))}
-    </div>
+    <LayoutGroup id={group}>
+      <div
+        className={[styles.group, compact && styles.compact, floating && `glass ${styles.floating}`]
+          .filter(Boolean)
+          .join(' ')}
+        role="group"
+        aria-label={label}
+      >
+        {options.map((option) => (
+          <button
+            key={option.value}
+            type="button"
+            className={`${styles.option} pressable`}
+            aria-pressed={option.value === value}
+            onClick={() => onChange(option.value)}
+          >
+            {option.value === value && (
+              <motion.span
+                layoutId="thumb"
+                className={styles.thumb}
+                transition={spring.indicator}
+                aria-hidden="true"
+              />
+            )}
+            <span className={styles.optionLabel}>
+              {option.label}
+              {option.count !== undefined && <span className={styles.count}>{option.count}</span>}
+            </span>
+          </button>
+        ))}
+      </div>
+    </LayoutGroup>
   );
 }

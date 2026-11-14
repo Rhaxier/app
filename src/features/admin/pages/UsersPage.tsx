@@ -21,6 +21,7 @@ import { responsibilityLabel, roleLabel } from '@/lib/status';
 import { Constants } from '@/types/database';
 import type { AdminUser, Responsibility, Role } from '../api';
 import { AdminPage } from '../components/AdminPage';
+import { footnotes, pageIntros } from '../strings';
 import {
   useLiftSuspension,
   useSetRole,
@@ -48,7 +49,7 @@ export function UsersPage() {
   const set = (changes: Partial<UserFilters>) => setFilters((f) => ({ ...f, ...changes }));
 
   return (
-    <AdminPage title="Users" description="Roles, grades, responsibilities and posting.">
+    <AdminPage title="Users" description={pageIntros.users}>
       <TextField
         label="Search by name or email"
         type="search"
@@ -246,7 +247,7 @@ function UserEditor({ user }: { user: AdminUser }) {
           })}
         </Card>
       ) : (
-        <p className="meta">Responsibilities are for teachers and admins.</p>
+        <p className="meta">{footnotes.users.notStaff}</p>
       )}
 
       <PostingPanel user={user} />
@@ -271,7 +272,7 @@ function UserEditor({ user }: { user: AdminUser }) {
               ? 'Admins can change everything, including other people’s roles.'
               : 'Teachers can approve events, post announcements and see staff screens.'}
         </p>
-        <p className="meta">The change is recorded in the audit log.</p>
+        <p className="meta">{footnotes.users.roleChange}</p>
       </ConfirmDialog>
     </>
   );
@@ -304,10 +305,7 @@ function PostingPanel({ user }: { user: AdminUser }) {
   return (
     <Card className={styles.panel}>
       <h3>Pause posting</h3>
-      <p className="meta">
-        They can still read everything, but can't post announcements, collab posts or requests,
-        events or fix-it reports until then. They see why.
-      </p>
+      <p className="meta">{footnotes.users.pausePosting}</p>
       <TextField
         label="Until"
         type="datetime-local"

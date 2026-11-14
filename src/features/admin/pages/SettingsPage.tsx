@@ -20,11 +20,12 @@ import {
 } from '../logic';
 import styles from './SettingsPage.module.css';
 import { AdminPage } from '../components/AdminPage';
+import { footnotes, pageIntros } from '../strings';
 
 export function SettingsPage() {
   const settings = useAppSettings();
   return (
-    <AdminPage title="Sign-in" description="Who can sign in, and who becomes staff.">
+    <AdminPage title="Sign-in" description={pageIntros['sign-in']}>
       {settings.isPending && <LoadingState />}
       {settings.isError && <ErrorState error={settings.error} onRetry={() => settings.refetch()} />}
       {settings.data && <SettingsForm key={settings.data.updated_at} settings={settings.data} />}
@@ -54,7 +55,7 @@ function SettingsForm({ settings }: { settings: AppSettings }) {
         <TextField
           label="School email domain"
           placeholder="school.example"
-          hint="Only accounts on this domain (or its subdomains) can sign up."
+          hint={footnotes.signIn.domain}
           value={values.schoolEmailDomain}
           onChange={(e) => update('schoolEmailDomain', e.target.value)}
           error={errors.schoolEmailDomain}
@@ -62,14 +63,14 @@ function SettingsForm({ settings }: { settings: AppSettings }) {
         <TextField
           label="Staff email pattern (optional)"
           placeholder="^[a-z]+\.[a-z]+@"
-          hint="A regular expression. Matching addresses become teachers at first sign-in."
+          hint={footnotes.signIn.pattern}
           value={values.staffEmailPattern}
           onChange={(e) => update('staffEmailPattern', e.target.value)}
           error={errors.staffEmailPattern}
         />
         <CheckboxField
           label="Allow dev accounts (@dev.local)"
-          hint="The seeded test users. Turn this off before the app goes live."
+          hint={footnotes.signIn.devAccounts}
           checked={values.allowDevAccounts}
           onChange={(e) => update('allowDevAccounts', e.target.checked)}
         />

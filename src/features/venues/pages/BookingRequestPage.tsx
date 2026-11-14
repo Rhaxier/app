@@ -18,6 +18,7 @@ import { errorMessage } from '@/lib/errors';
 import { useRequestBooking, useVenues } from '../hooks';
 import {
   emptyBookingValues,
+  afterSchoolSettings,
   periodsLabel,
   validateBooking,
   type BookingFormErrors,
@@ -86,7 +87,13 @@ export function BookingRequestPage() {
   }
 
   const when = `${formatDate(start)}, ${formatTimeRange(start, end)}`;
-  const covers = periodsLabel(new Date(start), new Date(end), periods.data ?? []) ?? 'Custom time';
+  const covers =
+    periodsLabel(
+      new Date(start),
+      new Date(end),
+      periods.data ?? [],
+      settings.data ? afterSchoolSettings(settings.data) : null,
+    ) ?? 'Custom time';
 
   if (request.isSuccess) {
     const booked = request.data.status === 'approved';

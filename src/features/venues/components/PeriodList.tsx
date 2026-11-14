@@ -3,13 +3,15 @@
 // (a "+" to add it), booked (hatched), pending approval (yellow), closed (a
 // holiday or blackout), past, or your selection. Neighbouring selected
 // periods join into one blue block, "your run". Gaps between periods show as
-// a quiet "Break" line. Free periods are buttons; tap neighbouring ones to
-// book several in a row.
+// a quiet "Break" or "Lunch" line with their times (gapBetween). After the
+// last period, an "After School Hours" line, then after-school blocks with
+// their times, booked the same way. Free periods are buttons; tap neighbouring
+// ones to book several in a row.
 import { Fragment } from 'react';
 import { Badge } from '@/components/Badge';
 import { Icon } from '@/components/Icon';
 import { formatTime, formatTimeRange } from '@/lib/dates';
-import { runLabel, type Slot, type SlotState } from '../logic';
+import { gapBetween, runLabel, type Slot, type SlotState } from '../logic';
 import styles from './PeriodList.module.css';
 
 interface PeriodListProps {
@@ -19,9 +21,6 @@ interface PeriodListProps {
   /** The day, for the column heading, e.g. "Tuesday 20 October". */
   dayLabel?: string;
 }
-
-/** A gap of five minutes or more between periods is a break. */
-const BREAK_MS = 5 * 60_000;
 
 export function PeriodList({ slots, states, onToggle, dayLabel }: PeriodListProps) {
   const firstSelected = states.findIndex((state) => state.kind === 'selected');
@@ -38,11 +37,12 @@ export function PeriodList({ slots, states, onToggle, dayLabel }: PeriodListProp
         {slots.map((slot, index) => {
           const state = states[index];
           const range = formatTimeRange(slot.start, slot.end);
-          const previous = slots[index - 1];
-          const isBreak = previous && slot.start.getTime() - previous.end.getTime() >= BREAK_MS;
+          const startsAfterSchool = slot.afterSchool && !slots[index - 1]?.afterSchool;
+          const gap = index > 0 && !startsAfterSchool ? gapBetween(slots[index - 1], slot) : null;
           const selected = state.kind === 'selected';
           const rowClass = [
             styles.row,
+            slot.afterSchool && styles.afterRow,
             selected && styles.inRun,
             selected && index === firstSelected && styles.runStart,
             selected && index === lastSelected && styles.runEnd,
@@ -51,14 +51,26 @@ export function PeriodList({ slots, states, onToggle, dayLabel }: PeriodListProp
             .join(' ');
           return (
             <Fragment key={slot.index}>
-              {isBreak && (
+              {startsAfterSchool && (
+                <li className={styles.afterSchool} role="presentation">
+                  <span>After School Hours</span>
+                </li>
+              )}
+              {gap && (
                 <li className={styles.break} aria-hidden="true">
-                  Break
+                  {gap.label} · {formatTimeRange(gap.start, gap.end)}
                 </li>
               )}
               <li className={rowClass}>
-                <span className={styles.name}>{slot.name}</span>
-                <span className={styles.time}>{formatTime(slot.start)}</span>
+                {slot.afterSchool ? (
+                  // After school there are no period names: the block's times instead.
+                  <span className={styles.name}>{range}</span>
+                ) : (
+                  <>
+                    <span className={styles.name}>{slot.name}</span>
+                    <span className={styles.time}>{formatTime(slot.start)}</span>
+                  </>
+                )}
                 {state.kind === 'booked' && (
                   <div className={`${styles.block} ${styles.booked}`}>
                     <span className={styles.blockTitle}>{state.booking.title}</span>

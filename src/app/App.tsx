@@ -1,6 +1,7 @@
 // The root of the app: data caching (TanStack Query), who's signed in
-// (AuthProvider) and the screens (router).
+// (AuthProvider), animation settings (Motion) and the screens (router).
 import { QueryClientProvider } from '@tanstack/react-query';
+import { MotionConfig } from 'motion/react';
 import { RouterProvider } from 'react-router-dom';
 import { Toaster } from '@/components/Toaster';
 import { AuthProvider } from '@/features/auth/AuthProvider';
@@ -12,12 +13,16 @@ import { SetupScreen } from './SetupScreen';
 export function App() {
   if (!isSupabaseConfigured) return <SetupScreen />;
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <RouterProvider router={router} />
-      </AuthProvider>
-      {/* Outside the router, so toasts survive moving between screens. */}
-      <Toaster />
-    </QueryClientProvider>
+    // reducedMotion="user": when the device asks for less motion, Motion keeps
+    // fades but drops movement (the design's "opacity only").
+    <MotionConfig reducedMotion="user">
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <RouterProvider router={router} />
+        </AuthProvider>
+        {/* Outside the router, so toasts survive moving between screens. */}
+        <Toaster />
+      </QueryClientProvider>
+    </MotionConfig>
   );
 }

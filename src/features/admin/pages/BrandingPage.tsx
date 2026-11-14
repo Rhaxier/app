@@ -15,13 +15,14 @@ import { useAppSettings } from '@/features/settings/hooks';
 import { accentProblem, brandAccents, contrastRatio } from '@/lib/contrast';
 import { errorMessage } from '@/lib/errors';
 import { AdminPage } from '../components/AdminPage';
+import { pageIntros } from '../strings';
 import { useUpdateSettings, useUploadLogo } from '../hooks';
 import styles from './BrandingPage.module.css';
 
 export function BrandingPage() {
   const settings = useAppSettings();
   return (
-    <AdminPage title="Branding" description="The school's name, logo and colour.">
+    <AdminPage title="Branding" description={pageIntros.branding}>
       {settings.isPending && <LoadingState />}
       {settings.data && <BrandingForm key={settings.data.updated_at} settings={settings.data} />}
     </AdminPage>

@@ -21,4 +21,10 @@ export default defineConfig([
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
     },
   },
+  {
+    // shadcn/ui components are generated (`npx shadcn add`) and export their
+    // style helpers (e.g. buttonVariants) beside the component, by design.
+    files: ['src/components/ui/**/*.tsx'],
+    rules: { 'react-refresh/only-export-components': 'off' },
+  },
 ]);

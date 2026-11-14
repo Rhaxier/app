@@ -56,7 +56,7 @@ export function ProjectsPage() {
         </EmptyState>
       )}
       {list.length > 0 && (
-        <ul className={styles.list}>
+        <ul className={`${styles.list} stagger`}>
           {list.map((project) => (
             <li key={project.id}>
               <ProjectCard project={project} showOwner={staff} canShare={!staff} />

@@ -17,6 +17,7 @@ import { WEEKDAY_NAMES, weekdaysLabel } from '@/features/school/logic';
 import { useAppSettings } from '@/features/settings/hooks';
 import { errorMessage } from '@/lib/errors';
 import { AdminPage } from '../components/AdminPage';
+import { footnotes, pageIntros } from '../strings';
 import { useUpdateSettings } from '../hooks';
 import { validatePeriod, type PeriodFormValues } from '../logic';
 import styles from './ListPage.module.css';
@@ -29,7 +30,7 @@ export function SchoolWeekPage() {
   return (
     <AdminPage
       title="School week and periods"
-      description="School days, and the periods venues can be booked by."
+      description={pageIntros['school-week']}
       actions={
         <span className="row-wrap">
           <ButtonLink to="/admin/bell-times" size="small" variant="secondary" icon="download">
@@ -45,10 +46,8 @@ export function SchoolWeekPage() {
 
       <Card className="stack-tight">
         <h2 className={styles.cardTitle}>Periods</h2>
-        <p className="meta">
-          Venue booking offers these on the days they run, and everyone sees them under Bell times.
-          Give a short day its own periods. Periods on the same day can't overlap.
-        </p>
+        <p className="meta">{footnotes.schoolWeek.periods}</p>
+        <p className="meta">{footnotes.schoolWeek.overlap}</p>
         {periods.isPending && <LoadingState shape="row" />}
         {periods.isError && <ErrorState error={periods.error} onRetry={() => periods.refetch()} />}
         {periods.data?.length === 0 && (
@@ -112,9 +111,7 @@ function SchoolDays() {
           </FilterChip>
         ))}
       </div>
-      <p className="meta">
-        Booking calendars show these days. Since 2022 most UAE schools run Monday to Friday.
-      </p>
+      <p className="meta">{footnotes.schoolWeek.days}</p>
       <FormError message={save.isError ? errorMessage(save.error) : null} />
     </Card>
   );

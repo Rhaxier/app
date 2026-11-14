@@ -56,7 +56,7 @@
 }
 
 /* Search lives in the tab bar, except for staff on a phone narrower than
-   375px, where six tabs leave no room for it (TabBar.module.css). */
+   390px, where six tabs leave no room for it (TabBar.module.css). */
 .search {
   display: none;
   place-items: center;
@@ -66,7 +66,7 @@
   color: var(--ink);
 }
 
-@media (max-width: 374px) {
+@media (max-width: 389px) {
   .search {
     display: grid;
   }

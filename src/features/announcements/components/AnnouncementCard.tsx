@@ -42,7 +42,9 @@ export function AnnouncementCard({
     <Card
       as="article"
       tone={announcement.urgent ? 'alert' : announcement.pinned ? 'accent' : 'default'}
-      className={[styles.card, featured && styles.featured].filter(Boolean).join(' ')}
+      className={[styles.card, featured && styles.featured, 'pressable-card']
+        .filter(Boolean)
+        .join(' ')}
     >
       <Link to={`/announcements/${announcement.id}`} className={styles.link}>
         <div className={styles.top}>

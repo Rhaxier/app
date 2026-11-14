@@ -32,7 +32,7 @@ export function HomeAnnouncements() {
         <EmptyState icon="megaphone" title="No announcements yet" />
       )}
       {rest.length > 0 && (
-        <ul className={styles.list}>
+        <ul className={`${styles.list} stagger`}>
           {rest.map((announcement) => (
             <li key={announcement.id}>
               <Link to={`/announcements/${announcement.id}`} className={`${styles.row} pressable`}>

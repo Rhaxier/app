@@ -1,0 +1,122 @@
+/*
+ * Tailwind CSS, for shadcn/ui components (src/components/ui) only.
+ *
+ * The app's own screens are styled with CSS Modules and the design tokens in
+ * tokens.css, and nothing in this file may change them:
+ *   * Tailwind's reset ("preflight") is left out: it would restyle every
+ *     element in the app. shadcn components get the small part of it they
+ *     rely on, scoped to their own elements ([data-slot], at the end).
+ *   * shadcn's colour names (background, primary, muted…) are mapped onto the
+ *     v5 design tokens rather than shadcn's own palette, so its components
+ *     match the app in dark and light mode and follow a school's own colour.
+ *
+ * Cascade layers (declared in tokens.css): theme < base < components <
+ * utilities, and anything unlayered (tokens.css, CSS Modules) beats them all.
+ * So where a shadcn variable has the same name as an app token (--card,
+ * --muted, --font-mono, --ease-out), the app's value always wins. Note that
+ * the app's --muted is grey text, where shadcn's would be a pale background:
+ * use the bg-muted / text-muted-foreground utilities, not var(--muted), in
+ * shadcn components.
+ */
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+
+/* Dark is the app's default; light mode is the .light class (src/lib/theme.ts). */
+@custom-variant dark (&:where(:root:not(.light), :root:not(.light) *));
+
+/* What the dark: variant and the utilities read, mapped onto the app's tokens. */
+@theme inline {
+  --font-sans: var(--font);
+  --font-heading: var(--font);
+  --color-background: var(--paper);
+  --color-foreground: var(--ink);
+  --color-card: var(--card);
+  --color-card-foreground: var(--ink);
+  --color-popover: var(--card);
+  --color-popover-foreground: var(--ink);
+  --color-primary: var(--pribg);
+  --color-primary-foreground: var(--prifg);
+  --color-secondary: var(--segbg);
+  --color-secondary-foreground: var(--ink);
+  --color-muted: var(--card2);
+  --color-muted-foreground: var(--muted);
+  --color-accent: var(--accsoft);
+  --color-accent-foreground: var(--on-accsoft);
+  --color-destructive: var(--fix);
+  --color-border: var(--line);
+  --color-input: var(--hair);
+  --color-ring: var(--acc);
+  --color-chart-1: var(--acc);
+  --color-chart-2: var(--okink);
+  --color-chart-3: var(--waitink);
+  --color-chart-4: var(--fix);
+  --color-chart-5: var(--muted);
+  --color-sidebar: var(--card);
+  --color-sidebar-foreground: var(--ink);
+  --color-sidebar-primary: var(--acc);
+  --color-sidebar-primary-foreground: var(--onacc);
+  --color-sidebar-accent: var(--accsoft);
+  --color-sidebar-accent-foreground: var(--on-accsoft);
+  --color-sidebar-border: var(--line);
+  --color-sidebar-ring: var(--acc);
+  /* The design's concentric radii (page 10). */
+  --radius-sm: var(--r-seg-thumb);
+  --radius-md: var(--r-seg);
+  --radius-lg: var(--r-tag);
+  --radius-xl: var(--r-field);
+  --radius-2xl: var(--r-card);
+  --radius-3xl: var(--r-button);
+  --radius-4xl: var(--r-sheet);
+}
+
+/* shadcn components also read a few raw variables directly (e.g. a hover
+   colour mixed from var(--secondary) and var(--foreground)). They live in
+   the theme layer, so the app's own tokens win wherever a name is shared. */
+@layer theme {
+  :root {
+    --background: var(--paper);
+    --foreground: var(--ink);
+    --card-foreground: var(--ink);
+    --popover: var(--card);
+    --popover-foreground: var(--ink);
+    --primary: var(--pribg);
+    --primary-foreground: var(--prifg);
+    --secondary: var(--segbg);
+    --secondary-foreground: var(--ink);
+    --muted-foreground: var(--muted);
+    --accent: var(--accsoft);
+    --accent-foreground: var(--on-accsoft);
+    --destructive: var(--fix);
+    --border: var(--line);
+    --input: var(--hair);
+    --ring: var(--acc);
+    --radius: var(--r-tag);
+  }
+}
+
+/* The part of Tailwind's reset shadcn components rely on, for their own
+   elements only (every shadcn part carries a data-slot attribute). */
+@layer base {
+  [data-slot],
+  [data-slot]::before,
+  [data-slot]::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    border: 0 solid var(--color-border);
+    outline-color: color-mix(in oklab, var(--color-ring) 50%, transparent);
+  }
+
+  button[data-slot] {
+    background-color: transparent;
+    color: inherit;
+    font: inherit;
+  }
+
+  button[data-slot]:not(:disabled),
+  [data-slot][role='button']:not(:disabled) {
+    cursor: pointer;
+  }
+}

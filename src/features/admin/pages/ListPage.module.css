@@ -107,13 +107,13 @@
 
 /* A square icon button in a picker; the chosen one has the ink fill. */
 .iconChoice {
+  composes: surface-control from global;
   display: grid;
   place-items: center;
   width: var(--touch-min);
   height: var(--touch-min);
   border: 1px solid var(--line);
   border-radius: var(--r-tag);
-  background: var(--card);
   cursor: pointer;
 }
 

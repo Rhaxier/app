@@ -1,6 +1,8 @@
-// The admin menu, grouped as in ../sections.ts. Two looks:
-//   compact  the laptop side menu: titles only, the current section highlighted
-//   full     the phone menu screen: big rows with a description each
+// The admin menu, grouped as in ../sections.ts. Every section has a grey
+// subtitle under its title, like a category in iPhone Settings (the wording
+// is in ../strings.ts). Two looks:
+//   compact  the laptop side menu: small rows, the current section highlighted
+//   full     the phone menu screen: big glass rows with an icon tile
 import { NavLink } from 'react-router-dom';
 import { Icon } from '@/components/Icon';
 import { adminGroups } from '../sections';
@@ -21,7 +23,7 @@ export function AdminMenu({ compact = false }: { compact?: boolean }) {
                   </span>
                   <span className={styles.text}>
                     <span className={styles.title}>{section.title}</span>
-                    {!compact && <span className="meta">{section.description}</span>}
+                    <span className={`meta ${styles.subtitle}`}>{section.description}</span>
                   </span>
                   {!compact && <Icon name="chevronRight" size={18} />}
                 </NavLink>

@@ -14,6 +14,7 @@ import { errorMessage } from '@/lib/errors';
 import { roleLabel } from '@/lib/status';
 import { exportBookings, exportReports, fetchUsers } from '../api';
 import { AdminPage } from '../components/AdminPage';
+import { footnotes, pageIntros } from '../strings';
 import { SupwExportButton } from '../components/SupwExportButton';
 import styles from './ListPage.module.css';
 
@@ -24,10 +25,10 @@ export function ExportPage() {
   const [to, setTo] = useState(dayKey());
 
   return (
-    <AdminPage title="Data export" description="Download a CSV file to open in a spreadsheet.">
+    <AdminPage title="Data export" description={pageIntros.export}>
       <ExportCard
         title="Users"
-        description="Everyone, with role, grade, section, responsibilities and status."
+        description={footnotes.export.users}
         run={async () => {
           const users = await fetchUsers();
           downloadCsv(
@@ -48,7 +49,7 @@ export function ExportPage() {
 
       <Card className="stack-tight">
         <h2 className={styles.cardTitle}>SUPW hours</h2>
-        <p className="meta">Every student's confirmed hours and events attended.</p>
+        <p className="meta">{footnotes.export.supw}</p>
         <SupwExportButton />
       </Card>
 
@@ -67,7 +68,7 @@ export function ExportPage() {
 
       <ExportCard
         title="Venue bookings"
-        description="Every booking in those dates, with who asked, the decision and why."
+        description={footnotes.export.bookings}
         run={async () => {
           const rows = await exportBookings(from, to);
           downloadCsv(
@@ -90,7 +91,7 @@ export function ExportPage() {
 
       <ExportCard
         title="Fix-it reports"
-        description="Every report made in those dates, with its status and who handled it."
+        description={footnotes.export.reports}
         run={async () => {
           const rows = await exportReports(from, to);
           downloadCsv(

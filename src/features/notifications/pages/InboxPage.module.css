@@ -5,12 +5,11 @@
 
 /* One card, a hairline between notifications: an inset grouped list. */
 .list {
+  composes: surface from global;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   border-radius: var(--r-card);
-  background: var(--card);
-  box-shadow: var(--e1);
 }
 
 .list > li + li {

@@ -24,6 +24,7 @@ import { Constants, type Enums } from '@/types/database';
 import { validateRoom } from '../logic';
 import styles from './MapAdminPage.module.css';
 import { AdminPage } from '../components/AdminPage';
+import { footnotes, pageIntros } from '../strings';
 
 type RoomKind = Enums<'room_kind'>;
 const roomKinds = Constants.public.Enums.room_kind as readonly RoomKind[];
@@ -44,7 +45,7 @@ export function MapAdminPage() {
   const selected = floorRooms.find((room) => room.id === selectedId) ?? null;
 
   return (
-    <AdminPage title="Map">
+    <AdminPage title="Map" description={pageIntros.map}>
       {!floor ? (
         <p className="meta">No floors yet.</p>
       ) : (
@@ -282,11 +283,7 @@ function FloorEditor({ floor }: { floor: Floor }) {
   return (
     <Card as="section" className="stack-tight" aria-label={`Floor ${floor.name} image`}>
       <h2 className={styles.heading}>Floor {floor.name} plan image</h2>
-      <p className="meta">
-        Upload the plan (SVG, PNG, JPEG or WebP, up to 5 MB): its address and pixel size are filled
-        in for you. Then save. Pins keep their pixel positions, so move them if the new plan is a
-        different size.
-      </p>
+      <p className="meta">{footnotes.map.planImage}</p>
       <input
         ref={fileInput}
         type="file"

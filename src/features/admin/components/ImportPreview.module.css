@@ -1,8 +1,8 @@
 /* Wide tables scroll sideways inside their card instead of widening the page. */
 .scroll {
+  composes: surface from global;
   overflow-x: auto;
   border-radius: var(--r-card);
-  background: var(--card);
 }
 
 .table {

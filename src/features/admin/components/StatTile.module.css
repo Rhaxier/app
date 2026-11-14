@@ -1,10 +1,10 @@
 .tile {
+  composes: surface from global;
   display: flex;
   flex-direction: column;
   gap: 2px;
   padding: var(--space-4);
   border-radius: var(--r-card);
-  background: var(--card);
 }
 
 .label {

@@ -1,12 +1,15 @@
 // The admin dashboard's menu: every section, in groups. The side menu (laptop),
 // the menu screen (phone) and the overview's links all read this list, so a
-// new section only needs adding here and in ./routes.tsx.
+// new section only needs adding here, in ./routes.tsx, and its subtitle in
+// ./strings.ts.
 import type { IconName } from '@/components/Icon';
+import { menuSubtitles, type AdminSectionPath } from './strings';
 
 export interface AdminSection {
   /** The address under /admin, e.g. 'users' → /admin/users. */
-  path: string;
+  path: AdminSectionPath;
   title: string;
+  /** The grey line under the title in the menu (from ./strings.ts). */
   description: string;
   icon: IconName;
 }
@@ -23,7 +26,7 @@ export const adminGroups: AdminGroup[] = [
       {
         path: 'overview',
         title: 'Overview',
-        description: 'What needs attention, and how the app is used',
+        description: menuSubtitles.overview,
         icon: 'layers',
       },
     ],
@@ -34,43 +37,43 @@ export const adminGroups: AdminGroup[] = [
       {
         path: 'users',
         title: 'Users',
-        description: 'Roles, grades, responsibilities, suspensions',
+        description: menuSubtitles.users,
         icon: 'users',
       },
       {
         path: 'grades',
         title: 'Grades and sections',
-        description: 'The grades in use and their sections',
+        description: menuSubtitles.grades,
         icon: 'layers',
       },
       {
         path: 'classes',
         title: 'Classes',
-        description: 'Who teaches whom',
+        description: menuSubtitles.classes,
         icon: 'folder',
       },
       {
         path: 'import',
         title: 'Import people',
-        description: 'Add or update people from a CSV file',
+        description: menuSubtitles.import,
         icon: 'download',
       },
       {
         path: 'rollover',
         title: 'Year-end rollover',
-        description: 'Move every student up a grade',
+        description: menuSubtitles.rollover,
         icon: 'chevronRight',
       },
       {
         path: 'staff-emails',
         title: 'Staff emails',
-        description: 'Who becomes a teacher at sign-in',
+        description: menuSubtitles['staff-emails'],
         icon: 'mail',
       },
       {
         path: 'responsibilities',
         title: 'Responsibilities',
-        description: 'Facilities, IT, venues, SUPW',
+        description: menuSubtitles.responsibilities,
         icon: 'shield',
       },
     ],
@@ -81,25 +84,25 @@ export const adminGroups: AdminGroup[] = [
       {
         path: 'school-week',
         title: 'School week and periods',
-        description: 'School days and bookable periods',
+        description: menuSubtitles['school-week'],
         icon: 'clock',
       },
       {
         path: 'bell-times',
         title: 'Upload bell times',
-        description: 'Replace periods from a CSV file',
+        description: menuSubtitles['bell-times'],
         icon: 'download',
       },
       {
         path: 'terms',
         title: 'Terms and holidays',
-        description: 'The school year and days off',
+        description: menuSubtitles.terms,
         icon: 'calendar',
       },
       {
         path: 'blackouts',
         title: 'Venue blackouts',
-        description: 'Days a venue can’t be booked',
+        description: menuSubtitles.blackouts,
         icon: 'eyeOff',
       },
     ],
@@ -110,43 +113,43 @@ export const adminGroups: AdminGroup[] = [
       {
         path: 'announcements',
         title: 'Announcements',
-        description: 'Expiry, pinning, scheduled and expired posts',
+        description: menuSubtitles.announcements,
         icon: 'megaphone',
       },
       {
         path: 'collab',
         title: 'Collab',
-        description: 'Team rules and the skills list',
+        description: menuSubtitles.collab,
         icon: 'users',
       },
       {
         path: 'volunteering',
         title: 'Volunteering',
-        description: 'Approval, categories, SUPW targets',
+        description: menuSubtitles.volunteering,
         icon: 'heart',
       },
       {
         path: 'venues',
         title: 'Venues',
-        description: 'Who can book, when, and each venue’s rules',
+        description: menuSubtitles.venues,
         icon: 'calendar',
       },
       {
         path: 'map',
         title: 'Map',
-        description: 'Floor plans, rooms and pin positions',
+        description: menuSubtitles.map,
         icon: 'map',
       },
       {
         path: 'report-categories',
         title: 'Fix-it categories',
-        description: 'What can be reported and who gets it',
+        description: menuSubtitles['report-categories'],
         icon: 'flag',
       },
       {
         path: 'reports',
         title: 'Fix-it reports',
-        description: 'Every open report, urgent first',
+        description: menuSubtitles.reports,
         icon: 'alert',
       },
     ],
@@ -157,7 +160,7 @@ export const adminGroups: AdminGroup[] = [
       {
         path: 'moderation',
         title: 'Moderation',
-        description: 'Reported content and hidden posts',
+        description: menuSubtitles.moderation,
         icon: 'eyeOff',
       },
     ],
@@ -168,19 +171,19 @@ export const adminGroups: AdminGroup[] = [
       {
         path: 'emergency',
         title: 'Emergency broadcast',
-        description: 'Tell everyone at once',
+        description: menuSubtitles.emergency,
         icon: 'megaphone',
       },
       {
         path: 'staff-email',
         title: 'Staff email',
-        description: 'Digest time, and who gets email',
+        description: menuSubtitles['staff-email'],
         icon: 'mail',
       },
       {
         path: 'outbox',
         title: 'Outbox',
-        description: 'Emails and pushes waiting to be sent',
+        description: menuSubtitles.outbox,
         icon: 'bell',
       },
     ],
@@ -191,40 +194,40 @@ export const adminGroups: AdminGroup[] = [
       {
         path: 'features',
         title: 'Feature switches',
-        description: 'Turn whole features off and on',
+        description: menuSubtitles.features,
         icon: 'settings',
       },
       {
         path: 'branding',
         title: 'Branding',
-        description: 'School name, logo and colour',
+        description: menuSubtitles.branding,
         icon: 'image',
       },
       {
         path: 'maintenance',
         title: 'Maintenance banner',
-        description: 'A notice on every screen',
+        description: menuSubtitles.maintenance,
         icon: 'alert',
       },
       {
         path: 'sign-in',
         title: 'Sign-in',
-        description: 'School email domain, staff pattern, dev accounts',
+        description: menuSubtitles['sign-in'],
         icon: 'user',
       },
       {
         path: 'export',
         title: 'Data export',
-        description: 'CSV files of users, hours, bookings, reports',
+        description: menuSubtitles.export,
         icon: 'download',
       },
       {
         path: 'deletion',
         title: 'Data deletion',
-        description: 'Delete someone’s personal data on request',
+        description: menuSubtitles.deletion,
         icon: 'trash',
       },
-      { path: 'audit', title: 'Audit log', description: 'Who changed what', icon: 'layers' },
+      { path: 'audit', title: 'Audit log', description: menuSubtitles.audit, icon: 'layers' },
     ],
   },
 ];

@@ -2,6 +2,7 @@
 // person instead of being reported again. The reporter's own report already
 // counts them. The count changes the moment you tap (an optimistic update,
 // see useToggleVote) and goes back if the database refuses.
+import { AnimatedNumber } from '@/components/AnimatedNumber';
 import { Button } from '@/components/Button';
 import { useCurrentUser } from '@/features/auth/hooks';
 import { useToggleVote } from '../hooks';
@@ -33,7 +34,7 @@ export function MeTooButton({
       // One tap at a time: a second tap waits for the first to finish.
       onClick={() => !toggle.isPending && toggle.mutate({ reportId, voted: votedByMe })}
     >
-      {votedByMe ? 'You said me too' : 'Me too'} · {count}
+      {votedByMe ? 'You said me too' : 'Me too'} · <AnimatedNumber value={count} />
     </Button>
   );
 }

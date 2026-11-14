@@ -6,10 +6,14 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import type { Period } from '@/features/school/api';
+import { formatTimeRange } from '@/lib/dates';
 import type { BookingDetails, CalendarBooking } from './api';
 import { PeriodList } from './components/PeriodList';
 import {
+  afterSchoolSettings,
+  afterSchoolSlots,
   buildSlots,
+  gapBetween,
   customTimesProblem,
   firstBookableDay,
   freeRun,
@@ -72,6 +76,94 @@ describe('buildSlots', () => {
       '2026-10-20T08:00:00.000Z', // 12:00
       '2026-10-20T09:30:00.000Z', // 13:30
     ]);
+  });
+});
+
+describe('breaks and lunch (the gaps in the timetable)', () => {
+  // Monday in the 2026–27 timetable: Period 3 ends 10:05, Period 4 starts
+  // 10:20 (a break); Period 6 ends 12:50, Period 7 starts 13:20 (lunch).
+  const monday: Period[] = [
+    ['Period 3', '09:15', '10:05'],
+    ['Period 4', '10:20', '11:10'],
+    ['Period 5', '11:10', '12:00'],
+    ['Period 6', '12:00', '12:50'],
+    ['Period 7', '13:20', '14:10'],
+  ].map(([name, starts, ends], i) => ({
+    ...periods[0],
+    id: `m${i}`,
+    name,
+    starts_at: `${starts}:00`,
+    ends_at: `${ends}:00`,
+    sort_order: i,
+    weekdays: [1],
+  }));
+  const day = buildSlots('2026-10-19', monday);
+
+  it('names a 15-minute gap a break and a 30-minute one lunch, with times', () => {
+    expect(gapBetween(day[0], day[1])).toMatchObject({ label: 'Break' });
+    expect(gapBetween(day[3], day[4])).toMatchObject({ label: 'Lunch' });
+    expect(gapBetween(day[3], day[4])?.start.toISOString()).toBe('2026-10-19T08:50:00.000Z');
+  });
+
+  it('draws no line between periods that run on', () => {
+    expect(gapBetween(day[1], day[2])).toBeNull();
+  });
+});
+
+describe('after-school blocks', () => {
+  const settings = afterSchoolSettings({
+    after_school_block_minutes: 30,
+    after_school_until: '18:00:00',
+  });
+  // The 2026–27 timetable's last periods: Wednesday's Collab / PD block ends
+  // 15:50, Friday's Period 7 ends 11:10.
+  const lastPeriod = (ends: string, weekday: number): Period => ({
+    ...periods[0],
+    id: `last${weekday}`,
+    starts_at: '07:45:00',
+    ends_at: `${ends}:00`,
+    weekdays: [weekday],
+  });
+  const times = (slots: { start: Date; end: Date }[]) =>
+    slots.map((slot) => formatTimeRange(slot.start, slot.end));
+
+  it('start at the last period on a 30-minute grid and run until 18:00', () => {
+    const tuesday = afterSchoolSlots('2026-10-20', periods, settings); // periods end 15:00
+    expect(times(tuesday)[0]).toBe('15:00–15:30');
+    expect(times(tuesday).at(-1)).toBe('17:30–18:00');
+    expect(tuesday).toHaveLength(6);
+    expect(tuesday[0]).toMatchObject({ name: 'After school', afterSchool: true, index: 5 });
+  });
+
+  it('round up to the next block: 16:00 after a 15:50 end, 11:30 after 11:10', () => {
+    expect(times(afterSchoolSlots('2026-10-21', [lastPeriod('15:50', 3)], settings))[0]).toBe(
+      '16:00–16:30',
+    );
+    expect(times(afterSchoolSlots('2026-10-23', [lastPeriod('11:10', 5)], settings))[0]).toBe(
+      '11:30–12:00',
+    );
+  });
+
+  it("stop at the venue's own closing time when that's earlier", () => {
+    expect(times(afterSchoolSlots('2026-10-20', periods, settings, '16:00:00'))).toEqual([
+      '15:00–15:30',
+      '15:30–16:00',
+    ]);
+  });
+
+  it('are left out on days without periods, and until the database has the settings', () => {
+    expect(afterSchoolSlots('2026-10-24', periods, settings)).toEqual([]); // Saturday
+    expect(afterSchoolSettings({})).toBeNull();
+  });
+
+  it('are booked as their own run, never joined to a period', () => {
+    const all = [...buildSlots(day, periods), ...afterSchoolSlots(day, periods, settings)];
+    const free = slotStates(all, [], [], null, morning);
+    // Period 5 (index 4) is chosen; tapping the first block starts afresh.
+    expect(nextSelection({ first: 4, last: 4 }, 5, free, all)).toEqual({ first: 5, last: 5 });
+    // Two blocks in a row join up, and read as "After school".
+    expect(nextSelection({ first: 5, last: 5 }, 6, free, all)).toEqual({ first: 5, last: 6 });
+    expect(periodsLabel(all[5].start, all[6].end, periods, settings)).toBe('After school');
   });
 });
 

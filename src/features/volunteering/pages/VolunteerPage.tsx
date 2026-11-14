@@ -2,7 +2,7 @@
 // hours as one large figure, a segmented filter, and events with their roles.
 // Anyone can create an event (the glass "+"); a student's event waits for a teacher.
 import { useState } from 'react';
-import { FilterChip } from '@/components/Chip';
+import { ChipGroup, FilterChip } from '@/components/Chip';
 import { Fab } from '@/components/Fab';
 import { PageHeader } from '@/components/PageHeader';
 import { SegmentedControl } from '@/components/SegmentedControl';
@@ -50,7 +50,7 @@ export function VolunteerPage() {
       />
 
       {categories.length > 0 && (
-        <div className="scroll-row" role="group" aria-label="Category">
+        <ChipGroup className="scroll-row" label="Category">
           <FilterChip selected={categoryId === ''} onClick={() => setCategoryId('')}>
             Every category
           </FilterChip>
@@ -63,7 +63,7 @@ export function VolunteerPage() {
               {category.name}
             </FilterChip>
           ))}
-        </div>
+        </ChipGroup>
       )}
 
       {events.isPending && <LoadingState />}
@@ -76,7 +76,7 @@ export function VolunteerPage() {
           {filter === 'all' ? 'New volunteering events will appear here.' : 'Try another filter.'}
         </EmptyState>
       )}
-      <div className="stack-tight">
+      <div className="stack-tight stagger">
         {visible.map((event) => (
           <EventCard key={event.id} event={event} signup={activeSignupFor(event.id, signups)} />
         ))}

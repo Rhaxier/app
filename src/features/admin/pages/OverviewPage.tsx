@@ -15,6 +15,7 @@ import { useOpenReports } from '@/features/fixit/hooks';
 import { reportTitle } from '@/features/fixit/logic';
 import type { AttentionKind, AttentionRow } from '../api';
 import { AdminPage } from '../components/AdminPage';
+import { pageIntros } from '../strings';
 import { BarList } from '../components/BarList';
 import { StatTile } from '../components/StatTile';
 import { SupwExportButton } from '../components/SupwExportButton';
@@ -29,11 +30,7 @@ export function OverviewPage() {
   const days = Number(period);
 
   return (
-    <AdminPage
-      title="Overview"
-      description="What needs attention, and how the app is being used."
-      fullWidth
-    >
+    <AdminPage title="Overview" description={pageIntros.overview} fullWidth>
       <NeedsAttention />
 
       <section className="stack-tight" aria-labelledby="activity-heading">
