@@ -1,178 +1,185 @@
-/* Base styles for the whole app: reset, type, the ambient glow, and a few utility classes. */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-html,
-body {
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  min-height: 100vh;
-  background: var(--paper);
-  color: var(--ink);
-  font-family: var(--font);
-  font-size: var(--text-body);
-  line-height: var(--leading-body);
-  /* Numbers use tabular figures, so times and counts line up (page 3). */
-  font-variant-numeric: tabular-nums;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-tap-highlight-color: transparent;
-}
-
 /*
- * E0 · the ambient glow behind every screen (page 10): soft blue from the top
- * and a violet bloom on the right. It is fixed to the screen and doesn't
- * scroll. A fixed layer behind everything is used rather than
- * background-attachment: fixed, which iPhones ignore.
+ * Base styles for the whole app: reset, type, the ambient glow, and a few
+ * utility classes. They sit in the `base` cascade layer (see tokens.css): the
+ * app's CSS Modules override them as before, and so can Tailwind classes on
+ * shadcn/ui components.
  */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  background: var(--glow);
-  pointer-events: none;
-}
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
 
-/* Large title: 34/36 Bold −3% (page 11). */
-h1 {
-  margin: 0;
-  font-size: var(--text-large-title);
-  font-weight: 700;
-  line-height: var(--leading-large-title);
-  letter-spacing: var(--tracking-large-title);
-}
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+  }
 
-h2 {
-  margin: 0;
-  font-size: var(--text-title2);
-  font-weight: 600;
-  line-height: 1.25;
-  letter-spacing: var(--tracking-title);
-}
+  body {
+    min-height: 100vh;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font);
+    font-size: var(--text-body);
+    line-height: var(--leading-body);
+    /* Numbers use tabular figures, so times and counts line up (page 3). */
+    font-variant-numeric: tabular-nums;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-tap-highlight-color: transparent;
+  }
 
-/* Title: 16/21 600 −2%. */
-h3 {
-  margin: 0;
-  font-size: var(--text-title);
-  font-weight: 600;
-  line-height: var(--leading-title);
-  letter-spacing: var(--tracking-title);
-}
+  /*
+   * E0 · the ambient glow behind every screen (page 10): soft blue from the top
+   * and a violet bloom on the right. It is fixed to the screen and doesn't
+   * scroll. A fixed layer behind everything is used rather than
+   * background-attachment: fixed, which iPhones ignore.
+   */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: var(--glow);
+    pointer-events: none;
+  }
 
-p {
-  margin: 0;
-}
+  /* Large title: 34/36 Bold −3% (page 11). */
+  h1 {
+    margin: 0;
+    font-size: var(--text-large-title);
+    font-weight: 700;
+    line-height: var(--leading-large-title);
+    letter-spacing: var(--tracking-large-title);
+  }
 
-a {
-  color: var(--acc);
-}
+  h2 {
+    margin: 0;
+    font-size: var(--text-title2);
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: var(--tracking-title);
+  }
 
-button,
-input,
-select,
-textarea {
-  font: inherit;
-  color: inherit;
-}
+  /* Title: 16/21 600 −2%. */
+  h3 {
+    margin: 0;
+    font-size: var(--text-title);
+    font-weight: 600;
+    line-height: var(--leading-title);
+    letter-spacing: var(--tracking-title);
+  }
 
-ul,
-ol {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
+  p {
+    margin: 0;
+  }
 
-::selection {
-  background: var(--accsoft);
-}
+  a {
+    color: var(--acc);
+  }
 
-/* Focus (page 11): 0 0 0 3px accent at 45%, 2px away from the element, for
-   keyboard users only; a tap or click never shows a ring. */
-:focus-visible {
-  outline: 3px solid var(--focus);
-  outline-offset: 2px;
-}
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+    color: inherit;
+  }
 
-:focus:not(:focus-visible) {
-  outline: none;
-}
+  ul,
+  ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
 
-/* Text that screen readers announce but nobody sees. */
-.visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
+  ::selection {
+    background: var(--accsoft);
+  }
 
-/* Muted detail line, e.g. "Grade 10 · 2 days ago". */
-.meta {
-  color: var(--muted);
-  font-size: var(--text-meta);
-  line-height: 16px;
-}
+  /* Focus (page 11): 0 0 0 3px accent at 45%, 2px away from the element, for
+     keyboard users only; a tap or click never shows a ring. */
+  :focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 2px;
+  }
 
-/* Caps label, e.g. "LOOKING FOR": 12 500 +3%. */
-.label {
-  font-size: var(--text-caps);
-  font-weight: 500;
-  line-height: 16px;
-  text-transform: uppercase;
-  letter-spacing: var(--tracking-caps);
-}
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
 
-/* Vertical stack with the standard gap between blocks. */
-.stack {
-  display: flex;
-  flex-direction: column;
-  gap: var(--gap-block);
-}
+  /* Text that screen readers announce but nobody sees. */
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
 
-.stack-tight {
-  display: flex;
-  flex-direction: column;
-  gap: var(--gap-tight);
-}
+  /* Muted detail line, e.g. "Grade 10 · 2 days ago". */
+  .meta {
+    color: var(--muted);
+    font-size: var(--text-meta);
+    line-height: 16px;
+  }
 
-.row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
+  /* Caps label, e.g. "LOOKING FOR": 12 500 +3%. */
+  .label {
+    font-size: var(--text-caps);
+    font-weight: 500;
+    line-height: 16px;
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-caps);
+  }
 
-.row-wrap {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-}
+  /* Vertical stack with the standard gap between blocks. */
+  .stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-block);
+  }
 
-/* A row of chips that scrolls sideways instead of wrapping (the collab skill
-   filter). The scrollbar is hidden; the cut-off chip shows there's more. */
-.scroll-row {
-  display: flex;
-  gap: var(--space-2);
-  margin: 0 calc(var(--screen-margin) * -1);
-  padding: 5px var(--screen-margin);
-  overflow-x: auto;
-  scrollbar-width: none;
-}
+  .stack-tight {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-tight);
+  }
 
-.scroll-row::-webkit-scrollbar {
-  display: none;
-}
+  .row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
 
-.scroll-row > * {
-  flex: none;
+  .row-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  /* A row of chips that scrolls sideways instead of wrapping (the collab skill
+     filter). The scrollbar is hidden; the cut-off chip shows there's more. */
+  .scroll-row {
+    display: flex;
+    gap: var(--space-2);
+    margin: 0 calc(var(--screen-margin) * -1);
+    padding: 5px var(--screen-margin);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .scroll-row::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scroll-row > * {
+    flex: none;
+  }
 }

@@ -14,6 +14,8 @@ import './styles/tokens.css';
 import './styles/globals.css';
 import './styles/glass.css';
 import './styles/motion.css';
+// Tailwind, for shadcn/ui components only (see the file's header).
+import './styles/tailwind.css';
 
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';

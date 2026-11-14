@@ -14,6 +14,21 @@
  * Every colour, size and radius in the app comes from here. Components use
  * var(--token), never a raw colour, so a design change is a one-line edit.
  */
+
+/*
+ * Cascade layers, lowest priority first. This is the first stylesheet the app
+ * loads, so it fixes the order for everything after it:
+ *   theme       Tailwind's and shadcn's variables (tailwind.css)
+ *   base        the app's element defaults (globals.css) and shadcn's resets
+ *   components  (unused for now)
+ *   utilities   Tailwind classes on shadcn/ui components
+ * Anything not in a layer (these tokens, CSS Modules, glass.css, motion.css)
+ * beats every layer, so the app's own components look exactly as designed,
+ * and a Tailwind class on a shadcn component can still override an element
+ * default such as the link colour.
+ */
+@layer theme, base, components, utilities;
+
 :root {
   /* Native form controls, scrollbars and date pickers follow the theme. */
   color-scheme: dark;
