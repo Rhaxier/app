@@ -1,9 +1,10 @@
 # MAP_NOTES: indoor navigation hand-off
 
-Status: **Phases 1, 2 and 3 complete.** The data, the router and this hand-off spec are done; the UI,
-the database tables and the rooms migration are not built (see "Phase 3" below).
-Nothing in the existing map UI, database or styling has been touched, and nothing is wired into the
-live map screen yet.
+Status: **Foundation phases 1-3 complete. UI phase 1 (data layer) complete, at checkpoint 1.**
+The database tables, functions, rooms migration step A (as a file), the client data layer and the
+shared router provider are built; see "UI phase 1" just before the Phase 3 spec. No screen uses them
+yet. Next: UI phase 2 (admin "Map and rooms", Classrooms tab). Nothing has been applied to the
+cloud project.
 
 ## What exists
 
@@ -249,6 +250,77 @@ Rows marked * change floor.
   `old_x`, `old_y` back to its table; set `retired_at = null` on the placeholders; restore the three
   floors' `width/height/image_path` (1000 x 700 and the SVG paths); then undo A. Ship the old map screen.
 - If anything looks wrong at step 5 and the above is not enough: restore the backup from step 0.
+
+# UI phase 1: data layer (built)
+
+Built on branch `indoor-nav`, 2026-11-15. Spec: "Phase 3" below, sections 1, 2 and 7.1-7.2.
+
+| Path                                                           | Job                                                                                                                                                                                                                          |
+| -------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `supabase/migrations/20261115120000_map_nav.sql`               | `map_connectors`, `map_presets`, `map_assignments`, `map_overrides`, `map_geometry_ids`, `app_settings.map_active_preset_id`, RLS, RPCs, Realtime.                                                                           |
+| `supabase/migrations/20261115120050_map_geometry_ids.sql`      | Generated: the 3,257 ids in `geometry.json` (rooms, places, doors, edges). The RPCs reject ids not in it.                                                                                                                    |
+| `supabase/migrations/20261115120100_rooms_migration_a.sql`     | Rooms migration **step A** (additive). The data is generated; the work is `room_migration_a_fill()`.                                                                                                                         |
+| `scripts/map/gen-sql.ts`                                       | `npm run map:sql` fills the generated blocks; `-- --check` fails if they are stale.                                                                                                                                          |
+| `src/features/map/nav/api.ts`, `hooks.ts`                      | Raw calls + row mappers; TanStack Query hooks (`useGeometry`, `useConnectors`, `useOverrides`, `usePresets`, `useAssignments`, `useActiveAssignments`, `useCanMarkOutOfOrder`, `useMapRealtime`, one mutation hook per RPC). |
+| `src/features/map/nav/RouterProvider.tsx`, `routerContext.ts`  | `<NavRouterProvider>` + `useNavRouter()` (the spec's `useRouter`; renamed so it isn't confused with React Router). `{ router, version, ready, ... }`.                                                                        |
+| `supabase/tests/19_map_nav_test.sql`, `20_..._a_test.sql`      | pgTAP, 61 + 14 checks.                                                                                                                                                                                                       |
+| `docs/runbooks/map-nav-phase1-cloud.md` + `docs/runbooks/sql/` | Cloud runbook, read-only check script, two undo scripts. Rehearsed locally (apply, undo, schema identical, re-apply).                                                                                                        |
+| `tools/local-pg/`                                              | Runs migrations + seed + pgTAP on a plain Postgres 17 without Docker (see its README).                                                                                                                                       |
+
+Decisions taken in this phase (from the team, 2026-11-15):
+
+- **Who can mark out of order:** `map_set_available` allows admins, and staff holding any
+  responsibility that an **active** `report_categories` row routes to (facilities and it today). It is
+  not tied to a specific report, so the editor's Available switch works too. Function:
+  `map_can_mark_out_of_order()` (the UI uses it to show the button).
+- **Step A stays invisible:** today's readers (`fetchRooms`, `fetchFloors` in `src/features/map/api.ts`)
+  return only rooms with `region_id is null` and floors with an image (floor 3 has none;
+  `floors.image_path` became nullable). `fetchRooms` falls back to the plain list on error 42703, so
+  this build also works before step A is applied. **Step B must change these readers** to the traced
+  rooms (`retired_at is null`), in the same release as the new map screen.
+
+How the functions behave (the admin UI in phases 2-3 relies on this):
+
+- All writes are RPCs; the tables have no write grants. Every RPC writes `audit_log`.
+- `map_save_connectors(list)` replaces the whole set; items keep their `id` (generate one with
+  `crypto.randomUUID()` for new ones), items left out are deleted. Checks: type, unique name (any case),
+  floors exist, a position on every floor served. Positions for floors not served are dropped.
+  "On a corridor" needs the geometry, so the editor checks it with `linkConnectors`.
+- `map_save_assignments` / `map_import_assignments(preset, rows)` replace a term's whole set. Rows:
+  `{room_id, name, subject, teacher, type, row?}`; `row` is the line number used in messages. Rows
+  with an empty name are dropped (room becomes unnamed). All problems are reported together, one per
+  line, using the messages from spec section 5(a). Names are unique per term, ignoring case.
+- `map_create_preset(name, copy_from?)`, `map_rename_preset`, `map_delete_preset` (refuses the active
+  one; the deleted names are kept in `audit_log.details.rooms`), `map_set_active_preset(id)`.
+- `map_set_edge_tags(edge, tags)` exists (admin only) but the school said nothing needs tagging; the
+  phase 3 brief says "if the spec includes it": it doesn't (spec section 8, points 7 and 9), so no UI.
+- Step A on a fresh local database: the migration runs before the seed creates floors and
+  placeholders, so `seed.sql` calls `room_migration_a_fill()` again at its end. On the cloud project
+  the migration does everything. The fill also refreshes `room_migration_backup`, so **step B should
+  call it first**, so the backup is current on the day of the switch.
+- Only **named** traced rooms get a `rooms` row (285). A room an admin names later has no `rooms` row
+  yet; step B (or phase 5) must add rows for names added since step A, e.g. by re-running the fill
+  after refreshing `room_migration_traced`.
+
+Verified (all local; nothing run against the cloud project):
+
+- `tools/local-pg/run.sh` on Postgres 17.9 + pgTAP 1.3.3: all 25 migrations and the seed apply from
+  empty; 19_map_nav 61/61, 20_rooms_migration_a 14/14. Whole suite: 465 passed, 1 failed, in 2 files.
+  Both failures were there before this phase and are not map-related:
+  `09_admin_overview` books "yesterday", which fails on Sundays (no Saturday periods), and
+  `17_bell_times` test 33 (an old short-Friday period can still be booked). Not fixed here.
+- Runbook rehearsal: check script all as expected; both undo scripts; `pg_dump -s` after undo is
+  identical to a database that never had the migrations; re-applying onto existing data passes.
+- `npm run build`, `npm run lint`, `npm test` (31 files, 247 tests), `npm run map:validate`,
+  `npm run map:sql -- --check`.
+- Types regenerated from the local database (`src/types/database.ts`, additive).
+
+Not verified: Supabase Realtime delivering the changes (the provider test fakes it), PostgREST's
+error code for the step A fallback (42703 is Postgres's code for a missing column),
+`supabase test db` itself.
+
+Left for later phases: every screen (admin tabs, student map), `reports.map_target_kind/id`
+(phase 5), migration B and its runbook (phase 6).
 
 # Phase 3: hand-off spec for the UI work
 
