@@ -554,6 +554,9 @@ delete reports; geometry is not editable in the app; run build, lint and tests; 
      The first-floor part of the hall stays a non-walkable `void`. Do not add them as stairs.
    - These facts live in `tools/map-extract/labels.json` under `links` and are copied into
      `geometry.json` by the tracer. No edge is tagged `steps`.
+   - Confirmed by the school afterwards: backstage doors stay blocked for everyone (no staff
+     exception), none of the four entrances has steps, and the steps inside the hall are never
+     used by routes. Nothing further to tag.
 8. **Outdoor links** are allowed at all times, with a small extra cost so indoor ways are preferred.
    Built: `OUTDOOR_PENALTY_M` = 10 m per outdoor stretch in `router.ts`, with a test.
 9. **No door editor.** The available/unavailable toggle is enough. `doorAvailable` stays in the data
