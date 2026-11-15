@@ -21,7 +21,7 @@ live map screen yet.
 | `src/features/map/nav/validate.ts`          | `validateMap`, `summariseMap`.                                                                                                  |
 | `src/features/map/nav/assignments.ts`       | CSV/JSON load, `updateAssignment` (rename one room), `assignmentsToCsv`, `searchableDestinations`.                              |
 | `src/features/map/nav/router.ts`            | **Phase 2.** `createRouter(...)`: routes, steps, errors.                                                                        |
-| `src/features/map/nav/router.test.ts`       | 20 tests. All stairs and lifts in it are fixtures.                                                                              |
+| `src/features/map/nav/router.test.ts`       | 22 tests. All stairs and lifts in it are fixtures.                                                                              |
 | `scripts/map/*.ts`                          | `npm run map:validate`, `npm run map:debug`, `npm run map:demo` (plain Node 24, no build).                                      |
 | `map-debug/index.html`                      | Output of `map:debug`. Git-ignored. Open in a browser.                                                                          |
 
@@ -129,7 +129,8 @@ floor only, so the matching symbol on another floor may simply be missing from t
 "Lifts" is printed on the ground floor beside two small cells west of the auditorium: G-R070 at
 (1569, 1169) and G-R071 at (1569, 1213). Floor 2 has the same two cells at the same spot (2-R070,
 2-R072). Floor 3 shows the same block as an outline inside corridor 3-R053. Floor 1 does not draw it.
-Likely one lift group serving G-3.
+**Confirmed by the school: the lift serves all four floors (G, 1, 2, 3)**, so on floor 1 the admin
+places it at the same spot even though the PDF does not draw it there.
 
 The round tower on the east side **is a staircase** (confirmed by the school). It is region G-R124 at
 about (3137, 1717) on the ground floor and is drawn at the same spot on floors 1, 2 and 3 as part of
@@ -147,8 +148,8 @@ const result = router.route(
 );
 ```
 
-- Ends: `{type:'room', id}`, `{type:'place', id}`, or `{type:'point', floor, x, y}` (snapped to the
-  nearest walkable spot).
+- Ends: `{type:'room', id}`, `{type:'place', id}`, `{type:'door', id}` (an entrance: a door that
+  leads outside), or `{type:'point', floor, x, y}` (snapped to the nearest walkable spot).
 - Success: `{ ok: true, mode, distanceM, durationS, legs: [{floor, points}], steps: [{kind, text, ...}], connectors }`.
 - Failure: `{ ok: false, code, message }` with codes `floors-not-connected`, `no-step-free-route`,
   `blocked`, `unreachable`, `unknown-start`, `unknown-destination`, `start-not-walkable`,
@@ -157,7 +158,7 @@ const result = router.route(
   `router.setOverrides(o)` for door and edge flags, `router.setNames(map)` for step text,
   `router.problems()` for the admin validation panel.
 - Cost = metres walked + 15 m per floor by stairs + 20 m per floor by lift + 40 m for cutting through
-  a room that is not the start or end. Step-free drops stairs and edges tagged `steps` or `narrow`.
+  a room that is not the start or end + 10 m per outdoor stretch. Step-free drops stairs and edges tagged `steps` or `narrow`.
   Unavailable connectors and closed doors are skipped in both modes. Constants are at the top of `router.ts`.
 - Spoken steps are smoothed (wiggles under 2 m and jogs under 4 m are ignored); the drawn path in
   `legs` is the exact centre-line.
@@ -251,7 +252,7 @@ Rows marked * change floor.
 
 Everything below is a **spec, not built**. Nothing in this section exists in the app yet unless it
 says "exists". Build order is in "Build order" near the end. Do not guess where a question in
-"Open questions" applies: ask the team.
+"Still open" (section 8) applies: ask the team.
 
 ## 1. Data: formats, locations, loading
 
@@ -406,11 +407,12 @@ in the admin editor too). Keep the existing layers (rooms, open reports, in use 
 
 ## 5. Admin: one new settings section, "Map and rooms"
 
-Where: **replace the page behind the existing `map` entry** rather than adding a second map entry.
-Files that exist: `src/features/admin/sections.ts` (the entry at `path: 'map'`), `routes.ts`,
-`strings.ts` (`menuSubtitles.map`, the page description, `map: {...}` help texts),
-`pages/MapAdminPage.tsx` (today: floor images and room pins). Keep the old page reachable until the
-rooms migration has run (see Open questions).
+Where: a **new entry next to the existing `map` entry** (path `map-rooms`), because the school wants
+the old page kept until the rooms migration has run, been checked and a term has passed. Copy the
+pattern of the existing entry: `src/features/admin/sections.ts` (the entry at `path: 'map'`),
+`routes.ts`, `strings.ts` (`menuSubtitles`, page description, help texts). Leave
+`pages/MapAdminPage.tsx` (floor images and room pins) alone; rename its menu title to
+"Map (old pins)" so the two are not confused.
 
 - Sidebar entry: title **Map and rooms**, icon `map`.
 - Subtitle (menu): "Room names for each term, and where stairs and lifts are".
@@ -418,7 +420,7 @@ rooms migration has run (see Open questions).
   "Name each room for the term and place the stairs and lifts. Walls, rooms and corridors come from
   the school's floor plan and can't be changed here."
 - Two tabs with `SegmentedControl`: **Classrooms** | **Stairs and lifts**. Keep the tab in the URL
-  (`/admin/map?tab=connectors`) so links from validation messages work.
+  (`/admin/map-rooms?tab=connectors`) so links from validation messages work.
 
 ### Tab (a): Classrooms
 
@@ -431,11 +433,12 @@ Layout: map on one side, table on the other (stacked on phone width, map first).
   show a `Chip` "Editing a term that is not active" when they differ.
 - **Map**: same drawing as the student map, with the floor switcher. Click a room or place to select
   it (highlight with `--selroom`). `regionAt` gives the region under the click.
-- **Table**: searchable (`Input`), one row per room and place on all floors: id, floor, name,
+- **Table**: searchable (`Input`), one row per room, place and entrance (door to the outside; shown
+  as a small door marker on the map, selectable like a room) on all floors: id, floor, name,
   class/subject, teacher, type. Filter chips: All, Named, Unnamed, per floor. Clicking a row selects
   it and moves the map to it; selecting on the map scrolls the table to it.
 - **Edit panel** (`Sheet` on phone, side panel on desktop): Name, Class or subject, Teacher (free
-  text), Type (select of `RoomType`). Save and Cancel. Clearing the name makes the room unnamed
+  text, not linked to staff profiles), Type (select of `RoomType`). Save and Cancel. Clearing the name makes the room unnamed
   (confirm first). Use `updateAssignment` to produce the new list, then `map_save_assignments`.
 - **CSV**: "Export" downloads the selected preset with `assignmentsToCsv` + `downloadCsv`. "Import"
   takes a file, parses it with `parseAssignmentsCsv`, and shows a preview using the pattern of
@@ -527,27 +530,35 @@ panel under the side panel.
 Rules that stay in force: never create real stairs or lifts in code, seeds or migrations; never
 delete reports; geometry is not editable in the app; run build, lint and tests; commit per step.
 
-## 8. Open questions (for the team or the school; do not guess)
+## 8. Answers from the school (all ten questions closed)
 
-1. **Presets and school terms.** The app already has school terms with dates (`TermsPage`,
-   `useTerms`). Should a map preset be tied to one of those terms (and switch by date), or stay a
-   separate named list switched by hand? This spec assumes separate and by hand.
-2. **Old map admin page.** It edits floor images and room pins, which the traced map replaces. Remove
-   it at migration B, or keep room pins for anything?
-3. **Teacher field.** Free text, or a pick from staff profiles? Free text avoids inventing links to
-   accounts that do not exist yet.
-4. **Who may mark a lift out of order?** Spec says admins and the staff the report is routed to.
-   Should any teacher be able to?
-5. **The 81 unnamed rooms.** Which are stores, toilets, staff rooms? Toilets would be useful
-   destinations ("nearest toilet"), but the PDF does not label them.
-6. **Lift floors.** The PDF draws "Lifts" on G, 2 and 3 only. Does the lift stop at floor 1?
-7. **Stairs that skip floors, or half-landings and ramps.** Any steps inside a single floor (for
-   example at the auditorium)? Those need the `steps` edge tag, which has no editor yet.
-8. **Outdoor links** (for example to the Multipurpose Hall): usable in all weather and at all times,
-   or should routes prefer indoor ways?
-9. **Doors that are locked at certain times.** `doorAvailable` exists in the data, with no editor in
-   this spec. Is one needed?
-10. **Exits and entrances** as destinations ("Main gate")? They are not named in the PDF.
+1. **Presets** are a separate list, switched by hand. Tying them to school terms by date can come later.
+2. **Old map admin page**: keep it. Remove it only after the rooms migration has run, been checked,
+   and a term of normal use has passed (the same moment as step 6 of the migration plan). Until then
+   the new section is a second entry, "Map and rooms", next to the existing "Map" entry (see section 5).
+3. **Teacher** is free text. No link to staff profiles yet.
+4. **Marking out of order**: admins, and staff holding the responsibility the report's category is
+   routed to (`report_category_routes`). Not every teacher. Enforce it inside `map_set_available`.
+5. **The 81 unnamed rooms** stay unnamed. The school will name them in the Classrooms tab.
+6. **The lift serves all floors** (G, 1, 2, 3). See "Hint for the lift".
+7. **Steps inside a floor**: only at the auditorium (G-R074). Nothing is tagged yet; see the one
+   open question below.
+8. **Outdoor links** are allowed at all times, with a small extra cost so indoor ways are preferred.
+   Built: `OUTDOOR_PENALTY_M` = 10 m per outdoor stretch in `router.ts`, with a test.
+9. **No door editor.** The available/unavailable toggle is enough. `doorAvailable` stays in the data
+   model, set only through "Mark out of order" on a report about a door.
+10. **Entrances and exits are destinations.** Built: the 60 doors that lead outside are nameable like
+    rooms (`entranceDoors`, included in `destinationIds`). An admin names one in the Classrooms tab
+    ("Main gate"); it then appears in `searchableDestinations` with `kind: 'entrance'` and is routed
+    to with `{ type: 'door', id }`. Unnamed ones are not listed for students. None are named in the
+    data: the PDF does not say which door is which, so nothing was invented.
+
+### Still open
+
+- **Auditorium steps.** Which way into the auditorium has the steps, and is there a step-free way
+  in? Until this is known no edge is tagged `steps`, so step-free routes treat the auditorium like
+  any other room. When known, add the door ids to `labels.json` (tracer) or to `map_overrides`
+  (`kind = 'edge'`, `tags = ['steps']`); the router already keeps step-free routes off such edges.
 
 ## 9. Risks
 

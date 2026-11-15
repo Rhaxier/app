@@ -38,6 +38,12 @@ export const STAIRS_SECONDS_PER_FLOOR = 15;
 export const LIFT_SECONDS_PER_FLOOR = 25;
 /** Cutting through a room that is neither the start nor the destination is discouraged, not banned. */
 export const THROUGH_ROOM_PENALTY_M = 40;
+/**
+ * Each stretch outside the building counts like this many extra metres. The school
+ * allows outdoor links at all times but prefers indoor ways, so the cost is small:
+ * an outdoor shortcut still wins when it saves more than this.
+ */
+export const OUTDOOR_PENALTY_M = 10;
 /** A bend sharper than this (degrees) is announced as a turn. */
 export const TURN_ANGLE_DEGREES = 40;
 /** Wiggles smaller than this (metres) in a corridor centre-line are not worth a spoken step. */
@@ -49,10 +55,14 @@ export const SHORT_JOG_M = 4;
 
 export type RouteMode = 'standard' | 'step-free';
 
-/** Where a route starts or ends. `point` is the "pointer" case: any spot on a floor. */
+/**
+ * Where a route starts or ends. `point` is the "pointer" case: any spot on a floor.
+ * `door` is an entrance or exit: the id of a door whose other side is "outside".
+ */
 export type RouteEnd =
   | { type: 'room'; id: string }
   | { type: 'place'; id: string }
+  | { type: 'door'; id: string }
   | { type: 'point'; floor: FloorId; x: number; y: number };
 
 export type RouteStepKind = 'start' | 'walk' | 'turn' | 'stairs' | 'lift' | 'arrive';
@@ -252,6 +262,9 @@ function findPath(
       if (next.kind === 'room' && nextId !== goalId) {
         cost += THROUGH_ROOM_PENALTY_M;
       }
+      if (edge.tags?.includes('outdoor')) {
+        cost += OUTDOOR_PENALTY_M;
+      }
       const total = soFar + cost;
       if (total < (best.get(nextId) ?? Infinity)) {
         best.set(nextId, total);
@@ -322,6 +335,15 @@ function resolveEnd(
       isRoom: false,
       name: names[end.id] || place.sourceLabel,
     };
+  }
+  if (end.type === 'door') {
+    // Only doors that lead outside can be destinations: they are the entrances and exits.
+    const door = index.geometry.doors.find((candidate) => candidate.id === end.id);
+    const node = index.geometry.nodes.find((candidate) => candidate.door === end.id);
+    if (!door || door.b !== 'outside' || !node) {
+      return 'unknown';
+    }
+    return { nodeId: node.id, floor: node.floor, isRoom: false, name: names[end.id] || 'Entrance' };
   }
   if (!index.edgesByFloor.has(end.floor)) {
     return 'unknown';

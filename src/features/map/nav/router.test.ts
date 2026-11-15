@@ -321,6 +321,74 @@ describe('router on the fixture building', () => {
     expect(router.route(room('G-A'), room('G-B')).ok).toBe(true);
   });
 
+  it('prefers the indoor way unless going outside saves more than the small extra cost', () => {
+    // TEST FIXTURE: between Room A and Room B the corridor bends away from the rooms
+    // (through a corner `detour` units off the straight line), and a straight 10 m
+    // outdoor path cuts across the bend.
+    const withBend = (detour: number) => {
+      const geometry = fixtureGeometry();
+      geometry.edges = geometry.edges.filter((edge) => edge.id !== 'G-e2');
+      geometry.nodes.push({
+        id: 'G-bend',
+        floor: 'G',
+        x: 150,
+        y: 50 + detour,
+        kind: 'corridor',
+        region: 'G-COR',
+      });
+      const half = Math.hypot(50, detour);
+      geometry.edges.push(
+        { id: 'G-bend-a', a: 'G-c1', b: 'G-bend', length: half, kind: 'walk' },
+        { id: 'G-bend-b', a: 'G-bend', b: 'G-c2', length: half, kind: 'walk' },
+        { id: 'G-yard', a: 'G-c1', b: 'G-c2', length: 100, kind: 'walk', tags: ['outdoor'] },
+      );
+      return createRouter(geometry).route(room('G-A'), room('G-B'));
+    };
+    // The bend adds about 4 m: not worth going outside, so the route is 7 m + 14 m indoors.
+    expect(expectOk(withBend(50)).distanceM).toBe(21);
+    // The bend adds 16 m: the outdoor path wins even with its extra cost (7 m + 10 m).
+    expect(expectOk(withBend(120)).distanceM).toBe(17);
+  });
+
+  it('routes to an entrance (a door that leads outside) and uses its name', () => {
+    // TEST FIXTURE: a door from Room A on the ground floor to the outside.
+    const geometry = fixtureGeometry();
+    geometry.doors.push({
+      id: 'G-A-exit',
+      floor: 'G',
+      x: 100,
+      y: 0,
+      kind: 'door',
+      a: 'G-A',
+      b: 'outside',
+    });
+    geometry.nodes.push({
+      id: 'G-A-xn',
+      floor: 'G',
+      x: 100,
+      y: 0,
+      kind: 'door',
+      region: 'G-A',
+      door: 'G-A-exit',
+    });
+    geometry.edges.push({
+      id: 'G-A-x',
+      a: 'G-A-n',
+      b: 'G-A-xn',
+      length: 15,
+      kind: 'walk',
+      door: 'G-A-exit',
+    });
+    const router = createRouter(geometry, [], undefined, { 'G-A-exit': 'Main gate' });
+    const route = expectOk(router.route(room('G-B'), { type: 'door', id: 'G-A-exit' }));
+    expect(route.steps.at(-1)?.text).toBe('You have arrived at Main gate');
+    // An inside door is not an entrance.
+    expect(router.route(room('G-B'), { type: 'door', id: 'G-A-door' })).toMatchObject({
+      ok: false,
+      code: 'unknown-destination',
+    });
+  });
+
   it('keeps step-free routes off edges tagged as steps', () => {
     const router = createRouter(fixtureGeometry());
     router.setOverrides({ doorAvailable: {}, edgeTags: { 'G-e2': ['steps'] } });

@@ -158,16 +158,25 @@ export function assignmentsToCsv(assignments: Assignment[]): string {
   return [ASSIGNMENT_COLUMNS.join(','), ...rows].join('\n') + '\n';
 }
 
-/** Renames or re-assigns a single room, leaving the rest of the set as it is. */
-/** Ids of everything that can be given a name: rooms and wall-less places. */
+/** Doors that lead outside. An admin can name one ("Main gate") to make it a destination. */
+export function entranceDoors(geometry: Geometry): Geometry['doors'] {
+  return geometry.doors.filter((door) => door.b === 'outside');
+}
+
+/** Ids of everything that can be given a name: rooms, wall-less places and entrances. */
 export function destinationIds(geometry: Geometry): string[] {
   const rooms = geometry.regions
     .filter((region) => region.kind === 'room')
     .map((region) => region.id);
-  return [...rooms, ...geometry.places.map((place) => place.id)];
+  return [
+    ...rooms,
+    ...geometry.places.map((place) => place.id),
+    ...entranceDoors(geometry).map((door) => door.id),
+  ];
 }
 
-export type Destination = Assignment & { floor: string; kind: 'room' | 'place' };
+/** `kind` says which RouteEnd type to use: `entrance` goes to the router as `{ type: 'door' }`. */
+export type Destination = Assignment & { floor: string; kind: 'room' | 'place' | 'entrance' };
 
 /**
  * What student search should list: every room or place that has a name.
@@ -178,7 +187,7 @@ export function searchableDestinations(
   geometry: Geometry,
   assignments: Assignment[],
 ): Destination[] {
-  const floorOf = new Map<string, { floor: string; kind: 'room' | 'place' }>();
+  const floorOf = new Map<string, { floor: string; kind: Destination['kind'] }>();
   for (const region of geometry.regions) {
     if (region.kind === 'room') {
       floorOf.set(region.id, { floor: region.floor, kind: 'room' });
@@ -186,6 +195,9 @@ export function searchableDestinations(
   }
   for (const place of geometry.places) {
     floorOf.set(place.id, { floor: place.floor, kind: 'place' });
+  }
+  for (const door of entranceDoors(geometry)) {
+    floorOf.set(door.id, { floor: door.floor, kind: 'entrance' });
   }
   const list: Destination[] = [];
   for (const assignment of assignments) {
@@ -197,6 +209,7 @@ export function searchableDestinations(
   return list;
 }
 
+/** Renames or re-assigns a single room, leaving the rest of the set as it is. */
 export function updateAssignment(
   assignments: Assignment[],
   roomId: string,

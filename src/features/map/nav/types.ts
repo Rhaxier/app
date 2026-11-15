@@ -80,7 +80,8 @@ export type NavNode = {
 
 /**
  * Extra facts about an edge. `steps` and `narrow` make it unusable step-free.
- * `ramp` and `outdoor` (a walk between buildings) are information only.
+ * `ramp` is information only. `outdoor` (a walk between buildings) is always
+ * allowed, but the router adds a small cost so indoor ways are preferred.
  */
 export type EdgeTag = 'steps' | 'ramp' | 'narrow' | 'outdoor';
 
