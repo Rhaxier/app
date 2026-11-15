@@ -21,7 +21,7 @@ live map screen yet.
 | `src/features/map/nav/validate.ts`          | `validateMap`, `summariseMap`.                                                                                                  |
 | `src/features/map/nav/assignments.ts`       | CSV/JSON load, `updateAssignment` (rename one room), `assignmentsToCsv`, `searchableDestinations`.                              |
 | `src/features/map/nav/router.ts`            | **Phase 2.** `createRouter(...)`: routes, steps, errors.                                                                        |
-| `src/features/map/nav/router.test.ts`       | 22 tests. All stairs and lifts in it are fixtures.                                                                              |
+| `src/features/map/nav/router.test.ts`       | 25 tests. All stairs and lifts in it are fixtures.                                                                              |
 | `scripts/map/*.ts`                          | `npm run map:validate`, `npm run map:debug`, `npm run map:demo` (plain Node 24, no build).                                      |
 | `map-debug/index.html`                      | Output of `map:debug`. Git-ignored. Open in a browser.                                                                          |
 
@@ -49,6 +49,8 @@ thin red = line across a corridor, filled colours = classrooms.
   here"; it creates no connector. `void` is not walkable. `holes` cut the middle out of ring corridors.
 - `Place`: a named spot with no walls (`G-P01`...). Has a graph node, so routes can end there. Named
   through assignments exactly like a room.
+- `Region.entrances`: other rooms that count as arriving at this one (the auditorium's first-floor
+  lobbies). `Door.restricted`: a door routes never use (backstage).
 - `Door`: joins regions `a` and `b` (`b = "outside"` for exterior doors). `kind` is `door` (drawn),
   `opening` (red line; the school confirmed these are passable), or `inferred` (not drawn).
 - Graph: corridors have centre-line nodes; a room has one node joined to each of its door nodes.
@@ -541,8 +543,17 @@ delete reports; geometry is not editable in the app; run build, lint and tests; 
    routed to (`report_category_routes`). Not every teacher. Enforce it inside `map_set_available`.
 5. **The 81 unnamed rooms** stay unnamed. The school will name them in the Classrooms tab.
 6. **The lift serves all floors** (G, 1, 2, 3). See "Hint for the lift".
-7. **Steps inside a floor**: only at the auditorium (G-R074). Nothing is tagged yet; see the one
-   open question below.
+7. **The auditorium (G-R074)** spans the ground and first floors. Built, from the school's answer:
+   - Ground floor: the two side doors (G-D089, G-D090) are the entrances. The two doors at the top
+     corners (G-D083, G-D084) are backstage doors: marked `restricted`, never used by any route.
+   - First floor: it is entered through two small lobbies (1-R112, 1-R114). They are listed in
+     `entrances` on G-R074, so reaching either counts as reaching the Auditorium, and the router
+     picks the cheapest way in. Someone on floor 1 is sent to "Auditorium (First Floor entrance)"
+     without needing stairs.
+   - The ramps inside the hall join the two levels but are **not** modelled: no connector, no edge.
+     The first-floor part of the hall stays a non-walkable `void`. Do not add them as stairs.
+   - These facts live in `tools/map-extract/labels.json` under `links` and are copied into
+     `geometry.json` by the tracer. No edge is tagged `steps`.
 8. **Outdoor links** are allowed at all times, with a small extra cost so indoor ways are preferred.
    Built: `OUTDOOR_PENALTY_M` = 10 m per outdoor stretch in `router.ts`, with a test.
 9. **No door editor.** The available/unavailable toggle is enough. `doorAvailable` stays in the data
@@ -555,10 +566,8 @@ delete reports; geometry is not editable in the app; run build, lint and tests; 
 
 ### Still open
 
-- **Auditorium steps.** Which way into the auditorium has the steps, and is there a step-free way
-  in? Until this is known no edge is tagged `steps`, so step-free routes treat the auditorium like
-  any other room. When known, add the door ids to `labels.json` (tracer) or to `map_overrides`
-  (`kind = 'edge'`, `tags = ['steps']`); the router already keeps step-free routes off such edges.
+Nothing. For the UI: a search result for a room that has `entrances` needs no special handling;
+pass `{ type: 'room', id }` as usual and draw whatever `legs` come back.
 
 ## 9. Risks
 

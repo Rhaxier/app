@@ -2496,5 +2496,18 @@
     "type": "other"
    }
   ]
+ },
+ "links": {
+  "_comment": "From the school: the auditorium is entered on the ground floor by its two side doors and on the first floor through two small lobbies. The two doors at its top corners are backstage doors. The ramps inside it are not stairs and are not modelled.",
+  "entrances": {
+   "G-R074": [
+    "1-R112",
+    "1-R114"
+   ]
+  },
+  "restrictedDoors": [
+   "G-D083",
+   "G-D084"
+  ]
  }
 }

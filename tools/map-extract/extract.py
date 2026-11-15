@@ -712,6 +712,19 @@ def main():
             # page-pixel positions, used when writing labels.json
             regions=[dict(id=rid_of[rid], kind=r["kind"], name=r["name"], page=[round(v) for v in r["labelAt"]], area=r["area"]) for rid, r in ordered],
         )
+    # Facts the school told us that the drawing cannot show. They are keyed by the final ids,
+    # so a re-trace that renumbers rooms fails here loudly instead of marking the wrong door.
+    links = labels.get("links", {})
+    region_by_id = {r["id"]: r for r in geometry["regions"]}
+    door_by_id = {d["id"]: d for d in geometry["doors"]}
+    for room, entrances in links.get("entrances", {}).items():
+        for rid in [room] + entrances:
+            assert rid in region_by_id and region_by_id[rid]["kind"] == "room", f"links.entrances: {rid} is not a room"
+        region_by_id[room]["entrances"] = entrances
+    for did in links.get("restrictedDoors", []):
+        assert did in door_by_id, f"links.restrictedDoors: {did} is not a door"
+        door_by_id[did]["restricted"] = True
+
     geometry["bounds"] = dict(minX=math.floor(min(xs)), minY=math.floor(min(ys)), maxX=math.ceil(max(xs)), maxY=math.ceil(max(ys)))
 
     os.makedirs(OUT_DIR, exist_ok=True)

@@ -389,6 +389,37 @@ describe('router on the fixture building', () => {
     });
   });
 
+  it('reaches a two-storey room by its entrance on the floor you are on', () => {
+    // TEST FIXTURE: Room B on floor 1 is a lobby that leads down into Room B on the ground floor.
+    const geometry = fixtureGeometry();
+    const hall = geometry.regions.find((region) => region.id === 'G-B');
+    if (hall) {
+      hall.entrances = ['1-B'];
+    }
+    const router = createRouter(geometry);
+    // No stairs or lifts at all, yet someone on floor 1 can get there.
+    const upstairs = expectOk(router.route(room('1-A'), room('G-B')));
+    expect(upstairs.legs.map((leg) => leg.floor)).toEqual(['1']);
+    expect(upstairs.steps.at(-1)?.text).toContain('Room BG (First Floor entrance)');
+    // From the ground floor the ordinary door is used.
+    const downstairs = expectOk(router.route(room('G-A'), room('G-B')));
+    expect(downstairs.legs.map((leg) => leg.floor)).toEqual(['G']);
+    expect(downstairs.steps.at(-1)?.text).toContain('Room BG,');
+  });
+
+  it('never routes through a restricted door', () => {
+    const geometry = fixtureGeometry();
+    const door = geometry.doors.find((candidate) => candidate.id === 'G-B-door');
+    if (door) {
+      door.restricted = true;
+    }
+    // It was the only door into Room B, so the room cannot be reached at all.
+    expect(createRouter(geometry).route(room('G-A'), room('G-B'))).toMatchObject({
+      ok: false,
+      code: 'unreachable',
+    });
+  });
+
   it('keeps step-free routes off edges tagged as steps', () => {
     const router = createRouter(fixtureGeometry());
     router.setOverrides({ doorAvailable: {}, edgeTags: { 'G-e2': ['steps'] } });
@@ -470,6 +501,23 @@ describe('the real school map', () => {
       'floor-not-connected',
       'floor-not-connected',
     ]);
+  });
+
+  it('reaches the auditorium from either floor without stairs, and never by a backstage door', () => {
+    const router = createRouter(geometry);
+    const auditorium = room(firstRoomOn('G', 'Auditorium'));
+    const fromFirst = expectOk(router.route(room(firstRoomOn('1', '9A')), auditorium));
+    expect(fromFirst.legs.map((leg) => leg.floor)).toEqual(['1']);
+    const fromGround = expectOk(router.route(room(firstRoomOn('G', 'PYP3 B')), auditorium));
+    expect(fromGround.legs.map((leg) => leg.floor)).toEqual(['G']);
+    // The two backstage doors (top corners of the hall) are restricted.
+    const restricted = geometry.doors.filter((door) => door.restricted).map((door) => door.id);
+    expect(restricted).toEqual(['G-D083', 'G-D084']);
+    // No point of the route sits on a backstage door.
+    const backstage = geometry.doors.filter((door) => door.restricted);
+    for (const point of fromGround.legs[0].points) {
+      expect(backstage.some((door) => door.x === point.x && door.y === point.y)).toBe(false);
+    }
   });
 
   it('routes between real rooms on one floor, and across floors with a fixture staircase', () => {

@@ -29,6 +29,12 @@ export type Region = {
   labelAt: [number, number];
   /** The text printed on the layout PDF, kept only as a tracing aid. */
   sourceLabel?: string;
+  /**
+   * Ids of other rooms that lead into this one, possibly on another floor: the
+   * small lobbies at the first-floor doors of the two-storey auditorium.
+   * Reaching any of them counts as reaching this room.
+   */
+  entrances?: string[];
 };
 
 export type DoorKind =
@@ -61,6 +67,8 @@ export type Door = {
   /** The two sides this door joins. `b` is "outside" for an exterior door. */
   a: string;
   b: string;
+  /** True for a door students do not use (e.g. backstage). Routes never pass through it. */
+  restricted?: boolean;
 };
 
 export type NodeKind = 'corridor' | 'door' | 'room' | 'place' | 'connector' | 'snap';

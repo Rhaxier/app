@@ -76,6 +76,8 @@ export type GeometryIndex = {
   component: Map<string, string>;
   /** Floor -> the component holding the most nodes (the floor's main walkable area). */
   mainComponent: Map<FloorId, string>;
+  /** Ids of doors marked `restricted` (not for students). */
+  restrictedDoors: Set<string>;
 };
 
 export function indexGeometry(geometry: Geometry): GeometryIndex {
@@ -132,7 +134,19 @@ export function indexGeometry(geometry: Geometry): GeometryIndex {
       mainComponent.set(node.floor, root);
     }
   }
-  return { geometry, nodes, regions, walkableByFloor, edgesByFloor, component, mainComponent };
+  const restrictedDoors = new Set(
+    geometry.doors.filter((door) => door.restricted).map((door) => door.id),
+  );
+  return {
+    geometry,
+    nodes,
+    regions,
+    walkableByFloor,
+    edgesByFloor,
+    component,
+    mainComponent,
+    restrictedDoors,
+  };
 }
 
 // ---------- snapping a free point to the walkable graph ----------

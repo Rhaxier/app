@@ -138,10 +138,14 @@ type Rules = { stepFree: boolean; respectAvailability: boolean };
 /** Extra nodes and edges that exist only for one search (the snapped start and end points). */
 type Overlay = { nodes: Map<string, NavNode>; edges: Map<string, NavEdge[]> };
 
-type Found = { nodes: NavNode[]; edges: NavEdge[] };
+type Found = { nodes: NavNode[]; edges: NavEdge[]; cost: number };
 
 function edgeUsable(graph: NavGraph, edge: NavEdge, rules: Rules): boolean {
   const connector = edge.connector ? graph.connectors.get(edge.connector) : undefined;
+  // Doors that are not for students (e.g. backstage doors) are never part of a route.
+  if (edge.door && graph.index.restrictedDoors.has(edge.door)) {
+    return false;
+  }
   if (rules.respectAvailability) {
     if (edge.door && graph.overrides.doorAvailable[edge.door] === false) {
       return false;
@@ -286,7 +290,7 @@ function findPath(
     nodes.unshift(nodeOf(step.from) as NavNode);
     at = step.from;
   }
-  return { nodes, edges };
+  return { nodes, edges, cost: best.get(goalId) as number };
 }
 
 // ---------- turning the ends into graph nodes ----------
@@ -296,6 +300,11 @@ type ResolvedEnd = {
   floor: FloorId;
   isRoom: boolean;
   name?: string;
+  /**
+   * Other ways into the same room, e.g. the first-floor doors of a two-storey hall.
+   * The router tries each one and keeps the cheapest route.
+   */
+  alternatives?: ResolvedEnd[];
   snapEdge?: NavEdge;
   snapPoint?: Point;
 };
@@ -316,12 +325,25 @@ function resolveEnd(
     if (!region || !node) {
       return 'unknown';
     }
-    return {
-      nodeId: node.id,
-      floor: node.floor,
-      isRoom: true,
-      name: names[end.id] || region.sourceLabel,
-    };
+    const name = names[end.id] || region.sourceLabel;
+    // A hall that spans two floors lists the small lobbies that lead into it upstairs.
+    // Arriving in one of those counts as arriving at the hall.
+    const alternatives: ResolvedEnd[] = [];
+    for (const entranceId of region.entrances ?? []) {
+      const entrance = index.geometry.nodes.find(
+        (candidate) => candidate.kind === 'room' && candidate.region === entranceId,
+      );
+      const floorName = index.geometry.floors.find((floor) => floor.id === entrance?.floor)?.name;
+      if (entrance) {
+        alternatives.push({
+          nodeId: entrance.id,
+          floor: entrance.floor,
+          isRoom: true,
+          name: name ? `${name} (${floorName} entrance)` : undefined,
+        });
+      }
+    }
+    return { nodeId: node.id, floor: node.floor, isRoom: true, name, alternatives };
   }
   if (end.type === 'place') {
     const place = index.geometry.places.find((candidate) => candidate.id === end.id);
@@ -703,12 +725,22 @@ export function createRouter(
     }
 
     const stepFree = mode === 'step-free';
-    const found = findPath(graph, overlay, start.nodeId, end.nodeId, {
-      stepFree,
-      respectAvailability: true,
-    });
-    if (found) {
-      return describe(graph, found, mode, start, end);
+    // Most rooms have one way to count as "there". A two-storey hall has several
+    // (see `Region.entrances`), so try every pair and keep the cheapest route.
+    let chosen: { found: Found; from: ResolvedEnd; to: ResolvedEnd } | undefined;
+    for (const from of [start, ...(start.alternatives ?? [])]) {
+      for (const to of [end, ...(end.alternatives ?? [])]) {
+        const found = findPath(graph, overlay, from.nodeId, to.nodeId, {
+          stepFree,
+          respectAvailability: true,
+        });
+        if (found && (!chosen || found.cost < chosen.found.cost)) {
+          chosen = { found, from, to };
+        }
+      }
+    }
+    if (chosen) {
+      return describe(graph, chosen.found, mode, chosen.from, chosen.to);
     }
 
     // No route. Work out the most helpful reason, from the most basic cause upward.

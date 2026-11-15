@@ -81,6 +81,15 @@ print(
 );
 
 print(
+  'Two-storey hall, from the ground floor: PYP3 B to Auditorium',
+  go(room('PYP3 B'), room('Auditorium')),
+);
+print(
+  'Two-storey hall, from the first floor (no stairs needed): 9A to Auditorium',
+  go(room('9A'), room('Auditorium')),
+);
+
+print(
   'BEFORE moving the lift, step-free: PYP3 I to DP 4',
   go(room('PYP3 I'), room('DP 4'), 'step-free'),
 );
