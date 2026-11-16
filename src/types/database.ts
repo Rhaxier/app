@@ -1484,6 +1484,8 @@ export type Database = {
           duplicate_of: string | null;
           floor_id: string | null;
           id: string;
+          map_target_id: string | null;
+          map_target_kind: Database['public']['Enums']['map_target_kind'] | null;
           photo_path: string | null;
           reporter_id: string;
           resolved_at: string | null;
@@ -1505,6 +1507,8 @@ export type Database = {
           duplicate_of?: string | null;
           floor_id?: string | null;
           id?: string;
+          map_target_id?: string | null;
+          map_target_kind?: Database['public']['Enums']['map_target_kind'] | null;
           photo_path?: string | null;
           reporter_id?: string;
           resolved_at?: string | null;
@@ -1524,6 +1528,8 @@ export type Database = {
           duplicate_of?: string | null;
           floor_id?: string | null;
           id?: string;
+          map_target_id?: string | null;
+          map_target_kind?: Database['public']['Enums']['map_target_kind'] | null;
           photo_path?: string | null;
           reporter_id?: string;
           resolved_at?: string | null;
@@ -2840,6 +2846,9 @@ export type Database = {
           duplicate_of: string;
           floor_id: string;
           id: string;
+          map_target_id: string;
+          map_target_kind: Database['public']['Enums']['map_target_kind'];
+          map_target_name: string;
           photo_path: string;
           reported_by_me: boolean;
           reporter_id: string;
@@ -2929,6 +2938,7 @@ export type Database = {
         | 'prayer'
         | 'store'
         | 'other';
+      map_target_kind: 'connector' | 'door';
       notification_type:
         | 'announcement_new'
         | 'report_new'
@@ -3093,6 +3103,7 @@ export const Constants = {
         'store',
         'other',
       ],
+      map_target_kind: ['connector', 'door'],
       notification_type: [
         'announcement_new',
         'report_new',

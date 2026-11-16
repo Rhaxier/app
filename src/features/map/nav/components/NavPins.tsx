@@ -4,7 +4,9 @@
 // with the keyboard (Tab, then Enter).
 import L from 'leaflet';
 import { Marker } from 'react-leaflet';
+import { glyphSvg, LIFT_PATHS, STAIRS_PATHS } from '@/components/connectorGlyphs';
 import pinStyles from '@/features/map/components/Pins.module.css';
+import type { Connector } from '../types.ts';
 import type { Point } from '../types.ts';
 import { fromLatLng, toLatLng } from './latlng.ts';
 import styles from './NavPins.module.css';
@@ -139,6 +141,49 @@ export function FloorChangeChip({
         iconAnchor: [width / 2, TAP + 6],
       })}
       eventHandlers={{ click: onPick }}
+    />
+  );
+}
+
+/**
+ * A lift or staircase on the student map. Out of order: greyed and dashed,
+ * with an "Out of order" badge, but still shown, so nobody walks there
+ * expecting it to work. Tap for its card ("Report a problem").
+ */
+export function ConnectorPin({
+  connector,
+  at,
+  selected,
+  onSelect,
+}: {
+  connector: Pick<Connector, 'name' | 'type' | 'available'>;
+  at: Point;
+  selected: boolean;
+  onSelect: () => void;
+}) {
+  const kind = connector.type === 'lift' ? 'Lift' : 'Stairs';
+  const badge = connector.available ? '' : `<span class="${styles.badge}">Out of order</span>`;
+  return (
+    <Marker
+      position={toLatLng(at)}
+      title={`${connector.name}${connector.available ? '' : ' (out of order)'}`}
+      alt={`${kind}: ${connector.name}${connector.available ? '' : ', out of order'}`}
+      keyboard
+      zIndexOffset={800}
+      icon={icon(
+        [
+          styles.connector,
+          !connector.available && styles.connectorDown,
+          selected && styles.connectorSelected,
+        ]
+          .filter(Boolean)
+          .join(' '),
+        `<span class="${styles.connectorDisc}">${glyphSvg(
+          connector.type === 'lift' ? LIFT_PATHS : STAIRS_PATHS,
+          16,
+        )}</span>${badge}`,
+      )}
+      eventHandlers={{ click: onSelect }}
     />
   );
 }

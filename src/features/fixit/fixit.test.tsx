@@ -18,6 +18,7 @@ const valid: ReportFormValues = {
   description: "Projector won't turn on",
   urgent: false,
   photo: null,
+  mapTarget: '',
 };
 
 function file(name: string, type: string, bytes: number): File {

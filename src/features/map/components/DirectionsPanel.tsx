@@ -13,6 +13,7 @@
 // nothing here suggests there is. When there is no route, the router's own
 // message says why.
 import { Link } from 'react-router-dom';
+import { ButtonLink } from '@/components/Button';
 import { Button } from '@/components/Button';
 import { Icon } from '@/components/Icon';
 import { EmptyState } from '@/components/States';
@@ -39,6 +40,10 @@ interface DirectionsPanelProps {
   result: RouteResult | null;
   stepIndex: number;
   isAdmin: boolean;
+  /** Why this isn't the usual route (something out of order), if it isn't. */
+  notice: string | null;
+  /** Where "Report a problem here" goes for the destination, if there is one. */
+  reportLink: string | null;
   /** Small: only time, distance and the current step (only when there is a route). */
   collapsed: boolean;
   onCollapsed: (collapsed: boolean) => void;
@@ -80,6 +85,12 @@ export function DirectionsPanel(props: DirectionsPanelProps) {
     >
       <Icon name="close" size={18} />
     </button>
+  );
+
+  const noticeLine = props.notice && (
+    <p className={styles.notice} role="status">
+      {props.notice}
+    </p>
   );
 
   const stepControls = route && (
@@ -127,6 +138,7 @@ export function DirectionsPanel(props: DirectionsPanelProps) {
           </button>
           {closeButton}
         </div>
+        {noticeLine}
         <div aria-live="polite">{stepControls}</div>
       </section>
     );
@@ -195,12 +207,19 @@ export function DirectionsPanel(props: DirectionsPanelProps) {
         <div className={styles.end}>
           <span className={styles.endLabel}>To</span>
           {destination ? (
-            <span className={styles.endValue}>
-              {destination.name}
-              <button type="button" className={styles.change} onClick={props.onClearDestination}>
-                Change
-              </button>
-            </span>
+            <>
+              <span className={styles.endValue}>
+                {destination.name}
+                <button type="button" className={styles.change} onClick={props.onClearDestination}>
+                  Change
+                </button>
+              </span>
+              {props.reportLink && (
+                <ButtonLink to={props.reportLink} variant="quiet" size="small" icon="wrench">
+                  Report a problem here
+                </ButtonLink>
+              )}
+            </>
           ) : (
             <DestinationSearch
               destinations={props.destinations}
@@ -218,6 +237,8 @@ export function DirectionsPanel(props: DirectionsPanelProps) {
         checked={props.stepFree}
         onChange={props.onStepFree}
       />
+
+      {noticeLine}
 
       {route && (
         <div className="stack-tight" aria-live="polite">

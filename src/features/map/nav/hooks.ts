@@ -45,9 +45,11 @@ export const navKeys = {
 // Outside navKeys.all on purpose: Realtime refreshes must never reload the geometry.
 const geometryKey = ['map-nav-geometry'] as const;
 
-export function useGeometry() {
+/** `enabled: false` skips the download on screens that only sometimes need it. */
+export function useGeometry(enabled = true) {
   return useQuery({
     queryKey: geometryKey,
+    enabled,
     queryFn: async () => (await import('./data/geometry.json')).default as unknown as Geometry,
     staleTime: Infinity,
     gcTime: Infinity,

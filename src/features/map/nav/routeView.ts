@@ -1,8 +1,8 @@
 // What the student map shows for a route: which part of the line is on the
 // floor in view, where the floor changes are, and the numbers in words.
 // Pure functions over the router's result, tested in routeView.test.ts.
-import type { RouteLeg, RouteOk, RouteStep } from './router.ts';
-import type { FloorId, Point } from './types.ts';
+import type { RouteLeg, RouteOk, RouteResult, RouteStep } from './router.ts';
+import type { Connector, FloorId, Point } from './types.ts';
 
 /** The stretches of the route on one floor (usually one; more if the route comes back). */
 export function legsOnFloor(result: RouteOk, floor: FloorId): RouteLeg[] {
@@ -70,3 +70,57 @@ export const formatDuration = (seconds: number) =>
 
 /** "Ground floor", "Floor 2". */
 export const floorLabel = (floor: FloorId) => (floor === 'G' ? 'Ground floor' : `Floor ${floor}`);
+
+export type DetourNotice = {
+  /** Shown on the route, e.g. "Lift 1 is out of order, so this route goes another way." */
+  text: string;
+  /** For the toast when an open route changes: "Lift 1 is out of order." */
+  short: string;
+};
+
+/**
+ * Why the route isn't the usual one, if something out of service is the
+ * reason. `ideal` is the same trip worked out with every lift, staircase and
+ * door in service: if it uses one that is out of order now, that's the
+ * reason. Closed doors don't say which, so they only explain a longer route.
+ */
+export function detourNotice(
+  real: RouteResult | null,
+  ideal: RouteResult | null,
+  connectors: Pick<Connector, 'id' | 'name' | 'available'>[],
+  doorsClosed: boolean,
+): DetourNotice | null {
+  if (!real || !ideal || !ideal.ok) return null;
+  const down = ideal.connectors
+    .map((id) => connectors.find((c) => c.id === id))
+    .filter((c): c is Pick<Connector, 'id' | 'name' | 'available'> => Boolean(c && !c.available));
+  const names = [...new Set(down.map((c) => c.name))];
+  if (names.length > 0) {
+    const who =
+      names.length === 1
+        ? `${names[0]} is`
+        : `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]} are`;
+    const short = `${who} out of order.`;
+    if (!real.ok) {
+      const what =
+        real.code === 'no-step-free-route' ? 'No step-free route right now' : 'No route right now';
+      return { text: `${what}: ${who} out of order.`, short };
+    }
+    return { text: `${who} out of order, so this route goes another way.`, short };
+  }
+  if (doorsClosed) {
+    if (!real.ok) {
+      return {
+        text: 'No route right now: a door on the way is closed.',
+        short: 'A door on the way is closed.',
+      };
+    }
+    if (real.distanceM > ideal.distanceM + 1) {
+      return {
+        text: 'A door on the usual way is closed, so this route is longer.',
+        short: 'A door on the usual way is closed.',
+      };
+    }
+  }
+  return null;
+}

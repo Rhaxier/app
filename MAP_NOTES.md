@@ -1,8 +1,9 @@
 # MAP_NOTES: indoor navigation hand-off
 
-Status: **Foundation phases 1-3 complete. UI phases 1-4 complete (data layer, admin Classrooms
-tab, Stairs and lifts editor, student map behind a switch), at checkpoint 4.** See "UI phase 1-4"
-just before the Phase 3 spec. Next: UI phase 5 (fix-it link and out-of-order flags). Nothing has
+Status: **Foundation phases 1-3 complete. UI phases 1-5 complete (data layer, admin Classrooms
+tab, Stairs and lifts editor, student map behind a switch, fix-it link and out-of-order), at
+checkpoint 5.** See "UI phase 1-5" just before the Phase 3 spec. Next: UI phase 6 (rooms
+migration runbook), only after the team writes "BACKUP TAKEN" with their counts. Nothing has
 been applied to the cloud project by Claude; the runbook
 (`docs/runbooks/map-nav-phase1-cloud.md`) applies part 1 and holds back step A.
 
@@ -469,6 +470,45 @@ and refusal, tap a room, step-free mode passed and remembered, swap, every route
 admin-only link). Real router with a fixture lift for G -> 3. **Not verified in a browser:** the
 drawing, the draw-in animation, line width by zoom, dragging the pin, widths 360/390/430 and
 desktop, both themes (phase 7).
+
+# UI phase 5: fix-it link and out-of-order (built)
+
+Built 2026-11-16. Decisions from the team: an **optional** "Is it about a lift, stairs or a door?"
+field on every report (no new category); out of order marked from **the report's staff panel and
+the map** (lifts and stairs; doors only through a report, school answer 9); **room pickers unchanged
+until phase 6** (links fill in the lift/door and floor; the room only if it is in the list).
+
+| Path                                                       | Job                                                                                                                                                                                                       |
+| ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `supabase/migrations/20261116120000_report_map_target.sql` | `reports.map_target_kind/id` (both or neither), a trigger that checks the target exists and that only the handling staff change it later, `report_feed()` + `map_target_kind/id/name`. Needs part 1 only. |
+| `supabase/tests/21_report_map_target_test.sql`             | 14 checks: targets, refusals, a report never closes anything, who may mark it.                                                                                                                            |
+| `docs/runbooks/` part 3                                    | Apply, check (`check_part3_report_target.sql`), undo (restores the old `report_feed`).                                                                                                                    |
+| `src/features/fixit/mapTargets.ts`, `ReportFormPage.tsx`   | The optional field: lifts/stairs on the room's floor, the room's doors (traced rooms).                                                                                                                    |
+| `src/features/fixit/components/MapTargetControls.tsx`      | On the staff panel: "About: …", Mark out of order / Back in service, the resolve prompt with the count of other open reports.                                                                             |
+| `src/features/map/components/ConnectorCard.tsx`            | Tapped lift/stairs on the map: Report a problem; Mark out of order for allowed staff.                                                                                                                     |
+| `NavPins.ConnectorPin`                                     | Lifts and stairs on the student map; out of order = dashed, greyed, "Out of order" badge.                                                                                                                 |
+| `routeView.detourNotice`                                   | Why the route isn't the usual one, from the same trip on a router with everything in service.                                                                                                             |
+
+Behaviour:
+
+- Who may mark out of order: unchanged database rule (`map_can_mark_out_of_order`: admins, and
+  staff holding a responsibility an active report category routes to). Students never can; a
+  report never changes availability.
+- Rerouting: the change arrives through Realtime (`map_connectors`, `map_overrides`), the shared
+  router updates, the open route is worked out again. The panel shows the notice ("West stairs is
+  out of order, so this route goes another way." / "No step-free route right now: Lift A is out of
+  order." / closed door: "...so this route is longer."), and a toast says it once
+  ("West stairs is out of order. Route updated."). The "ideal" router is built only while something
+  is out of service.
+- "Report a problem here" (directions panel, on the destination) opens the form with `?floor=` and,
+  once the destination's room is a traced room the form lists (phase 6), `?room=`.
+- A connector deleted in the editor leaves reports that name it with "(no longer on the map)".
+
+Verified: pgTAP 21 (14/14) and the full suite; part 3 rehearsed from the cloud state (apply, check,
+older tests, undo = part-1 schema, undo again harmless). Vitest: options, form input, staff controls
+(hidden for others, confirm, resolve prompt with count, doors), map card, `detourNotice`, live
+reroute on the screen (stairs out -> lift + notice + toast; lift out -> step-free message + notice).
+Not verified in a browser (phase 7).
 
 # Phase 3: hand-off spec for the UI work
 

@@ -6,6 +6,7 @@
 -- Edit the list on the marked line before running:
 --   after part 1: '20261115120000', '20261115120050'
 --   after part 2: '20261115120100'
+--   after part 3: '20261116120000'
 -- =============================================================================
 do $$
 declare
@@ -31,6 +32,7 @@ begin
           when '20261115120050' then 'map_geometry_ids'
           when '20261115120100' then 'rooms_migration_a'
           when '20261114120000' then 'after_school_booking'
+          when '20261116120000' then 'report_map_target'
         end
       );
     else

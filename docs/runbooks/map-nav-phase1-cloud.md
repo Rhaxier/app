@@ -160,6 +160,25 @@ two new columns; every original room, report, venue and event stays as it was.
 2. Check: run `preflight_part2.sql` again: rows 2 and 3 say `true` and `0`, row 4 equals your
    number from 2.1.
 
+## Part 3: fix-it reports about a lift, stairs or door (after part 1)
+
+`20261116120000_report_map_target.sql` lets a report say which lift, staircase or door it is about,
+and adds three columns to `report_feed()`. It needs part 1, not part 2. The deployed old app keeps
+working: it doesn't send the new columns, and `report_feed()` still returns every column it reads
+(the new ones are added at the end). Apply it before or with the build that has the new report form.
+
+1. `status.sql`: row 1 says "applied" and row 6 "not applied".
+2. Apply `20261116120000_report_map_target.sql` with `begin;` ... `commit;` as above.
+3. If the history table exists: set the marked line of `record_history.sql` to
+   `array['20261116120000']` and run it.
+4. Run `docs/runbooks/sql/check_part3_report_target.sql`: every `result` equals `expected`.
+5. In the app: open a fix-it report (list and detail pages), and file a test report: both work as
+   before.
+
+Undo: `docs/runbooks/sql/undo_20261116120000_report_map_target.sql` puts `report_feed()` back as it
+was and removes the columns (the "about" link on reports made since is lost; the reports stay).
+Check with `status.sql` row 6 = "not applied".
+
 ## Last resort
 
 If something looks wrong and the undo scripts don't fix it, restore the backup (Database → Backups,

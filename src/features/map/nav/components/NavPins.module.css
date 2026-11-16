@@ -46,3 +46,61 @@
   outline: 2px solid var(--acc);
   outline-offset: 2px;
 }
+
+/* Lifts and stairs on the student map. */
+.connector {
+  position: relative;
+  display: grid;
+  place-items: center;
+  color: var(--ink);
+}
+
+.connectorDisc {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+  background: var(--card);
+  box-shadow: var(--e1);
+}
+
+.connectorSelected .connectorDisc {
+  border-color: var(--acc);
+  color: var(--acc);
+  box-shadow:
+    0 0 0 3px var(--accsoft),
+    var(--e1);
+}
+
+/* Out of order: still there, clearly not usable. */
+.connectorDown .connectorDisc {
+  border-style: dashed;
+  border-color: var(--fix);
+  background: var(--paper);
+  color: var(--faint);
+}
+
+.badge {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 1px 6px;
+  border-radius: var(--radius-pill);
+  background: var(--fixsoft);
+  color: var(--fix);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.connector:focus-visible {
+  outline: none;
+}
+
+.connector:focus-visible .connectorDisc {
+  outline: 2px solid var(--acc);
+  outline-offset: 3px;
+}

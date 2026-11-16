@@ -8,6 +8,7 @@ import { parseAssignmentsCsv, searchableDestinations } from './assignments.ts';
 import { indexGeometry } from './graph.ts';
 import { createRouter, ROUTE_MESSAGES, type RouteOk } from './router.ts';
 import {
+  detourNotice,
   floorChanges,
   formatDistance,
   formatDuration,
@@ -121,5 +122,59 @@ describe('snapStart', () => {
       ok: false,
       message: ROUTE_MESSAGES['start-not-walkable'],
     });
+  });
+});
+
+describe('detour notices (real router, fixture lift and stairs)', () => {
+  const stairsSpot = { x: 1221, y: 978 };
+  const stairs: Connector = {
+    id: 'fixture-stairs',
+    type: 'stairs',
+    name: 'West stairs',
+    floors: ['G', '1', '2', '3'],
+    positions: { G: stairsSpot, 1: stairsSpot, 2: stairsSpot, 3: stairsSpot },
+    accessible: false,
+    available: true,
+  };
+  const lift2: Connector = { ...lift, name: 'Lift A' };
+  const ideal = createRouter(geometry, [lift2, stairs]);
+  const real = createRouter(geometry, [lift2, stairs]);
+  const trip = (router: typeof real, mode: 'standard' | 'step-free') =>
+    router.route({ type: 'room', id: 'G-R030' }, { type: 'room', id: '3-R043' }, { mode });
+
+  it('says nothing when everything is in service', () => {
+    expect(
+      detourNotice(trip(real, 'standard'), trip(ideal, 'standard'), [lift2, stairs], false),
+    ).toBeNull();
+  });
+
+  it('reroutes by the lift when the stairs are out of order, and says why', () => {
+    const now = [lift2, { ...stairs, available: false }];
+    real.setConnectors(now);
+    const result = trip(real, 'standard');
+    expect(result.ok && result.connectors).toEqual(['fixture-lift']);
+    expect(detourNotice(result, trip(ideal, 'standard'), now, false)).toEqual({
+      text: 'West stairs is out of order, so this route goes another way.',
+      short: 'West stairs is out of order.',
+    });
+  });
+
+  it('explains a missing step-free route when the lift is out of order', () => {
+    const now = [{ ...lift2, available: false }, stairs];
+    real.setConnectors(now);
+    const result = trip(real, 'step-free');
+    expect(result.ok ? 'ok' : result.code).toBe('no-step-free-route');
+    expect(detourNotice(result, trip(ideal, 'step-free'), now, false)?.text).toBe(
+      'No step-free route right now: Lift A is out of order.',
+    );
+  });
+
+  it('blames a closed door only when the route got longer', () => {
+    const short = { ...(trip(ideal, 'standard') as RouteOk) };
+    const long = { ...short, distanceM: short.distanceM + 20 };
+    expect(detourNotice(long, short, [], true)?.text).toBe(
+      'A door on the usual way is closed, so this route is longer.',
+    );
+    expect(detourNotice(short, short, [], true)).toBeNull();
   });
 });

@@ -66,6 +66,7 @@ vi.mock('./nav/components/RouteLayer', async () => {
   };
 });
 vi.mock('./nav/components/NavPins', () => ({
+  ConnectorPin: () => null,
   HereMarker: () => <p>Pin</p>,
   ReportCountPin: () => null,
   BusyDot: () => null,
@@ -82,7 +83,13 @@ vi.mock('@/features/venues/hooks', () => ({
   useBookingsNow: () => ({ data: [] }),
   useLiveBookings: () => {},
 }));
-vi.mock('./nav/hooks', () => ({ useTracedRooms: () => ({ data: {} }) }));
+vi.mock('./nav/hooks', () => ({
+  useTracedRooms: () => ({ data: {} }),
+  useCanMarkOutOfOrder: () => ({ data: false }),
+  useSetAvailable: () => ({ mutate: vi.fn(), isPending: false, isError: false, error: null }),
+}));
+const toasts = vi.hoisted(() => ({ showToast: vi.fn() }));
+vi.mock('@/lib/toast', () => toasts);
 
 import { MapScreen } from './pages/IndoorMapPage';
 
@@ -310,5 +317,66 @@ describe('indoor map: mode, swap and messages (fake router)', () => {
       expect(screen.getByText(ROUTE_MESSAGES[code])).toBeInTheDocument();
       view.unmount();
     }
+  });
+});
+
+describe('indoor map: out of order (real router)', () => {
+  const stairsSpot = { x: 1221, y: 978 };
+  const stairs: Connector = {
+    id: 'fixture-stairs',
+    type: 'stairs',
+    name: 'West stairs',
+    floors: ['G', '1', '2', '3'],
+    positions: { G: stairsSpot, 1: stairsSpot, 2: stairsSpot, 3: stairsSpot },
+    accessible: false,
+    available: true,
+  };
+
+  function screenWith(router: Router, connectors: Connector[], version: number) {
+    const value: NavRouterValue = {
+      router,
+      version,
+      ready: true,
+      error: null,
+      geometry,
+      connectors,
+      overrides: { doorAvailable: {}, edgeTags: {} },
+      assignments,
+      activePresetId: null,
+    };
+    return (
+      <MemoryRouter initialEntries={['/?from=G-R030&to=3-R043']}>
+        <NavRouterContext.Provider value={value}>
+          <MapScreen geometry={geometry} router={router} />
+        </NavRouterContext.Provider>
+      </MemoryRouter>
+    );
+  }
+
+  it('reroutes an open route when the stairs go out of order, and says why', () => {
+    toasts.showToast.mockReset();
+    const router = createRouter(geometry, [lift, stairs]);
+    const view = render(screenWith(router, [lift, stairs], 1));
+    expect(within(panel()).queryByText(/out of order/)).not.toBeInTheDocument();
+
+    // A Realtime update: the stairs are marked out of order elsewhere.
+    const now = [lift, { ...stairs, available: false }];
+    router.setConnectors(now);
+    view.rerender(screenWith(router, now, 2));
+
+    expect(
+      within(panel()).getByText('West stairs is out of order, so this route goes another way.'),
+    ).toBeInTheDocument();
+    expect(toasts.showToast).toHaveBeenCalledWith('West stairs is out of order. Route updated.');
+  });
+
+  it('explains why there is no step-free route when the lift is out of order', () => {
+    window.localStorage.setItem('campus.map.stepFree', 'true');
+    const now = [{ ...lift, available: false }, stairs];
+    render(screenWith(createRouter(geometry, now), now, 1));
+    expect(within(panel()).getByText(ROUTE_MESSAGES['no-step-free-route'])).toBeInTheDocument();
+    expect(
+      within(panel()).getByText('No step-free route right now: Fixture lift is out of order.'),
+    ).toBeInTheDocument();
   });
 });

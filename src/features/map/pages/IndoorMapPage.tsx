@@ -16,7 +16,7 @@
 //
 // The address keeps ?to=<id>&from=<id> (ids from the map) so a route can be
 // linked to; ?report=<id> opens a fix-it report.
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { FilterChip } from '@/components/Chip';
 import { PageChrome } from '@/components/PageChrome';
@@ -29,21 +29,23 @@ import { useLiveReports, useReports } from '@/features/fixit/hooks';
 import { reportTitle } from '@/features/fixit/logic';
 import { useBookingsNow, useLiveBookings, useVenues } from '@/features/venues/hooks';
 import { isAdmin } from '@/lib/permissions';
+import { showToast } from '@/lib/toast';
 import { useDocumentTitle } from '@/lib/useDocumentTitle';
 import { DestinationSearch } from '../components/DestinationSearch';
+import { ConnectorCard } from '../components/ConnectorCard';
 import { DirectionsPanel } from '../components/DirectionsPanel';
 import { roomsInUse } from '../logic';
 import { searchableDestinations, type Destination } from '../nav/assignments';
 import { FloorPlanView } from '../nav/components/FloorPlanView';
-import { BusyDot, HereMarker, ReportCountPin } from '../nav/components/NavPins';
+import { BusyDot, ConnectorPin, HereMarker, ReportCountPin } from '../nav/components/NavPins';
 import { RouteLayer } from '../nav/components/RouteLayer';
 import { indexGeometry } from '../nav/graph';
 import { useTracedRooms } from '../nav/hooks';
 import { destinationEnd } from '../nav/routeEnds';
-import type { RouteEnd, RouteMode, Router } from '../nav/router';
+import { createRouter, type RouteEnd, type RouteMode, type Router } from '../nav/router';
 import { NavRouterProvider } from '../nav/RouterProvider';
 import { useNavRouter } from '../nav/routerContext';
-import { floorLabel, startFloor } from '../nav/routeView';
+import { detourNotice, floorLabel, startFloor } from '../nav/routeView';
 import { snapStart } from '../nav/startPoint';
 import type { FloorId, Geometry, Point } from '../nav/types';
 import styles from './MapPage.module.css';
@@ -92,7 +94,7 @@ type Pin = { floor: FloorId; point: Point; end: RouteEnd };
 type Layer = 'reports' | 'inUse';
 
 export function MapScreen({ geometry, router }: { geometry: Geometry; router: Router }) {
-  const { version, assignments } = useNavRouter();
+  const { version, assignments, connectors, overrides } = useNavRouter();
   const user = useCurrentUser();
   const [params, setParams] = useSearchParams();
   const index = useMemo(() => indexGeometry(geometry), [geometry]);
@@ -128,6 +130,7 @@ export function MapScreen({ geometry, router }: { geometry: Geometry; router: Ro
   const [stepIndex, setStepIndex] = useState(0);
   const [collapsed, setCollapsed] = useState(false);
   const [layers, setLayers] = useState<Record<Layer, boolean>>({ reports: true, inUse: true });
+  const [connectorId, setConnectorId] = useState<string | null>(null);
 
   function setStepFree(value: boolean) {
     setStepFreeState(value);
@@ -170,6 +173,36 @@ export function MapScreen({ geometry, router }: { geometry: Geometry; router: Ro
     if (result.ok) setFloor(startFloor(result) ?? floor);
   }
   const step = result?.ok ? Math.min(stepIndex, result.steps.length - 1) : 0;
+
+  // ---------- Why the route isn't the usual one ----------
+  // The same trip with every lift, staircase and door in service, worked
+  // out on a second router. Only built while something is out of service.
+  const doorsClosed = Object.values(overrides?.doorAvailable ?? {}).some((open) => open === false);
+  const somethingDown = doorsClosed || connectors.some((c) => !c.available);
+  const idealRouter = useMemo(
+    () => (somethingDown ? createRouter(geometry) : null),
+    [geometry, somethingDown],
+  );
+  const ideal = useMemo(() => {
+    if (!idealRouter || !fromEnd || !toEnd) return null;
+    idealRouter.setConnectors(connectors.map((c) => ({ ...c, available: true })));
+    return idealRouter.route(fromEnd, toEnd, { mode });
+    // endsKey stands for fromEnd, toEnd and mode.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [idealRouter, connectors, endsKey]);
+  const notice = detourNotice(result, ideal, connectors, doorsClosed);
+
+  // An open route changed because something went out of order (Realtime):
+  // say so once, as well as on the route.
+  const lastNotice = useRef<{ trip: string; short: string | null }>({ trip: '', short: null });
+  useEffect(() => {
+    const short = notice?.short ?? null;
+    const before = lastNotice.current;
+    if (before.trip === endsKey && short && short !== before.short) {
+      showToast(`${short} Route updated.`);
+    }
+    lastNotice.current = { trip: endsKey, short };
+  }, [endsKey, notice?.short]);
 
   const showStep = useCallback(
     (index: number) => {
@@ -249,7 +282,19 @@ export function MapScreen({ geometry, router }: { geometry: Geometry; router: Ro
       ? [selectedReport]
       : [];
 
-  const sheetOpen = Boolean(selectedReport || panelOpen);
+  const selectedConnector = connectors.find((c) => c.id === connectorId) ?? null;
+  // Start a fix-it report about the destination (the room only when the
+  // form's list has it: traced rooms, after the room lists switch over).
+  const destinationRoomId = destination
+    ? Object.entries(tracedRooms ?? {}).find(([, region]) => region === destination.roomId)?.[0]
+    : undefined;
+  const reportLink = destination
+    ? `/map/report?floor=${encodeURIComponent(destination.floor)}${
+        destinationRoomId ? `&room=${encodeURIComponent(destinationRoomId)}` : ''
+      }`
+    : null;
+
+  const sheetOpen = Boolean(selectedReport || panelOpen || selectedConnector);
   const margins = result?.ok ? (collapsed ? ROUTE_MARGINS : ROUTE_MARGINS_FULL) : PLAN_MARGINS;
 
   return (
@@ -314,6 +359,17 @@ export function MapScreen({ geometry, router }: { geometry: Geometry; router: Ro
               padding={margins}
             />
           )}
+          {connectors
+            .filter((c) => c.floors.includes(floor) && c.positions[floor])
+            .map((c) => (
+              <ConnectorPin
+                key={`connector:${c.id}`}
+                connector={c}
+                at={c.positions[floor] as Point}
+                selected={c.id === connectorId}
+                onSelect={() => setConnectorId(c.id)}
+              />
+            ))}
           {pin && pin.floor === floor && (
             <HereMarker at={pin.point} onDrop={(point) => dropPin(point, floor)} />
           )}
@@ -358,7 +414,13 @@ export function MapScreen({ geometry, router }: { geometry: Geometry; router: Ro
         </div>
 
         <div className={styles.bottom}>
-          {selectedReport ? (
+          {selectedConnector ? (
+            <ConnectorCard
+              connector={selectedConnector}
+              floor={floor}
+              onClose={() => setConnectorId(null)}
+            />
+          ) : selectedReport ? (
             <ReportCard
               report={selectedReport}
               others={reportsHere}
@@ -379,6 +441,8 @@ export function MapScreen({ geometry, router }: { geometry: Geometry; router: Ro
               result={result}
               stepIndex={step}
               isAdmin={isAdmin(user)}
+              notice={notice?.text ?? null}
+              reportLink={reportLink}
               collapsed={collapsed}
               onCollapsed={setCollapsed}
               onTapToStart={() => {

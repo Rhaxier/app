@@ -233,3 +233,14 @@
   display: flex;
   gap: 8px;
 }
+
+/* Why the route isn't the usual one (something out of order). */
+.notice {
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: var(--r-tag);
+  background: var(--fixsoft);
+  color: var(--fix);
+  font-size: var(--text-body);
+  font-weight: 600;
+}
