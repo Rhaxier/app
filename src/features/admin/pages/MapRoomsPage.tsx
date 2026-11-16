@@ -8,7 +8,7 @@
 import { useSearchParams } from 'react-router-dom';
 import { SegmentedControl } from '@/components/SegmentedControl';
 import { ClassroomsTab } from '../components/map-rooms/ClassroomsTab';
-import { ConnectorStatus } from '../components/map-rooms/ConnectorStatus';
+import { ConnectorsTab } from '../components/map-rooms/connectors/ConnectorsTab';
 import { NavRouterProvider } from '@/features/map/nav/RouterProvider';
 import { AdminPage } from '../components/AdminPage';
 import { pageIntros } from '../strings';
@@ -33,7 +33,7 @@ export function MapRoomsPage() {
         ]}
       />
       <NavRouterProvider>
-        {tab === 'classrooms' ? <ClassroomsTab /> : <ConnectorStatus />}
+        {tab === 'classrooms' ? <ClassroomsTab /> : <ConnectorsTab />}
       </NavRouterProvider>
     </AdminPage>
   );

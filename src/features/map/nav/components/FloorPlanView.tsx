@@ -45,6 +45,14 @@ interface FloorPlanViewProps {
   onSelect?: (id: string) => void;
   /** Pans to this id when `seq` changes (a row picked in a list, not a click on the map). */
   focus?: { id: string; seq: number } | null;
+  /** A quiet background: rooms can't be picked and have no tooltips (the stairs and lifts editor). */
+  quiet?: boolean;
+  /** Any click on the plan, in map coordinates (the editor's Add tools). */
+  onMapClick?: (point: Point) => void;
+  /** The pointer's position over the plan, or null when it leaves (the Add tools' ghost marker). */
+  onPointerMove?: (point: Point | null) => void;
+  /** Show a crosshair cursor (an Add tool is active). */
+  crosshair?: boolean;
   /** Extra layers drawn on top (markers, routes). */
   children?: ReactNode;
 }
@@ -58,6 +66,10 @@ export function FloorPlanView({
   selectedId,
   onSelect,
   focus,
+  quiet = false,
+  onMapClick,
+  onPointerMove,
+  crosshair = false,
   children,
 }: FloorPlanViewProps) {
   const { bounds } = geometry;
@@ -91,7 +103,9 @@ export function FloorPlanView({
 
   return (
     <div
-      className={styles.frame}
+      className={[styles.frame, quiet && styles.quiet, crosshair && styles.crosshair]
+        .filter(Boolean)
+        .join(' ')}
       role="region"
       aria-label={label}
       style={{ aspectRatio: `${width} / ${height}` }}
@@ -118,6 +132,7 @@ export function FloorPlanView({
             region={region}
             named={named?.has(region.id) ?? false}
             name={names?.[region.id]}
+            quiet={quiet}
           />
         ))}
         {places.map((place) => (
@@ -125,9 +140,10 @@ export function FloorPlanView({
             key={place.id}
             center={toLatLng(place)}
             radius={6}
+            interactive={!quiet}
             pathOptions={{ className: styles.place }}
           >
-            <Tooltip>{names?.[place.id] || place.id}</Tooltip>
+            {!quiet && <Tooltip>{names?.[place.id] || place.id}</Tooltip>}
           </CircleMarker>
         ))}
         {entrances.map((door) => (
@@ -135,11 +151,12 @@ export function FloorPlanView({
             key={door.id}
             center={toLatLng(door)}
             radius={4}
+            interactive={!quiet}
             pathOptions={{
               className: named?.has(door.id) ? styles.entranceNamed : styles.entrance,
             }}
           >
-            <Tooltip>{names?.[door.id] || `Entrance ${door.id}`}</Tooltip>
+            {!quiet && <Tooltip>{names?.[door.id] || `Entrance ${door.id}`}</Tooltip>}
           </CircleMarker>
         ))}
         {/* The selection is its own shape on top, so it can change without redrawing the rest. */}
@@ -161,6 +178,9 @@ export function FloorPlanView({
           />
         )}
         {onSelect && <ClickToSelect geometry={geometry} floor={floor} onSelect={onSelect} />}
+        {(onMapClick || onPointerMove) && (
+          <PointerEvents onMapClick={onMapClick} onPointerMove={onPointerMove} />
+        )}
         {focus && <FocusOn geometry={geometry} focus={focus} animate={animate} />}
         {children}
       </MapContainer>
@@ -168,7 +188,17 @@ export function FloorPlanView({
   );
 }
 
-function RegionShape({ region, named, name }: { region: Region; named: boolean; name?: string }) {
+function RegionShape({
+  region,
+  named,
+  name,
+  quiet,
+}: {
+  region: Region;
+  named: boolean;
+  name?: string;
+  quiet: boolean;
+}) {
   const className =
     region.kind === 'room'
       ? named
@@ -181,8 +211,14 @@ function RegionShape({ region, named, name }: { region: Region; named: boolean; 
           : styles.corridor;
   const positions = [ring(region.polygon), ...(region.holes ?? []).map(ring)];
   return (
-    <Polygon positions={positions} pathOptions={{ className }} interactive={region.kind === 'room'}>
-      {region.kind === 'room' && <Tooltip sticky>{name || `${region.id} (no name)`}</Tooltip>}
+    <Polygon
+      positions={positions}
+      pathOptions={{ className }}
+      interactive={!quiet && region.kind === 'room'}
+    >
+      {!quiet && region.kind === 'room' && (
+        <Tooltip sticky>{name || `${region.id} (no name)`}</Tooltip>
+      )}
     </Polygon>
   );
 }
@@ -218,6 +254,22 @@ function ClickToSelect({
       const region = regionAt(index, floor, point);
       if (region?.kind === 'room') onSelect(region.id);
     },
+  });
+  return null;
+}
+
+/** Raw clicks and pointer moves, in map coordinates, for tools that place things. */
+function PointerEvents({
+  onMapClick,
+  onPointerMove,
+}: {
+  onMapClick?: (point: Point) => void;
+  onPointerMove?: (point: Point | null) => void;
+}) {
+  useMapEvents({
+    click: (event) => onMapClick?.(fromLatLng(event.latlng)),
+    mousemove: (event) => onPointerMove?.(fromLatLng(event.latlng)),
+    mouseout: () => onPointerMove?.(null),
   });
   return null;
 }

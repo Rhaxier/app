@@ -232,6 +232,19 @@ export const footnotes = {
     entrance: 'Name a door that leads outside, for example “Main gate”, and students can find it.',
     firstRun:
       'Start from the names printed on the floor plan, then rename rooms as needed and make the term active.',
+    // Stairs and lifts editor. Router rules: router.ts (step-free skips stairs
+    // and inaccessible connectors; unavailable ones are skipped in both modes).
+    tools:
+      'Pick Add stairs or Add lift, then click the plan where it is. Drag a marker to move it. Hatched areas are where the floor plan shows stairs. Esc cancels.',
+    floorsServed:
+      'A floor you tick starts at the same spot as the nearest floor, because the floors line up; drag it to fine-tune. The dashed circles show where it is on the floor above and below.',
+    position: 'For moving it with the keyboard: map units, about 5 cm each.',
+    accessible: 'Step-free routes only use accessible lifts.',
+    // map_set_available(): saved straight away, unlike the rest of the editor.
+    available:
+      'Turn off when it is out of order. Routes avoid it straight away; this is saved at once.',
+    save: 'Nothing changes for students until you save. Problems in red must be fixed first.',
+    tryRoute: 'Uses your unsaved changes, so you can check them before saving.',
   },
   map: {
     planImage:

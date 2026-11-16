@@ -1,9 +1,10 @@
 # MAP_NOTES: indoor navigation hand-off
 
-Status: **Foundation phases 1-3 complete. UI phases 1 (data layer) and 2 (admin Classrooms tab)
-complete, at checkpoint 2.** See "UI phase 1" and "UI phase 2" just before the Phase 3 spec.
-Next: UI phase 3 (Stairs and lifts editor). Nothing has been applied to the cloud project; the
-runbook (`docs/runbooks/map-nav-phase1-cloud.md`) applies part 1 now and holds back step A.
+Status: **Foundation phases 1-3 complete. UI phases 1 (data layer), 2 (admin Classrooms tab) and
+3 (Stairs and lifts editor) complete, at checkpoint 3.** See "UI phase 1/2/3" just before the
+Phase 3 spec. Next: the school places the real stairs and lifts in the editor; then UI phase 4
+(student map). Nothing has been applied to the cloud project by Claude; the runbook
+(`docs/runbooks/map-nav-phase1-cloud.md`) applies part 1 and holds back step A.
 
 ## What exists
 
@@ -368,6 +369,49 @@ build, lint. **Not verified:** the screen in a real browser (no Supabase Auth/Po
 here, and Leaflet doesn't render in jsdom), so widths 360/390/430/desktop, both themes, keyboard
 use on the map and reduced motion were checked by reading the code only. Do this first in phase 7.
 
+# UI phase 3: admin "Map and rooms", Stairs and lifts editor (built)
+
+Built 2026-11-16. `/admin/map-rooms?tab=connectors`.
+
+| Path                                                   | Job                                                                                                                                                                                                   |
+| ------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/features/map/nav/connectorDraft.ts`               | Pure draft functions: new/move/rename/remove, `setFloorsServed` (copies the nearest floor's x/y by level), `checkDraft` (linking problems + empty/duplicate names), `connectivitySummary`, `isDirty`. |
+| `src/features/map/nav/components/ConnectorMarkers.tsx` | Draggable stairs/lift markers (44px), snap lines, red ring when not walkable, dashed ghosts for the floors above and below, the Add tool's ghost.                                                     |
+| `src/components/connectorGlyphs.ts`                    | Stairs and lift path data, used by `Icon.tsx` (`stairs`, `lift`) and by the markers.                                                                                                                  |
+| `src/features/map/nav/routeEnds.ts`                    | `destinationEnd(destination)`: a search result as a `RouteEnd` (entrances are doors). Reuse in phase 4.                                                                                               |
+| `src/features/admin/components/map-rooms/connectors/`  | `ConnectorsTab` (draft, tools, Save/Discard, leave guard), `ConnectorPanel`, `ValidationPanel`, `TryRoute`.                                                                                           |
+| `FloorPlanView`                                        | New props: `quiet`, `onMapClick`, `onPointerMove`, `crosshair`.                                                                                                                                       |
+
+How it behaves:
+
+- Tools: Select (drag markers), Add stairs, Add lift (click places one at the clicked point, opens
+  the panel with the name selected, returns to Select; Esc cancels).
+- Everything is a draft until **Save** (`map_save_connectors`, whole list). Save is disabled while
+  any check is an error. Discard asks first. Leaving the page (or switching tab) with unsaved
+  changes asks first (`useBlocker`), closing the browser tab warns (`beforeunload`).
+- **Available** on a saved connector is saved at once (`map_set_available`) and doesn't count as an
+  unsaved change. On a connector not yet saved it only changes the draft.
+- The draft follows the saved list while there are no unsaved changes, so another admin's save
+  appears live. With unsaved changes, a notice offers "Load the saved version" or "Keep mine".
+- Position X/Y fields on the current floor are the keyboard way to move a marker.
+- Try a route runs on a second router that holds the draft. `RouteOk.connectors` are **ids**, not
+  names (the spec example below said names; fixed); the box maps them to names.
+- Not built, per the spec (school answers 7 and 9): a door editor and edge tags. Doors get
+  "Mark out of order" with fix-it in phase 5.
+
+How to place the real stairs and lifts: Admin -> Map and rooms -> Stairs and lifts. Use the hint
+tables near the top of this file ("Hints for placing stairs", "Hint for the lift"): hatched areas
+on the plan are the PDF's stair symbols. For each staircase: Add stairs on its lowest floor, tick
+the other floors (the marker is copied to the same spot), check each floor with Show and drag
+where needed, until the checks say "All four floors are connected." and show no Fix lines. The
+lift serves all four floors (school answer 6) and isn't drawn on floor 1: place it at the same
+spot. Then Save.
+
+Verified: Vitest (draft functions on the real map; editor with the map stubbed: placing, floors
+served, route on the unsaved draft, Save payload, Save blocked by a marker in a wall, Available
+saved at once, delete confirm, leave guard). **Not verified:** dragging, drawing and the pointer
+ghost in a real browser (Leaflet doesn't render in jsdom), and real Realtime.
+
 # Phase 3: hand-off spec for the UI work
 
 Everything below is a **spec, not built**. Nothing in this section exists in the app yet unless it
@@ -453,7 +497,7 @@ Success:
 { ok: true, mode: 'standard', distanceM: 35, durationS: 74,
   legs: [{ floor: 'G', points: [{x,y}, ...] }, { floor: '3', points: [...] }],   // draw these
   steps: [{ kind, text: 'Walk 5 m to the stairs (West stairs)', floor, distanceM, durationS, connector? }, ...],
-  connectors: ['West stairs'] }
+  connectors: ['3f2c…'] }  // connector ids, not names
 ```
 
 Failure: `{ ok: false, code, message }`. Show `message` as it is; it is written for students.

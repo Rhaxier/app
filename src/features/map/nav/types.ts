@@ -188,6 +188,9 @@ export type ProblemCode =
   | 'connector-missing-floor'
   | 'connector-unknown-floor'
   | 'connector-single-floor'
+  // From the stairs and lifts editor's own checks (connectorDraft.ts), not from linking.
+  | 'connector-no-name'
+  | 'connector-duplicate-name'
   | 'floor-not-connected'
   | 'floors-split'
   | 'room-without-door'
