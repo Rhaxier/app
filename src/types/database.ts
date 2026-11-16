@@ -100,6 +100,8 @@ export type Database = {
           maintenance_enabled: boolean;
           maintenance_message: string | null;
           maintenance_until: string | null;
+          map_active_preset_id: string | null;
+          map_indoor_live: boolean;
           report_auto_urgent_votes: number | null;
           school_days: number[];
           school_email_domain: string | null;
@@ -130,6 +132,8 @@ export type Database = {
           maintenance_enabled?: boolean;
           maintenance_message?: string | null;
           maintenance_until?: string | null;
+          map_active_preset_id?: string | null;
+          map_indoor_live?: boolean;
           report_auto_urgent_votes?: number | null;
           school_days?: number[];
           school_email_domain?: string | null;
@@ -159,6 +163,8 @@ export type Database = {
           maintenance_enabled?: boolean;
           maintenance_message?: string | null;
           maintenance_until?: string | null;
+          map_active_preset_id?: string | null;
+          map_indoor_live?: boolean;
           report_auto_urgent_votes?: number | null;
           school_days?: number[];
           school_email_domain?: string | null;
@@ -171,7 +177,15 @@ export type Database = {
           venue_reminder_days_before?: number;
           venue_reminder_hours?: number;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'app_settings_map_active_preset_id_fkey';
+            columns: ['map_active_preset_id'];
+            isOneToOne: false;
+            referencedRelation: 'map_presets';
+            referencedColumns: ['id'];
+          },
+        ];
       };
       audit_log: {
         Row: {
@@ -744,7 +758,7 @@ export type Database = {
           created_at: string;
           height: number;
           id: string;
-          image_path: string;
+          image_path: string | null;
           name: string;
           sort_order: number;
           updated_at: string;
@@ -755,7 +769,7 @@ export type Database = {
           created_at?: string;
           height: number;
           id?: string;
-          image_path: string;
+          image_path?: string | null;
           name: string;
           sort_order?: number;
           updated_at?: string;
@@ -765,7 +779,7 @@ export type Database = {
           created_at?: string;
           height?: number;
           id?: string;
-          image_path?: string;
+          image_path?: string | null;
           name?: string;
           sort_order?: number;
           updated_at?: string;
@@ -869,6 +883,177 @@ export type Database = {
           {
             foreignKeyName: 'join_requests_requester_id_fkey';
             columns: ['requester_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      map_assignments: {
+        Row: {
+          created_at: string;
+          id: string;
+          name: string;
+          preset_id: string;
+          region_id: string;
+          subject: string;
+          teacher: string;
+          type: Database['public']['Enums']['map_room_type'];
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          id?: string;
+          name: string;
+          preset_id: string;
+          region_id: string;
+          subject?: string;
+          teacher?: string;
+          type?: Database['public']['Enums']['map_room_type'];
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          name?: string;
+          preset_id?: string;
+          region_id?: string;
+          subject?: string;
+          teacher?: string;
+          type?: Database['public']['Enums']['map_room_type'];
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'map_assignments_preset_id_fkey';
+            columns: ['preset_id'];
+            isOneToOne: false;
+            referencedRelation: 'map_presets';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      map_connectors: {
+        Row: {
+          accessible: boolean;
+          available: boolean;
+          created_at: string;
+          floors: string[];
+          id: string;
+          name: string;
+          positions: NonNullable<Json>;
+          type: Database['public']['Enums']['map_connector_type'];
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          accessible: boolean;
+          available?: boolean;
+          created_at?: string;
+          floors: string[];
+          id?: string;
+          name: string;
+          positions?: NonNullable<Json>;
+          type: Database['public']['Enums']['map_connector_type'];
+          updated_at?: string;
+        };
+        Update: {
+          accessible?: boolean;
+          available?: boolean;
+          created_at?: string;
+          floors?: string[];
+          id?: string;
+          name?: string;
+          positions?: NonNullable<Json>;
+          type?: Database['public']['Enums']['map_connector_type'];
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      map_geometry_ids: {
+        Row: {
+          created_at: string;
+          destination: boolean;
+          floor: string;
+          id: string;
+          kind: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          destination?: boolean;
+          floor: string;
+          id: string;
+          kind: string;
+        };
+        Update: {
+          created_at?: string;
+          destination?: boolean;
+          floor?: string;
+          id?: string;
+          kind?: string;
+        };
+        Relationships: [];
+      };
+      map_overrides: {
+        Row: {
+          available: boolean;
+          created_at: string;
+          id: string;
+          kind: Database['public']['Enums']['map_override_kind'];
+          tags: string[];
+          target_id: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          available?: boolean;
+          created_at?: string;
+          id?: string;
+          kind: Database['public']['Enums']['map_override_kind'];
+          tags?: string[];
+          target_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          available?: boolean;
+          created_at?: string;
+          id?: string;
+          kind?: Database['public']['Enums']['map_override_kind'];
+          tags?: string[];
+          target_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      map_presets: {
+        Row: {
+          created_at: string;
+          created_by: string | null;
+          id: string;
+          name: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          name: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          name?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'map_presets_created_by_fkey';
+            columns: ['created_by'];
             isOneToOne: false;
             referencedRelation: 'profiles';
             referencedColumns: ['id'];
@@ -1302,6 +1487,8 @@ export type Database = {
           duplicate_of: string | null;
           floor_id: string | null;
           id: string;
+          map_target_id: string | null;
+          map_target_kind: Database['public']['Enums']['map_target_kind'] | null;
           photo_path: string | null;
           reporter_id: string;
           resolved_at: string | null;
@@ -1323,6 +1510,8 @@ export type Database = {
           duplicate_of?: string | null;
           floor_id?: string | null;
           id?: string;
+          map_target_id?: string | null;
+          map_target_kind?: Database['public']['Enums']['map_target_kind'] | null;
           photo_path?: string | null;
           reporter_id?: string;
           resolved_at?: string | null;
@@ -1342,6 +1531,8 @@ export type Database = {
           duplicate_of?: string | null;
           floor_id?: string | null;
           id?: string;
+          map_target_id?: string | null;
+          map_target_kind?: Database['public']['Enums']['map_target_kind'] | null;
           photo_path?: string | null;
           reporter_id?: string;
           resolved_at?: string | null;
@@ -1503,6 +1694,147 @@ export type Database = {
           },
         ];
       };
+      room_migration_backup: {
+        Row: {
+          captured_at: string;
+          id: string;
+          old_floor_id: string | null;
+          old_room_id: string;
+          old_x: number | null;
+          old_y: number | null;
+          row_id: string;
+          table_name: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          captured_at?: string;
+          id?: string;
+          old_floor_id?: string | null;
+          old_room_id: string;
+          old_x?: number | null;
+          old_y?: number | null;
+          row_id: string;
+          table_name: string;
+        };
+        Update: {
+          captured_at?: string;
+          id?: string;
+          old_floor_id?: string | null;
+          old_room_id?: string;
+          old_x?: number | null;
+          old_y?: number | null;
+          row_id?: string;
+          table_name?: string;
+        };
+        Relationships: [];
+      };
+      room_migration_floors_backup: {
+        Row: {
+          captured_at: string;
+          floor_id: string;
+          height: number;
+          image_path: string | null;
+          name: string;
+          width: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          captured_at?: string;
+          floor_id: string;
+          height: number;
+          image_path?: string | null;
+          name: string;
+          width: number;
+        };
+        Update: {
+          captured_at?: string;
+          floor_id?: string;
+          height?: number;
+          image_path?: string | null;
+          name?: string;
+          width?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'room_migration_floors_backup_floor_id_fkey';
+            columns: ['floor_id'];
+            isOneToOne: true;
+            referencedRelation: 'floors';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      room_migration_map: {
+        Row: {
+          created_at: string;
+          new_region_id: string;
+          new_room_id: string | null;
+          old_code: string;
+          old_room_id: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          new_region_id: string;
+          new_room_id?: string | null;
+          old_code: string;
+          old_room_id?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          new_region_id?: string;
+          new_room_id?: string | null;
+          old_code?: string;
+          old_room_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'room_migration_map_new_room_id_fkey';
+            columns: ['new_room_id'];
+            isOneToOne: false;
+            referencedRelation: 'rooms';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'room_migration_map_old_room_id_fkey';
+            columns: ['old_room_id'];
+            isOneToOne: false;
+            referencedRelation: 'rooms';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      room_migration_traced: {
+        Row: {
+          created_at: string;
+          floor: string;
+          kind: Database['public']['Enums']['room_kind'];
+          name: string;
+          region_id: string;
+          x: number;
+          y: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          floor: string;
+          kind: Database['public']['Enums']['room_kind'];
+          name: string;
+          region_id: string;
+          x: number;
+          y: number;
+        };
+        Update: {
+          created_at?: string;
+          floor?: string;
+          kind?: Database['public']['Enums']['room_kind'];
+          name?: string;
+          region_id?: string;
+          x?: number;
+          y?: number;
+        };
+        Relationships: [];
+      };
       rooms: {
         Row: {
           code: string;
@@ -1511,6 +1843,8 @@ export type Database = {
           id: string;
           kind: Database['public']['Enums']['room_kind'];
           name: string;
+          region_id: string | null;
+          retired_at: string | null;
           updated_at: string;
           x: number;
           y: number;
@@ -1523,6 +1857,8 @@ export type Database = {
           id?: string;
           kind?: Database['public']['Enums']['room_kind'];
           name: string;
+          region_id?: string | null;
+          retired_at?: string | null;
           updated_at?: string;
           x: number;
           y: number;
@@ -1534,6 +1870,8 @@ export type Database = {
           id?: string;
           kind?: Database['public']['Enums']['room_kind'];
           name?: string;
+          region_id?: string | null;
+          retired_at?: string | null;
           updated_at?: string;
           x?: number;
           y?: number;
@@ -2452,6 +2790,25 @@ export type Database = {
       is_staff: { Args: Record<PropertyKey, never>; Returns: boolean };
       is_staff_member: { Args: { p_user_id: string }; Returns: boolean };
       is_trusted_change: { Args: Record<PropertyKey, never>; Returns: boolean };
+      map_can_mark_out_of_order: { Args: Record<PropertyKey, never>; Returns: boolean };
+      map_check_preset_name: { Args: { p_except: string; p_name: string }; Returns: string };
+      map_create_preset: { Args: { p_copy_from?: string; p_name: string }; Returns: string };
+      map_delete_preset: { Args: { p_id: string }; Returns: undefined };
+      map_import_assignments: { Args: { p_preset_id: string; p_rows: Json }; Returns: undefined };
+      map_rename_preset: { Args: { p_id: string; p_name: string }; Returns: undefined };
+      map_require_admin: { Args: Record<PropertyKey, never>; Returns: undefined };
+      map_save_assignments: { Args: { p_preset_id: string; p_rows: Json }; Returns: undefined };
+      map_save_connectors: { Args: { p_connectors: Json }; Returns: undefined };
+      map_set_active_preset: { Args: { p_id: string }; Returns: undefined };
+      map_set_available: {
+        Args: { p_available: boolean; p_kind: string; p_target_id: string };
+        Returns: undefined;
+      };
+      map_set_edge_tags: { Args: { p_edge_id: string; p_tags: string[] }; Returns: undefined };
+      map_write_assignments: {
+        Args: { p_action: string; p_preset_id: string; p_rows: Json };
+        Returns: undefined;
+      };
       mark_email_digest_sent: { Args: Record<PropertyKey, never>; Returns: undefined };
       my_account_status: {
         Args: Record<PropertyKey, never>;
@@ -2528,6 +2885,9 @@ export type Database = {
           duplicate_of: string;
           floor_id: string;
           id: string;
+          map_target_id: string;
+          map_target_kind: Database['public']['Enums']['map_target_kind'];
+          map_target_name: string;
           photo_path: string;
           reported_by_me: boolean;
           reporter_id: string;
@@ -2560,6 +2920,10 @@ export type Database = {
         Returns: Database['public']['Enums']['responsibility_kind'];
       };
       role_selected_count: { Args: { p_role_id: string }; Returns: number };
+      room_migration_a_fill: { Args: Record<PropertyKey, never>; Returns: undefined };
+      room_migration_b_apply: { Args: Record<PropertyKey, never>; Returns: Json };
+      room_migration_b_undo: { Args: Record<PropertyKey, never>; Returns: Json };
+      rooms_sync_names: { Args: Record<PropertyKey, never>; Returns: undefined };
       send_announcement_notifications: { Args: { p_id: string }; Returns: undefined };
       signup_conflicts: {
         Args: { p_event_id: string; p_ignore_signup: string; p_student_id: string };
@@ -2603,6 +2967,20 @@ export type Database = {
       content_report_status: 'open' | 'actioned' | 'dismissed';
       email_mode: 'immediate' | 'digest';
       join_request_status: 'pending' | 'accepted' | 'declined' | 'withdrawn';
+      map_connector_type: 'stairs' | 'lift';
+      map_override_kind: 'door' | 'edge';
+      map_room_type:
+        | 'classroom'
+        | 'lab'
+        | 'office'
+        | 'hall'
+        | 'library'
+        | 'cafeteria'
+        | 'toilet'
+        | 'prayer'
+        | 'store'
+        | 'other';
+      map_target_kind: 'connector' | 'door';
       notification_type:
         | 'announcement_new'
         | 'report_new'
@@ -2753,6 +3131,21 @@ export const Constants = {
       content_report_status: ['open', 'actioned', 'dismissed'],
       email_mode: ['immediate', 'digest'],
       join_request_status: ['pending', 'accepted', 'declined', 'withdrawn'],
+      map_connector_type: ['stairs', 'lift'],
+      map_override_kind: ['door', 'edge'],
+      map_room_type: [
+        'classroom',
+        'lab',
+        'office',
+        'hall',
+        'library',
+        'cafeteria',
+        'toilet',
+        'prayer',
+        'store',
+        'other',
+      ],
+      map_target_kind: ['connector', 'door'],
       notification_type: [
         'announcement_new',
         'report_new',

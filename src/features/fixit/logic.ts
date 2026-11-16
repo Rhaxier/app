@@ -64,7 +64,22 @@ export interface ReportFormValues {
   description: string;
   urgent: boolean;
   photo: File | null;
+  /**
+   * Optional: the lift, stairs or door it is about, as "connector:<id>" or
+   * "door:<id>" (one select field holds both kinds). Empty for none.
+   */
+  mapTarget: string;
 }
+
+export type MapTarget = { kind: 'connector' | 'door'; id: string };
+
+/** "connector:<id>" / "door:<id>" -> the parts; anything else -> null. */
+export function parseMapTarget(value: string | null | undefined): MapTarget | null {
+  const match = /^(connector|door):(.+)$/.exec(value ?? '');
+  return match ? { kind: match[1] as MapTarget['kind'], id: match[2] } : null;
+}
+
+export const mapTargetValue = (target: MapTarget) => `${target.kind}:${target.id}`;
 
 export type ReportFormErrors = Partial<Record<keyof ReportFormValues, string>>;
 
@@ -90,6 +105,8 @@ export function toReportInput(values: ReportFormValues): ReportInput {
     category: values.category as ReportCategory,
     description: values.description.trim(),
     urgent: values.urgent,
+    map_target_kind: parseMapTarget(values.mapTarget)?.kind ?? null,
+    map_target_id: parseMapTarget(values.mapTarget)?.id ?? null,
   };
 }
 

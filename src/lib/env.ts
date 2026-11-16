@@ -14,6 +14,9 @@ export const env = {
   authProvider: readAuthProvider(import.meta.env.VITE_AUTH_PROVIDER),
   schoolEmailDomain: import.meta.env.VITE_SCHOOL_EMAIL_DOMAIN ?? '',
   enablePush: import.meta.env.VITE_ENABLE_PUSH === 'true',
+  // Forces the indoor map and traced rooms on, for trying them locally. The
+  // real switch is app_settings.map_indoor_live, set by rooms migration B.
+  indoorMap: import.meta.env.VITE_INDOOR_MAP === 'true',
 };
 
 // True when .env has been filled in. If not, the app shows setup instructions

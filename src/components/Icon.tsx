@@ -3,6 +3,8 @@
 // Icons are decorative (aria-hidden): the button or link around them carries
 // the accessible name.
 
+import { LIFT_PATHS, STAIRS_PATHS } from './connectorGlyphs';
+
 const paths = {
   home: (
     <>
@@ -181,6 +183,29 @@ const paths = {
     <>
       <rect x="3.5" y="4.5" width="17" height="11.5" rx="2" />
       <path d="M8.5 20h7M12 16v4" />
+    </>
+  ),
+  swap: (
+    <>
+      <path d="M7.5 19.5V4.5" />
+      <path d="m4 8 3.5-3.5L11 8" />
+      <path d="M16.5 4.5v15" />
+      <path d="m13 16 3.5 3.5L20 16" />
+    </>
+  ),
+  // Shared with the map's stairs and lift markers (connectorGlyphs.ts).
+  stairs: (
+    <>
+      {STAIRS_PATHS.map((d) => (
+        <path key={d} d={d} />
+      ))}
+    </>
+  ),
+  lift: (
+    <>
+      {LIFT_PATHS.map((d) => (
+        <path key={d} d={d} />
+      ))}
     </>
   ),
 } as const;

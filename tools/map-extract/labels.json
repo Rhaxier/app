@@ -1,0 +1,2513 @@
+{
+ "G": {
+  "rooms": [
+   {
+    "at": [
+     1665,
+     606
+    ],
+    "name": "Clinic",
+    "type": "other"
+   },
+   {
+    "at": [
+     1904,
+     686
+    ],
+    "name": "Senior Library",
+    "type": "library"
+   },
+   {
+    "at": [
+     2097,
+     582
+    ],
+    "name": "Design and Technology Lab",
+    "type": "lab"
+   },
+   {
+    "at": [
+     1710,
+     806
+    ],
+    "name": "Digital Learning Center",
+    "type": "other"
+   },
+   {
+    "at": [
+     1774,
+     801
+    ],
+    "name": "Dean of Studies",
+    "type": "office"
+   },
+   {
+    "at": [
+     2051,
+     765
+    ],
+    "name": "Vice-Principal",
+    "type": "office"
+   },
+   {
+    "at": [
+     2112,
+     783
+    ],
+    "name": "Head Primary",
+    "type": "office"
+   },
+   {
+    "at": [
+     2071,
+     844
+    ],
+    "name": "Head of Senior School / Dean of Assessment and Data",
+    "type": "office"
+   },
+   {
+    "at": [
+     786,
+     765
+    ],
+    "name": "Inclusion Unit",
+    "type": "other"
+   },
+   {
+    "at": [
+     1016,
+     727
+    ],
+    "name": "PYP3 H",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1135,
+     768
+    ],
+    "name": "PYP3 E",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     930,
+     866
+    ],
+    "name": "PYP3 G",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1039,
+     912
+    ],
+    "name": "PYP3 F",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1328,
+     798
+    ],
+    "name": "PYP3 B",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1445,
+     798
+    ],
+    "name": "PYP3 A",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1324,
+     965
+    ],
+    "name": "PYP3 C",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1460,
+     965
+    ],
+    "name": "PYP3 D",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1538,
+     798
+    ],
+    "name": "PYP 3 Supervisor",
+    "type": "office"
+   },
+   {
+    "at": [
+     1598,
+     762
+    ],
+    "name": "Male Washroom",
+    "type": "toilet"
+   },
+   {
+    "at": [
+     1598,
+     825
+    ],
+    "name": "Director Student Welfare",
+    "type": "office"
+   },
+   {
+    "at": [
+     1571,
+     965
+    ],
+    "name": "Canteen",
+    "type": "cafeteria"
+   },
+   {
+    "at": [
+     1904,
+     945
+    ],
+    "name": "Inclusion",
+    "type": "other"
+   },
+   {
+    "at": [
+     2066,
+     950
+    ],
+    "name": "SOR GF-1",
+    "type": "other"
+   },
+   {
+    "at": [
+     1904,
+     1207
+    ],
+    "name": "Auditorium",
+    "type": "hall"
+   },
+   {
+    "at": [
+     1271,
+     1416
+    ],
+    "name": "PYP2 E",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1389,
+     1416
+    ],
+    "name": "PYP2 D",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1516,
+     1419
+    ],
+    "name": "PYP2 A",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     978,
+     1480
+    ],
+    "name": "PYP2 F",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1392,
+     1586
+    ],
+    "name": "PYP2 C",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1518,
+     1586
+    ],
+    "name": "PYP2 B",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1071,
+     1628
+    ],
+    "name": "PYP2 G",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     956,
+     1680
+    ],
+    "name": "PYP2 H",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     869,
+     1525
+    ],
+    "name": "IER",
+    "type": "other"
+   },
+   {
+    "at": [
+     783,
+     1578
+    ],
+    "name": "Facility Manager",
+    "type": "office"
+   },
+   {
+    "at": [
+     1268,
+     1586
+    ],
+    "name": "KG Music",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1604,
+     1578
+    ],
+    "name": "Music Room",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1730,
+     1635
+    ],
+    "name": "PYP 1 Supervisor",
+    "type": "office"
+   },
+   {
+    "at": [
+     2082,
+     1541
+    ],
+    "name": "Asst. MSO",
+    "type": "office"
+   },
+   {
+    "at": [
+     1719,
+     1450
+    ],
+    "name": "Female Washroom",
+    "type": "toilet"
+   },
+   {
+    "at": [
+     2095,
+     1450
+    ],
+    "name": "Male Washroom",
+    "type": "toilet"
+   },
+   {
+    "at": [
+     938,
+     1788
+    ],
+    "name": "HR",
+    "type": "office"
+   },
+   {
+    "at": [
+     947,
+     1856
+    ],
+    "name": "Hindustani Music",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     941,
+     1980
+    ],
+    "name": "STS",
+    "type": "office"
+   },
+   {
+    "at": [
+     932,
+     2051
+    ],
+    "name": "KG 1 & 2 Supervisor",
+    "type": "office"
+   },
+   {
+    "at": [
+     953,
+     2162
+    ],
+    "name": "KG2 I",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1071,
+     2212
+    ],
+    "name": "KG2 F",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     865,
+     2313
+    ],
+    "name": "KG2 H",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     980,
+     2362
+    ],
+    "name": "KG2 G",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1260,
+     2250
+    ],
+    "name": "KG2 E",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1389,
+     2245
+    ],
+    "name": "KG2 C",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1510,
+     2245
+    ],
+    "name": "KG1 G",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1256,
+     2416
+    ],
+    "name": "KG2 D",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1392,
+     2416
+    ],
+    "name": "KG2 B",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1506,
+     2416
+    ],
+    "name": "KG2 A",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     778,
+     2238
+    ],
+    "name": "GRE",
+    "type": "other"
+   },
+   {
+    "at": [
+     1244,
+     1909
+    ],
+    "name": "PLC",
+    "type": "other"
+   },
+   {
+    "at": [
+     1657,
+     2365
+    ],
+    "name": "Female Washroom",
+    "type": "toilet"
+   },
+   {
+    "at": [
+     1657,
+     2433
+    ],
+    "name": "Male Washroom",
+    "type": "toilet"
+   },
+   {
+    "at": [
+     1757,
+     2493
+    ],
+    "name": "Conference Room",
+    "type": "other"
+   },
+   {
+    "at": [
+     2090,
+     2390
+    ],
+    "name": "Accounts",
+    "type": "office"
+   },
+   {
+    "at": [
+     2160,
+     2362
+    ],
+    "name": "GSM",
+    "type": "office"
+   },
+   {
+    "at": [
+     2160,
+     2415
+    ],
+    "name": "MSO",
+    "type": "office"
+   },
+   {
+    "at": [
+     2053,
+     2507
+    ],
+    "name": "Registrar",
+    "type": "office"
+   },
+   {
+    "at": [
+     2040,
+     2225
+    ],
+    "name": "Principal",
+    "type": "office"
+   },
+   {
+    "at": [
+     2051,
+     2278
+    ],
+    "name": "Principal Secretary",
+    "type": "office"
+   },
+   {
+    "at": [
+     2142,
+     2245
+    ],
+    "name": "Director",
+    "type": "office"
+   },
+   {
+    "at": [
+     2220,
+     770
+    ],
+    "name": "Female Washroom",
+    "type": "toilet"
+   },
+   {
+    "at": [
+     2217,
+     827
+    ],
+    "name": "Secretary",
+    "type": "office"
+   },
+   {
+    "at": [
+     2277,
+     803
+    ],
+    "name": "Supervisor Teaching & Learning",
+    "type": "office"
+   },
+   {
+    "at": [
+     2368,
+     783
+    ],
+    "name": "PYP3 I",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2497,
+     798
+    ],
+    "name": "MYP1 A",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2694,
+     775
+    ],
+    "name": "MYP1 C",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2804,
+     730
+    ],
+    "name": "MYP1 D",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2780,
+     930
+    ],
+    "name": "MYP1 E",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2894,
+     882
+    ],
+    "name": "MYP1 F",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2377,
+     968
+    ],
+    "name": "PYP3 J",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2500,
+     965
+    ],
+    "name": "MYP1 B",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2941,
+     707
+    ],
+    "name": "Art",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     3015,
+     750
+    ],
+    "name": "Art",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2254,
+     962
+    ],
+    "name": "Music",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2244,
+     1192
+    ],
+    "name": "Male Prayer Room",
+    "type": "prayer"
+   },
+   {
+    "at": [
+     2295,
+     1427
+    ],
+    "name": "Music Violin",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2421,
+     1432
+    ],
+    "name": "PYP1 B",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2550,
+     1432
+    ],
+    "name": "PYP1 C",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2835,
+     1483
+    ],
+    "name": "PYP1 E",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2947,
+     1538
+    ],
+    "name": "PYP1 G",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2292,
+     1594
+    ],
+    "name": "IT 1 GF",
+    "type": "lab"
+   },
+   {
+    "at": [
+     2425,
+     1598
+    ],
+    "name": "PYP1 A",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2547,
+     1598
+    ],
+    "name": "PYP1 D",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2744,
+     1632
+    ],
+    "name": "PYP1 F",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2856,
+     1682
+    ],
+    "name": "PYP1 H",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     3035,
+     1571
+    ],
+    "name": "PYP Coordinator",
+    "type": "office"
+   },
+   {
+    "at": [
+     2909,
+     1780
+    ],
+    "name": "Clinic",
+    "type": "other"
+   },
+   {
+    "at": [
+     2686,
+     1919
+    ],
+    "name": "Discovery Centre",
+    "type": "other"
+   },
+   {
+    "at": [
+     2895,
+     2033
+    ],
+    "name": "Learning Support Unit",
+    "type": "other"
+   },
+   {
+    "at": [
+     2850,
+     2166
+    ],
+    "name": "Pre KG C",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2747,
+     2222
+    ],
+    "name": "Pre KG D",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2938,
+     2321
+    ],
+    "name": "Pre KG B",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2830,
+     2371
+    ],
+    "name": "Pre KG A",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2297,
+     2253
+    ],
+    "name": "KG1 B",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2416,
+     2253
+    ],
+    "name": "KG1 D",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2539,
+     2250
+    ],
+    "name": "KG1 F",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2297,
+     2419
+    ],
+    "name": "KG1 A",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2416,
+     2419
+    ],
+    "name": "KG1 C",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2535,
+     2419
+    ],
+    "name": "KG1 E",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     3360,
+     1897
+    ],
+    "name": "Multipurpose Hall",
+    "type": "hall"
+   },
+   {
+    "at": [
+     3298,
+     1768
+    ],
+    "name": "Male Washroom",
+    "type": "toilet"
+   },
+   {
+    "at": [
+     3262,
+     1750
+    ],
+    "name": "Store",
+    "type": "store"
+   },
+   {
+    "at": [
+     3300,
+     2028
+    ],
+    "name": "Female Washroom",
+    "type": "toilet"
+   },
+   {
+    "at": [
+     3262,
+     2048
+    ],
+    "name": "Store",
+    "type": "store"
+   },
+   {
+    "at": [
+     3315,
+     2139
+    ],
+    "name": "Canteen",
+    "type": "cafeteria"
+   },
+   {
+    "at": [
+     3418,
+     2132
+    ],
+    "name": "PE Room",
+    "type": "other"
+   },
+   {
+    "at": [
+     3360,
+     2225
+    ],
+    "name": "KG Swimming Pool",
+    "type": "hall"
+   },
+   {
+    "at": [
+     3360,
+     2353
+    ],
+    "name": "Swimming Pool",
+    "type": "hall"
+   }
+  ],
+  "void": [
+   [
+    392,
+    1498
+   ],
+   [
+    3900,
+    1560
+   ]
+  ],
+  "outdoor": [
+   [
+    [
+     3012,
+     1904
+    ],
+    [
+     3242,
+     1869
+    ]
+   ],
+   [
+    [
+     3319,
+     2060
+    ],
+    [
+     3365,
+     2116
+    ]
+   ],
+   [
+    [
+     3447,
+     2268
+    ],
+    [
+     3447,
+     2407
+    ]
+   ]
+  ],
+  "places": [
+   {
+    "at": [
+     1710,
+     2240
+    ],
+    "name": "Parents Lounge",
+    "type": "other"
+   },
+   {
+    "at": [
+     2035,
+     2393
+    ],
+    "name": "Reception",
+    "type": "office"
+   },
+   {
+    "at": [
+     2613,
+     1786
+    ],
+    "name": "PYP 2 Supervisor",
+    "type": "office"
+   }
+  ]
+ },
+ "1": {
+  "rooms": [
+   {
+    "at": [
+     1994,
+     288
+    ],
+    "name": "Sewing",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2126,
+     288
+    ],
+    "name": "Pottery",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2266,
+     288
+    ],
+    "name": "Art",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2450,
+     288
+    ],
+    "name": "IT Services",
+    "type": "office"
+   },
+   {
+    "at": [
+     2244,
+     476
+    ],
+    "name": "Budhayana Spark Lab",
+    "type": "lab"
+   },
+   {
+    "at": [
+     1216,
+     440
+    ],
+    "name": "MYP4 G",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1338,
+     496
+    ],
+    "name": "MYP2 C",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1460,
+     514
+    ],
+    "name": "Male Prayer Room",
+    "type": "prayer"
+   },
+   {
+    "at": [
+     1570,
+     530
+    ],
+    "name": "MYP2 D",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1766,
+     534
+    ],
+    "name": "CPR",
+    "type": "other"
+   },
+   {
+    "at": [
+     1122,
+     610
+    ],
+    "name": "MYP2 A",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1246,
+     674
+    ],
+    "name": "MYP2 B",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1566,
+     722
+    ],
+    "name": "MYP2 E",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1706,
+     716
+    ],
+    "name": "MYP2 F",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1850,
+     720
+    ],
+    "name": "9F",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     956,
+     526
+    ],
+    "name": "MYP Coordinator",
+    "type": "office"
+   },
+   {
+    "at": [
+     2630,
+     526
+    ],
+    "name": "9A",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2764,
+     526
+    ],
+    "name": "9C",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2906,
+     526
+    ],
+    "name": "9E",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     3020,
+     510
+    ],
+    "name": "Female Prayer Room",
+    "type": "prayer"
+   },
+   {
+    "at": [
+     3146,
+     500
+    ],
+    "name": "6A",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     3256,
+     436
+    ],
+    "name": "6D",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     3240,
+     670
+    ],
+    "name": "6B",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     3360,
+     606
+    ],
+    "name": "6C",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     3524,
+     518
+    ],
+    "name": "Supervisor Grade 6 & MYP 1",
+    "type": "office"
+   },
+   {
+    "at": [
+     2616,
+     718
+    ],
+    "name": "9B",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2764,
+     718
+    ],
+    "name": "9D",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2910,
+     716
+    ],
+    "name": "MYP1 G",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2190,
+     696
+    ],
+    "name": "Head of Middle School & Teaching Learning Coach",
+    "type": "office"
+   },
+   {
+    "at": [
+     2320,
+     690
+    ],
+    "name": "Female Washroom",
+    "type": "toilet"
+   },
+   {
+    "at": [
+     2420,
+     700
+    ],
+    "name": "Supervisor Grade 9 ICSE",
+    "type": "office"
+   },
+   {
+    "at": [
+     2136,
+     774
+    ],
+    "name": "School Counselor",
+    "type": "office"
+   },
+   {
+    "at": [
+     2256,
+     770
+    ],
+    "name": "Examination Center",
+    "type": "other"
+   },
+   {
+    "at": [
+     2360,
+     780
+    ],
+    "name": "Male Washroom",
+    "type": "toilet"
+   },
+   {
+    "at": [
+     2432,
+     774
+    ],
+    "name": "Exam Photocopy",
+    "type": "other"
+   },
+   {
+    "at": [
+     2032,
+     950
+    ],
+    "name": "Counsellors Room",
+    "type": "office"
+   },
+   {
+    "at": [
+     2446,
+     950
+    ],
+    "name": "Arabic & Islamic Education Supervisors",
+    "type": "office"
+   },
+   {
+    "at": [
+     2600,
+     1020
+    ],
+    "name": "Female Prayer Room",
+    "type": "prayer"
+   },
+   {
+    "at": [
+     1520,
+     1310
+    ],
+    "name": "MYP3 E",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1650,
+     1310
+    ],
+    "name": "MYP3 F",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1794,
+     1320
+    ],
+    "name": "SOR FF-4",
+    "type": "other"
+   },
+   {
+    "at": [
+     1182,
+     1374
+    ],
+    "name": "MYP3 D",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1056,
+     1440
+    ],
+    "name": "MYP3 A",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1280,
+     1580
+    ],
+    "name": "MYP3 C",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1154,
+     1644
+    ],
+    "name": "MYP3 B",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1050,
+     1700
+    ],
+    "name": "MYP 2&3 Supervisor",
+    "type": "office"
+   },
+   {
+    "at": [
+     1516,
+     1524
+    ],
+    "name": "7E",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1646,
+     1524
+    ],
+    "name": "7F",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1786,
+     1524
+    ],
+    "name": "Mind Spark Lab",
+    "type": "lab"
+   },
+   {
+    "at": [
+     1884,
+     1530
+    ],
+    "name": "Female Washroom",
+    "type": "toilet"
+   },
+   {
+    "at": [
+     2678,
+     1314
+    ],
+    "name": "Physics Store",
+    "type": "store"
+   },
+   {
+    "at": [
+     2884,
+     1314
+    ],
+    "name": "Physics Lab",
+    "type": "lab"
+   },
+   {
+    "at": [
+     2680,
+     1372
+    ],
+    "name": "Grade 5 AC",
+    "type": "other"
+   },
+   {
+    "at": [
+     3356,
+     1414
+    ],
+    "name": "Physics Lab",
+    "type": "lab"
+   },
+   {
+    "at": [
+     3550,
+     1470
+    ],
+    "name": "Physics Store",
+    "type": "store"
+   },
+   {
+    "at": [
+     2576,
+     1534
+    ],
+    "name": "Male Washroom",
+    "type": "toilet"
+   },
+   {
+    "at": [
+     2680,
+     1530
+    ],
+    "name": "SOR FF-3",
+    "type": "other"
+   },
+   {
+    "at": [
+     2820,
+     1530
+    ],
+    "name": "PYP5 I",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2960,
+     1530
+    ],
+    "name": "PYP5 J",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     3250,
+     1606
+    ],
+    "name": "Biology Lab",
+    "type": "lab"
+   },
+   {
+    "at": [
+     3480,
+     1714
+    ],
+    "name": "Biology Store",
+    "type": "store"
+   },
+   {
+    "at": [
+     3260,
+     2306
+    ],
+    "name": "General Science Lab",
+    "type": "lab"
+   },
+   {
+    "at": [
+     1160,
+     2274
+    ],
+    "name": "PYP4 I",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1274,
+     2320
+    ],
+    "name": "PYP4 H",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1050,
+     2450
+    ],
+    "name": "PYP4 J",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1174,
+     2500
+    ],
+    "name": "PYP4 G",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1500,
+     2366
+    ],
+    "name": "PYP4 E",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1644,
+     2366
+    ],
+    "name": "PYP4 D",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1786,
+     2366
+    ],
+    "name": "PYP4 A",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1934,
+     2370
+    ],
+    "name": "SOR FF-2",
+    "type": "other"
+   },
+   {
+    "at": [
+     2076,
+     2366
+    ],
+    "name": "PYP5 H",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1500,
+     2576
+    ],
+    "name": "PYP4 F",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1644,
+     2576
+    ],
+    "name": "PYP4 C",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1786,
+     2576
+    ],
+    "name": "PYP4 B",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1980,
+     2576
+    ],
+    "name": "STEAM Studio",
+    "type": "lab"
+   },
+   {
+    "at": [
+     2406,
+     2376
+    ],
+    "name": "PYP5 K",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2534,
+     2376
+    ],
+    "name": "PYP5 G",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2644,
+     2376
+    ],
+    "name": "PYP5 F",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2840,
+     2366
+    ],
+    "name": "Staff Room",
+    "type": "office"
+   },
+   {
+    "at": [
+     2406,
+     2580
+    ],
+    "name": "PYP 4&5 Supervisors",
+    "type": "office"
+   },
+   {
+    "at": [
+     2534,
+     2580
+    ],
+    "name": "PYP5 E",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2676,
+     2580
+    ],
+    "name": "PYP5 D",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2816,
+     2576
+    ],
+    "name": "PYP5 C",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2960,
+     2580
+    ],
+    "name": "IT FF2",
+    "type": "lab"
+   },
+   {
+    "at": [
+     3414,
+     2450
+    ],
+    "name": "PYP5 A",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     3290,
+     2540
+    ],
+    "name": "PYP5 B",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1016,
+     2220
+    ],
+    "name": "Resource Room",
+    "type": "other"
+   }
+  ],
+  "void": [
+   [
+    2228,
+    1982
+   ],
+   [
+    1252,
+    1950
+   ],
+   [
+    3228,
+    1962
+   ],
+   [
+    306,
+    1513
+   ],
+   [
+    3973,
+    1537
+   ],
+   [
+    2220,
+    1150
+   ]
+  ],
+  "doors": [
+   [
+    [
+     3020,
+     510
+    ],
+    [
+     3030,
+     626
+    ]
+   ],
+   [
+    [
+     2678,
+     1314
+    ],
+    [
+     2516,
+     1270
+    ]
+   ]
+  ]
+ },
+ "2": {
+  "rooms": [
+   {
+    "at": [
+     1948,
+     404
+    ],
+    "name": "Agile Learning Center",
+    "type": "hall"
+   },
+   {
+    "at": [
+     2294,
+     404
+    ],
+    "name": "Agile Learning Center",
+    "type": "hall"
+   },
+   {
+    "at": [
+     1016,
+     506
+    ],
+    "name": "MYP4 A",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1150,
+     560
+    ],
+    "name": "MYP4 B",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1400,
+     606
+    ],
+    "name": "MYP4 E",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1550,
+     620
+    ],
+    "name": "MYP5 A",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1700,
+     620
+    ],
+    "name": "MYP5 B",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1890,
+     614
+    ],
+    "name": "MYP5 D",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2116,
+     594
+    ],
+    "name": "ISC Lounge",
+    "type": "other"
+   },
+   {
+    "at": [
+     2360,
+     620
+    ],
+    "name": "MYP5 E",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2536,
+     594
+    ],
+    "name": "DP 9",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2670,
+     600
+    ],
+    "name": "DP 10",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2830,
+     606
+    ],
+    "name": "DP 12",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2974,
+     630
+    ],
+    "name": "Grade 9 & 10 Supervisor",
+    "type": "office"
+   },
+   {
+    "at": [
+     3080,
+     566
+    ],
+    "name": "10 B",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     3224,
+     506
+    ],
+    "name": "10 C",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     3366,
+     480
+    ],
+    "name": "Geography Lab",
+    "type": "lab"
+   },
+   {
+    "at": [
+     3330,
+     694
+    ],
+    "name": "10 D",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     3194,
+     764
+    ],
+    "name": "10 A",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     910,
+     686
+    ],
+    "name": "11 E",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1050,
+     764
+    ],
+    "name": "MYP4 C",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1254,
+     636
+    ],
+    "name": "MYP 4 & 5 Supervisor",
+    "type": "office"
+   },
+   {
+    "at": [
+     1394,
+     810
+    ],
+    "name": "MYP4 D",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1550,
+     810
+    ],
+    "name": "MYP4 F",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1704,
+     814
+    ],
+    "name": "MYP5 C",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1936,
+     776
+    ],
+    "name": "Senior School AS/AC",
+    "type": "office"
+   },
+   {
+    "at": [
+     2336,
+     786
+    ],
+    "name": "ICT Engineer",
+    "type": "office"
+   },
+   {
+    "at": [
+     2544,
+     816
+    ],
+    "name": "Cookery Lab",
+    "type": "lab"
+   },
+   {
+    "at": [
+     2690,
+     806
+    ],
+    "name": "DP 11",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2840,
+     816
+    ],
+    "name": "DP 13",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2126,
+     1070
+    ],
+    "name": "Dance Studio",
+    "type": "hall"
+   },
+   {
+    "at": [
+     2514,
+     1140
+    ],
+    "name": "AV Hub",
+    "type": "other"
+   },
+   {
+    "at": [
+     1340,
+     1464
+    ],
+    "name": "8 D",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1490,
+     1464
+    ],
+    "name": "8 E",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1640,
+     1470
+    ],
+    "name": "SOR SF-6",
+    "type": "other"
+   },
+   {
+    "at": [
+     982,
+     1530
+    ],
+    "name": "7 A",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     850,
+     1596
+    ],
+    "name": "7 D",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1090,
+     1730
+    ],
+    "name": "7 B",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     956,
+     1794
+    ],
+    "name": "7 C",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1200,
+     1654
+    ],
+    "name": "Grade 8 Supervisor",
+    "type": "office"
+   },
+   {
+    "at": [
+     1344,
+     1674
+    ],
+    "name": "8 C",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1496,
+     1674
+    ],
+    "name": "8 B",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1644,
+     1674
+    ],
+    "name": "8 A",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1736,
+     1660
+    ],
+    "name": "Female Washroom",
+    "type": "toilet"
+   },
+   {
+    "at": [
+     1736,
+     1720
+    ],
+    "name": "Male Washroom",
+    "type": "toilet"
+   },
+   {
+    "at": [
+     2590,
+     1450
+    ],
+    "name": "Store",
+    "type": "store"
+   },
+   {
+    "at": [
+     2836,
+     1464
+    ],
+    "name": "Chem Lab 2",
+    "type": "lab"
+   },
+   {
+    "at": [
+     2486,
+     1650
+    ],
+    "name": "Female Washroom",
+    "type": "toilet"
+   },
+   {
+    "at": [
+     2486,
+     1716
+    ],
+    "name": "Male Washroom",
+    "type": "toilet"
+   },
+   {
+    "at": [
+     2590,
+     1674
+    ],
+    "name": "IER 2",
+    "type": "other"
+   },
+   {
+    "at": [
+     2820,
+     1680
+    ],
+    "name": "Music Room",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     3026,
+     1686
+    ],
+    "name": "SOR SF-5",
+    "type": "other"
+   }
+  ],
+  "void": [
+   [
+    2132,
+    2470
+   ],
+   [
+    2112,
+    2160
+   ],
+   [
+    2114,
+    1422
+   ],
+   [
+    2114,
+    1824
+   ],
+   [
+    335,
+    1238
+   ],
+   [
+    3990,
+    1505
+   ]
+  ],
+  "doors": [
+   [
+    [
+     1948,
+     404
+    ],
+    [
+     1890,
+     614
+    ]
+   ],
+   [
+    [
+     1948,
+     404
+    ],
+    [
+     2116,
+     594
+    ]
+   ],
+   [
+    [
+     2294,
+     404
+    ],
+    [
+     2360,
+     620
+    ]
+   ],
+   [
+    [
+     2590,
+     1450
+    ],
+    [
+     2424,
+     1450
+    ]
+   ]
+  ],
+  "places": [
+   {
+    "at": [
+     2136,
+     862
+    ],
+    "name": "Staff Room",
+    "type": "office"
+   },
+   {
+    "at": [
+     3324,
+     1550
+    ],
+    "name": "Bio Lab",
+    "type": "lab"
+   },
+   {
+    "at": [
+     3210,
+     1770
+    ],
+    "name": "Chem Lab",
+    "type": "lab"
+   },
+   {
+    "at": [
+     3530,
+     1650
+    ],
+    "name": "Bio Store",
+    "type": "store"
+   },
+   {
+    "at": [
+     3470,
+     1880
+    ],
+    "name": "Chem Store",
+    "type": "store"
+   }
+  ]
+ },
+ "3": {
+  "rooms": [
+   {
+    "at": [
+     1076,
+     446
+    ],
+    "name": "11 C",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1200,
+     500
+    ],
+    "name": "11 B",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1286,
+     566
+    ],
+    "name": "11 & 12 Supervisors",
+    "type": "office"
+   },
+   {
+    "at": [
+     1410,
+     534
+    ],
+    "name": "12 A",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1540,
+     534
+    ],
+    "name": "12 D",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1674,
+     534
+    ],
+    "name": "12 E",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     974,
+     614
+    ],
+    "name": "11 D",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1100,
+     664
+    ],
+    "name": "11 A",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1406,
+     726
+    ],
+    "name": "12 B",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1544,
+     726
+    ],
+    "name": "12 C",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1680,
+     726
+    ],
+    "name": "12 F",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     1886,
+     746
+    ],
+    "name": "IB Secretary",
+    "type": "office"
+   },
+   {
+    "at": [
+     1886,
+     804
+    ],
+    "name": "SOR TF-7",
+    "type": "other"
+   },
+   {
+    "at": [
+     2070,
+     780
+    ],
+    "name": "Staff Room",
+    "type": "office"
+   },
+   {
+    "at": [
+     2310,
+     730
+    ],
+    "name": "Career Counsellor",
+    "type": "office"
+   },
+   {
+    "at": [
+     2416,
+     534
+    ],
+    "name": "DP 1",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2800,
+     530
+    ],
+    "name": "IBDP Coordinator",
+    "type": "office"
+   },
+   {
+    "at": [
+     2800,
+     574
+    ],
+    "name": "Asst. DP Coordinator",
+    "type": "office"
+   },
+   {
+    "at": [
+     2896,
+     494
+    ],
+    "name": "DP 7",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     3020,
+     446
+    ],
+    "name": "DP 8",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2990,
+     674
+    ],
+    "name": "DP 5",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     3110,
+     614
+    ],
+    "name": "DP 6",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2416,
+     730
+    ],
+    "name": "DP 2",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2550,
+     730
+    ],
+    "name": "DP 3",
+    "type": "classroom"
+   },
+   {
+    "at": [
+     2684,
+     730
+    ],
+    "name": "DP 4",
+    "type": "classroom"
+   }
+  ],
+  "void": [
+   [
+    2092,
+    1388
+   ],
+   [
+    2060,
+    2272
+   ],
+   [
+    2042,
+    1980
+   ],
+   [
+    371,
+    1579
+   ],
+   [
+    3954,
+    1576
+   ]
+  ],
+  "places": [
+   {
+    "at": [
+     2630,
+     550
+    ],
+    "name": "DP Lounge",
+    "type": "other"
+   }
+  ]
+ },
+ "links": {
+  "_comment": "From the school: the auditorium is entered on the ground floor by its two side doors and on the first floor through two small lobbies. The two doors at its top corners are backstage doors. The ramps inside it are not stairs and are not modelled.",
+  "entrances": {
+   "G-R074": [
+    "1-R112",
+    "1-R114"
+   ]
+  },
+  "restrictedDoors": [
+   "G-D083",
+   "G-D084"
+  ]
+ }
+}

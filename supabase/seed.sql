@@ -605,3 +605,18 @@ begin
   insert into public.report_votes (report_id, user_id) values (v_report, pg_temp.u('student.g10.b'));
 end;
 $$;
+
+-- ---------------------------------------------------------------------------
+-- Rooms migration step A, second run. The migration ran before this seed
+-- created the floors, placeholder rooms, reports, venues and events, so it
+-- runs again now to add the traced rooms and back up the rooms in use.
+-- (On a cloud project the migration does all of this by itself.)
+-- Skipped when step A is held back (the function doesn't exist then).
+-- ---------------------------------------------------------------------------
+do $$
+begin
+  if to_regprocedure('public.room_migration_a_fill()') is not null then
+    perform public.room_migration_a_fill();
+  end if;
+end;
+$$;

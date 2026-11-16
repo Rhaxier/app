@@ -136,8 +136,16 @@ export const adminGroups: AdminGroup[] = [
       },
       {
         path: 'map',
-        title: 'Map',
+        // Kept until the rooms migration has run and a term has passed
+        // (MAP_NOTES.md); "old pins" tells it apart from Map and rooms.
+        title: 'Map (old pins)',
         description: menuSubtitles.map,
+        icon: 'map',
+      },
+      {
+        path: 'map-rooms',
+        title: 'Map and rooms',
+        description: menuSubtitles['map-rooms'],
         icon: 'map',
       },
       {

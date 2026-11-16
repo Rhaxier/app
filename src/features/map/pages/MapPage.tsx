@@ -25,7 +25,7 @@ import { MapView } from '../components/MapView';
 import { BusyPin, HerePin, ReportPin, RoomPin } from '../components/Pins';
 import { RoomCard } from '../components/RoomCard';
 import { RoomSearch } from '../components/RoomSearch';
-import { useFloors, useRooms } from '../hooks';
+import { useLegacyFloors, useLegacyRooms } from '../hooks';
 import { reportSpots, roomsInUse } from '../logic';
 import styles from './MapPage.module.css';
 
@@ -37,8 +37,10 @@ const PLAN_MARGINS = { top: 132, bottom: 150 };
 
 export function MapPage() {
   useDocumentTitle('Campus map');
-  const floors = useFloors();
-  const rooms = useRooms();
+  // The old map always shows the old floors and rooms (the switch to the
+  // indoor map replaces this whole screen: MapSwitchPage).
+  const floors = useLegacyFloors();
+  const rooms = useLegacyRooms();
   const venues = useVenues();
   const bookingsNow = useBookingsNow();
   const reports = useReports();
@@ -205,6 +207,7 @@ export function MapPage() {
               report={selectedReport}
               others={selectedSpot?.reports ?? [selectedReport]}
               onPick={(id) => show({ report: id })}
+              onClose={() => show({})}
             />
           )}
           {selectedRoom && !selectedReport && (

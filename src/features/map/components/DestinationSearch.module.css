@@ -1,0 +1,127 @@
+/* The indoor map's search: the old room search's look (glass bar, thick-glass
+   matches), with two-line results and a plain version for inside a panel. */
+
+.wrap {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: var(--height-input);
+  padding: 0 var(--space-4);
+  border-radius: var(--r-search);
+  color: var(--muted);
+}
+
+.plain {
+  border: 0.5px solid var(--hair);
+  background: var(--paper);
+}
+
+.box:focus-within {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  min-height: var(--touch-min);
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-size: var(--text-input);
+  outline: none;
+}
+
+.input::placeholder {
+  color: var(--muted);
+}
+
+/* Matches hang below the bar (never glass on glass), or above it when the
+   box sits at the bottom of the screen. */
+.results {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  max-height: min(50vh, 360px);
+  overflow-y: auto;
+  margin: 0;
+  padding: 6px;
+  border-radius: var(--r-card);
+  list-style: none;
+}
+
+/* Inside the directions panel: listed in place, under the box. */
+.inline {
+  max-height: 240px;
+  overflow-y: auto;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.result {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0 var(--space-2);
+  align-items: center;
+  width: 100%;
+  min-height: var(--touch-min);
+  padding: 6px 10px;
+  border: 0;
+  border-radius: var(--r-tag);
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.result:hover {
+  background: var(--segbg);
+}
+
+.result:focus-visible {
+  outline: 2px solid var(--acc);
+  outline-offset: -2px;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.name {
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.detail {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: var(--text-meta);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.floor {
+  color: var(--muted);
+  font-size: var(--text-meta);
+  white-space: nowrap;
+}
+
+.none {
+  padding: var(--space-3);
+  color: var(--muted);
+  font-size: var(--text-body);
+}

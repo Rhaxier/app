@@ -31,7 +31,8 @@ const projectForm = () => import('@/features/projects/pages/ProjectFormPage');
 const collab = () => import('@/features/collab/pages/CollabPage');
 const collabPost = () => import('@/features/collab/pages/CollabDetailPage');
 const collabForm = () => import('@/features/collab/pages/CollabFormPage');
-const map = () => import('@/features/map/pages/MapPage');
+const mapSwitch = () => import('@/features/map/pages/MapSwitchPage');
+const indoorMap = () => import('@/features/map/pages/IndoorMapPage');
 const reportForm = () => import('@/features/fixit/pages/ReportFormPage');
 const report = () => import('@/features/fixit/pages/ReportDetailPage');
 const book = () => import('@/features/venues/pages/BookPage');
@@ -91,7 +92,18 @@ export const router = createBrowserRouter([
               },
               {
                 element: <RequireFeature feature="map" />,
-                children: [{ path: '/map', lazy: lazyPage(map, 'MapPage') }],
+                children: [
+                  {
+                    path: '/map',
+                    // The old map until the indoor map is live (rooms migration B).
+                    lazy: lazyPage(mapSwitch, 'MapSwitchPage'),
+                  },
+                  {
+                    // Staff try the indoor map here before it becomes /map.
+                    element: <RequireRole role="staff" />,
+                    children: [{ path: '/map/indoor', lazy: lazyPage(indoorMap, 'IndoorMapPage') }],
+                  },
+                ],
               },
               {
                 element: <RequireFeature feature="fixit" />,

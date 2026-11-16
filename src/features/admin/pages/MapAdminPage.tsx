@@ -1,6 +1,7 @@
 // Admin > Map (Q6). Choose a room, then click the plan to move its pin.
 // Also: edit or add rooms, and point a floor at a new plan image.
 import { useRef, useState, type FormEvent } from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { FieldRow, FormError, SelectField, TextField } from '@/components/Input';
@@ -12,8 +13,9 @@ import { RoomPin } from '@/features/map/components/Pins';
 import {
   useCreateRoom,
   useDeleteRoom,
-  useFloors,
-  useRooms,
+  useIndoorMapLive,
+  useLegacyFloors,
+  useLegacyRooms,
   useUpdateFloor,
   useUpdateRoom,
   useUploadFloorPlan,
@@ -30,12 +32,31 @@ type RoomKind = Enums<'room_kind'>;
 const roomKinds = Constants.public.Enums.room_kind as readonly RoomKind[];
 
 export function MapAdminPage() {
-  const floors = useFloors();
-  const rooms = useRooms();
+  const { live } = useIndoorMapLive();
+  const floors = useLegacyFloors();
+  const rooms = useLegacyRooms();
   const updateRoom = useUpdateRoom();
   const [floorId, setFloorId] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
+  // After rooms migration B the placeholder rooms are retired and the floors
+  // have no images, so there is nothing to edit here: rooms come from the
+  // traced floor plan (Map and rooms). Undoing B brings this page back.
+  if (live) {
+    return (
+      <AdminPage title="Map" description={pageIntros.map}>
+        <Card className="stack-tight">
+          <p>
+            The indoor map is live: rooms now come from the school&rsquo;s floor plan, and these old
+            pins are retired.
+          </p>
+          <p>
+            <Link to="/admin/map-rooms">Go to Map and rooms</Link>
+          </p>
+        </Card>
+      </AdminPage>
+    );
+  }
   if (floors.isPending || rooms.isPending) return <LoadingState />;
   if (floors.isError) return <ErrorState error={floors.error} onRetry={() => floors.refetch()} />;
   if (rooms.isError) return <ErrorState error={rooms.error} onRetry={() => rooms.refetch()} />;

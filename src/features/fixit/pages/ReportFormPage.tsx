@@ -1,5 +1,10 @@
 // Report an issue: safety notice first, then pick the room, check what's
 // already reported there, and describe the problem (photo optional).
+// Optionally, say which lift, stairs or door it is about (MAP_NOTES.md,
+// spec 3): the staff who handle it can then mark that one out of order.
+// The report itself never closes anything. Links from the indoor map fill
+// that in (?target=connector:<id>&floor=G); ?room= is used when that room
+// is in the list.
 // The database sends it to the right team (report_categories, which admins
 // edit in Admin > Fix-it categories).
 import { useRef, useState, type FormEvent } from 'react';
@@ -12,10 +17,13 @@ import { PageHeader } from '@/components/PageHeader';
 import { LoadingState } from '@/components/States';
 import { SAFETY_COPY } from '@/config/school';
 import { useCurrentUser } from '@/features/auth/hooks';
-import { useRooms } from '@/features/map/hooks';
+import { useFloors, useRooms } from '@/features/map/hooks';
+import { roomLabel } from '@/features/map/logic';
+import { useConnectors, useGeometry, useTracedRooms } from '@/features/map/nav/hooks';
 import { errorMessage } from '@/lib/errors';
 import { isStaff } from '@/lib/permissions';
 import { DuplicateCheck } from '../components/DuplicateCheck';
+import { mapTargetOptions } from '../mapTargets';
 import { useCreateReport, useReportCategories } from '../hooks';
 import {
   toReportInput,
@@ -44,8 +52,30 @@ export function ReportFormPage() {
     description: '',
     urgent: false,
     photo: null,
+    mapTarget: params.get('target') ?? '',
   });
   const [errors, setErrors] = useState<ReportFormErrors>({});
+
+  // A room from the address that isn't in the list (a traced room, before
+  // the room lists switch over) is dropped: the student picks one instead.
+  if (rooms.data && values.roomId && !rooms.data.some((room) => room.id === values.roomId)) {
+    setValues((current) => ({ ...current, roomId: '' }));
+  }
+
+  // What the lift, stairs or door choices depend on: the room's floor (old
+  // floor names G, 1, 2 are the map's floor ids) and, for a traced room, its doors.
+  const floors = useFloors();
+  const connectors = useConnectors();
+  const tracedRooms = useTracedRooms();
+  const room = rooms.data?.find((r) => r.id === values.roomId);
+  const floorName =
+    floors.data?.find((f) => f.id === room?.floor_id)?.name ?? params.get('floor') ?? null;
+  const region = values.roomId ? tracedRooms.data?.[values.roomId] : undefined;
+  const geometry = useGeometry(Boolean(region));
+  const doors = region
+    ? (geometry.data?.doors ?? []).filter((door) => door.a === region || door.b === region)
+    : [];
+  const targetOptions = mapTargetOptions(connectors.data ?? [], floorName, doors, values.mapTarget);
 
   function update<K extends keyof ReportFormValues>(key: K, value: ReportFormValues[K]) {
     setValues((current) => ({ ...current, [key]: value }));
@@ -83,12 +113,28 @@ export function ReportFormPage() {
           <option value="">Choose a room…</option>
           {rooms.data?.map((room) => (
             <option key={room.id} value={room.id}>
-              {room.code} · {room.name}
+              {roomLabel(room)}
             </option>
           ))}
         </SelectField>
 
         {values.roomId && <DuplicateCheck roomId={values.roomId} />}
+
+        {(targetOptions.length > 0 || values.mapTarget) && (
+          <SelectField
+            label="Is it about a lift, stairs or a door? (optional)"
+            hint="Staff decide whether it is out of order; your report doesn't close it."
+            value={values.mapTarget}
+            onChange={(e) => update('mapTarget', e.target.value)}
+          >
+            <option value="">No</option>
+            {targetOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </SelectField>
+        )}
 
         <fieldset className={styles.fieldset}>
           <legend className={styles.legend}>What kind of problem?</legend>

@@ -1,0 +1,159 @@
+/* Map and rooms > Stairs and lifts. Map first on phones; map beside the
+   panels on laptops. Every colour is a token. */
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  align-items: center;
+}
+
+.layout {
+  display: grid;
+  gap: 16px;
+}
+
+@media (min-width: 900px) {
+  .layout {
+    grid-template-columns: minmax(0, 3fr) minmax(320px, 2fr);
+    align-items: start;
+  }
+
+  .mapColumn {
+    position: sticky;
+    top: 16px;
+  }
+}
+
+.mapColumn,
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.heading {
+  margin: 0;
+  font-size: var(--text-title);
+}
+
+/* ---------- Side panel ---------- */
+
+.fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.fieldset legend {
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.floorRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 8px;
+  align-items: center;
+  min-height: 44px;
+}
+
+.set {
+  color: var(--ok);
+  font-size: var(--text-meta);
+}
+
+.notSet {
+  color: var(--fix);
+  font-size: var(--text-meta);
+}
+
+/* ---------- Checks ---------- */
+
+.summaryOk,
+.summaryWait {
+  margin: 0;
+  font-weight: 600;
+}
+
+.summaryOk {
+  color: var(--ok);
+}
+
+.summaryWait {
+  color: var(--wait);
+}
+
+.problems {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.problem {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  width: 100%;
+  min-height: 44px;
+  padding: 8px;
+  border: 0;
+  border-radius: var(--r-tag);
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.problem:hover:not(:disabled) {
+  background: var(--paper);
+}
+
+.problem:focus-visible {
+  outline: 2px solid var(--acc);
+  outline-offset: -2px;
+}
+
+.problem:disabled {
+  cursor: default;
+}
+
+/* ---------- Try a route ---------- */
+
+.steps {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.steps li + li {
+  margin-top: 2px;
+}
+
+.routeError {
+  margin: 0;
+  color: var(--wait);
+}
+
+/* ---------- Unsaved changes ---------- */
+
+/* Stays in view at the bottom, above the tab bar on phones. */
+.saveBar {
+  position: sticky;
+  bottom: calc(var(--tabbar-space) + var(--space-3));
+  z-index: 500; /* above Leaflet's panes (400) */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border: 0.5px solid var(--g-rim);
+  border-radius: var(--r-card);
+  background: var(--card);
+  box-shadow: var(--e2, var(--e1));
+}

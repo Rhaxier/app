@@ -1,0 +1,286 @@
+room_id,name,subject,teacher,type
+G-R004,Clinic (G-1),,,other
+G-R008,Design and Technology Lab,,,lab
+G-R016,PYP3 H,,,classroom
+G-R017,MYP1 D,,,classroom
+G-R018,Art (G-1),,,classroom
+G-R019,Inclusion Unit,,,other
+G-R020,PYP3 E,,,classroom
+G-R022,PYP 3 Supervisor,,,office
+G-R023,Senior Library,,,library
+G-R024,Supervisor Teaching & Learning,,,office
+G-R026,MYP1 C,,,classroom
+G-R027,Art (G-2),,,classroom
+G-R030,PYP3 B,,,classroom
+G-R031,PYP3 A,,,classroom
+G-R032,Male Washroom (G-1),,,toilet
+G-R033,Dean of Studies,,,office
+G-R034,Vice-Principal / Head Primary,,,office
+G-R035,Female Washroom (G-1),,,toilet
+G-R036,PYP3 I,,,classroom
+G-R037,MYP1 A,,,classroom
+G-R040,Director Student Welfare,,,office
+G-R041,Digital Learning Center,,,other
+G-R042,Head of Senior School / Dean of Assessment and Data,,,office
+G-R043,Secretary,,,office
+G-R046,PYP3 G,,,classroom
+G-R048,MYP1 F,,,classroom
+G-R049,PYP3 F,,,classroom
+G-R051,Canteen (G-1),,,cafeteria
+G-R055,Music,,,classroom
+G-R057,MYP1 E,,,classroom
+G-R058,PYP3 C,,,classroom
+G-R059,PYP3 D,,,classroom
+G-R060,Inclusion,,,other
+G-R061,SOR GF-1,,,other
+G-R062,PYP3 J,,,classroom
+G-R063,MYP1 B,,,classroom
+G-R073,Male Prayer Room (G-1),,,prayer
+G-R074,Auditorium,,,hall
+G-R082,PYP2 E,,,classroom
+G-R083,PYP2 D,,,classroom
+G-R084,PYP2 A,,,classroom
+G-R089,PYP1 B,,,classroom
+G-R090,PYP1 C,,,classroom
+G-R092,IER,,,other
+G-R093,PYP2 F,,,classroom
+G-R094,Female Washroom (G-2),,,toilet
+G-R095,Male Washroom (G-2),,,toilet
+G-R096,Music Violin,,,classroom
+G-R097,PYP1 E,,,classroom
+G-R099,Facility Manager,,,office
+G-R102,Asst. MSO,,,office
+G-R104,PYP1 G,,,classroom
+G-R105,PYP Coordinator,,,office
+G-R106,KG Music,,,classroom
+G-R107,PYP2 C,,,classroom
+G-R108,PYP2 B,,,classroom
+G-R109,Music Room (G-1),,,classroom
+G-R110,IT 1 GF,,,lab
+G-R111,PYP1 A,,,classroom
+G-R112,PYP1 D,,,classroom
+G-R113,PYP2 G,,,classroom
+G-R114,PYP1 F,,,classroom
+G-R115,PYP2 H,,,classroom
+G-R116,PYP 1 Supervisor,,,office
+G-R118,PYP1 H,,,classroom
+G-R122,Discovery Centre,,,other
+G-R126,Store (G-1),,,store
+G-R127,Male Washroom (G-3),,,toilet
+G-R128,HR,,,office
+G-R132,Clinic (G-2),,,other
+G-R134,Hindustani Music,,,classroom
+G-R135,Multipurpose Hall,,,hall
+G-R138,PLC,,,other
+G-R139,STS,,,office
+G-R140,Female Washroom (G-3),,,toilet
+G-R143,Store (G-2),,,store
+G-R145,KG 1 & 2 Supervisor,,,office
+G-R147,Learning Support Unit,,,other
+G-R152,Canteen (G-2),,,cafeteria
+G-R153,PE Room,,,other
+G-R155,KG2 I,,,classroom
+G-R156,Pre KG C,,,classroom
+G-R157,KG2 F,,,classroom
+G-R158,Principal,,,office
+G-R159,Pre KG D,,,classroom
+G-R161,KG Swimming Pool,,,hall
+G-R162,KG2 E,,,classroom
+G-R163,KG2 C,,,classroom
+G-R165,Director,,,office
+G-R166,GRE,,,other
+G-R168,KG1 G,,,classroom
+G-R170,Principal Secretary,,,office
+G-R171,KG1 B,,,classroom
+G-R172,KG1 D,,,classroom
+G-R173,KG1 F,,,classroom
+G-R175,KG2 H,,,classroom
+G-R176,Pre KG B,,,classroom
+G-R177,Swimming Pool,,,hall
+G-R178,KG2 G,,,classroom
+G-R179,Female Washroom (G-4),,,toilet
+G-R181,Accounts,,,office
+G-R182,GSM,,,office
+G-R184,Pre KG A,,,classroom
+G-R187,KG2 D,,,classroom
+G-R188,KG2 B,,,classroom
+G-R189,KG2 A,,,classroom
+G-R193,Male Washroom (G-4),,,toilet
+G-R194,MSO,,,office
+G-R195,KG1 A,,,classroom
+G-R196,KG1 C,,,classroom
+G-R197,KG1 E,,,classroom
+G-R201,Conference Room,,,other
+G-R203,Registrar,,,office
+G-P01,Parents Lounge,,,other
+G-P02,Reception,,,office
+G-P03,PYP 2 Supervisor,,,office
+1-R001,Sewing,,,classroom
+1-R002,Pottery,,,classroom
+1-R003,Art (1-1),,,classroom
+1-R004,IT Services,,,office
+1-R016,MYP4 G,,,classroom
+1-R017,6D,,,classroom
+1-R019,MYP Coordinator,,,office
+1-R020,MYP2 C,,,classroom
+1-R021,Budhayana Spark Lab,,,lab
+1-R022,6A,,,classroom
+1-R023,Male Prayer Room (1-1),,,prayer
+1-R024,MYP2 D,,,classroom
+1-R025,CPR,,,other
+1-R026,Female Prayer Room (1-1),,,prayer
+1-R028,Supervisor Grade 6 & MYP 1,,,office
+1-R032,9A,,,classroom
+1-R033,9C,,,classroom
+1-R034,9E,,,classroom
+1-R039,MYP2 A,,,classroom
+1-R041,6C,,,classroom
+1-R046,MYP2 B,,,classroom
+1-R048,Head of Middle School & Teaching Learning Coach,,,office
+1-R049,Female Washroom (1-1),,,toilet
+1-R050,Supervisor Grade 9 ICSE,,,office
+1-R052,6B,,,classroom
+1-R053,MYP2 E,,,classroom
+1-R054,MYP2 F,,,classroom
+1-R055,MYP1 G,,,classroom
+1-R059,9F,,,classroom
+1-R060,Male Washroom (1-1),,,toilet
+1-R061,Exam Photocopy,,,other
+1-R062,9B,,,classroom
+1-R063,9D,,,classroom
+1-R067,School Counselor,,,office
+1-R068,Examination Center,,,other
+1-R069,Counsellors Room,,,office
+1-R070,Arabic & Islamic Education Supervisors,,,office
+1-R072,Female Prayer Room (1-2),,,prayer
+1-R080,MYP3 E,,,classroom
+1-R081,MYP3 F,,,classroom
+1-R082,SOR FF-4,,,other
+1-R085,Physics Store (1-1),,,store
+1-R086,Physics Lab (1-1),,,lab
+1-R091,Grade 5 AC,,,other
+1-R094,MYP3 D,,,classroom
+1-R095,MYP3 A,,,classroom
+1-R097,Physics Lab (1-2),,,lab
+1-R098,7E,,,classroom
+1-R099,Male Washroom (1-2),,,toilet
+1-R101,Physics Store (1-2),,,store
+1-R102,Mind Spark Lab,,,lab
+1-R103,Female Washroom (1-2),,,toilet
+1-R104,SOR FF-3,,,other
+1-R105,PYP5 I,,,classroom
+1-R106,PYP5 J,,,classroom
+1-R109,MYP3 C,,,classroom
+1-R110,7F,,,classroom
+1-R116,Biology Lab,,,lab
+1-R117,MYP3 B,,,classroom
+1-R119,MYP 2&3 Supervisor,,,office
+1-R120,Biology Store,,,store
+1-R128,Resource Room,,,other
+1-R132,General Science Lab,,,lab
+1-R134,PYP4 I,,,classroom
+1-R137,PYP4 H,,,classroom
+1-R139,SOR FF-2,,,other
+1-R140,PYP5 H,,,classroom
+1-R141,PYP5 K,,,classroom
+1-R142,PYP5 G,,,classroom
+1-R143,PYP5 F,,,classroom
+1-R144,Staff Room (1-1),,,office
+1-R146,PYP4 J,,,classroom
+1-R147,PYP4 E,,,classroom
+1-R148,PYP4 D,,,classroom
+1-R149,PYP4 A,,,classroom
+1-R151,PYP5 A,,,classroom
+1-R153,PYP4 G,,,classroom
+1-R155,PYP5 B,,,classroom
+1-R157,STEAM Studio,,,lab
+1-R158,PYP 4&5 Supervisors,,,office
+1-R159,PYP5 E,,,classroom
+1-R160,PYP5 D,,,classroom
+1-R161,PYP5 C,,,classroom
+1-R162,IT FF2,,,lab
+1-R164,PYP4 F,,,classroom
+1-R165,PYP4 C,,,classroom
+1-R166,PYP4 B,,,classroom
+2-R005,Agile Learning Center (2-1),,,hall
+2-R006,Agile Learning Center (2-2),,,hall
+2-R012,Geography Lab,,,lab
+2-R015,MYP4 A,,,classroom
+2-R017,MYP4 B,,,classroom
+2-R019,ISC Lounge,,,other
+2-R021,10 C,,,classroom
+2-R024,MYP4 E,,,classroom
+2-R025,MYP5 A,,,classroom
+2-R026,MYP5 B,,,classroom
+2-R027,MYP5 D,,,classroom
+2-R028,MYP5 E,,,classroom
+2-R029,10 B,,,classroom
+2-R031,MYP 4 & 5 Supervisor,,,office
+2-R032,DP 9,,,classroom
+2-R033,DP 10,,,classroom
+2-R034,DP 12,,,classroom
+2-R035,Grade 9 & 10 Supervisor,,,office
+2-R037,10 D,,,classroom
+2-R040,11 E,,,classroom
+2-R045,10 A,,,classroom
+2-R046,MYP4 C,,,classroom
+2-R050,DP 11,,,classroom
+2-R051,DP 13,,,classroom
+2-R053,MYP4 D,,,classroom
+2-R054,MYP4 F,,,classroom
+2-R055,MYP5 C,,,classroom
+2-R056,Senior School AS/AC,,,office
+2-R057,ICT Engineer,,,office
+2-R058,Cookery Lab,,,lab
+2-R069,Dance Studio,,,hall
+2-R071,AV Hub,,,other
+2-R080,8 D,,,classroom
+2-R081,8 E,,,classroom
+2-R082,SOR SF-6,,,other
+2-R083,Store (2-1),,,store
+2-R084,Chem Lab 2,,,lab
+2-R085,7 A,,,classroom
+2-R093,7 D,,,classroom
+2-R095,Grade 8 Supervisor,,,office
+2-R096,8 C,,,classroom
+2-R097,Female Washroom (2-1),,,toilet
+2-R098,Female Washroom (2-2),,,toilet
+2-R099,7 B,,,classroom
+2-R103,IER 2,,,other
+2-R104,Music Room (2-1),,,classroom
+2-R105,SOR SF-5,,,other
+2-R106,8 B,,,classroom
+2-R107,8 A,,,classroom
+2-R108,Male Washroom (2-1),,,toilet
+2-R109,Male Washroom (2-2),,,toilet
+2-R114,7 C,,,classroom
+2-P01,Staff Room (2-1),,,office
+2-P02,Bio Lab,,,lab
+2-P03,Chem Lab,,,lab
+2-P04,Bio Store,,,store
+2-P05,Chem Store,,,store
+3-R006,DP 8,,,classroom
+3-R010,11 C,,,classroom
+3-R013,11 B,,,classroom
+3-R016,DP 1,,,classroom
+3-R019,11 & 12 Supervisors,,,office
+3-R020,12 A,,,classroom
+3-R021,12 D,,,classroom
+3-R022,12 E,,,classroom
+3-R024,IBDP Coordinator / Asst. DP Coordinator,,,office
+3-R025,DP 7,,,classroom
+3-R026,DP 6,,,classroom
+3-R027,11 D,,,classroom
+3-R029,DP 5,,,classroom
+3-R030,11 A,,,classroom
+3-R034,DP 2,,,classroom
+3-R035,DP 3,,,classroom
+3-R036,DP 4,,,classroom
+3-R039,Career Counsellor,,,office
+3-R043,12 B,,,classroom
+3-R044,12 C,,,classroom
+3-R045,12 F,,,classroom
+3-R046,IB Secretary,,,office
+3-R047,Staff Room (3-1),,,office
+3-R050,SOR TF-7,,,other
+3-P01,DP Lounge,,,other

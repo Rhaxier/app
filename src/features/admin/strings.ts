@@ -31,6 +31,7 @@ export const menuSubtitles = {
   volunteering: 'Teacher approval, event categories and SUPW hour targets',
   venues: 'Who can book, when, and each venue’s own rules',
   map: 'Floor plans, rooms and where each room’s pin sits',
+  'map-rooms': 'Room names for each term, and where stairs and lifts are',
   'report-categories': 'What can be reported, and which team gets each kind',
   reports: 'Every open fix-it report, urgent ones first',
   moderation: 'Reported posts, and posts staff have hidden or removed',
@@ -67,6 +68,10 @@ export const pageIntros: Record<AdminSectionPath, string> = {
   volunteering: 'Approval, categories and SUPW targets.',
   venues: 'Who can book, when, and the rules for each venue.',
   map: 'Floor plans, rooms and where each room’s pin sits.',
+  // Walls, rooms and corridors come from geometry.json (traced from the
+  // school's plan); nothing in the app can edit them.
+  'map-rooms':
+    'Name each room for the term and place the stairs and lifts. Walls, rooms and corridors come from the school’s floor plan and can’t be changed here.',
   'report-categories': 'What can be reported, and which team gets each kind.',
   reports: 'Every open report, urgent first, oldest first.',
   moderation: 'Reported, hidden and removed content.',
@@ -208,6 +213,38 @@ export const footnotes = {
   },
   features: {
     off: 'Off hides the tab and tile and stops anyone but admins adding anything new; nothing is deleted.',
+  },
+  mapRooms: {
+    // app_settings.map_active_preset_id; map_set_active_preset().
+    terms:
+      'Students see the active term’s names. You can edit any term; changes to the active one show straight away.',
+    copyFrom: 'The new term starts with the same names, so you only change what’s different.',
+    // map_delete_preset() refuses the active one and copies the names into the audit log.
+    deleteActive: 'The active term can’t be deleted. Make another term active first.',
+    teacher: 'Free text: it isn’t linked to anyone’s account.',
+    // Routes come from the geometry and the stairs and lifts only.
+    type: 'Used to describe the room in search; it doesn’t change any route.',
+    // searchableDestinations() leaves out rooms without a name.
+    unnamed: 'A room without a name stays on the map, but students can’t search for it.',
+    // map_import_assignments() replaces the term's whole set.
+    import:
+      'Importing replaces every name in this term: rooms missing from the file become unnamed. Nothing changes until you press Apply.',
+    entrance: 'Name a door that leads outside, for example “Main gate”, and students can find it.',
+    firstRun:
+      'Start from the names printed on the floor plan, then rename rooms as needed and make the term active.',
+    // Stairs and lifts editor. Router rules: router.ts (step-free skips stairs
+    // and inaccessible connectors; unavailable ones are skipped in both modes).
+    tools:
+      'Pick Add stairs or Add lift, then click the plan where it is. Drag a marker to move it. Hatched areas are where the floor plan shows stairs. Esc cancels.',
+    floorsServed:
+      'A floor you tick starts at the same spot as the nearest floor, because the floors line up; drag it to fine-tune. The dashed circles show where it is on the floor above and below.',
+    position: 'For moving it with the keyboard: map units, about 5 cm each.',
+    accessible: 'Step-free routes only use accessible lifts.',
+    // map_set_available(): saved straight away, unlike the rest of the editor.
+    available:
+      'Turn off when it is out of order. Routes avoid it straight away; this is saved at once.',
+    save: 'Nothing changes for students until you save. Problems in red must be fixed first.',
+    tryRoute: 'Uses your unsaved changes, so you can check them before saving.',
   },
   map: {
     planImage:

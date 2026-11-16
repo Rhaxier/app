@@ -1,0 +1,74 @@
+/* Stairs and lift markers in the editor. Every colour is a token. */
+
+/* The marker box is the 44px touch target; the visible disc sits inside. */
+.marker {
+  display: grid;
+  place-items: center;
+  background: transparent;
+  border: 0;
+  color: var(--ink);
+}
+
+.marker:focus-visible {
+  outline: none;
+}
+
+.marker:focus-visible .disc {
+  outline: 2px solid var(--acc);
+  outline-offset: 3px;
+}
+
+.disc {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1.5px solid var(--line);
+  border-radius: 50%;
+  background: var(--card);
+  box-shadow: var(--e1);
+}
+
+.selected .disc {
+  border-color: var(--acc);
+  color: var(--acc);
+  box-shadow:
+    0 0 0 3px var(--accsoft),
+    var(--e1);
+}
+
+/* Out of order: greyed, still there. */
+.unavailable .disc {
+  border-style: dashed;
+  color: var(--faint);
+  background: var(--paper);
+}
+
+.ghost {
+  fill: none;
+  stroke: var(--faint);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 4;
+}
+
+.addGhost {
+  fill: var(--accsoft);
+  fill-opacity: 0.6;
+  stroke: var(--acc);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 3;
+}
+
+.warning {
+  fill: var(--fixsoft);
+  fill-opacity: 0.7;
+  stroke: var(--fix);
+  stroke-width: 2;
+}
+
+.snapLine {
+  stroke: var(--acc);
+  stroke-width: 1.5;
+  stroke-dasharray: 2 3;
+  fill: none;
+}

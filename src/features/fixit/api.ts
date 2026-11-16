@@ -44,6 +44,11 @@ export interface Report {
   created_at: string;
   vote_count: number;
   voted_by_me: boolean;
+  /** What the report is about on the indoor map: a lift or staircase, or a door. */
+  map_target_kind: Enums<'map_target_kind'> | null;
+  map_target_id: string | null;
+  /** The lift's or staircase's name; null for doors and reports without a target. */
+  map_target_name: string | null;
 }
 
 export const OPEN_STATUSES: ReportStatus[] = ['open', 'acknowledged', 'in_progress'];
@@ -96,7 +101,7 @@ export async function fetchOpenReportsInRoom(roomId: string): Promise<RoomReport
 
 export type ReportInput = Pick<
   TablesInsert<'reports'>,
-  'room_id' | 'category' | 'description' | 'urgent'
+  'room_id' | 'category' | 'description' | 'urgent' | 'map_target_kind' | 'map_target_id'
 >;
 
 /** Creates the report (the database notifies the right team), then attaches the photo. */

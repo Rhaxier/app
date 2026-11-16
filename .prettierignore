@@ -8,3 +8,9 @@ CLAUDE.md
 
 # Third-party Claude Code skills, kept exactly as published
 .claude/skills
+
+# Indoor map: generated data and local debug output
+src/features/map/nav/data/geometry.json
+tools/map-extract/report.json
+tools/map-extract/labels.json
+map-debug/

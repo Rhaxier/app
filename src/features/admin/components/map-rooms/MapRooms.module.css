@@ -1,0 +1,144 @@
+/* Admin > Map and rooms. Map first on phones; map beside the list on laptops. */
+
+.layout {
+  display: grid;
+  gap: 16px;
+}
+
+@media (min-width: 900px) {
+  .layout {
+    grid-template-columns: minmax(0, 3fr) minmax(320px, 2fr);
+    align-items: start;
+  }
+
+  /* The map stays in view while the list scrolls. */
+  .mapColumn {
+    position: sticky;
+    top: 16px;
+  }
+}
+
+.mapColumn,
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.bar > :first-child {
+  flex: 1 1 220px;
+}
+
+.status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+/* ---------- The room list ---------- */
+
+.list {
+  max-height: 60vh;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0;
+  border-radius: var(--r-card);
+  background: var(--card);
+  box-shadow: var(--e1);
+  list-style: none;
+}
+
+.rowButton {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2px 12px;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 0;
+  border-bottom: 0.5px solid var(--hair);
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.rowButton:hover {
+  background: var(--paper);
+}
+
+.rowButton:focus-visible {
+  outline: 2px solid var(--acc);
+  outline-offset: -2px;
+}
+
+.rowSelected,
+.rowSelected:hover {
+  background: var(--accsoft);
+}
+
+.rowName {
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rowUnnamed {
+  color: var(--muted);
+  font-style: italic;
+  font-weight: 400;
+}
+
+.rowId {
+  color: var(--muted);
+  font-size: var(--text-meta);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.rowDetail {
+  grid-column: 1 / -1;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: var(--text-meta);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- Import preview ---------- */
+
+.counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.errors {
+  max-height: 240px;
+  overflow-y: auto;
+  margin: 0;
+  padding-left: 20px;
+  color: var(--fix);
+}
+
+.errors li + li {
+  margin-top: 4px;
+}
+
+.fileInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}

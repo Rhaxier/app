@@ -21,3 +21,7 @@ ios/
 
 # Vercel CLI link (`vercel link`): which Vercel project this folder deploys to
 .vercel
+
+# Indoor map: local debug page (npm run map:debug) and the school layout PDF
+map-debug/
+map-inputs/

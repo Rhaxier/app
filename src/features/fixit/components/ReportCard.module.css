@@ -14,6 +14,37 @@
   gap: var(--space-3);
 }
 
+/* The time, and the close button in the top right corner when there is one. */
+.topEnd {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* 44px tap target pulled into the sheet's corner, so the row stays compact. */
+.close {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: var(--touch-min);
+  height: var(--touch-min);
+  margin: -10px -10px -10px 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.close:hover {
+  background: var(--segbg);
+}
+
+.close:focus-visible {
+  outline: 2px solid var(--acc);
+  outline-offset: 2px;
+}
+
 .label {
   color: var(--fixink);
 }
