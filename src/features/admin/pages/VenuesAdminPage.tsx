@@ -12,6 +12,7 @@ import { CheckboxField, FieldRow, FormError, SelectField, TextField } from '@/co
 import { Sheet } from '@/components/Sheet';
 import { ErrorState, LoadingState } from '@/components/States';
 import { useRooms } from '@/features/map/hooks';
+import { roomLabel } from '@/features/map/logic';
 import type { Venue } from '@/features/venues/api';
 import { useVenues } from '@/features/venues/hooks';
 import { errorMessage } from '@/lib/errors';
@@ -189,7 +190,7 @@ function VenueEditor({ venue, onClose }: { venue: Venue | null; onClose: () => v
         <option value="">Not on the map</option>
         {rooms.data?.map((room) => (
           <option key={room.id} value={room.id}>
-            {room.code} · {room.name}
+            {roomLabel(room)}
           </option>
         ))}
       </SelectField>

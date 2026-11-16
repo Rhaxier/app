@@ -73,3 +73,16 @@ export function reportSpots<R extends { id: string; room_id: string | null; x: n
   }
   return [...spots.values()];
 }
+
+/**
+ * How a room is named in pickers and search. A placeholder room has a short
+ * code ("G.04 · Classroom G.04"); a room traced from the floor plan has an
+ * id-like code ("G-R030"), so it shows its name and floor instead
+ * ("PYP3 B (Ground floor)").
+ */
+export function roomLabel(room: { code: string; name: string }): string {
+  const traced = /^([G0-9]+)-[RP]\d+$/.exec(room.code);
+  if (!traced) return `${room.code} · ${room.name}`;
+  const floor = traced[1] === 'G' ? 'Ground floor' : `Floor ${traced[1]}`;
+  return `${room.name} (${floor})`;
+}

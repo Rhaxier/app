@@ -9,12 +9,55 @@ export type Floor = Pick<Tables<'floors'>, 'id' | 'name' | 'sort_order' | 'width
   image_path: string;
 };
 export type Room = Pick<Tables<'rooms'>, 'id' | 'floor_id' | 'code' | 'name' | 'kind' | 'x' | 'y'>;
+/** A floor as the rest of the app needs it (its name), with or without an image. */
+export type FloorInfo = Pick<
+  Tables<'floors'>,
+  'id' | 'name' | 'sort_order' | 'width' | 'height' | 'image_path'
+>;
 
-// Why the two filters below: the rooms migration (step A, MAP_NOTES.md) adds
-// the traced rooms of the new indoor map and a floor 3 without an image.
-// Their positions belong to the new map, so until step B switches the map
-// screen over, today's screens show only floors with an image and the
-// original rooms (no region_id), exactly as before.
+/**
+ * Is the indoor map live? Rooms migration B switches it on
+ * (app_settings.map_indoor_live). Before step B the column doesn't exist
+ * (42703): not live.
+ */
+export async function fetchIndoorMapLive(): Promise<boolean> {
+  const { data, error } = await supabase
+    .from('app_settings')
+    .select('map_indoor_live')
+    .maybeSingle();
+  if (error?.code === '42703') return false;
+  if (error) throw error;
+  return data?.map_indoor_live === true;
+}
+
+/** Once live: every floor (they have no image; the indoor map draws them). */
+export async function fetchAllFloors(): Promise<FloorInfo[]> {
+  const { data, error } = await supabase
+    .from('floors')
+    .select('id, name, sort_order, image_path, width, height')
+    .order('sort_order');
+  if (error) throw error;
+  return data;
+}
+
+/** Once live: the traced rooms (the placeholders are retired), by name. */
+export async function fetchIndoorRooms(): Promise<Room[]> {
+  const { data, error } = await supabase
+    .from('rooms')
+    .select('id, floor_id, code, name, kind, x, y')
+    .not('region_id', 'is', null)
+    .is('retired_at', null)
+    .order('name');
+  if (error) throw error;
+  return data;
+}
+
+// The old map's floors and rooms. Why the two filters below: the rooms
+// migration (step A, MAP_NOTES.md) adds the traced rooms of the new indoor
+// map and a floor 3 without an image. Their positions belong to the new map,
+// so until step B switches over, the old screens show only floors with an
+// image and the original rooms (no region_id), exactly as before. After the
+// switch, useRooms()/useFloors() read fetchIndoorRooms/fetchAllFloors instead.
 export async function fetchFloors(): Promise<Floor[]> {
   const { data, error } = await supabase
     .from('floors')

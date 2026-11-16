@@ -13,6 +13,7 @@ import {
 } from '@/components/Input';
 import { SegmentedControl } from '@/components/SegmentedControl';
 import { useRooms } from '@/features/map/hooks';
+import { roomLabel } from '@/features/map/logic';
 import { useCalendarData } from '@/features/school/hooks';
 import { useVolunteerCategories } from '../hooks';
 import { dayNote } from '@/features/school/logic';
@@ -169,7 +170,7 @@ export function EventForm({
             <option value="">Choose a room…</option>
             {rooms.data?.map((room) => (
               <option key={room.id} value={room.id}>
-                {room.code} · {room.name}
+                {roomLabel(room)}
               </option>
             ))}
           </SelectField>

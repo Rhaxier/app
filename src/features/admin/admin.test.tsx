@@ -40,6 +40,7 @@ const settings: AppSettings = {
   venue_reminder_days_before: 3,
   school_days: [0, 1, 2, 3, 4],
   map_active_preset_id: null,
+  map_indoor_live: false,
   created_at: '',
   updated_at: '',
 };

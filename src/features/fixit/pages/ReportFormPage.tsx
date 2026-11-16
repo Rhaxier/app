@@ -18,6 +18,7 @@ import { LoadingState } from '@/components/States';
 import { SAFETY_COPY } from '@/config/school';
 import { useCurrentUser } from '@/features/auth/hooks';
 import { useFloors, useRooms } from '@/features/map/hooks';
+import { roomLabel } from '@/features/map/logic';
 import { useConnectors, useGeometry, useTracedRooms } from '@/features/map/nav/hooks';
 import { errorMessage } from '@/lib/errors';
 import { isStaff } from '@/lib/permissions';
@@ -112,7 +113,7 @@ export function ReportFormPage() {
           <option value="">Choose a room…</option>
           {rooms.data?.map((room) => (
             <option key={room.id} value={room.id}>
-              {room.code} · {room.name}
+              {roomLabel(room)}
             </option>
           ))}
         </SelectField>

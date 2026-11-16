@@ -53,6 +53,15 @@ select 6, 'Part 3, report target (20261116120000)',
     else 'PARTLY applied: tell the developer'
   end
 union all
+select 7, 'Part 4, release tools (20261116130000)',
+  case when to_regprocedure('public.room_migration_b_apply()') is not null
+       then 'applied' else 'not applied' end
+union all
+select 8, 'Part 5, RELEASED (indoor map live)',
+  coalesce((xpath('/row/v/text()', query_to_xml(
+    'select case when map_indoor_live then ''yes'' else ''no'' end as v from public.app_settings',
+    false, true, '')))[1]::text, 'no (part 4 not applied)')
+union all
 select 4, 'Recorded in the CLI history',
   case when to_regclass('supabase_migrations.schema_migrations') is null then 'no history table'
        else coalesce((xpath('/row/v/text()', query_to_xml(

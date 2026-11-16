@@ -101,6 +101,7 @@ export type Database = {
           maintenance_message: string | null;
           maintenance_until: string | null;
           map_active_preset_id: string | null;
+          map_indoor_live: boolean;
           report_auto_urgent_votes: number | null;
           school_days: number[];
           school_email_domain: string | null;
@@ -132,6 +133,7 @@ export type Database = {
           maintenance_message?: string | null;
           maintenance_until?: string | null;
           map_active_preset_id?: string | null;
+          map_indoor_live?: boolean;
           report_auto_urgent_votes?: number | null;
           school_days?: number[];
           school_email_domain?: string | null;
@@ -162,6 +164,7 @@ export type Database = {
           maintenance_message?: string | null;
           maintenance_until?: string | null;
           map_active_preset_id?: string | null;
+          map_indoor_live?: boolean;
           report_auto_urgent_votes?: number | null;
           school_days?: number[];
           school_email_domain?: string | null;
@@ -1725,6 +1728,42 @@ export type Database = {
         };
         Relationships: [];
       };
+      room_migration_floors_backup: {
+        Row: {
+          captured_at: string;
+          floor_id: string;
+          height: number;
+          image_path: string | null;
+          name: string;
+          width: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          captured_at?: string;
+          floor_id: string;
+          height: number;
+          image_path?: string | null;
+          name: string;
+          width: number;
+        };
+        Update: {
+          captured_at?: string;
+          floor_id?: string;
+          height?: number;
+          image_path?: string | null;
+          name?: string;
+          width?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'room_migration_floors_backup_floor_id_fkey';
+            columns: ['floor_id'];
+            isOneToOne: true;
+            referencedRelation: 'floors';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       room_migration_map: {
         Row: {
           created_at: string;
@@ -2882,6 +2921,9 @@ export type Database = {
       };
       role_selected_count: { Args: { p_role_id: string }; Returns: number };
       room_migration_a_fill: { Args: Record<PropertyKey, never>; Returns: undefined };
+      room_migration_b_apply: { Args: Record<PropertyKey, never>; Returns: Json };
+      room_migration_b_undo: { Args: Record<PropertyKey, never>; Returns: Json };
+      rooms_sync_names: { Args: Record<PropertyKey, never>; Returns: undefined };
       send_announcement_notifications: { Args: { p_id: string }; Returns: undefined };
       signup_conflicts: {
         Args: { p_event_id: string; p_ignore_signup: string; p_student_id: string };

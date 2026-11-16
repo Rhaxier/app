@@ -7,6 +7,7 @@
 --   after part 1: '20261115120000', '20261115120050'
 --   after part 2: '20261115120100'
 --   after part 3: '20261116120000'
+--   after part 4: '20261116130000' (part 5, the release, is not a migration)
 -- =============================================================================
 do $$
 declare
@@ -33,6 +34,7 @@ begin
           when '20261115120100' then 'rooms_migration_a'
           when '20261114120000' then 'after_school_booking'
           when '20261116120000' then 'report_map_target'
+          when '20261116130000' then 'rooms_migration_b'
         end
       );
     else

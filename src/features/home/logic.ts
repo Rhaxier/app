@@ -4,7 +4,7 @@
 import type { CollabPost } from '@/features/collab/api';
 import { isOpen } from '@/features/fixit/logic';
 import type { Report } from '@/features/fixit/api';
-import type { Floor } from '@/features/map/api';
+import type { FloorInfo } from '@/features/map/api';
 import type { Project } from '@/features/projects/api';
 import type { VolunteerEvent } from '@/features/volunteering/api';
 import { isSignupOpen } from '@/features/volunteering/logic';
@@ -21,7 +21,7 @@ export interface ToolHint {
 export interface ToolData {
   userId: string;
   staff: boolean;
-  floors?: Floor[];
+  floors?: FloorInfo[];
   events?: VolunteerEvent[];
   projects?: Project[];
   posts?: CollabPost[];

@@ -10,6 +10,7 @@ import { useContext, useEffect, useRef, useState } from 'react';
 import { useAnnouncements } from '@/features/announcements/hooks';
 import { usePosts } from '@/features/collab/hooks';
 import { useRooms } from '@/features/map/hooks';
+import { roomLabel } from '@/features/map/logic';
 import { useEvents } from '@/features/volunteering/hooks';
 import { formatDate } from '@/lib/dates';
 import { SearchOverlayContext } from './context';
@@ -26,7 +27,7 @@ export function useSearchSources(): { sources: SearchSources; loading: boolean }
     rooms: (rooms.data ?? []).map((room) => ({
       item: {
         id: room.id,
-        title: `${room.code} · ${room.name}`,
+        title: roomLabel(room),
         detail: 'On the map',
         to: `/map?room=${encodeURIComponent(room.code)}`,
       },

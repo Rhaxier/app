@@ -1,19 +1,22 @@
-# Runbook: indoor-nav migrations on the cloud Supabase project (SQL Editor)
+# Runbook: the indoor map on the cloud Supabase project (SQL Editor)
 
-Two parts, applied at different times, both by hand in the dashboard's **SQL Editor**. Nothing here
+Five parts, applied at different times, all by hand in the dashboard's **SQL Editor**. Nothing here
 uses `supabase db push`.
 
-| Part | Files                                                                    | When                                                       | Visible to users?                                                                 |
-| ---- | ------------------------------------------------------------------------ | ---------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| 1    | `20261115120000_map_nav.sql`, then `20261115120050_map_geometry_ids.sql` | Now, while the old app is still the one deployed           | No. Only admins on the new build see the new "Map and rooms" section              |
-| 2    | `20261115120100_rooms_migration_a.sql` (rooms migration step A)          | Only after the new build is deployed and in use everywhere | No, on the new build. On the **old** build, room pickers would list 285 new rooms |
+| Part | What                                                                        | When                                                  | Visible to users?                                                                 |
+| ---- | --------------------------------------------------------------------------- | ----------------------------------------------------- | --------------------------------------------------------------------------------- |
+| 1    | `20261115120000_map_nav.sql`, then `20261115120050_map_geometry_ids.sql`    | Any time                                              | No. Admins on the new build get the "Map and rooms" section                       |
+| 2    | `20261115120100_rooms_migration_a.sql` (rooms migration step A)             | After the new build is deployed and in use everywhere | No, on the new build. On the **old** build, room pickers would list 285 new rooms |
+| 3    | `20261116120000_report_map_target.sql` (reports about a lift or door)       | After part 1, before or with the build that uses it   | No                                                                                |
+| 4    | `20261116130000_rooms_migration_b.sql` (the release tools; changes no data) | After part 2                                          | No                                                                                |
+| 5    | **The release:** `select public.room_migration_b_apply();`                  | When the school is ready, after a fresh backup        | **Yes:** `/map` becomes the indoor map, room pickers list the traced rooms        |
 
-Part 1 creates new tables and functions and adds one column to `app_settings`. It doesn't change any
-room, floor, report, venue, event, policy or existing function. Part 2 only adds rows and columns;
-nothing is moved, retired or deleted (that is step B, a later runbook).
+Parts 1-4 add tables, columns and functions; they don't move, retire or delete anything. Part 5
+moves the reports, venues and volunteer events from the 15 placeholder rooms to traced rooms,
+retires (hides, never deletes) the placeholders, and switches the app over. It has an exact undo.
 
-**Hold back part 2:** don't run `supabase db push` from this branch until you want part 2. `db push`
-applies every migration file the project hasn't recorded, which would include part 2.
+**Don't run `supabase db push` from this branch** unless you mean to apply every part not yet
+applied. (Part 5 is never applied by `db push`: it is a function you call.)
 
 Rehearsed on a local throwaway Postgres 17 with the same SQL (psql in place of the SQL Editor); see
 "How this was tested" at the end. Not tested against Supabase itself.
@@ -179,6 +182,82 @@ Undo: `docs/runbooks/sql/undo_20261116120000_report_map_target.sql` puts `report
 was and removes the columns (the "about" link on reports made since is lost; the reports stay).
 Check with `status.sql` row 6 = "not applied".
 
+## Part 4: the release tools (after part 2)
+
+`20261116130000_rooms_migration_b.sql` adds `app_settings.map_indoor_live` (off), a table for the old
+floor values, and the functions `room_migration_b_apply()` / `room_migration_b_undo()` (only the
+database owner, i.e. the SQL Editor, can run them; never the app). It changes no data.
+
+1. `status.sql`: rows 1, 3 say "applied"; row 7 "not applied".
+2. Apply the file with `begin;` ... `commit;`.
+3. History table: set `record_history.sql`'s marked line to `array['20261116130000']`, run it.
+4. `status.sql`: row 7 "applied", row 8 "no".
+
+Undo: `docs/runbooks/sql/undo_20261116130000_rooms_migration_b.sql` (refuses while released).
+
+## Part 5: the release (the school's go-ahead day)
+
+What students see change: `/map` becomes the indoor map with directions, and every room picker (fix-it
+form, venues, volunteering) and search list the rooms traced from the floor plan, with this term's
+names. Open apps switch within about a minute (or on reload); nobody needs a new build. Your counts at
+the backup: **12 reports, 4 venues, 3 volunteer events** with a room.
+
+### 5.1 Before
+
+1. The build deployed everywhere is this branch's (it follows the switch). Check: as a student,
+   `/map` shows the old map today.
+2. **A fresh backup** ("Before you start"). This is the step most worth a backup.
+3. Stairs and lifts placed and saved (Admin -> Map and rooms -> Stairs and lifts says "All four
+   floors are connected."), and the term you want students to see is **active** (Classrooms tab).
+4. `status.sql`: parts 1-4 "applied", row 8 "no".
+
+### 5.2 Preflight (read-only)
+
+Run `docs/runbooks/sql/preflight_part5_release.sql`. Rows 1-4 must equal `expected`. If row 4 lists
+codes, those placeholder rooms are in use but have nowhere to go: stop and tell the developer (the
+mapping in `room_migration_map` needs a line for each). **Write down rows 5-9.**
+
+### 5.3 Release
+
+New query, run exactly:
+
+```sql
+select public.room_migration_b_apply();
+```
+
+It answers with what it did, e.g.
+`{"events_moved": 3, "venues_moved": 4, "reports_moved": 12, "placeholders_retired": 15}`.
+If it stops with "These placeholder rooms are in use but have no traced room ...", nothing was changed:
+see 5.2. Running it twice is harmless (the second time it moves nothing).
+
+### 5.4 Check (read-only)
+
+Run `docs/runbooks/sql/check_part5_release.sql`. Every `result` must equal `expected`; the "your"
+rows must equal what you wrote down in 5.2 (counts can only stay the same: nothing is deleted).
+
+### 5.5 Check the app (as a student, then as an admin)
+
+- `/map` is the indoor map; search "Where to?" finds rooms by this term's names; a route works.
+- Fix-it report form: "Where is it?" lists traced rooms ("PYP3 B (Ground floor)"); open reports appear
+  as pins on their rooms on the indoor map; an old report still opens and shows its room.
+- Venue admin and the volunteering event form list traced rooms; a venue shows its room.
+- Admin -> Map (old pins) says the old pins are retired and links to Map and rooms.
+
+### Undo the release
+
+New query, run exactly:
+
+```sql
+select public.room_migration_b_undo();
+```
+
+Everything the release moved goes back to its placeholder room (reports with their old floor and pin),
+the placeholders come back, the floors get their images and sizes back, and `/map` is the old map
+again within a minute. Reports, venues and events created **after** the release stay on the traced
+rooms they were made for (the old map won't show those). Check with `preflight_part5_release.sql`:
+row 2 "false" and rows 5-9 equal what you wrote down in 5.2 (plus anything created since).
+Running the undo twice is harmless. To go further back, undo part 4, then part 2.
+
 ## Last resort
 
 If something looks wrong and the undo scripts don't fix it, restore the backup (Database → Backups,
@@ -187,6 +266,12 @@ throws away anything written since the backup, and restoring over a live Supabas
 with Supabase's own schemas, so prefer the undo scripts.
 
 ## How this was tested (locally only)
+
+Parts 4 and 5 (2026-11-16): a local copy at the cloud project's state (earlier migrations and data),
+parts 1-4 applied through the same SQL, the sample data topped up to the school's counts (12 / 4 / 3
+with made-up reports). Preflight, release, check, the app's reads, older features' tests, a second
+release (no change), undo (every row, floor and placeholder identical to before), release again.
+pgTAP `22_rooms_migration_b_test.sql` covers the same (25 checks).
 
 On a throwaway Postgres 17.9 with `tools/local-pg`, starting from a database with every earlier
 migration and the seed (the state of the cloud project): preflight; part 1 applied with

@@ -1,11 +1,10 @@
 # MAP_NOTES: indoor navigation hand-off
 
-Status: **Foundation phases 1-3 complete. UI phases 1-5 complete (data layer, admin Classrooms
-tab, Stairs and lifts editor, student map behind a switch, fix-it link and out-of-order), at
-checkpoint 5.** See "UI phase 1-5" just before the Phase 3 spec. Next: UI phase 6 (rooms
-migration runbook), only after the team writes "BACKUP TAKEN" with their counts. Nothing has
-been applied to the cloud project by Claude; the runbook
-(`docs/runbooks/map-nav-phase1-cloud.md`) applies part 1 and holds back step A.
+Status: **Foundation phases 1-3 complete. UI phases 1-6 complete (data layer, admin Classrooms
+tab, Stairs and lifts editor, student map, fix-it link and out-of-order, rooms migration B and the
+release), at checkpoint 6.** See "UI phase 1-6" just before the Phase 3 spec. Next: UI phase 7
+(final check). Nothing has been applied to the cloud project by Claude; the runbook
+(`docs/runbooks/map-nav-phase1-cloud.md`) has parts 1-5, part 5 being the release.
 
 ## What exists
 
@@ -509,6 +508,43 @@ older tests, undo = part-1 schema, undo again harmless). Vitest: options, form i
 (hidden for others, confirm, resolve prompt with count, doors), map card, `detourNotice`, live
 reroute on the screen (stairs out -> lift + notice + toast; lift out -> step-free message + notice).
 Not verified in a browser (phase 7).
+
+# UI phase 6: rooms migration B and the release (built, not released)
+
+Built 2026-11-16, after the team's BACKUP TAKEN (12 reports, 4 venues, 3 volunteer events with a
+room). Decisions: **migration B flips the switch** (`app_settings.map_indoor_live`) and the build
+follows it live; local test on sample data topped up to 12/4/3 (no real data was used).
+
+| Path                                                       | Job                                                                                                                                                                                                                                     |
+| ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `supabase/migrations/20261116130000_rooms_migration_b.sql` | Adds the switch column, a floors snapshot table, `room_migration_b_apply()` / `_undo()` (owner only) and `rooms_sync_names()` + triggers. **Changes no data.**                                                                          |
+| `supabase/tests/22_rooms_migration_b_test.sql`             | 25 checks: counts kept at 12/4/3, every row on its mapped room with its pin, 15 placeholders retired not deleted, floors, switch, refusal when a used placeholder is unmapped, idempotent, exact undo, name sync.                       |
+| `src/features/map/hooks.ts`, `api.ts`                      | `useIndoorMapLive()` (checks every minute and on focus; `VITE_INDOOR_MAP=true` forces it). `useRooms()`/`useFloors()` follow it (traced rooms, every floor); `useLegacyRooms()`/`useLegacyFloors()` for the old map and its admin page. |
+| `src/features/map/pages/MapSwitchPage.tsx`                 | `/map`: old map until live, then the indoor map.                                                                                                                                                                                        |
+| `src/features/map/logic.ts` `roomLabel`                    | Pickers and search name traced rooms "PYP3 B (Ground floor)".                                                                                                                                                                           |
+| `MapAdminPage.tsx`                                         | When live: a notice linking to Map and rooms (its images are gone; undo brings it back).                                                                                                                                                |
+| `docs/runbooks/` parts 4 and 5                             | Release tools, then the release: preflight (with the counts), `select public.room_migration_b_apply();`, check, app checks, `select public.room_migration_b_undo();`.                                                                   |
+
+What the release does (one transaction): refresh step A's backup and mapping (first time only),
+refuse if a used placeholder has no traced room, snapshot floors, move reports (room, floor, x, y),
+venues and volunteer events, retire the placeholders, floors to 3448 x 2551 with no image, switch on,
+sync names from the active term, one audit row. The undo moves back only rows the release moved (rows
+made after it stay), un-retires the placeholders, restores the floors, switches off.
+
+Room names: once live, renaming a room in the active term (or switching terms) renames it in `rooms`
+too (trigger), so pickers and report cards match the map. Known gap: a room first named after step A
+has no `rooms` row, so it can be searched and routed to but not picked in the report form; adding rows
+for those needs its label point in the database (a follow-up).
+
+Local default stays "before the release" (`db reset` doesn't run part 5). To try the released state
+locally: `select public.room_migration_b_apply();` in the local database (and undo the same way). The
+pgTAP files assume the state before the release: on a released database `08_fixit` test 13 fails
+because its seeded report has moved to its traced room (expected; never run tests on the cloud project).
+
+Verified (local): pgTAP full suite (22: 25/25); the release rehearsed from the cloud state with the
+counts at 12/4/3: preflight, apply, check (all as expected), app reads, older tests, second apply (no
+change), undo (rows, floors and placeholders identical to before), release again. Vitest for the
+switch, pickers' labels and the old-pins notice. Not verified in a browser (phase 7).
 
 # Phase 3: hand-off spec for the UI work
 
