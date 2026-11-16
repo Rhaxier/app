@@ -58,9 +58,13 @@
   list-style: none;
 }
 
-.up {
-  top: auto;
-  bottom: calc(100% + 8px);
+/* Inside the directions panel: listed in place, under the box. */
+.inline {
+  max-height: 240px;
+  overflow-y: auto;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
 }
 
 .result {

@@ -1,12 +1,17 @@
 // The directions panel at the bottom of the indoor map, above the tab bar.
 //
-// From: the student says where they are, either by dropping the "I'm here"
-// pin on the map or by naming the classroom they're nearest. There is no
-// live positioning, and nothing here suggests there is.
-// To: the destination from the search. Swap turns the trip round.
-// Then the route: distance and time, the current step with Previous and
-// Next (the map follows to the step's floor), and every step in a list.
-// When there is no route, the router's own message says why.
+// Two sizes, like the card in a phone's maps app:
+//   * collapsed (the default once there is a route): time, distance, the
+//     step to do now, and Previous / Next. Small, so the route line stays in
+//     view. Tap the handle (or the time) to see everything.
+//   * expanded: where from and where to, swap, the step-free switch, and the
+//     full list of steps.
+// While the two ends are still being chosen it is always expanded.
+//
+// From: the student says where they are, by dropping the "I'm here" pin or
+// by naming the room they're nearest. There is no live positioning, and
+// nothing here suggests there is. When there is no route, the router's own
+// message says why.
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/Button';
 import { Icon } from '@/components/Icon';
@@ -34,6 +39,9 @@ interface DirectionsPanelProps {
   result: RouteResult | null;
   stepIndex: number;
   isAdmin: boolean;
+  /** Small: only time, distance and the current step (only when there is a route). */
+  collapsed: boolean;
+  onCollapsed: (collapsed: boolean) => void;
   onTapToStart: () => void;
   onPickStart: (destination: Destination) => void;
   onPickDestination: (destination: Destination) => void;
@@ -47,20 +55,91 @@ interface DirectionsPanelProps {
 
 export function DirectionsPanel(props: DirectionsPanelProps) {
   const { start, destination, result, stepIndex } = props;
+  const route = result?.ok && result.steps.length > 0 ? result : null;
+  const small = props.collapsed && route !== null;
+
+  // The grab bar at the top: the way to change size.
+  const handle = route && (
+    <button
+      type="button"
+      className={styles.handle}
+      aria-expanded={!small}
+      aria-label={small ? 'Show all directions' : 'Show less'}
+      onClick={() => props.onCollapsed(!small)}
+    >
+      <span className={styles.grip} aria-hidden="true" />
+    </button>
+  );
+
+  const closeButton = (
+    <button
+      type="button"
+      className={styles.iconButton}
+      aria-label="Close directions"
+      onClick={props.onClose}
+    >
+      <Icon name="close" size={18} />
+    </button>
+  );
+
+  const stepControls = route && (
+    <div className={small ? styles.stepSmall : styles.step}>
+      <div className={styles.stepWords}>
+        <span className="meta">
+          Step {stepIndex + 1} of {route.steps.length} · {floorLabel(route.steps[stepIndex].floor)}
+        </span>
+        <p className={styles.stepText}>{route.steps[stepIndex].text}</p>
+      </div>
+      <div className={styles.stepButtons}>
+        <Button
+          size="small"
+          variant="secondary"
+          disabled={stepIndex === 0}
+          onClick={() => props.onStep(stepIndex - 1)}
+        >
+          Previous
+        </Button>
+        <Button
+          size="small"
+          disabled={stepIndex >= route.steps.length - 1}
+          onClick={() => props.onStep(stepIndex + 1)}
+        >
+          Next
+        </Button>
+      </div>
+    </div>
+  );
+
+  if (small && route) {
+    return (
+      <section className={`glass thick ${styles.panel} ${styles.small}`} aria-label="Directions">
+        {handle}
+        <div className={styles.header}>
+          <button
+            type="button"
+            className={styles.summaryButton}
+            onClick={() => props.onCollapsed(false)}
+          >
+            <strong>{formatDuration(route.durationS)}</strong>
+            <span className="meta">
+              {formatDistance(route.distanceM)} to {destination?.name ?? 'your destination'}
+            </span>
+          </button>
+          {closeButton}
+        </div>
+        <div aria-live="polite">{stepControls}</div>
+      </section>
+    );
+  }
+
   const canSwap = start?.kind === 'place' && destination !== null;
 
   return (
     <section className={`glass thick ${styles.panel}`} aria-label="Directions">
+      {handle}
       <div className={styles.header}>
         <h2 className={styles.title}>Directions</h2>
-        <button
-          type="button"
-          className={styles.iconButton}
-          aria-label="Close directions"
-          onClick={props.onClose}
-        >
-          <Icon name="close" size={18} />
-        </button>
+        {closeButton}
       </div>
 
       <div className={styles.ends}>
@@ -91,7 +170,6 @@ export function DirectionsPanel(props: DirectionsPanelProps) {
                 destinations={props.destinations}
                 label="Or the room you're nearest"
                 plain
-                dropUp
                 onPick={props.onPickStart}
               />
               {props.pinMessage && (
@@ -128,7 +206,6 @@ export function DirectionsPanel(props: DirectionsPanelProps) {
               destinations={props.destinations}
               label="Where to?"
               plain
-              dropUp
               onPick={props.onPickDestination}
             />
           )}
@@ -142,39 +219,16 @@ export function DirectionsPanel(props: DirectionsPanelProps) {
         onChange={props.onStepFree}
       />
 
-      {result && result.ok && result.steps.length > 0 && (
+      {route && (
         <div className="stack-tight" aria-live="polite">
           <p className={styles.summary}>
-            <strong>{formatDistance(result.distanceM)}</strong> · {formatDuration(result.durationS)}
+            <strong>{formatDistance(route.distanceM)}</strong> · {formatDuration(route.durationS)}
           </p>
-          <div className={styles.step}>
-            <span className="meta">
-              Step {stepIndex + 1} of {result.steps.length}
-              {` · ${floorLabel(result.steps[stepIndex].floor)}`}
-            </span>
-            <p className={styles.stepText}>{result.steps[stepIndex].text}</p>
-            <div className="row">
-              <Button
-                size="small"
-                variant="secondary"
-                disabled={stepIndex === 0}
-                onClick={() => props.onStep(stepIndex - 1)}
-              >
-                Previous
-              </Button>
-              <Button
-                size="small"
-                disabled={stepIndex >= result.steps.length - 1}
-                onClick={() => props.onStep(stepIndex + 1)}
-              >
-                Next
-              </Button>
-            </div>
-          </div>
+          {stepControls}
           <details className={styles.all}>
             <summary>All steps</summary>
             <ol className={styles.steps}>
-              {result.steps.map((step, index) => (
+              {route.steps.map((step, index) => (
                 <li key={index}>
                   <button
                     type="button"

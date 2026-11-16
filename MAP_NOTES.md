@@ -454,6 +454,12 @@ How it behaves:
 - Layers: fix-it reports (count pin at the room's label point) and "in use now", placed through
   `rooms.region_id` (`useTracedRooms`). **Empty until migration B** moves reports and venues to
   traced rooms. Phase 5 adds the out-of-order parts.
+- After testing (2026-11-16): search is forgiving (`nav/search.ts`: spaces and punctuation ignored,
+  so "kg2b" finds "KG2 B"; words in any order; one slip in words of 4+ letters). In the panel the
+  matches are listed inside it (a pop-over was cut off). Once a route is found the panel shrinks to
+  time, distance, the current step and Previous/Next, like a phone maps card; the grab bar or the
+  time expands it. The plan can be dragged further (bounds padded 1.2x when full screen), so it no
+  longer springs back when pulled up from under the panel.
 - Nothing collides with the tab bar: the panel sits at `--tabbar-space` like the old map's sheet,
   and the zoom buttons hide while it is open.
 

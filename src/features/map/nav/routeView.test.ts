@@ -41,6 +41,20 @@ describe('searchDestinations', () => {
     expect(searchDestinations(destinations, '12 b')[0].name).toBe('12 B');
   });
 
+  it('ignores spaces, dots and capitals, the way people type names', () => {
+    expect(searchDestinations(destinations, 'kg2b')[0].name).toBe('KG2 B');
+    expect(searchDestinations(destinations, 'pyp 3b')[0].name).toBe('PYP3 B');
+    expect(searchDestinations(destinations, 'Asst MSO')[0].name).toBe('Asst. MSO');
+  });
+
+  it('takes the words in any order, and forgives one slip in a longer word', () => {
+    expect(searchDestinations(destinations, 'lab chem').map((d) => d.name)).toContain('Chem Lab');
+    expect(searchDestinations(destinations, 'auditorim')[0].name).toBe('Auditorium');
+    expect(searchDestinations(destinations, 'libary').map((d) => d.name)).toContain(
+      'Senior Library',
+    );
+  });
+
   it('returns nothing for an empty box, and only named places', () => {
     expect(searchDestinations(destinations, '  ')).toEqual([]);
     expect(searchDestinations(destinations, 'zzz')).toEqual([]);

@@ -50,7 +50,9 @@ import styles from './MapPage.module.css';
 
 // Where the plan fits on screen, clear of the floating controls (px).
 const PLAN_MARGINS = { top: 132, bottom: 150 };
-const ROUTE_MARGINS = { top: 140, bottom: 380 };
+// With a route: room for the directions card (small or full) under the line.
+const ROUTE_MARGINS = { top: 140, bottom: 220 };
+const ROUTE_MARGINS_FULL = { top: 140, bottom: 420 };
 const STEP_FREE_KEY = 'campus.map.stepFree';
 
 function readStepFree(): boolean {
@@ -124,6 +126,7 @@ export function MapScreen({ geometry, router }: { geometry: Geometry; router: Ro
   const [panelOpen, setPanelOpen] = useState(Boolean(destination || fromPlace));
   const [stepFree, setStepFreeState] = useState(readStepFree);
   const [stepIndex, setStepIndex] = useState(0);
+  const [collapsed, setCollapsed] = useState(false);
   const [layers, setLayers] = useState<Record<Layer, boolean>>({ reports: true, inUse: true });
 
   function setStepFree(value: boolean) {
@@ -162,6 +165,8 @@ export function MapScreen({ geometry, router }: { geometry: Geometry; router: Ro
   if (result && endsKey !== shownTrip) {
     setShownTrip(endsKey);
     setStepIndex(0);
+    // A route was found: shrink the panel so the line can be seen.
+    setCollapsed(result.ok);
     if (result.ok) setFloor(startFloor(result) ?? floor);
   }
   const step = result?.ok ? Math.min(stepIndex, result.steps.length - 1) : 0;
@@ -245,7 +250,7 @@ export function MapScreen({ geometry, router }: { geometry: Geometry; router: Ro
       : [];
 
   const sheetOpen = Boolean(selectedReport || panelOpen);
-  const margins = result?.ok ? ROUTE_MARGINS : PLAN_MARGINS;
+  const margins = result?.ok ? (collapsed ? ROUTE_MARGINS : ROUTE_MARGINS_FULL) : PLAN_MARGINS;
 
   return (
     <div className={styles.page}>
@@ -374,6 +379,8 @@ export function MapScreen({ geometry, router }: { geometry: Geometry; router: Ro
               result={result}
               stepIndex={step}
               isAdmin={isAdmin(user)}
+              collapsed={collapsed}
+              onCollapsed={setCollapsed}
               onTapToStart={() => {
                 setTapping((t) => !t);
                 setPinMessage(null);

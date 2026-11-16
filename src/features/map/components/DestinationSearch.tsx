@@ -15,11 +15,13 @@ interface DestinationSearchProps {
   /** Visible placeholder and the box's accessible name. */
   label: string;
   onPick: (destination: Destination) => void;
-  /** Glass over the map (default), or plain inside a panel. */
+  /**
+   * Glass over the map (default), or plain inside a panel. Inside a panel the
+   * matches are listed in the panel itself: a pop-over would be cut off by
+   * the panel's edges.
+   */
   plain?: boolean;
   autoFocus?: boolean;
-  /** Open the matches above the box (it sits near the bottom of the screen). */
-  dropUp?: boolean;
 }
 
 const kindLabel: Record<Destination['kind'], string> = {
@@ -34,7 +36,6 @@ export function DestinationSearch({
   onPick,
   plain = false,
   autoFocus = false,
-  dropUp = false,
 }: DestinationSearchProps) {
   const id = useId();
   const [query, setQuery] = useState('');
@@ -60,7 +61,7 @@ export function DestinationSearch({
       </div>
       {query.trim() && (
         <ul
-          className={`glass thick ${styles.results} ${dropUp ? styles.up : ''}`}
+          className={plain ? styles.inline : `glass thick ${styles.results}`}
           aria-label={`${label}: matches`}
         >
           {matches.length === 0 && (

@@ -131,7 +131,10 @@ export function FloorPlanView({
             ? { paddingTopLeft: [16, immersive.top], paddingBottomRight: [16, immersive.bottom] }
             : undefined
         }
-        maxBounds={L.latLngBounds(mapBounds as L.LatLngTuple[]).pad(0.5)}
+        // How far the plan can be dragged off screen. Full screen needs more
+        // room, so a student can pull the plan up from under the directions
+        // card without it springing back.
+        maxBounds={L.latLngBounds(mapBounds as L.LatLngTuple[]).pad(immersive ? 1.2 : 0.5)}
         minZoom={-4}
         maxZoom={2}
         zoomSnap={0.25}

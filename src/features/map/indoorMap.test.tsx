@@ -133,6 +133,9 @@ function fakeRouter(result: RouteResult): Router & { route: ReturnType<typeof vi
 
 const panel = () => screen.getByRole('region', { name: 'Directions' });
 const floorShown = () => screen.getByTestId('floor').textContent;
+// A route shrinks the panel to time, distance and the current step.
+const expand = () =>
+  userEvent.click(within(panel()).getByRole('button', { name: 'Show all directions' }));
 
 beforeEach(() => {
   role.value = 'student';
@@ -169,6 +172,7 @@ describe('indoor map: a route between floors (real router, fixture lift)', () =>
 
     // The last step ("Your destination, 12 B, ...") is on the third floor;
     // the first is back on the ground floor.
+    await expand();
     const steps = within(panel())
       .getAllByRole('button', { name: /./ })
       .filter((b) => b.closest('ol'));
@@ -185,6 +189,7 @@ describe('indoor map: a route between floors (real router, fixture lift)', () =>
     renderMap(createRouter(geometry, [lift]), '/?to=3-R043');
     await userEvent.click(within(panel()).getByRole('button', { name: 'Drop a pin on the map' }));
     await userEvent.click(screen.getByRole('button', { name: 'Tap the map here' }));
+    await expand();
     expect(within(panel()).getByText(/Your pin, floor 3/)).toBeInTheDocument();
     expect(within(panel()).getByText(/Step 1 of/)).toBeInTheDocument();
   });
@@ -220,10 +225,24 @@ describe('indoor map: mode, swap and messages (fake router)', () => {
     connectors: [],
   };
 
+  it('shrinks to time, distance and the current step once there is a route, and grows back', async () => {
+    renderMap(fakeRouter(ok), '/?from=G-R030&to=G-R008');
+    expect(within(panel()).getByText('under a minute')).toBeInTheDocument();
+    expect(within(panel()).getByText(/Step 1 of 2/)).toBeInTheDocument();
+    expect(within(panel()).getByRole('button', { name: 'Next' })).toBeInTheDocument();
+    expect(within(panel()).queryByRole('switch')).not.toBeInTheDocument();
+
+    await expand();
+    expect(within(panel()).getByRole('switch', { name: /Step-free route/ })).toBeInTheDocument();
+    await userEvent.click(within(panel()).getByRole('button', { name: 'Show less' }));
+    expect(within(panel()).queryByRole('switch')).not.toBeInTheDocument();
+  });
+
   it('asks for a step-free route when the switch is on, and remembers it', async () => {
     const router = fakeRouter(ok);
     renderMap(router, '/?from=G-R030&to=G-R008');
     expect(router.route.mock.lastCall?.[2]).toEqual({ mode: 'standard' });
+    await expand();
     await userEvent.click(within(panel()).getByRole('switch', { name: /Step-free route/ }));
     expect(router.route.mock.lastCall?.[2]).toEqual({ mode: 'step-free' });
     expect(window.localStorage.getItem('campus.map.stepFree')).toBe('true');
@@ -232,6 +251,7 @@ describe('indoor map: mode, swap and messages (fake router)', () => {
   it('swaps the start and the destination', async () => {
     const router = fakeRouter(ok);
     renderMap(router, '/?from=G-R030&to=G-R008');
+    await expand();
     await userEvent.click(
       within(panel()).getByRole('button', { name: 'Swap start and destination' }),
     );
