@@ -55,5 +55,5 @@ select 7, 'WRITE DOWN: migration history table (Supabase CLI)',
          'select max(version) as v from supabase_migrations.schema_migrations', false, true, '')))[1]::text,
          'empty')
   end,
-  'none, or newest 20261114120000'
+  'none, or newest 20261114120000 (if older, see runbook 1.1)'
 order by n;

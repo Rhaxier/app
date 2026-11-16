@@ -35,6 +35,15 @@ How to run a file in the SQL Editor (every step below uses this):
 3. Run. If it ends with an error, run `rollback;` in the same editor, and nothing from that file is
    kept. Copy the error and stop.
 
+## Where am I?
+
+Any time you're unsure what is applied (after an error, or before an undo), run
+`docs/runbooks/sql/status.sql` (read-only). It says for each file "applied", "not applied" or
+"PARTLY applied" (stop and tell the developer). The undo scripts are safe to run in any state:
+anything already gone is skipped, so an undo when nothing is applied changes nothing.
+
+If a script stops with an error in the SQL Editor, run `rollback;` before anything else.
+
 ## Part 1: the map tables (now)
 
 ### 1.1 Preflight (read-only)
@@ -42,6 +51,13 @@ How to run a file in the SQL Editor (every step below uses this):
 Run `docs/runbooks/sql/preflight_part1.sql`. Every `result` must equal `expected`.
 **Write down rows 6 and 7.** If rows 1-5 don't match, stop: the project is missing an earlier
 migration or already has something with these names.
+
+Row 7 showing an older newest version (for example `20261027120100`) means the CLI's history is
+behind: later migrations were applied by hand, or not at all. It doesn't block part 1 (nothing in it
+depends on them). `status.sql` row 5 says whether `20261114120000_after_school` is actually on the
+project. If it is, add `'20261114120000'` to the list in `record_history.sql` at step 1.4 so a
+later `db push` doesn't try to run it again. If it isn't, it still needs applying (separately from
+this runbook) before the new build's after-school booking rules work.
 
 Undo: nothing to undo.
 

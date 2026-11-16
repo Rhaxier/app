@@ -30,6 +30,7 @@ begin
           when '20261115120000' then 'map_nav'
           when '20261115120050' then 'map_geometry_ids'
           when '20261115120100' then 'rooms_migration_a'
+          when '20261114120000' then 'after_school_booking'
         end
       );
     else
