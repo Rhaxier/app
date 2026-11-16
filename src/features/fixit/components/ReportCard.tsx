@@ -22,9 +22,11 @@ interface ReportCardProps {
   /** Every open report at this pin, including this one. */
   others?: Report[];
   onPick?: (id: string) => void;
+  /** Shows a close button in the top right corner. */
+  onClose?: () => void;
 }
 
-export function ReportCard({ report, others = [report], onPick }: ReportCardProps) {
+export function ReportCard({ report, others = [report], onPick, onClose }: ReportCardProps) {
   const step = progressStep(report.status);
   // How much of the rail is filled: up to the middle of the current step's
   // name, or all of it once fixed.
@@ -47,7 +49,19 @@ export function ReportCard({ report, others = [report], onPick }: ReportCardProp
           {reportLabel(report)}
           {report.urgent && ' · Urgent'}
         </p>
-        <span className="meta">{relativeTime(report.created_at)}</span>
+        <span className={styles.topEnd}>
+          <span className="meta">{relativeTime(report.created_at)}</span>
+          {onClose && (
+            <button
+              type="button"
+              className={`${styles.close} pressable`}
+              aria-label="Close fix-it report"
+              onClick={onClose}
+            >
+              <Icon name="close" size={18} />
+            </button>
+          )}
+        </span>
       </div>
 
       <div className={styles.titleRow}>

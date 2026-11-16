@@ -429,6 +429,11 @@ export function MapScreen({ geometry, router }: { geometry: Geometry; router: Ro
                 next.set('report', id);
                 setParams(next, { replace: true });
               }}
+              onClose={() => {
+                const next = new URLSearchParams(params);
+                next.delete('report');
+                setParams(next, { replace: true });
+              }}
             />
           ) : panelOpen ? (
             <DirectionsPanel

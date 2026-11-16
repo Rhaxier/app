@@ -207,6 +207,7 @@ export function MapPage() {
               report={selectedReport}
               others={selectedSpot?.reports ?? [selectedReport]}
               onPick={(id) => show({ report: id })}
+              onClose={() => show({})}
             />
           )}
           {selectedRoom && !selectedReport && (
