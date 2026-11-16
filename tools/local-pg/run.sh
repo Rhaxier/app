@@ -12,6 +12,8 @@
 #
 # Optional: PGPORT (default 54329), KEEP=1 to leave the server running after
 # the tests (stop it with: "$PGBIN/pg_ctl" -D "$WORKDIR/data" stop).
+# HOLD="20261115120100 ..." skips those migrations (as if not yet applied) and
+# any test file that names one of them in its first lines.
 # =============================================================================
 set -euo pipefail
 
@@ -48,7 +50,18 @@ echo "== Stand-in for Supabase"
 "${DB[@]}" -f "$REPO/tools/local-pg/supabase-standin.sql" >/dev/null
 
 echo "== Migrations"
+held() {
+  for version in ${HOLD:-}; do
+    case "$1" in *"$version"*) return 0 ;; esac
+  done
+  return 1
+}
+
 for f in "$REPO"/supabase/migrations/*.sql; do
+  if held "$(basename "$f")"; then
+    echo "   held $(basename "$f")"
+    continue
+  fi
   # Each file in its own transaction, like `supabase db push`.
   "${DB[@]}" -1 -f "$f" >/dev/null 2>"$WORKDIR/last.err" || {
     echo "FAILED: $(basename "$f")"
@@ -66,6 +79,10 @@ total_ok=0
 total_fail=0
 failed_files=()
 for f in "$REPO"/supabase/tests/*.sql; do
+  if [ -n "${HOLD:-}" ] && held "$(head -5 "$f" | tr '\n' ' ')"; then
+    echo "   held $(basename "$f")"
+    continue
+  fi
   out="$("${PSQL[@]}" -d app -t -A -f "$f" 2>&1 || true)"
   ok=$(grep -cE '^ok [0-9]+' <<<"$out" || true)
   bad=$(grep -cE '^not ok [0-9]+' <<<"$out" || true)

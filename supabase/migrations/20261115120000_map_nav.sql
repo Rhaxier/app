@@ -768,14 +768,28 @@ $$;
 -- Realtime: open maps refresh when stairs, lifts, flags or names change, and
 -- when the active preset is switched (app_settings).
 -- -----------------------------------------------------------------------------
+-- Each table is added only if it isn't in the publication already (someone
+-- may have switched Realtime on for app_settings in the dashboard), because
+-- adding a table twice is an error that would stop the whole migration.
 do $$
+declare
+  v_table text;
 begin
-  if exists (select 1 from pg_publication where pubname = 'supabase_realtime') then
-    alter publication supabase_realtime add table
-      public.map_connectors, public.map_overrides, public.map_presets,
-      public.map_assignments, public.app_settings;
-  else
+  if not exists (select 1 from pg_publication where pubname = 'supabase_realtime') then
     raise notice 'No supabase_realtime publication: skipping Realtime setup.';
+    return;
   end if;
+  if (select puballtables from pg_publication where pubname = 'supabase_realtime') then
+    raise notice 'supabase_realtime already covers every table: nothing to add.';
+    return;
+  end if;
+  foreach v_table in array array['map_connectors', 'map_overrides', 'map_presets', 'map_assignments', 'app_settings'] loop
+    if not exists (
+      select 1 from pg_publication_tables
+      where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = v_table
+    ) then
+      execute format('alter publication supabase_realtime add table public.%I', v_table);
+    end if;
+  end loop;
 end;
 $$;

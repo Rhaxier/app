@@ -17,13 +17,20 @@ begin
 end;
 $$;
 
--- Realtime first, while the tables still exist (skipped without Realtime).
+-- Realtime: the map tables leave the publication by themselves when they are
+-- dropped below. app_settings stays a table, so it is taken out here, unless
+-- it was already sent through Realtime before part 1 (part 1 preflight,
+-- row 6). In that case change `true` to `false` on the marked line.
 do $$
+declare
+  -- >>> false if the part 1 preflight's row 6 said "yes" <<<
+  v_remove_app_settings boolean := true;
 begin
-  if exists (select 1 from pg_publication where pubname = 'supabase_realtime') then
-    alter publication supabase_realtime drop table
-      public.map_connectors, public.map_overrides, public.map_presets,
-      public.map_assignments, public.app_settings;
+  if v_remove_app_settings and exists (
+    select 1 from pg_publication_tables
+    where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'app_settings'
+  ) then
+    alter publication supabase_realtime drop table public.app_settings;
   end if;
 end;
 $$;

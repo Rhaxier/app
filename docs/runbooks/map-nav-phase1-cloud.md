@@ -1,137 +1,95 @@
-# Runbook: indoor-nav phase 1 migrations on the cloud Supabase project
+# Runbook: indoor-nav migrations on the cloud Supabase project (SQL Editor)
 
-What this applies (three files, in this order; the second is generated data that the first needs):
+Two parts, applied at different times, both by hand in the dashboard's **SQL Editor**. Nothing here
+uses `supabase db push`.
 
-| File                                                       | What it does                                                                                                                                     | Visible to users?                                                              |
-| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ |
-| `supabase/migrations/20261115120000_map_nav.sql`           | New `map_*` tables (stairs and lifts, terms, room names, flags), their RLS, the `map_*` functions, `app_settings.map_active_preset_id`, Realtime | No                                                                             |
-| `supabase/migrations/20261115120050_map_geometry_ids.sql`  | 3,257 rows: the ids that exist on the traced map                                                                                                 | No                                                                             |
-| `supabase/migrations/20261115120100_rooms_migration_a.sql` | Rooms migration **step A** (additive): `rooms.region_id`, `rooms.retired_at`, floor 3, 285 traced rooms, mapping and backup tables               | No, **if** the app build from this branch is the one people use (step 3 below) |
+| Part | Files                                                                    | When                                                       | Visible to users?                                                                 |
+| ---- | ------------------------------------------------------------------------ | ---------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| 1    | `20261115120000_map_nav.sql`, then `20261115120050_map_geometry_ids.sql` | Now, while the old app is still the one deployed           | No. Only admins on the new build see the new "Map and rooms" section              |
+| 2    | `20261115120100_rooms_migration_a.sql` (rooms migration step A)          | Only after the new build is deployed and in use everywhere | No, on the new build. On the **old** build, room pickers would list 285 new rooms |
 
-Nothing here moves, retires or deletes an existing room, report, venue or event. Step B (the switch)
-is a separate, later runbook.
+Part 1 creates new tables and functions and adds one column to `app_settings`. It doesn't change any
+room, floor, report, venue, event, policy or existing function. Part 2 only adds rows and columns;
+nothing is moved, retired or deleted (that is step B, a later runbook).
 
-Rehearsed on a local throwaway Postgres 17 (`tools/local-pg/run.sh`): apply, check, undo both, schema
-compared with a database that never had them (identical), re-apply onto existing data, check again.
-Not rehearsed: the Supabase CLI against a real project, Supabase's own Realtime and PostgREST.
+**Hold back part 2:** don't run `supabase db push` from this branch until you want part 2. `db push`
+applies every migration file the project hasn't recorded, which would include part 2.
 
-## You need
+Rehearsed on a local throwaway Postgres 17 with the same SQL (psql in place of the SQL Editor); see
+"How this was tested" at the end. Not tested against Supabase itself.
 
-- This branch checked out, with `npm install` done.
-- The Supabase CLI linked to the project: `npx supabase link --project-ref <your-project-ref>`
-  (asks for the database password). `migration list` and `db push` don't need Docker.
-- For the backup: `pg_dump` version 17 (PostgreSQL 17 client tools). `npx supabase db dump` also
-  works, but it needs Docker.
-- About 20 minutes, at a quiet time.
+## Before you start
 
-## 1. Backup and counts (before anything else)
+- A full backup you can restore. Dashboard → Database → Backups (paid plans), or with PostgreSQL 17
+  client tools: `pg_dump "<session pooler connection string>" -Fc -f campus-before-map.dump`
+  (Project Settings → Database → Connection string → Session pooler). Keep it safe: it holds
+  personal data.
+- A quiet time (adding the column takes a brief lock on `app_settings`).
+- This repository at the commit you are applying, to copy the files from.
 
-1. Dashboard → Project Settings → Database → Connection string → **Session pooler**. Copy it.
-2. Full backup to a file (keep it somewhere safe, it holds personal data):
+How to run a file in the SQL Editor (every step below uses this):
 
-   ```
-   pg_dump "<session pooler connection string>" -Fc -f campus-before-map-phase1.dump
-   ```
+1. SQL Editor → New query.
+2. Type `begin;` on the first line, paste the **whole** file below it, then type `commit;` on the
+   last line. (`20261115120050` is long, about 3,300 lines: paste all of it.)
+3. Run. If it ends with an error, run `rollback;` in the same editor, and nothing from that file is
+   kept. Copy the error and stop.
 
-   Check: the file exists and is not tiny (`ls -l`; more than a few hundred KB).
+## Part 1: the map tables (now)
 
-3. Dashboard → SQL editor, run and **write the four numbers down**:
+### 1.1 Preflight (read-only)
 
-   ```sql
-   select
-     (select count(*) from public.reports where room_id is not null)          as reports_with_room,
-     (select count(*) from public.venues where room_id is not null)           as venues_with_room,
-     (select count(*) from public.volunteer_events where room_id is not null) as events_with_room,
-     (select count(*) from public.rooms)                                       as rooms;
-   ```
+Run `docs/runbooks/sql/preflight_part1.sql`. Every `result` must equal `expected`.
+**Write down rows 6 and 7.** If rows 1-5 don't match, stop: the project is missing an earlier
+migration or already has something with these names.
 
-   Undo: nothing to undo.
+Undo: nothing to undo.
 
-## 2. Check what's pending
+### 1.2 Apply `20261115120000_map_nav.sql`
 
-```
-npx supabase migration list
-```
+Run it as described above (`begin;` … `commit;`).
 
-Check: every migration up to and including `20261114120000` shows in **both** the Local and Remote
-columns, and only `20261115120000`, `20261115120050`, `20261115120100` are Local only.
-If anything else is Local only, **stop**: `db push` would apply that too. Sort that out first.
+Check: it finishes without an error. In Table Editor, `map_connectors`, `map_presets`,
+`map_assignments`, `map_overrides` and `map_geometry_ids` exist (the last one empty for now).
 
-## 3. Ship the app build from this branch first
+Undo: `docs/runbooks/sql/undo_20261115120000_map_nav.sql` (below).
 
-Run or deploy the app from this branch (and ask teammates to pull it) **before** step 4. It works on
-the database before and after step A: today's map, the room pickers and the old Map admin page
-show only the original rooms and floors either way (`src/features/map/api.ts`).
-An older build would list the 285 new rooms in the room pickers as soon as step A is applied.
+### 1.3 Apply `20261115120050_map_geometry_ids.sql`
 
-Check: open the Map screen and the fix-it report form: the same rooms as yesterday.
-Undo: redeploy the previous build (safe while step A is not applied).
+Same way.
 
-## 4. Dry run
+Check: `select count(*) from public.map_geometry_ids;` returns **3257**.
 
-```
-npx supabase db push --dry-run
-```
+Undo: `docs/runbooks/sql/undo_20261115120050_map_geometry_ids.sql` (empties the list only), or
+undo part 1 as a whole.
 
-Check: it lists exactly the three files above and nothing else. Undo: nothing to undo.
+### 1.4 Record them for the Supabase CLI
 
-## 5. Apply
+Only if row 7 of the preflight said the history table exists: run
+`docs/runbooks/sql/record_history.sql` as it is (it lists the part 1 versions). Otherwise skip this
+step (the script does nothing on a project without the table anyway).
 
-```
-npx supabase db push
-```
+Check: `npx supabase migration list` shows `20261115120000` and `20261115120050` in both columns,
+and `20261115120100` as Local only.
 
-It asks to confirm, then applies the files in order. Each file runs in its own transaction: if one
-fails, that file is rolled back, the ones before it stay applied, and the CLI stops. Copy the error,
-then go to step 6 to see where it stopped.
+Undo: the undo scripts remove these rows themselves.
 
-Check: the command ends without an error; `npx supabase migration list` now shows all three in both
-columns.
+### 1.5 Check
 
-## 6. Check the database
+Run `docs/runbooks/sql/check_part1_map_tables.sql`. Every `result` must equal `expected`
+(row 11 confirms part 2 is still held back).
 
-Dashboard → SQL editor: paste and run `docs/runbooks/sql/check_map_nav_phase1.sql` (read-only).
-Every row's `result` must equal `expected`; rows 13, 16, 17, 18 must equal your numbers from step 1
-(row 13 = your `rooms`).
+### 1.6 Check the old app (still deployed)
 
-If row 15 lists placeholder codes, those placeholders have other codes on this project: nothing is
-broken, but the mapping for those rooms must be fixed before step B (tell the developer).
+- Sign in as an admin: Admin → Settings and the other settings pages open and save as before.
+- Map screen, fix-it report form, bookings, volunteering, announcements, projects: as before.
+- Admin → Audit log: as before. New entries appear only when someone uses the new section.
 
-## 7. Check the app
+### Undo part 1
 
-- Map screen: floors G, 1, 2 only (no floor 3), the same pins as before.
-- Fix-it report form, venue admin, volunteer event form: the same room list as before.
-- Admin → Map (old pins): the same floors and rooms.
-- Nothing new is visible yet: the new admin section and student map come in later phases.
-
-## Undo
-
-Undo in reverse order. Each undo script refuses to run, and changes nothing, if it isn't safe.
-
-### Undo step A (`20261115120100`)
-
-Safe until step B has run. Removes the 285 traced rooms, floor 3, the helper tables and the two
-columns; leaves every original room, report, venue and event as it was.
-
-1. Dashboard → SQL editor: run `docs/runbooks/sql/undo_20261115120100_rooms_migration_a.sql`.
-2. Check:
-
-   ```sql
-   select count(*) from information_schema.columns
-   where table_schema = 'public' and table_name = 'rooms' and column_name in ('region_id', 'retired_at');
-   -- expect 0
-   select count(*) from public.rooms;  -- expect your step 1 "rooms" number
-   ```
-
-   `npx supabase migration list` shows `20261115120100` as Local only again.
-
-3. A later `db push` would apply it again. To hold it back, don't push from this branch until you
-   decide.
-
-### Undo the map tables (`20261115120000` and `20261115120050`)
-
-Only after step A is undone. **This removes any stairs, lifts, terms and room names admins have
-entered.** Export them first (SQL editor; save each result):
+Undo part 2 first if it has been applied (the script refuses otherwise). **This removes any terms,
+room names, stairs, lifts and flags admins have entered since.** Export them first (SQL Editor, save
+each result):
 
 ```sql
 select jsonb_agg(c) from public.map_connectors c;
@@ -140,15 +98,65 @@ select jsonb_agg(a) from public.map_assignments a;
 select jsonb_agg(o) from public.map_overrides o;
 ```
 
-1. Run `docs/runbooks/sql/undo_20261115120000_map_nav.sql`.
-2. Check: `select to_regclass('public.map_connectors');` returns null;
-   `npx supabase migration list` shows both as Local only.
+1. Open `docs/runbooks/sql/undo_20261115120000_map_nav.sql`. If preflight row 6 said **yes**,
+   change `true` to `false` on the marked line, so `app_settings` stays in Realtime as before.
+2. Run it. It has its own `begin;` and `commit;`; paste it as it is.
+3. Check: run `preflight_part1.sql` again: rows 3, 4 and 6 are back to what you wrote down.
 
-### Last resort: restore the backup
+## Part 2: rooms migration step A (later)
 
-If something looks wrong and the undo scripts don't fix it: Dashboard → Database → Backups (paid
-plans), or restore the file from step 1 with
-`pg_restore --clean --if-exists -d "<connection string>" campus-before-map-phase1.dump`.
-This also throws away anything written since the backup, so prefer the undo scripts. Restoring
-over a live Supabase project can clash with Supabase's own schemas: try it on a new free project
-first.
+Only when the new build (with the new `src/features/map/api.ts`) is deployed and everyone uses it.
+The new build shows only the original rooms whether or not part 2 is applied; the old build would
+list the 285 new rooms in room pickers.
+
+### 2.1 Fresh backup, then preflight (read-only)
+
+Take a new backup as in "Before you start". Run `docs/runbooks/sql/preflight_part2.sql`.
+Rows 1-3 and 8 must match. **Write down rows 4-7** (rooms, and reports, venues and events with a
+room). If row 8 lists codes, those placeholders are named differently on this project. Nothing
+breaks, but tell the developer: the mapping for those rooms must be fixed before step B.
+
+### 2.2 Apply `20261115120100_rooms_migration_a.sql`
+
+Same way (`begin;` … `commit;`).
+
+Check: finishes without an error.
+
+### 2.3 Record it for the Supabase CLI
+
+If the history table exists: edit the marked line of `record_history.sql` to
+`array['20261115120100']` and run it.
+
+### 2.4 Check
+
+Run `docs/runbooks/sql/check_part2_rooms_a.sql`. Every `result` must equal `expected`; rows 13 and
+16-18 must equal your numbers from 2.1.
+
+Then in the app: Map screen shows floors G, 1, 2 only (no floor 3) with the same pins; fix-it
+report form, venue admin and event form list the same rooms as before.
+
+### Undo part 2
+
+Safe until step B has run. Removes the 285 traced rooms, floor 3, the three helper tables and the
+two new columns; every original room, report, venue and event stays as it was.
+
+1. Run `docs/runbooks/sql/undo_20261115120100_rooms_migration_a.sql` (has its own `begin;`/`commit;`).
+2. Check: run `preflight_part2.sql` again: rows 2 and 3 say `true` and `0`, row 4 equals your
+   number from 2.1.
+
+## Last resort
+
+If something looks wrong and the undo scripts don't fix it, restore the backup (Database → Backups,
+or `pg_restore --clean --if-exists -d "<connection string>" campus-before-map.dump`). That also
+throws away anything written since the backup, and restoring over a live Supabase project can clash
+with Supabase's own schemas, so prefer the undo scripts.
+
+## How this was tested (locally only)
+
+On a throwaway Postgres 17.9 with `tools/local-pg`, starting from a database with every earlier
+migration and the seed (the state of the cloud project): preflight; part 1 applied with
+`begin;`/`commit;` around each file; history recorded into a stand-in history table; checks; the
+existing pgTAP tests for every older feature run against that state (all pass apart from the two
+date-related failures that predate this work); undo of each file; schema compared with the start
+(identical); part 1 again; part 2; checks; undo part 2 (schema identical to part 1 only). Also:
+part 1 with `app_settings` already in Realtime, and its undo keeping it there.

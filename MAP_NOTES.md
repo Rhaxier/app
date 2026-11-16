@@ -1,10 +1,9 @@
 # MAP_NOTES: indoor navigation hand-off
 
-Status: **Foundation phases 1-3 complete. UI phase 1 (data layer) complete, at checkpoint 1.**
-The database tables, functions, rooms migration step A (as a file), the client data layer and the
-shared router provider are built; see "UI phase 1" just before the Phase 3 spec. No screen uses them
-yet. Next: UI phase 2 (admin "Map and rooms", Classrooms tab). Nothing has been applied to the
-cloud project.
+Status: **Foundation phases 1-3 complete. UI phases 1 (data layer) and 2 (admin Classrooms tab)
+complete, at checkpoint 2.** See "UI phase 1" and "UI phase 2" just before the Phase 3 spec.
+Next: UI phase 3 (Stairs and lifts editor). Nothing has been applied to the cloud project; the
+runbook (`docs/runbooks/map-nav-phase1-cloud.md`) applies part 1 now and holds back step A.
 
 ## What exists
 
@@ -307,7 +306,8 @@ Verified (all local; nothing run against the cloud project):
 - `tools/local-pg/run.sh` on Postgres 17.9 + pgTAP 1.3.3: all 25 migrations and the seed apply from
   empty; 19_map_nav 61/61, 20_rooms_migration_a 14/14. Whole suite: 465 passed, 1 failed, in 2 files.
   Both failures were there before this phase and are not map-related:
-  `09_admin_overview` books "yesterday", which fails on Sundays (no Saturday periods), and
+  `09_admin_overview` books "yesterday", which fails whenever yesterday has no seeded bell-time
+  periods (seen on a Sunday and a Monday: no Saturday or Sunday periods), and
   `17_bell_times` test 33 (an old short-Friday period can still be booked). Not fixed here.
 - Runbook rehearsal: check script all as expected; both undo scripts; `pg_dump -s` after undo is
   identical to a database that never had the migrations; re-applying onto existing data passes.
@@ -321,6 +321,52 @@ error code for the step A fallback (42703 is Postgres's code for a missing colum
 
 Left for later phases: every screen (admin tabs, student map), `reports.map_target_kind/id`
 (phase 5), migration B and its runbook (phase 6).
+
+# UI phase 2: admin "Map and rooms", Classrooms tab (built)
+
+Built 2026-11-16. Admin menu: **Map and rooms** (`/admin/map-rooms`, `?tab=connectors` for the
+second tab) next to the old entry, now titled **Map (old pins)** (`MapAdminPage.tsx` untouched).
+
+| Path                                                | Job                                                                                                                                                                                                                                                 |
+| --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/features/map/nav/components/FloorPlanView.tsx` | **The** floor-plan drawing for every map screen (Leaflet `CRS.Simple`, SVG polygons styled by tokens). Click picks a room (`regionAt`) or a place/entrance marker; `focus` pans to an item; `children` for more layers. Reuse it in phases 3 and 4. |
+| `src/features/map/nav/components/latlng.ts`         | `toLatLng` / `fromLatLng` (`lat = -y`, `lng = x`).                                                                                                                                                                                                  |
+| `src/features/map/nav/assignments.ts` (end of file) | Strict checks: `checkAssignmentsCsv` (spec messages, file line numbers), `compareAssignments`, `checkRoomEdit`, `roomRows`, `filterRoomRows`. The lenient `parseAssignmentsCsv` is unchanged.                                                       |
+| `src/features/admin/pages/MapRoomsPage.tsx`         | The section: tabs + `NavRouterProvider`.                                                                                                                                                                                                            |
+| `src/features/admin/components/map-rooms/`          | `ClassroomsTab` (map + list + editor, first run), `TermBar`, `RoomTable`, `RoomEditor`, `AssignmentCsv` (export, import preview), `ConnectorStatus` (read-only placeholder for phase 3), `labels.ts`.                                               |
+| `src/features/admin/strings.ts`                     | `menuSubtitles['map-rooms']`, `pageIntros['map-rooms']`, `footnotes.mapRooms`.                                                                                                                                                                      |
+
+Behaviour worth knowing:
+
+- The editor edits the term chosen in the term bar (default: the active one). A badge says when it
+  isn't the active one. "Make active" is one RPC behind a confirm. Delete is disabled on the active term.
+- First run (no terms): "Start Term 1 from the floor plan's names" creates Term 1 and imports the
+  bundled `assignments.csv` through the strict check. It is **not** made active automatically.
+- Saving a room sends the whole term (`updateAssignment` then `map_save_assignments`). Two admins
+  editing the same term at the same moment: the last save wins (no merge). Fine for now.
+- Import: file -> `checkAssignmentsCsv` -> preview (get a name / change / lose their name, then every
+  problem) -> Apply only when there are no problems -> `map_import_assignments` with line numbers.
+- Live: every mutation invalidates `navKeys.all`; other devices refresh through Realtime; the
+  provider's `setNames` updates route step text. The **old** student map's search still reads the
+  `rooms` table and is unchanged until the switch (phase 4/6).
+- The Stairs and lifts tab only shows how many are placed and the router's problems; phase 3
+  replaces `ConnectorStatus` with the editor.
+
+Database changes in this phase (not applied anywhere): the Realtime block of `20261115120000`
+adds only tables not already in the publication (and skips a FOR ALL TABLES publication);
+`seed.sql` calls `room_migration_a_fill()` only if it exists; `tools/local-pg/run.sh` takes
+`HOLD="<versions>"` to leave migrations (and their test files) out.
+
+Runbook: rewritten for the SQL Editor in two parts (part 1 = `120000` + `120050` now; part 2 =
+`120100` after the new build is deployed), with preflight, check, history and per-file undo scripts
+in `docs/runbooks/sql/`. Rehearsed locally from the cloud project's state (see the runbook's last
+section).
+
+Verified: Vitest (strict checks, table filter, term bar rules, import preview, room editor, menu);
+pgTAP full suite and the runbook rehearsal (results in the checkpoint 2 message and below);
+build, lint. **Not verified:** the screen in a real browser (no Supabase Auth/PostgREST running
+here, and Leaflet doesn't render in jsdom), so widths 360/390/430/desktop, both themes, keyboard
+use on the map and reduced motion were checked by reading the code only. Do this first in phase 7.
 
 # Phase 3: hand-off spec for the UI work
 

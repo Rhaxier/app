@@ -231,9 +231,11 @@ select lives_ok(
 );
 select pg_temp.act_as_owner();
 select is(
-  (select array_agg(action order by created_at)::text from public.audit_log
+  -- Sorted by action, not time: every row in this test has the same
+  -- created_at (now() is the transaction's start time).
+  (select array_agg(action order by action)::text from public.audit_log
    where action in ('map_out_of_order', 'map_back_in_service')),
-  '{map_out_of_order,map_out_of_order,map_back_in_service}',
+  '{map_back_in_service,map_out_of_order,map_out_of_order}',
   'Every out-of-order and back-in-service change is in the audit log'
 );
 -- If no active report category routes to IT any more, IT staff lose the switch.

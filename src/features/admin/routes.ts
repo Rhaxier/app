@@ -50,6 +50,7 @@ export const adminRoutes: RouteObject = {
     },
     { path: 'venues', lazy: lazyPage(() => import('./pages/VenuesAdminPage'), 'VenuesAdminPage') },
     { path: 'map', lazy: lazyPage(() => import('./pages/MapAdminPage'), 'MapAdminPage') },
+    { path: 'map-rooms', lazy: lazyPage(() => import('./pages/MapRoomsPage'), 'MapRoomsPage') },
     {
       path: 'reports',
       lazy: lazyPage(() => import('./pages/ReportsQueuePage'), 'ReportsQueuePage'),

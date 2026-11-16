@@ -226,3 +226,225 @@ export function updateAssignment(
     assignment.roomId === roomId ? { ...assignment, ...change } : assignment,
   );
 }
+
+// ---------- Strict checks for the admin screens ----------
+// The parser above is forgiving on purpose (scripts and the bundled file use
+// it: it skips bad rows and keeps going). The admin import is not: a file
+// with any problem can't be applied, and every problem is listed. The same
+// messages come back from the database (map_write_assignments), so a bad
+// row reads the same whichever side catches it.
+
+export const NAME_MAX_LENGTH = 80;
+
+export type AssignmentsCheck = {
+  /** Rows that passed, in file order. A row with an empty name is kept: applying it leaves the room unnamed. */
+  assignments: Assignment[];
+  /** The file line of each row in `assignments` (the header is line 1), for the database's messages. */
+  lines: number[];
+  /** Every problem, in file order. Empty means the file can be applied. */
+  errors: string[];
+};
+
+export const missingColumnsMessage = `The file needs these columns: ${ASSIGNMENT_COLUMNS.join(', ')}.`;
+
+export const duplicateNameMessage = (name: string, usedBy: string) =>
+  `Two rooms can't share a name: "${name}" is already used by ${usedBy}.`;
+
+/** Checks a whole CSV file for the Import button. Nothing is skipped silently. */
+export function checkAssignmentsCsv(text: string, geometry: Geometry): AssignmentsCheck {
+  // A spreadsheet may start the file with an invisible byte-order mark.
+  const withoutMark = text.charCodeAt(0) === 0xfeff ? text.slice(1) : text;
+  const lines = withoutMark.split(/\r?\n/);
+  const headerAt = lines.findIndex((line) => line.trim() !== '');
+  if (headerAt < 0) {
+    return { assignments: [], lines: [], errors: ['The file is empty.'] };
+  }
+  const header = splitCsvLine(lines[headerAt]).map((name) =>
+    name.toLowerCase().replace(/\s+/g, '_'),
+  );
+  const column = (name: string, alias?: string) => {
+    const at = header.indexOf(name);
+    return at >= 0 || !alias ? at : header.indexOf(alias);
+  };
+  const at = {
+    roomId: column('room_id', 'room'),
+    name: column('name'),
+    subject: column('subject', 'class'),
+    teacher: column('teacher'),
+    type: column('type'),
+  };
+  if (Object.values(at).some((index) => index < 0)) {
+    return { assignments: [], lines: [], errors: [missingColumnsMessage] };
+  }
+
+  const known = new Set(destinationIds(geometry));
+  const roomLine = new Map<string, number>();
+  const nameOwner = new Map<string, string>();
+  const result: AssignmentsCheck = { assignments: [], lines: [], errors: [] };
+
+  for (let index = headerAt + 1; index < lines.length; index += 1) {
+    if (lines[index].trim() === '') continue;
+    const row = index + 1; // the line number a spreadsheet shows
+    const cells = splitCsvLine(lines[index]);
+    const roomId = cells[at.roomId] ?? '';
+    const name = cells[at.name] ?? '';
+    const rawType = cells[at.type] ?? '';
+    const type = rawType.toLowerCase();
+
+    if (roomId === '') {
+      result.errors.push(`Row ${row}: the room_id is empty.`);
+      continue;
+    }
+    if (!known.has(roomId)) {
+      result.errors.push(`Row ${row}: "${roomId}" is not a room on the map.`);
+      continue;
+    }
+    const firstLine = roomLine.get(roomId);
+    if (firstLine !== undefined) {
+      result.errors.push(`Row ${row}: ${roomId} already appears on row ${firstLine}.`);
+      continue;
+    }
+    roomLine.set(roomId, row);
+    if (type !== '' && !ROOM_TYPES.includes(type as RoomType)) {
+      result.errors.push(
+        `Row ${row}: "${rawType}" is not a room type. Use one of: ${ROOM_TYPES.join(', ')}.`,
+      );
+      continue;
+    }
+    if (name.length > NAME_MAX_LENGTH) {
+      result.errors.push(
+        `Row ${row}: the name is too long (${NAME_MAX_LENGTH} characters at most).`,
+      );
+      continue;
+    }
+    if (name !== '') {
+      const owner = nameOwner.get(name.toLowerCase());
+      if (owner !== undefined) {
+        result.errors.push(duplicateNameMessage(name, owner));
+        continue;
+      }
+      nameOwner.set(name.toLowerCase(), roomId);
+    }
+    result.assignments.push({
+      roomId,
+      name,
+      subject: cells[at.subject] ?? '',
+      teacher: cells[at.teacher] ?? '',
+      type: type === '' ? 'other' : (type as RoomType),
+    });
+    result.lines.push(row);
+  }
+  return result;
+}
+
+export type AssignmentChanges = { added: string[]; changed: string[]; removed: string[] };
+
+/**
+ * What applying `after` to a term holding `before` will do, by room id.
+ * Only named rooms count: `removed` are the rooms that will become unnamed.
+ */
+export function compareAssignments(before: Assignment[], after: Assignment[]): AssignmentChanges {
+  const named = (list: Assignment[]) =>
+    new Map(list.filter((a) => a.name.trim() !== '').map((a) => [a.roomId, a]));
+  const old = named(before);
+  const next = named(after);
+  const changes: AssignmentChanges = { added: [], changed: [], removed: [] };
+  for (const [roomId, assignment] of next) {
+    const was = old.get(roomId);
+    if (!was) {
+      changes.added.push(roomId);
+    } else if (
+      was.name !== assignment.name ||
+      was.subject !== assignment.subject ||
+      was.teacher !== assignment.teacher ||
+      was.type !== assignment.type
+    ) {
+      changes.changed.push(roomId);
+    }
+  }
+  for (const roomId of old.keys()) {
+    if (!next.has(roomId)) changes.removed.push(roomId);
+  }
+  return changes;
+}
+
+/** The edit form's check of a room's new name. Null when it can be saved. */
+export function checkRoomEdit(
+  assignments: Assignment[],
+  roomId: string,
+  name: string,
+): string | null {
+  const trimmed = name.trim();
+  if (trimmed.length > NAME_MAX_LENGTH) {
+    return `Use ${NAME_MAX_LENGTH} characters or fewer.`;
+  }
+  if (trimmed === '') return null;
+  const other = assignments.find(
+    (a) => a.roomId !== roomId && a.name.trim().toLowerCase() === trimmed.toLowerCase(),
+  );
+  return other ? duplicateNameMessage(trimmed, other.roomId) : null;
+}
+
+/** One line of the admin table: every room, place and entrance, named or not. */
+export type RoomRow = {
+  id: string;
+  floor: string;
+  kind: Destination['kind'];
+  /** Empty when unnamed. */
+  name: string;
+  subject: string;
+  teacher: string;
+  type: RoomType;
+};
+
+export function roomRows(geometry: Geometry, assignments: Assignment[]): RoomRow[] {
+  const byId = new Map(assignments.map((a) => [a.roomId, a]));
+  const floorOrder = new Map(geometry.floors.map((floor, index) => [floor.id, index]));
+  const items: { id: string; floor: string; kind: Destination['kind'] }[] = [
+    ...geometry.regions
+      .filter((region) => region.kind === 'room')
+      .map((region) => ({ id: region.id, floor: region.floor, kind: 'room' as const })),
+    ...geometry.places.map((place) => ({
+      id: place.id,
+      floor: place.floor,
+      kind: 'place' as const,
+    })),
+    ...entranceDoors(geometry).map((door) => ({
+      id: door.id,
+      floor: door.floor,
+      kind: 'entrance' as const,
+    })),
+  ];
+  return items
+    .map((item) => {
+      const assignment = byId.get(item.id);
+      return {
+        ...item,
+        name: assignment?.name ?? '',
+        subject: assignment?.subject ?? '',
+        teacher: assignment?.teacher ?? '',
+        type: assignment?.type ?? 'other',
+      };
+    })
+    .sort(
+      (a, b) =>
+        (floorOrder.get(a.floor) ?? 99) - (floorOrder.get(b.floor) ?? 99) ||
+        a.id.localeCompare(b.id),
+    );
+}
+
+/** 'all', 'named', 'unnamed', or one floor: 'floor:G', 'floor:1' and so on. */
+export type RoomFilter = 'all' | 'named' | 'unnamed' | `floor:${string}`;
+
+export function filterRoomRows(rows: RoomRow[], query: string, filter: RoomFilter): RoomRow[] {
+  const words = query.trim().toLowerCase();
+  return rows.filter((row) => {
+    if (filter === 'named' && row.name === '') return false;
+    if (filter === 'unnamed' && row.name !== '') return false;
+    if (filter.startsWith('floor:') && row.floor !== filter.slice('floor:'.length)) return false;
+    if (words === '') return true;
+    return [row.id, row.name, row.subject, row.teacher].some((value) =>
+      value.toLowerCase().includes(words),
+    );
+  });
+}

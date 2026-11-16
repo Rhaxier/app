@@ -611,5 +611,12 @@ $$;
 -- created the floors, placeholder rooms, reports, venues and events, so it
 -- runs again now to add the traced rooms and back up the rooms in use.
 -- (On a cloud project the migration does all of this by itself.)
+-- Skipped when step A is held back (the function doesn't exist then).
 -- ---------------------------------------------------------------------------
-select public.room_migration_a_fill();
+do $$
+begin
+  if to_regprocedure('public.room_migration_a_fill()') is not null then
+    perform public.room_migration_a_fill();
+  end if;
+end;
+$$;
