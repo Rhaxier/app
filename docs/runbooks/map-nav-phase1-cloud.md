@@ -59,8 +59,8 @@ Row 7 showing an older newest version (for example `20261027120100`) means the C
 behind: later migrations were applied by hand, or not at all. It doesn't block part 1 (nothing in it
 depends on them). `status.sql` row 5 says whether `20261114120000_after_school` is actually on the
 project. If it is, add `'20261114120000'` to the list in `record_history.sql` at step 1.4 so a
-later `db push` doesn't try to run it again. If it isn't, it still needs applying (separately from
-this runbook) before the new build's after-school booking rules work.
+later `db push` doesn't try to run it again. If it isn't, apply it with **Part 0** at the end of this
+runbook (it can go at any time; see "Does it have to go before the release?" there).
 
 Undo: nothing to undo.
 
@@ -280,3 +280,57 @@ existing pgTAP tests for every older feature run against that state (all pass ap
 date-related failures that predate this work); undo of each file; schema compared with the start
 (identical); part 1 again; part 2; checks; undo part 2 (schema identical to part 1 only). Also:
 part 1 with `app_settings` already in Realtime, and its undo keeping it there.
+
+---
+
+## Part 0: the after-school booking migration (`20261114120000`)
+
+Not part of the indoor map, but `status.sql` row 5 says "no" on your project, so it was never applied.
+It is independent of parts 1-5 and can go at any point: before part 1, between parts, or after the
+release.
+
+### Does it have to go before the release?
+
+**No. The release does not need it, and nothing in parts 1-5 touches it.** Apply it before the new
+build goes live, though, because the new build's Venues admin page shows two settings that only exist
+once it is applied ("after-school block length" and "latest after-school booking ends at"). Without it:
+
+- The new build still works everywhere (it reads settings with `select *`; the booking page just doesn't
+  offer after-school times).
+- Changing either of those two settings in Admin > Venues fails with an error until it is applied.
+
+**Effect on the old app while it is still live:** none that anyone sees. The old build ignores the two new
+columns. The database rule `booking_period_problem()` is replaced; during school hours it behaves exactly
+as before. The only change is that a booking after the last period (rounded up to 30-minute blocks, until
+18:00) is now accepted by the database instead of refused, and the old app has no way to ask for one.
+Existing bookings are not touched.
+
+### 0.1 Check first (read-only)
+
+Run `docs/runbooks/sql/check_part0_after_school.sql`. Rows 1-3 should say **no**; row 4 must say **yes**
+(if it says MISSING, stop: an earlier migration is also missing).
+
+### 0.2 Apply
+
+Paste the whole of `supabase/migrations/20261114120000_after_school_booking.sql` into the SQL Editor
+between `begin;` and `commit;` and run it. Then run `record_history.sql` with
+`v_versions := array['20261114120000']`.
+
+### 0.3 Check
+
+Run `check_part0_after_school.sql` again: rows 1-4 all say **yes**. Optionally, in Admin > Venues (new build)
+the two after-school settings appear and save.
+
+### 0.4 Undo
+
+Run `docs/runbooks/sql/undo_20261114120000_after_school_booking.sql`. It puts the old bell-times-only rule
+back, removes the two settings (any value an admin chose is lost) and removes the history row. Bookings
+already made after school stay as they are. Running it when the migration isn't applied does nothing harmful.
+Check: `check_part0_after_school.sql` rows 1-3 say **no** again.
+
+### How this was tested
+
+Locally, from a database without the migration: check (all no) → apply → check (all yes; a Monday
+15:00-15:30 booking passes, 17:45-18:15 is refused with "After school, bookings can run until 18:00.")
+→ undo → check (all no) → undo again (harmless). The rule function after the undo is the original one.
+Nothing was run against your cloud project.
