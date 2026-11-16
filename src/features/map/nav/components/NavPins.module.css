@@ -1,4 +1,6 @@
-/* Indoor map pins that the old map doesn't have. Colours are tokens. */
+/* Indoor map pins that the old map doesn't have. Colours are tokens: the
+   plan's greys (--plan-mark), except keyboard focus rings, which use the
+   accent as everywhere else in the app. */
 
 .draggable {
   cursor: grab;
@@ -14,9 +16,9 @@
   height: 18px;
   border: 3px solid var(--card);
   border-radius: 50%;
-  background: var(--acc);
+  background: var(--plan-mark);
   box-shadow:
-    0 0 0 4px var(--accsoft),
+    0 0 0 4px var(--plan-mark-soft),
     var(--e1);
 }
 
@@ -67,10 +69,10 @@
 }
 
 .connectorSelected .connectorDisc {
-  border-color: var(--acc);
-  color: var(--acc);
+  border-color: var(--plan-mark);
+  color: var(--plan-mark);
   box-shadow:
-    0 0 0 3px var(--accsoft),
+    0 0 0 3px var(--plan-mark-soft),
     var(--e1);
 }
 

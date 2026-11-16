@@ -13,7 +13,6 @@ import {
   formatDistance,
   formatDuration,
   legsOnFloor,
-  routeLineWeight,
   startFloor,
 } from './routeView.ts';
 import { searchDestinations } from './search.ts';
@@ -93,18 +92,12 @@ describe('a route between floors', () => {
   });
 });
 
-describe('numbers and widths', () => {
+describe('numbers', () => {
   it('words distances and times the way a student reads them', () => {
     expect(formatDistance(3.4)).toBe('3 m');
     expect(formatDistance(77)).toBe('75 m');
     expect(formatDuration(40)).toBe('under a minute');
     expect(formatDuration(150)).toBe('about 3 min');
-  });
-
-  it('draws the line bolder as you zoom in, within limits', () => {
-    expect(routeLineWeight(-4)).toBe(3);
-    expect(routeLineWeight(0)).toBeGreaterThan(routeLineWeight(-2));
-    expect(routeLineWeight(2)).toBe(14);
   });
 });
 

@@ -1,5 +1,5 @@
-/* The traced floor plan. Every colour is a token, so light and dark mode
-   both work. Leaflet sets fill and stroke as SVG attributes; these classes
+/* The traced floor plan. Every colour is a --plan-* token (tokens.css):
+   neutral greys in both light and dark mode. Leaflet sets fill and stroke as SVG attributes; these classes
    override them (CSS beats presentation attributes). */
 
 .frame {
@@ -7,7 +7,7 @@
   width: 100%;
   max-height: 70vh;
   border-radius: var(--r-card);
-  background: var(--paper);
+  background: var(--plan-ground);
   box-shadow: var(--e1);
 }
 
@@ -46,70 +46,115 @@
   box-shadow: var(--e1);
 }
 
+/* Lines are drawn in metres (planScale.ts, LINE_M). FloorPlanView keeps
+   --px-per-m, the screen pixels per metre at the current zoom, on the map, so
+   every line grows and shrinks at exactly the rate the plan does. The
+   fallback is the plan at zoom -2, until the first zoom is known. */
+.map {
+  --wall: calc(0.1 * var(--px-per-m, 5.4px));
+  --selection-line: calc(0.2 * var(--px-per-m, 5.4px));
+}
+
 .corridor {
-  fill: var(--paper);
+  fill: var(--plan-corridor);
   fill-opacity: 1;
-  stroke: var(--hair);
-  stroke-width: 1;
+  stroke: var(--plan-wall-soft);
+  stroke-width: var(--wall);
 }
 
 .room {
-  fill: var(--card);
+  fill: var(--plan-room);
   fill-opacity: 1;
-  stroke: var(--line);
-  stroke-width: 1;
+  stroke: var(--plan-wall);
+  stroke-width: var(--wall);
   cursor: pointer;
 }
 
 /* Unnamed rooms stay on the plan but quieter: students can't search for them. */
 .roomUnnamed {
-  fill: var(--card);
-  fill-opacity: 0.45;
-  stroke: var(--faint);
-  stroke-width: 1;
+  fill: var(--plan-room-unnamed);
+  fill-opacity: 1;
+  stroke: var(--plan-wall-soft);
+  stroke-width: var(--wall);
   cursor: pointer;
 }
 
 /* Where the floor plan shows a staircase symbol: a hint for placing stairs. */
 .stairwell {
-  fill: var(--hatch);
+  fill: var(--plan-stairs);
   fill-opacity: 1;
-  stroke: var(--line);
-  stroke-width: 1;
+  stroke: var(--plan-wall);
+  stroke-width: var(--wall);
 }
 
 .void {
-  fill: var(--hair);
-  fill-opacity: 0.5;
+  fill: var(--plan-void);
+  fill-opacity: 1;
   stroke: none;
 }
 
+/* Places and entrances are markers a fixed size on screen, so they stay easy
+   to see and tap. Their outlines thin with the zoom like every other line,
+   but stop at the width they were drawn at, so a ring never fills in. */
 .place {
-  fill: var(--card);
+  fill: var(--plan-room);
   fill-opacity: 1;
-  stroke: var(--muted);
-  stroke-width: 2;
+  stroke: var(--plan-wall);
+  stroke-width: min(2px, var(--wall));
 }
 
 .entrance {
-  fill: var(--paper);
+  fill: var(--plan-corridor);
   fill-opacity: 1;
-  stroke: var(--faint);
-  stroke-width: 2;
+  stroke: var(--plan-wall-soft);
+  stroke-width: min(2px, var(--wall));
 }
 
 .entranceNamed {
-  fill: var(--acc);
+  fill: var(--plan-mark);
   fill-opacity: 1;
-  stroke: var(--card);
-  stroke-width: 2;
+  stroke: var(--plan-room);
+  stroke-width: min(2px, var(--wall));
 }
 
 .selected {
-  fill: var(--selroom);
-  fill-opacity: 0.35;
-  stroke: var(--acc);
-  stroke-width: 3;
+  fill: var(--plan-mark);
+  fill-opacity: 0.08;
+  stroke: var(--plan-mark);
+  stroke-width: var(--selection-line);
+}
+
+/* The selected place or entrance (a ring around its marker). */
+.selectedPoint {
+  fill: var(--plan-mark);
+  fill-opacity: 0.08;
+  stroke: var(--plan-mark);
+  stroke-width: min(3px, var(--selection-line));
+}
+
+/* Room names (RoomLabels in FloorPlanView): 10pt in the app's typeface,
+   centred on the room. Leaflet sizes and centres the box; the name can't be
+   tapped, so a tap reaches the room under it. */
+.label {
+  display: grid;
+  place-items: center;
+  color: var(--plan-label);
+  font: 500 10pt / 16px var(--font);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* A name fades in when the room grows big enough to hold it. */
+  .label {
+    animation: label-in var(--motion-fast) var(--ease-out) both;
+  }
+}
+
+@keyframes label-in {
+  from {
+    opacity: 0;
+  }
 }
 
 /* The stairs and lifts editor: the plan is only a background to place on. */

@@ -7,12 +7,18 @@
 // are SVG shapes styled only by CSS classes, so the colours come from the
 // tokens and follow light and dark mode.
 //
+// The plan is drawn to scale (../planScale.ts): line widths are set in metres
+// and follow the zoom, and a room's name appears once the room is big enough
+// on screen to hold it.
+//
 // Coordinates: see ./latlng.ts.
 import L from 'leaflet';
-import { useEffect, useMemo, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import {
   CircleMarker,
   MapContainer,
+  Marker,
+  Pane,
   Polygon,
   Tooltip,
   useMap,
@@ -22,6 +28,7 @@ import {
 import { prefersReducedMotion } from '@/lib/motion';
 import { entranceDoors } from '../assignments.ts';
 import { distance, indexGeometry, regionAt } from '../graph.ts';
+import { LABEL_FONT_SIZE, labelMinScale, pxPerMetre, pxPerUnit } from '../planScale.ts';
 import type { FloorId, Geometry, Point, Region } from '../types.ts';
 import styles from './FloorPlanView.module.css';
 import { fromLatLng, toLatLng } from './latlng.ts';
@@ -145,6 +152,7 @@ export function FloorPlanView({
         attributionControl={false}
       >
         <ZoomControl position={immersive ? 'bottomright' : 'topleft'} />
+        <LineScale metresPerUnit={geometry.metresPerUnit} />
         {onZoom && <ZoomWatcher onZoom={onZoom} />}
         {/* key: shapes are made once per floor; a name change redraws only that room. */}
         {regions.map((region) => (
@@ -195,9 +203,10 @@ export function FloorPlanView({
             center={toLatLng(selectedPoint)}
             radius={10}
             interactive={false}
-            pathOptions={{ className: styles.selected }}
+            pathOptions={{ className: styles.selectedPoint }}
           />
         )}
+        {names && named && <RoomLabels regions={regions} named={named} names={names} />}
         {onSelect && <ClickToSelect geometry={geometry} floor={floor} onSelect={onSelect} />}
         {(onMapClick || onPointerMove) && (
           <PointerEvents onMapClick={onMapClick} onPointerMove={onPointerMove} />
@@ -242,6 +251,145 @@ function RegionShape({
       )}
     </Polygon>
   );
+}
+
+/**
+ * Keeps --px-per-m (screen pixels per metre) on the map, for the line widths
+ * in FloorPlanView.module.css. Updated when a zoom ends: while one is running,
+ * Leaflet stretches the drawing as a whole, lines included, so they already
+ * change at the zoom's rate.
+ */
+function LineScale({ metresPerUnit }: { metresPerUnit: number }) {
+  const map = useMapEvents({ zoomend: () => update() });
+  function update() {
+    const px = pxPerMetre(map.getZoom(), metresPerUnit);
+    map.getContainer().style.setProperty('--px-per-m', `${px}px`);
+  }
+  useEffect(update, [map, metresPerUnit]);
+  return null;
+}
+
+/**
+ * Each named room's name, shown once the room is big enough on screen to hold
+ * it at 10pt with a little space around it (labelMinScale), hidden again when
+ * zooming out makes it too small.
+ *
+ * When a zoom starts, names that won't fit at the new zoom go straight away,
+ * so none overlaps a wall as the plan shrinks; names that now fit appear when
+ * it ends.
+ */
+function RoomLabels({
+  regions,
+  named,
+  names,
+}: {
+  regions: Region[];
+  named: ReadonlySet<string>;
+  names: Record<string, string>;
+}) {
+  const map = useMap();
+  const [zoom, setZoom] = useState(() => map.getZoom());
+  const [target, setTarget] = useState<number | null>(null);
+  useMapEvents({
+    zoomanim: (event) => setTarget(event.zoom),
+    zoomend: () => {
+      setTarget(null);
+      setZoom(map.getZoom());
+    },
+  });
+  const font = useLabelFont(map.getContainer());
+
+  // The scale at which each name first fits. Depends only on the rooms, the
+  // names and the font, so it's worked out once, not on every zoom.
+  const maxScale = pxPerUnit(map.getMaxZoom());
+  const labels = useMemo(() => {
+    const list: { region: Region; name: string; width: number; minScale: number }[] = [];
+    for (const region of regions) {
+      const name = names[region.id];
+      if (region.kind !== 'room' || !named.has(region.id) || !name) continue;
+      const width = measureText(name, font);
+      const minScale = labelMinScale(region, width, maxScale);
+      if (minScale !== null) list.push({ region, name, width, minScale });
+    }
+    return list;
+  }, [regions, named, names, font, maxScale]);
+
+  const scale = pxPerUnit(Math.min(zoom, target ?? zoom));
+  return (
+    <Pane name="room-labels" style={{ zIndex: 450, pointerEvents: 'none' }}>
+      {labels
+        .filter((label) => label.minScale <= scale)
+        .map((label) => (
+          <RoomLabel
+            key={label.region.id}
+            at={label.region.labelAt}
+            name={label.name}
+            width={label.width}
+          />
+        ))}
+    </Pane>
+  );
+}
+
+function RoomLabel({ at, name, width }: { at: [number, number]; name: string; width: number }) {
+  const icon = useMemo(() => {
+    // The name goes in as text, never as HTML: room names are typed by admins.
+    const text = document.createElement('span');
+    text.textContent = name;
+    text.dataset.roomLabel = '';
+    const boxWidth = Math.ceil(width) + 2;
+    return L.divIcon({
+      className: styles.label,
+      html: text,
+      iconSize: [boxWidth, 16],
+      iconAnchor: [boxWidth / 2, 8],
+    });
+  }, [name, width]);
+  return (
+    <Marker
+      position={toLatLng({ x: at[0], y: at[1] })}
+      icon={icon}
+      interactive={false}
+      keyboard={false}
+    />
+  );
+}
+
+/**
+ * The CSS font of a room name, for measuring it. Measured again once the
+ * app's typeface has loaded, since a fallback font has different widths.
+ */
+function useLabelFont(container: HTMLElement): string {
+  const [fontsLoaded, setFontsLoaded] = useState(0);
+  useEffect(() => {
+    let live = true;
+    document.fonts?.ready.then(() => live && setFontsLoaded((n) => n + 1));
+    return () => {
+      live = false;
+    };
+  }, []);
+  return useMemo(
+    () => `500 ${LABEL_FONT_SIZE} ${getComputedStyle(container).fontFamily}`,
+    // fontsLoaded: re-read after the typeface arrives.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [container, fontsLoaded],
+  );
+}
+
+let measuringContext: CanvasRenderingContext2D | null | undefined;
+
+/** How wide `text` is in `font`, in pixels. */
+function measureText(text: string, font: string): number {
+  if (measuringContext === undefined) {
+    // Test runs (jsdom) have no canvas; they get an estimate instead.
+    measuringContext = /jsdom/i.test(navigator.userAgent)
+      ? null
+      : document.createElement('canvas').getContext('2d');
+  }
+  if (!measuringContext) return text.length * 7.5;
+  measuringContext.font = font;
+  // A couple of extra pixels: canvas and the page can round a font differently.
+  return measuringContext.measureText(text).width + 2;
 }
 
 /** A click picks the place or entrance marker it is on, otherwise the room under it. */

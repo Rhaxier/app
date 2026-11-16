@@ -352,6 +352,7 @@ export function MapScreen({ geometry, router }: { geometry: Geometry; router: Ro
           {result?.ok && (
             <RouteLayer
               result={result}
+              metresPerUnit={geometry.metresPerUnit}
               floor={floor}
               zoom={zoom}
               destinationName={destination?.name ?? ''}
