@@ -6,6 +6,7 @@
 // validation message can open the right one. Both tabs share one router
 // (NavRouterProvider), which is also what keeps them up to date live.
 import { useSearchParams } from 'react-router-dom';
+import { ButtonLink } from '@/components/Button';
 import { SegmentedControl } from '@/components/SegmentedControl';
 import { ClassroomsTab } from '../components/map-rooms/ClassroomsTab';
 import { ConnectorsTab } from '../components/map-rooms/connectors/ConnectorsTab';
@@ -20,7 +21,17 @@ export function MapRoomsPage() {
   const tab: Tab = params.get('tab') === 'connectors' ? 'connectors' : 'classrooms';
 
   return (
-    <AdminPage title="Map and rooms" description={pageIntros['map-rooms']} fullWidth>
+    <AdminPage
+      title="Map and rooms"
+      description={pageIntros['map-rooms']}
+      fullWidth
+      actions={
+        // The student map with directions, before it replaces /map (MAP_NOTES.md).
+        <ButtonLink to="/map/indoor" variant="secondary" size="small" icon="map">
+          Preview student map
+        </ButtonLink>
+      }
+    >
       <SegmentedControl<Tab>
         label="Part"
         value={tab}

@@ -1,0 +1,18 @@
+/* The route line: accent on top of a wide soft glow. Leaflet sets the width
+   (it follows the zoom); the colours come from tokens, so both themes work. */
+
+.glow {
+  stroke: var(--acc);
+  stroke-opacity: 0.22;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
+
+.line {
+  stroke: var(--acc);
+  stroke-opacity: 1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}

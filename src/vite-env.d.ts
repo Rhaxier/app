@@ -7,6 +7,7 @@ interface ImportMetaEnv {
   readonly VITE_AUTH_PROVIDER?: string;
   readonly VITE_SCHOOL_EMAIL_DOMAIN?: string;
   readonly VITE_ENABLE_PUSH?: string;
+  readonly VITE_INDOOR_MAP?: string;
 }
 
 interface ImportMeta {

@@ -1,9 +1,9 @@
 # MAP_NOTES: indoor navigation hand-off
 
-Status: **Foundation phases 1-3 complete. UI phases 1 (data layer), 2 (admin Classrooms tab) and
-3 (Stairs and lifts editor) complete, at checkpoint 3.** See "UI phase 1/2/3" just before the
-Phase 3 spec. Next: the school places the real stairs and lifts in the editor; then UI phase 4
-(student map). Nothing has been applied to the cloud project by Claude; the runbook
+Status: **Foundation phases 1-3 complete. UI phases 1-4 complete (data layer, admin Classrooms
+tab, Stairs and lifts editor, student map behind a switch), at checkpoint 4.** See "UI phase 1-4"
+just before the Phase 3 spec. Next: UI phase 5 (fix-it link and out-of-order flags). Nothing has
+been applied to the cloud project by Claude; the runbook
 (`docs/runbooks/map-nav-phase1-cloud.md`) applies part 1 and holds back step A.
 
 ## What exists
@@ -411,6 +411,58 @@ Verified: Vitest (draft functions on the real map; editor with the map stubbed: 
 served, route on the unsaved draft, Save payload, Save blocked by a marker in a wall, Available
 saved at once, delete confirm, leave guard). **Not verified:** dragging, drawing and the pointer
 ghost in a real browser (Leaflet doesn't render in jsdom), and real Realtime.
+
+# UI phase 4: student map (built, behind a switch)
+
+Built 2026-11-16. Decision from the team: **behind a switch**. `/map` stays the old map (its fix-it
+pins as today) until the release that runs rooms migration B (phase 6). The new screen:
+
+- `/map/indoor` for staff (teachers and admins) to try it; admins have a "Preview student map"
+  button in Admin -> Map and rooms.
+- `VITE_INDOOR_MAP=true` (`.env`, read in `src/lib/env.ts`) makes `/map` render the new screen
+  for everyone. Turn it on in the phase 6 release, together with migration B.
+
+| Path                                                              | Job                                                                                                                                   |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/features/map/pages/IndoorMapPage.tsx`                        | The screen (`MapScreen` inside `NavRouterProvider`). Reuses `MapPage.module.css` for the floating layout.                             |
+| `src/features/map/components/DestinationSearch.tsx`               | Search as you type over `searchableDestinations`; also the "room you're nearest" start.                                               |
+| `src/features/map/components/DirectionsPanel.tsx`                 | From/To, swap, step-free switch, summary, current step with Previous/Next, all steps, error messages.                                 |
+| `src/features/map/nav/components/RouteLayer.tsx`                  | Route line (glow + line, width by zoom, Motion draw-in unless reduced motion), destination pin, floor-change chips, fit to the route. |
+| `src/features/map/nav/components/NavPins.tsx`                     | `HereMarker` (draggable "I'm here"), `ReportCountPin`, `BusyDot`, `DestinationPin`, `FloorChangeChip`.                                |
+| `src/features/map/nav/search.ts`, `routeView.ts`, `startPoint.ts` | Ranking, floor changes, line width, words for distance/time, `floorLabel`, pin snapping.                                              |
+| `FloorPlanView`                                                   | New props `immersive` (full screen behind the controls) and `onZoom`.                                                                 |
+
+How it behaves:
+
+- Destination: the top search, or tap a named room/place/entrance on the plan. The plan opens on
+  the destination's floor. `?to=<map id>` (and `?room=<code>`, the old links: a traced room's code
+  is its map id, so other screens' links work after migration B) pick it from the address.
+- Start ("Where are you?"): "Drop a pin on the map" then tap, or drag the pin; the spot snaps to
+  the nearest walkable point or is refused with "That starting point isn't somewhere you can
+  walk." Or search "the room you're nearest". `?from=<map id>` keeps a room start. No live
+  positioning anywhere.
+- Step-free switch, remembered in `localStorage` (`campus.map.stepFree`). Swap works when the
+  start is a room.
+- Route: recomputed when the ends or mode change, and when the shared router changes (Realtime:
+  stairs/lifts saved, out-of-order flags, new names). A new trip starts at step 1 on its first floor;
+  a reroute of the same trip keeps the current step. Only the floor in view draws its part of the
+  line. A chip at the stairs or lift ("Take the lift up to Third Floor") and an arrival chip
+  ("Came from the ground floor") switch floor. Previous/Next and tapping a step move the map to that
+  step's floor.
+- Errors: the router's message; "Show route with stairs" for `no-step-free-route`; admins get
+  "Add stairs or a lift" for `floors-not-connected`.
+- Layers: fix-it reports (count pin at the room's label point) and "in use now", placed through
+  `rooms.region_id` (`useTracedRooms`). **Empty until migration B** moves reports and venues to
+  traced rooms. Phase 5 adds the out-of-order parts.
+- Nothing collides with the tab bar: the panel sits at `--tabbar-space` like the old map's sheet,
+  and the zoom buttons hide while it is open.
+
+Verified: Vitest (search ranking; floor changes, line width, words; pin snapping; the screen with
+the plan stubbed: search both ends, route summary, floor switching by chip and steps, pin start
+and refusal, tap a room, step-free mode passed and remembered, swap, every router message, the
+admin-only link). Real router with a fixture lift for G -> 3. **Not verified in a browser:** the
+drawing, the draw-in animation, line width by zoom, dragging the pin, widths 360/390/430 and
+desktop, both themes (phase 7).
 
 # Phase 3: hand-off spec for the UI work
 

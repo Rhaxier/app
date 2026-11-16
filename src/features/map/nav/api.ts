@@ -144,6 +144,22 @@ export async function fetchAssignments(presetId: string): Promise<Assignment[]> 
   return data.map(assignmentFromRow);
 }
 
+/**
+ * Which map region each traced room is (rooms.id -> region_id), so reports,
+ * venues and events, which point at rooms, can be placed on the indoor map.
+ * Empty until rooms migration step A has run (no region_id column: 42703),
+ * and only the traced rooms are listed (the old placeholders have none).
+ */
+export async function fetchTracedRooms(): Promise<Record<string, string>> {
+  const { data, error } = await supabase
+    .from('rooms')
+    .select('id, region_id')
+    .not('region_id', 'is', null);
+  if (error?.code === '42703') return {};
+  if (error) throw error;
+  return Object.fromEntries(data.map((room) => [room.id, room.region_id as string]));
+}
+
 /** Whether to show "Mark out of order" (the database checks again on the call). */
 export async function fetchCanMarkOutOfOrder(): Promise<boolean> {
   const { data, error } = await supabase.rpc('map_can_mark_out_of_order');

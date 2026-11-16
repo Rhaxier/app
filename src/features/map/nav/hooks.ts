@@ -18,6 +18,7 @@ import {
   fetchConnectors,
   fetchOverrides,
   fetchPresets,
+  fetchTracedRooms,
   importAssignments,
   renamePreset,
   saveAssignments,
@@ -38,6 +39,7 @@ export const navKeys = {
   activeAssignments: () => [...navKeys.all, 'assignments', 'active'] as const,
   assignments: (presetId: string) => [...navKeys.all, 'assignments', presetId] as const,
   canMarkOutOfOrder: () => [...navKeys.all, 'can-mark-out-of-order'] as const,
+  tracedRooms: () => [...navKeys.all, 'traced-rooms'] as const,
 };
 
 // Outside navKeys.all on purpose: Realtime refreshes must never reload the geometry.
@@ -96,6 +98,15 @@ export function useActiveAssignments() {
       }
       return { presetId, assignments: await fetchAssignments(presetId) };
     },
+  });
+}
+
+/** rooms.id -> map region, for the fix-it and "in use now" layers. Rooms change rarely. */
+export function useTracedRooms() {
+  return useQuery({
+    queryKey: navKeys.tracedRooms(),
+    queryFn: fetchTracedRooms,
+    staleTime: 10 * 60_000,
   });
 }
 

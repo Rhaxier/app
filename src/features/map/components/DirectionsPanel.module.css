@@ -1,0 +1,163 @@
+/* The directions panel: thick glass at the bottom of the map, above the tab
+   bar. It scrolls inside itself so it never covers the whole map. */
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-height: min(60vh, 520px);
+  overflow-y: auto;
+  padding: var(--space-4);
+  border-radius: var(--r-card);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  margin: 0;
+  font-size: var(--text-title);
+}
+
+.iconButton {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: var(--touch-min);
+  height: var(--touch-min);
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.iconButton:hover:not(:disabled) {
+  background: var(--segbg);
+}
+
+.iconButton:focus-visible {
+  outline: 2px solid var(--acc);
+  outline-offset: 2px;
+}
+
+.iconButton:disabled {
+  color: var(--faint);
+  cursor: default;
+}
+
+.ends {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: var(--space-2);
+  align-items: start;
+}
+
+/* On phones the two ends stack, with the swap button between them. */
+@media (max-width: 520px) {
+  .ends {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ends > .iconButton {
+    justify-self: center;
+  }
+}
+
+.end {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.endLabel {
+  color: var(--muted);
+  font-size: var(--text-caps);
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.endValue {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  align-items: baseline;
+  font-weight: 600;
+}
+
+.change {
+  min-height: var(--touch-min);
+  padding: 0 4px;
+  border: 0;
+  background: transparent;
+  color: var(--acc);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.problem {
+  margin: 0;
+  color: var(--fix);
+  font-size: var(--text-body);
+}
+
+.summary {
+  margin: 0;
+  font-size: var(--text-reading);
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: var(--space-3);
+  border-radius: var(--r-tag);
+  background: var(--accsoft);
+}
+
+.stepText {
+  margin: 0;
+  font-size: var(--text-reading);
+  font-weight: 600;
+}
+
+.all summary {
+  min-height: var(--touch-min);
+  line-height: var(--touch-min);
+  color: var(--acc);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.steps {
+  margin: 0;
+  padding-left: 22px;
+}
+
+.stepButton {
+  width: 100%;
+  min-height: var(--touch-min);
+  padding: 4px 6px;
+  border: 0;
+  border-radius: var(--r-tag);
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.stepButton:hover {
+  background: var(--segbg);
+}
+
+.stepButton[aria-current='step'] {
+  background: var(--accsoft);
+  font-weight: 600;
+}

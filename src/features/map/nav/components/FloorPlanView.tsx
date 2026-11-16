@@ -53,6 +53,10 @@ interface FloorPlanViewProps {
   onPointerMove?: (point: Point | null) => void;
   /** Show a crosshair cursor (an Add tool is active). */
   crosshair?: boolean;
+  /** Fill the screen behind floating controls; the plan fits between these margins (px). */
+  immersive?: { top: number; bottom: number };
+  /** Told the zoom level when it changes (the route line is scaled with it). */
+  onZoom?: (zoom: number) => void;
   /** Extra layers drawn on top (markers, routes). */
   children?: ReactNode;
 }
@@ -70,6 +74,8 @@ export function FloorPlanView({
   onMapClick,
   onPointerMove,
   crosshair = false,
+  immersive,
+  onZoom,
   children,
 }: FloorPlanViewProps) {
   const { bounds } = geometry;
@@ -103,17 +109,28 @@ export function FloorPlanView({
 
   return (
     <div
-      className={[styles.frame, quiet && styles.quiet, crosshair && styles.crosshair]
+      className={[
+        styles.frame,
+        immersive && styles.immersive,
+        quiet && styles.quiet,
+        crosshair && styles.crosshair,
+      ]
         .filter(Boolean)
         .join(' ')}
       role="region"
       aria-label={label}
-      style={{ aspectRatio: `${width} / ${height}` }}
+      // Framed: the frame takes the plan's shape. Immersive: the whole screen.
+      style={immersive ? undefined : { aspectRatio: `${width} / ${height}` }}
     >
       <MapContainer
         className={styles.map}
         crs={L.CRS.Simple}
         bounds={mapBounds}
+        boundsOptions={
+          immersive
+            ? { paddingTopLeft: [16, immersive.top], paddingBottomRight: [16, immersive.bottom] }
+            : undefined
+        }
         maxBounds={L.latLngBounds(mapBounds as L.LatLngTuple[]).pad(0.5)}
         minZoom={-4}
         maxZoom={2}
@@ -124,7 +141,8 @@ export function FloorPlanView({
         markerZoomAnimation={animate}
         attributionControl={false}
       >
-        <ZoomControl position="topleft" />
+        <ZoomControl position={immersive ? 'bottomright' : 'topleft'} />
+        {onZoom && <ZoomWatcher onZoom={onZoom} />}
         {/* key: shapes are made once per floor; a name change redraws only that room. */}
         {regions.map((region) => (
           <RegionShape
@@ -255,6 +273,13 @@ function ClickToSelect({
       if (region?.kind === 'room') onSelect(region.id);
     },
   });
+  return null;
+}
+
+/** Reports the zoom level now and after every zoom. */
+function ZoomWatcher({ onZoom }: { onZoom: (zoom: number) => void }) {
+  const map = useMapEvents({ zoomend: () => onZoom(map.getZoom()) });
+  useEffect(() => onZoom(map.getZoom()), [map, onZoom]);
   return null;
 }
 

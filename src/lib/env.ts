@@ -14,6 +14,9 @@ export const env = {
   authProvider: readAuthProvider(import.meta.env.VITE_AUTH_PROVIDER),
   schoolEmailDomain: import.meta.env.VITE_SCHOOL_EMAIL_DOMAIN ?? '',
   enablePush: import.meta.env.VITE_ENABLE_PUSH === 'true',
+  // The new indoor map with directions at /map (MAP_NOTES.md). Off until the
+  // release that runs rooms migration B; staff can try it at /map/indoor.
+  indoorMap: import.meta.env.VITE_INDOOR_MAP === 'true',
 };
 
 // True when .env has been filled in. If not, the app shows setup instructions

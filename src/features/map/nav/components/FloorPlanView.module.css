@@ -122,3 +122,31 @@
 .crosshair :global(.leaflet-container) {
   cursor: crosshair;
 }
+
+/* The student map: the whole screen in the app's column, behind its glass
+   controls and the tab bar (same as the old map's immersive view). */
+.immersive {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  max-width: var(--content-max);
+  max-height: none;
+  margin: 0 auto;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.immersive :global(.leaflet-bottom.leaflet-right) {
+  right: var(--chrome-inset);
+  bottom: calc(var(--tabbar-space) + 64px);
+}
+
+.immersive :global(.leaflet-control-zoom) {
+  margin: 0;
+}
+
+/* While the directions panel is open it covers that corner; pinch, scroll
+   or the + and - keys still zoom. */
+:global([data-sheet]) .immersive :global(.leaflet-control-zoom) {
+  display: none;
+}

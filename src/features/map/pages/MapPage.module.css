@@ -54,3 +54,18 @@
   font-size: var(--text-meta);
   font-weight: 500;
 }
+
+/* The indoor map's "Get directions" button: the hint pill, made tappable. */
+.hintButton {
+  min-height: var(--touch-min);
+  border: 0;
+  font: inherit;
+  font-size: var(--text-body);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.hintButton:focus-visible {
+  outline: 2px solid var(--acc);
+  outline-offset: 2px;
+}

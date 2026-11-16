@@ -13,6 +13,7 @@ import { HomePage } from '@/features/home/pages/HomePage';
 import { InboxPage } from '@/features/notifications/pages/InboxPage';
 import { NotificationSettingsPage } from '@/features/notifications/pages/NotificationSettingsPage';
 import { adminRoutes } from '@/features/admin/routes';
+import { env } from '@/lib/env';
 import { AppLayout } from './AppLayout';
 import { RequireAuth, RequireFeature, RequireRole } from './guards';
 import { lazyPage } from './lazyPage';
@@ -32,6 +33,7 @@ const collab = () => import('@/features/collab/pages/CollabPage');
 const collabPost = () => import('@/features/collab/pages/CollabDetailPage');
 const collabForm = () => import('@/features/collab/pages/CollabFormPage');
 const map = () => import('@/features/map/pages/MapPage');
+const indoorMap = () => import('@/features/map/pages/IndoorMapPage');
 const reportForm = () => import('@/features/fixit/pages/ReportFormPage');
 const report = () => import('@/features/fixit/pages/ReportDetailPage');
 const book = () => import('@/features/venues/pages/BookPage');
@@ -91,7 +93,20 @@ export const router = createBrowserRouter([
               },
               {
                 element: <RequireFeature feature="map" />,
-                children: [{ path: '/map', lazy: lazyPage(map, 'MapPage') }],
+                children: [
+                  {
+                    path: '/map',
+                    // The switch to the indoor map with directions (env.indoorMap).
+                    lazy: env.indoorMap
+                      ? lazyPage(indoorMap, 'IndoorMapPage')
+                      : lazyPage(map, 'MapPage'),
+                  },
+                  {
+                    // Staff try the indoor map here before it becomes /map.
+                    element: <RequireRole role="staff" />,
+                    children: [{ path: '/map/indoor', lazy: lazyPage(indoorMap, 'IndoorMapPage') }],
+                  },
+                ],
               },
               {
                 element: <RequireFeature feature="fixit" />,
