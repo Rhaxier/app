@@ -334,3 +334,14 @@ Locally, from a database without the migration: check (all no) → apply → che
 15:00-15:30 booking passes, 17:45-18:15 is refused with "After school, bookings can run until 18:00.")
 → undo → check (all no) → undo again (harmless). The rule function after the undo is the original one.
 Nothing was run against your cloud project.
+
+### 0.5 If it is half applied ("column already exists")
+
+Symptom: applying the migration fails with `column "after_school_block_minutes" ... already exists`, or
+`check_part0_after_school.sql` shows a mix of yes and no (for example row 1 yes, row 2 no, row 3 yes).
+That means an earlier attempt, or the undo, stopped part way. Don't apply the migration again.
+Run `docs/runbooks/sql/repair_part0_after_school.sql` instead. It adds whichever setting is missing,
+keeps any value already set, installs the new booking rule and records the history row. Safe to run
+any number of times. Then run `check_part0_after_school.sql`: rows 1-4 must all say yes.
+(To go the other way, run the undo in 0.4, then check that rows 1-3 say no.)
+Tested locally from both half-applied states: both ended all yes.
