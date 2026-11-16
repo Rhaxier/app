@@ -167,6 +167,16 @@ describe('indoor map: a route between floors (real router, fixture lift)', () =>
     expect(floorShown()).toBe('G');
   });
 
+  it('closes the search matches with Escape', async () => {
+    renderMap(createRouter(geometry, [lift]));
+    const search = screen.getByRole('searchbox', { name: 'Where to?' });
+    await userEvent.type(search, '12 B');
+    expect(screen.getByRole('button', { name: /^12 B/ })).toBeInTheDocument();
+    await userEvent.keyboard('{Escape}');
+    expect(screen.queryByRole('button', { name: /^12 B/ })).not.toBeInTheDocument();
+    expect(search).toHaveValue('');
+  });
+
   it('switches floor from the floor-change chip, and from the steps', async () => {
     renderMap(createRouter(geometry, [lift]), '/?from=G-R030&to=3-R043');
     expect(floorShown()).toBe('G');

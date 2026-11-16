@@ -57,6 +57,14 @@ export function DestinationSearch({
           autoFocus={autoFocus}
           value={query}
           onChange={(event) => setQuery(event.target.value)}
+          // Escape closes the matches in every browser (only some clear a
+          // search box on their own).
+          onKeyDown={(event) => {
+            if (event.key === 'Escape' && query) {
+              event.preventDefault();
+              setQuery('');
+            }
+          }}
         />
       </div>
       {query.trim() && (

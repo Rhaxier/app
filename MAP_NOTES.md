@@ -2,9 +2,10 @@
 
 Status: **Foundation phases 1-3 complete. UI phases 1-6 complete (data layer, admin Classrooms
 tab, Stairs and lifts editor, student map, fix-it link and out-of-order, rooms migration B and the
-release), at checkpoint 6.** See "UI phase 1-6" just before the Phase 3 spec. Next: UI phase 7
-(final check). Nothing has been applied to the cloud project by Claude; the runbook
-(`docs/runbooks/map-nav-phase1-cloud.md`) has parts 1-5, part 5 being the release.
+release) and phase 7 (final check without a browser), at checkpoint 7.** See "UI phase 1-7" just
+before the Phase 3 spec. Open: a browser walkthrough (see phase 7). Nothing has been applied to the
+cloud project by Claude; the runbook (`docs/runbooks/map-nav-phase1-cloud.md`) has parts 0-5, part 5
+being the release.
 
 ## What exists
 
@@ -545,6 +546,29 @@ Verified (local): pgTAP full suite (22: 25/25); the release rehearsed from the c
 counts at 12/4/3: preflight, apply, check (all as expected), app reads, older tests, second apply (no
 change), undo (rows, floors and placeholders identical to before), release again. Vitest for the
 switch, pickers' labels and the old-pins notice. Not verified in a browser (phase 7).
+
+# UI phase 7: final check
+
+No new features. Gates: build OK, lint clean, Vitest 40 files / 330 tests, pgTAP 504 passed (only the
+older Friday Period 3 failure in 17). Runbook part 0 (after-school migration, with a repair script for
+a half-applied project) was added between phases 6 and 7.
+
+Checked without a browser:
+- Routing on the real map (`npm run map:demo`, `router.test.ts`): same floor, stairs, step-free by lift,
+  out-of-order lift rerouted or refused clearly, closed doors, entrances, backstage never used.
+- Starting point (pointer / nearest room), floor-change chips, report link: `indoorMap.test.tsx`.
+- Fix-it target, out-of-order permissions, renaming and presets: pgTAP 19 and 21, Vitest admin tests.
+- Tap targets: every map marker is a 44px Leaflet icon box (the visible disc sits inside); buttons
+  use the shared 44px components.
+- Reduced motion: the route draw-in is skipped and Leaflet's zoom/fade/marker animations are off; the
+  map CSS has no transitions of its own.
+- Dark mode: every map colour is a token (no hard-coded colours in map, admin map or fix-it target code).
+- Keyboard: search results are buttons in tab order; fixed: Escape now closes the search matches.
+
+Not verified (needs a real browser with a running Supabase): drawing at 360/390/430 and desktop, light
+and dark visually, dragging pins, keyboard focus order on the live page, Realtime refresh, photo
+uploads, screen readers, real phones. A browser walkthrough was planned with PostgREST + Playwright in
+the scratchpad, but downloading them was blocked; it needs the owner's go-ahead or `supabase start`.
 
 # Phase 3: hand-off spec for the UI work
 
