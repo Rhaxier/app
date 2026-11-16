@@ -92,22 +92,37 @@ function RouteLine({ points, weight }: { points: { x: number; y: number }[]; wei
   const positions = points.map(toLatLng);
 
   // Draw in once, when this stretch first appears.
+  //
+  // The dash is measured as a share of the line (pathLength = 1), not in
+  // pixels: Leaflet redraws the line at a new pixel length on every zoom, and
+  // a dash measured in pixels would then stop short of the destination. Once
+  // the line is drawn the dash is removed altogether.
   useEffect(() => {
     if (prefersReducedMotion()) return;
-    const controls = [glow.current, line.current].flatMap((layer) => {
-      const path = layer?.getElement() as SVGPathElement | undefined;
-      if (!path || typeof path.getTotalLength !== 'function') return [];
-      const length = path.getTotalLength();
-      path.style.strokeDasharray = `${length}`;
-      return [
-        animate(
-          path,
-          { strokeDashoffset: [length, 0] },
-          { duration: (duration.slow * 2) / 1000, ease: easeOut },
-        ),
-      ];
+    const paths = [glow.current, line.current]
+      .map((layer) => layer?.getElement() as SVGPathElement | undefined)
+      .filter((path): path is SVGPathElement => Boolean(path));
+    const reset = () => {
+      for (const path of paths) {
+        path.removeAttribute('pathLength');
+        path.style.strokeDasharray = '';
+        path.style.strokeDashoffset = '';
+      }
+    };
+    const controls = paths.map((path) => {
+      path.setAttribute('pathLength', '1');
+      path.style.strokeDasharray = '1';
+      return animate(
+        path,
+        { strokeDashoffset: [1, 0] },
+        { duration: (duration.slow * 2) / 1000, ease: easeOut },
+      );
     });
-    return () => controls.forEach((control) => control.stop());
+    void Promise.all(controls.map((control) => control.finished)).then(reset, reset);
+    return () => {
+      controls.forEach((control) => control.stop());
+      reset();
+    };
   }, []);
 
   return (
