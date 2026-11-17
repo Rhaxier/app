@@ -135,7 +135,15 @@ def segment(rgb):
 
 # ---------------------------------------------------------------- step 5: corridor centre-lines
 def rdp(points, eps):
-    """Ramer-Douglas-Peucker line simplification."""
+    """Ramer-Douglas-Peucker line simplification.
+
+    WARNING: a line whose two ends are the same point (a closed loop) comes back
+    as that one point, because distances are measured from the straight line
+    between the ends. walls.py works around it (walls.simplify). In this file it
+    means 3 corridor loops on G have no centre line (wall audit, 2026-11-17, see
+    MAP_NOTES.md). Do not change rdp() here without care: the next run of this
+    script would then add nodes and edges, renumbering node and edge ids.
+    """
     if len(points) < 3:
         return points
     (x0, y0), (x1, y1) = points[0], points[-1]

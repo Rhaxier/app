@@ -1,0 +1,56 @@
+{
+  "_about": "Hand-made adjustments to walls.json, applied by walls.py. Each comes from the wall audit of 2026-11-17 (MAP_NOTES.md). Coordinates are page pixels of that floor's page in map-inputs/layout.pdf; walls.py moves them onto the map with the floor's transform, like every traced wall. Walls only: nothing here changes rooms, doors or routes.",
+  "_lines": "Wall pieces the tracing cannot see, plainly drawn on the plan. 'page' is a polyline [[x, y], ...].",
+  "lines": [
+    {
+      "floor": "G",
+      "page": [
+        [2585, 1805],
+        [2592, 1805]
+      ],
+      "why": "Top wall of Discovery Centre, under the 'P' of the text 'PYP 2 Supervisor': navy text drawn over the wall hides it from the tracing (audit G-B08)."
+    },
+    {
+      "floor": "G",
+      "page": [
+        [2613, 1805],
+        [2622, 1805]
+      ],
+      "why": "Same wall, under the 'S' of 'Supervisor' (audit G-B09)."
+    },
+    {
+      "floor": "2",
+      "page": [
+        [3112, 1515],
+        [3132, 1525]
+      ],
+      "why": "Cross-bar of the T-shaped wall end in corridor 2-R092: its two arms are shorter than the tracing's minimum piece length (audit 2-M03)."
+    },
+    {
+      "floor": "2",
+      "page": [
+        [3125, 1514],
+        [3122, 1520]
+      ],
+      "why": "Joins the diagonal wall to the middle of that cross-bar, as drawn (audit 2-M03)."
+    }
+  ],
+  "_unchanged": "Areas the audit marked UNSURE and that were chosen to stay as first traced: walls.py fills no gaps inside these boxes. 'page_box' is [x0, y0, x1, y1] with 10 px to spare.",
+  "unchanged": [
+    {
+      "floor": "2",
+      "page_box": [1770, 1866, 1929, 1916],
+      "why": "Two lines meeting at a narrow angle on the bottom edge by the stage, west side: step, ramp or drawing slip? (audit 2-M05)"
+    },
+    {
+      "floor": "2",
+      "page_box": [2312, 1866, 2470, 1916],
+      "why": "The same, east side (audit 2-M06)."
+    },
+    {
+      "floor": "G",
+      "page_box": [2813, 2213, 2843, 2249],
+      "why": "Short black stroke across the door recess of Pre KG C (audit G-B10)."
+    }
+  ]
+}

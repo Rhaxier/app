@@ -44,3 +44,6 @@ supabase/.branches/
 
 # Python bytecode from the map tracing scripts
 __pycache__/
+
+# Wall audit pictures (tools/map-extract/review): they show the real school plan, like layout.pdf
+tools/map-extract/review/

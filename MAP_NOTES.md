@@ -9,24 +9,25 @@ being the release.
 
 ## What exists
 
-| Path                                        | Job                                                                                                                                                                                                  |
-| ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `map-inputs/layout.pdf`                     | Source layout. Git-ignored (it is the real school plan).                                                                                                                                             |
-| `tools/map-extract/extract.py`              | One-off tracer: PDF pixels -> geometry. Re-run only if the PDF or `labels.json` changes.                                                                                                             |
-| `tools/map-extract/labels.json`             | Hand-read room names (keyed by a point inside each room), named places, confirmed doors, non-walkable overrides, outdoor links.                                                                      |
-| `tools/map-extract/report.json`             | Tracing details: floor transforms, stair symbols, notes.                                                                                                                                             |
-| `tools/map-extract/walls.py`                | Walls as the layout draws them -> `src/features/map/nav/data/walls.json` (lines per floor). Run after `extract.py`. Drawn by `WallLines` in `FloorPlanView.tsx`; rooms have no outline of their own. |
-| `src/features/map/nav/data/geometry.json`   | **Layer 1.** Regions, places, doors, walkable nodes and edges, all floors. Generated; do not hand-edit.                                                                                              |
-| `src/features/map/nav/data/connectors.json` | **Layer 2.** Stairs and lifts. `[]` until an admin places them.                                                                                                                                      |
-| `src/features/map/nav/data/assignments.csv` | **Layer 3.** `room_id,name,subject,teacher,type`. Names currently come from the PDF.                                                                                                                 |
-| `src/features/map/nav/types.ts`             | All types. Read this first.                                                                                                                                                                          |
-| `src/features/map/nav/graph.ts`             | `indexGeometry`, `snapToWalkable`, `linkConnectors`, `buildNavGraph`.                                                                                                                                |
-| `src/features/map/nav/validate.ts`          | `validateMap`, `summariseMap`.                                                                                                                                                                       |
-| `src/features/map/nav/assignments.ts`       | CSV/JSON load, `updateAssignment` (rename one room), `assignmentsToCsv`, `searchableDestinations`.                                                                                                   |
-| `src/features/map/nav/router.ts`            | **Phase 2.** `createRouter(...)`: routes, steps, errors.                                                                                                                                             |
-| `src/features/map/nav/router.test.ts`       | 25 tests. All stairs and lifts in it are fixtures.                                                                                                                                                   |
-| `scripts/map/*.ts`                          | `npm run map:validate`, `npm run map:debug`, `npm run map:demo` (plain Node 24, no build).                                                                                                           |
-| `map-debug/index.html`                      | Output of `map:debug`. Git-ignored. Open in a browser.                                                                                                                                               |
+| Path                                        | Job                                                                                                                                                                                                                          |
+| ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `map-inputs/layout.pdf`                     | Source layout. Git-ignored (it is the real school plan).                                                                                                                                                                     |
+| `tools/map-extract/extract.py`              | One-off tracer: PDF pixels -> geometry. Re-run only if the PDF or `labels.json` changes.                                                                                                                                     |
+| `tools/map-extract/labels.json`             | Hand-read room names (keyed by a point inside each room), named places, confirmed doors, non-walkable overrides, outdoor links.                                                                                              |
+| `tools/map-extract/report.json`             | Tracing details: floor transforms, stair symbols, notes.                                                                                                                                                                     |
+| `tools/map-extract/walls.py`                | Walls as the layout draws them -> `src/features/map/nav/data/walls.json` (lines per floor). Run after `extract.py`. Drawn by `WallLines` in `FloorPlanView.tsx`; rooms have no outline of their own. See "Wall audit" below. |
+| `tools/map-extract/walls_patch.json`        | Hand-made wall adjustments read by `walls.py`: pieces the tracing cannot see, and UNSURE areas left as first traced. Each entry says why.                                                                                    |
+| `src/features/map/nav/data/geometry.json`   | **Layer 1.** Regions, places, doors, walkable nodes and edges, all floors. Generated; do not hand-edit.                                                                                                                      |
+| `src/features/map/nav/data/connectors.json` | **Layer 2.** Stairs and lifts. `[]` until an admin places them.                                                                                                                                                              |
+| `src/features/map/nav/data/assignments.csv` | **Layer 3.** `room_id,name,subject,teacher,type`. Names currently come from the PDF.                                                                                                                                         |
+| `src/features/map/nav/types.ts`             | All types. Read this first.                                                                                                                                                                                                  |
+| `src/features/map/nav/graph.ts`             | `indexGeometry`, `snapToWalkable`, `linkConnectors`, `buildNavGraph`.                                                                                                                                                        |
+| `src/features/map/nav/validate.ts`          | `validateMap`, `summariseMap`.                                                                                                                                                                                               |
+| `src/features/map/nav/assignments.ts`       | CSV/JSON load, `updateAssignment` (rename one room), `assignmentsToCsv`, `searchableDestinations`.                                                                                                                           |
+| `src/features/map/nav/router.ts`            | **Phase 2.** `createRouter(...)`: routes, steps, errors.                                                                                                                                                                     |
+| `src/features/map/nav/router.test.ts`       | 25 tests. All stairs and lifts in it are fixtures.                                                                                                                                                                           |
+| `scripts/map/*.ts`                          | `npm run map:validate`, `npm run map:debug`, `npm run map:demo` (plain Node 24, no build).                                                                                                                                   |
+| `map-debug/index.html`                      | Output of `map:debug`. Git-ignored. Open in a browser.                                                                                                                                                                       |
 
 ## The source PDF
 
@@ -913,11 +914,51 @@ pass `{ type: 'room', id }` as usual and draw whatever `legs` come back.
   exactly, with the backup first.
 - **Times are rough** (1.2 m/s, fixed seconds per floor) and take no account of crowds between lessons.
 
+## Wall audit (2026-11-17)
+
+The map's walls (`walls.json`) were checked against `layout.pdf`, page by page. Only `walls.json`
+changed: `geometry.json` (regions, doors, nodes, edges), the floor transforms and every id are as
+before, so routing, rooms and fix-it links are untouched and the floors line up as before.
+
+Fixed in `walls.py` (all approved as CLEAR):
+
+- Closed shapes were missing (the PRE circle in the G lobby, the basins of KG Swimming Pool and
+  Swimming Pool, a small box on the wall at stairwell 1-R087). `rdp()` collapses a line whose ends
+  meet to one point; `walls.simplify()` splits such a line first. Closed shapes under 15 px across
+  are letters ("o", "e" in "Store Room") and stay as they were.
+- Walls stopped short where they meet (0.2-1 m, all floors, including the round east staircase on
+  floor 2). The letter filter also cut out thick bits of wall where walls meet. The page is now
+  traced twice; from the second trace (thick bits that belong to walls kept) only stretches that run
+  from wall to wall are added. Stretches with a free end (corner tips, stubs, letters touching a
+  wall) are left out on purpose. About 6 notches of 0.3 m or less remain where the two traces
+  don't line up (e.g. the door recess of 9B on floor 1); they are below what this rule can reach
+  safely.
+- Floor 3's roof outline and round staircase were missing: lines were clipped to the width of the
+  floor's rooms. The width now includes the voids that overlap the building (the roofs), and a line
+  is kept when any part of it lies within it. The fields beside the building stay out.
+- Added by hand (`walls_patch.json`): two short gaps under the text "PYP 2 Supervisor" (top wall
+  of Discovery Centre, G) and the cross-bar of the T-shaped wall end in corridor 2-R092 (floor 2).
+
+Left as they were (UNSURE, by choice): the stroke across the Pre KG C door recess (G), the two
+lines at a narrow angle by the stage (floor 2; boxes in `walls_patch.json` "unchanged"), and the
+corner tips. Not walls but kept on the map, unchanged: letter fragments (PYP1 H, Store Room,
+KG Swimming Pool, Swimming Pool, 10 B), staircase symbols drawn as thin lines, the dashed line
+between PYP 1 Supervisor and Asst. MSO, the outdoor lines on G. Door marks stay open.
+
+Known, not fixed: `rdp()` in `extract.py` also leaves 3 corridor loops on G without a centre
+line. Every room is reachable; fixing it would renumber node and edge ids on the next run (see
+the warning on `rdp()`).
+
+`tools/map-extract/review/` (git-ignored: it shows the real plan) holds the read-only audit:
+`audit_walls.py`, `AUDIT.md` (the list), overlays and crops (`step1/` = before the fixes).
+Re-run: `python tools/map-extract/review/audit_walls.py`.
+
 ## Re-running the tracer
 
 ```
 pip install pymupdf numpy scipy opencv-python-headless scikit-image
 python tools/map-extract/extract.py
+python tools/map-extract/walls.py
 npm run map:validate && npm run map:debug
 ```
 
