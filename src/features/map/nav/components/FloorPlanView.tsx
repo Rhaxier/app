@@ -25,6 +25,7 @@ import {
   MapContainer,
   Pane,
   Polygon,
+  Polyline,
   SVGOverlay,
   Tooltip,
   useMap,
@@ -36,6 +37,7 @@ import { entranceDoors } from '../assignments.ts';
 import { distance, indexGeometry, regionAt } from '../graph.ts';
 import { LABEL_MAX_PX, placeLabel, pxPerMetre, pxPerUnit } from '../planScale.ts';
 import type { FloorId, Geometry, Point, Region } from '../types.ts';
+import walls from '../data/walls.json';
 import styles from './FloorPlanView.module.css';
 import { fromLatLng, toLatLng } from './latlng.ts';
 
@@ -171,20 +173,6 @@ export function FloorPlanView({
         <ZoomControl position={immersive ? 'bottomright' : 'topleft'} />
         <LineScale metresPerUnit={geometry.metresPerUnit} />
         {onZoom && <ZoomWatcher onZoom={onZoom} />}
-        {/* The building's walls: every walkable shape drawn again, underneath,
-            with a thick wall-coloured outline. The shapes on top cover its
-            inner half, so only the outside edge of the building (and of any
-            courtyard) is left showing, as one continuous wall. */}
-        {drawn
-          .filter((region) => region.kind !== 'void')
-          .map((region) => (
-            <Polygon
-              key={`shell:${region.id}`}
-              positions={[ring(region.polygon), ...(region.holes ?? []).map(ring)]}
-              className={styles.shell}
-              interactive={false}
-            />
-          ))}
         {/* key: shapes are made once per floor; a name change redraws only that room. */}
         {drawn.map((region) => (
           <RegionShape
@@ -195,6 +183,7 @@ export function FloorPlanView({
             quiet={quiet}
           />
         ))}
+        <WallLines floor={floor} />
         {places.map((place) => (
           <CircleMarker
             key={place.id}
@@ -287,6 +276,33 @@ function RegionShape({
         <Tooltip sticky>{name || `${region.id} (no name)`}</Tooltip>
       )}
     </Polygon>
+  );
+}
+
+/**
+ * The walls as the school's layout draws them (walls.json, traced from the
+ * PDF by tools/map-extract/walls.py), over the room and corridor shapes.
+ * The shapes alone lose the walls inside open areas such as the central hall,
+ * because the tracing merges those areas into one corridor. Gaps in these
+ * lines are the doorways the layout marks in green. Their own pane keeps them
+ * above the shapes even when a renamed room is redrawn, and below the names.
+ */
+function WallLines({ floor }: { floor: FloorId }) {
+  const lines = useMemo(
+    () =>
+      ((walls as Record<string, number[][]>)[floor] ?? []).map((line) => {
+        const points: L.LatLngTuple[] = [];
+        for (let i = 0; i < line.length; i += 2)
+          points.push(toLatLng({ x: line[i], y: line[i + 1] }));
+        return points;
+      }),
+    [floor],
+  );
+  return (
+    <Pane name="walls" style={{ zIndex: 420, pointerEvents: 'none' }}>
+      {/* key: one path per floor, replaced when the floor changes. */}
+      <Polyline key={floor} positions={lines} className={styles.walls} interactive={false} />
+    </Pane>
   );
 }
 

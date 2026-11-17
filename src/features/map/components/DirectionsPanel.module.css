@@ -244,3 +244,12 @@
   font-size: var(--text-body);
   font-weight: 600;
 }
+
+/* The one-line panel while waiting for the "I'm here" tap. */
+.tapPrompt {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font-weight: 600;
+}

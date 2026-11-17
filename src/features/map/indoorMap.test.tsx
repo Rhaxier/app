@@ -211,6 +211,17 @@ describe('indoor map: a route between floors (real router, fixture lift)', () =>
     expect(within(panel()).getByText(/Step 1 of/)).toBeInTheDocument();
   });
 
+  it('shrinks to one line while waiting for the pin, and Cancel brings it back', async () => {
+    renderMap(createRouter(geometry, [lift]), '/?to=3-R043');
+    await userEvent.click(within(panel()).getByRole('button', { name: 'Drop a pin on the map' }));
+    expect(within(panel()).getByText('Tap the map where you are')).toBeInTheDocument();
+    expect(within(panel()).queryByText('From')).not.toBeInTheDocument();
+    await userEvent.click(within(panel()).getByRole('button', { name: 'Cancel' }));
+    expect(
+      within(panel()).getByRole('button', { name: 'Drop a pin on the map' }),
+    ).toBeInTheDocument();
+  });
+
   it('refuses a pin outside the building with the router’s message', async () => {
     tap.point = { x: 5, y: 5 };
     renderMap(createRouter(geometry, [lift]), '/?to=3-R043');

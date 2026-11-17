@@ -9,23 +9,24 @@ being the release.
 
 ## What exists
 
-| Path                                        | Job                                                                                                                             |
-| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `map-inputs/layout.pdf`                     | Source layout. Git-ignored (it is the real school plan).                                                                        |
-| `tools/map-extract/extract.py`              | One-off tracer: PDF pixels -> geometry. Re-run only if the PDF or `labels.json` changes.                                        |
-| `tools/map-extract/labels.json`             | Hand-read room names (keyed by a point inside each room), named places, confirmed doors, non-walkable overrides, outdoor links. |
-| `tools/map-extract/report.json`             | Tracing details: floor transforms, stair symbols, notes.                                                                        |
-| `src/features/map/nav/data/geometry.json`   | **Layer 1.** Regions, places, doors, walkable nodes and edges, all floors. Generated; do not hand-edit.                         |
-| `src/features/map/nav/data/connectors.json` | **Layer 2.** Stairs and lifts. `[]` until an admin places them.                                                                 |
-| `src/features/map/nav/data/assignments.csv` | **Layer 3.** `room_id,name,subject,teacher,type`. Names currently come from the PDF.                                            |
-| `src/features/map/nav/types.ts`             | All types. Read this first.                                                                                                     |
-| `src/features/map/nav/graph.ts`             | `indexGeometry`, `snapToWalkable`, `linkConnectors`, `buildNavGraph`.                                                           |
-| `src/features/map/nav/validate.ts`          | `validateMap`, `summariseMap`.                                                                                                  |
-| `src/features/map/nav/assignments.ts`       | CSV/JSON load, `updateAssignment` (rename one room), `assignmentsToCsv`, `searchableDestinations`.                              |
-| `src/features/map/nav/router.ts`            | **Phase 2.** `createRouter(...)`: routes, steps, errors.                                                                        |
-| `src/features/map/nav/router.test.ts`       | 25 tests. All stairs and lifts in it are fixtures.                                                                              |
-| `scripts/map/*.ts`                          | `npm run map:validate`, `npm run map:debug`, `npm run map:demo` (plain Node 24, no build).                                      |
-| `map-debug/index.html`                      | Output of `map:debug`. Git-ignored. Open in a browser.                                                                          |
+| Path                                        | Job                                                                                                                                                                                                  |
+| ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `map-inputs/layout.pdf`                     | Source layout. Git-ignored (it is the real school plan).                                                                                                                                             |
+| `tools/map-extract/extract.py`              | One-off tracer: PDF pixels -> geometry. Re-run only if the PDF or `labels.json` changes.                                                                                                             |
+| `tools/map-extract/labels.json`             | Hand-read room names (keyed by a point inside each room), named places, confirmed doors, non-walkable overrides, outdoor links.                                                                      |
+| `tools/map-extract/report.json`             | Tracing details: floor transforms, stair symbols, notes.                                                                                                                                             |
+| `tools/map-extract/walls.py`                | Walls as the layout draws them -> `src/features/map/nav/data/walls.json` (lines per floor). Run after `extract.py`. Drawn by `WallLines` in `FloorPlanView.tsx`; rooms have no outline of their own. |
+| `src/features/map/nav/data/geometry.json`   | **Layer 1.** Regions, places, doors, walkable nodes and edges, all floors. Generated; do not hand-edit.                                                                                              |
+| `src/features/map/nav/data/connectors.json` | **Layer 2.** Stairs and lifts. `[]` until an admin places them.                                                                                                                                      |
+| `src/features/map/nav/data/assignments.csv` | **Layer 3.** `room_id,name,subject,teacher,type`. Names currently come from the PDF.                                                                                                                 |
+| `src/features/map/nav/types.ts`             | All types. Read this first.                                                                                                                                                                          |
+| `src/features/map/nav/graph.ts`             | `indexGeometry`, `snapToWalkable`, `linkConnectors`, `buildNavGraph`.                                                                                                                                |
+| `src/features/map/nav/validate.ts`          | `validateMap`, `summariseMap`.                                                                                                                                                                       |
+| `src/features/map/nav/assignments.ts`       | CSV/JSON load, `updateAssignment` (rename one room), `assignmentsToCsv`, `searchableDestinations`.                                                                                                   |
+| `src/features/map/nav/router.ts`            | **Phase 2.** `createRouter(...)`: routes, steps, errors.                                                                                                                                             |
+| `src/features/map/nav/router.test.ts`       | 25 tests. All stairs and lifts in it are fixtures.                                                                                                                                                   |
+| `scripts/map/*.ts`                          | `npm run map:validate`, `npm run map:debug`, `npm run map:demo` (plain Node 24, no build).                                                                                                           |
+| `map-debug/index.html`                      | Output of `map:debug`. Git-ignored. Open in a browser.                                                                                                                                               |
 
 ## The source PDF
 
@@ -554,6 +555,7 @@ older Friday Period 3 failure in 17). Runbook part 0 (after-school migration, wi
 a half-applied project) was added between phases 6 and 7.
 
 Checked without a browser:
+
 - Routing on the real map (`npm run map:demo`, `router.test.ts`): same floor, stairs, step-free by lift,
   out-of-order lift rerouted or refused clearly, closed doors, entrances, backstage never used.
 - Starting point (pointer / nearest room), floor-change chips, report link: `indoorMap.test.tsx`.

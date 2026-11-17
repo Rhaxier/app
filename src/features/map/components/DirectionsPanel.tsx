@@ -144,6 +144,29 @@ export function DirectionsPanel(props: DirectionsPanelProps) {
     );
   }
 
+  // Waiting for the "I'm here" tap: shrink to one line so the map is free to
+  // tap. Cancel goes back to the full panel.
+  if (props.tapping && !start) {
+    return (
+      <section className={`glass thick ${styles.panel} ${styles.small}`} aria-label="Directions">
+        <div className={styles.header}>
+          <p className={styles.tapPrompt} role="status">
+            <Icon name="pin" size={18} />
+            Tap the map where you are
+          </p>
+          <Button size="small" variant="secondary" onClick={props.onTapToStart}>
+            Cancel
+          </Button>
+        </div>
+        {props.pinMessage && (
+          <p className={styles.problem} role="alert">
+            {props.pinMessage}
+          </p>
+        )}
+      </section>
+    );
+  }
+
   const canSwap = start?.kind === 'place' && destination !== null;
 
   return (
@@ -169,14 +192,8 @@ export function DirectionsPanel(props: DirectionsPanelProps) {
           ) : (
             <div className="stack-tight">
               <span className="meta">Where are you?</span>
-              <Button
-                size="small"
-                variant={props.tapping ? 'primary' : 'secondary'}
-                icon="pin"
-                aria-pressed={props.tapping}
-                onClick={props.onTapToStart}
-              >
-                {props.tapping ? 'Now tap the map where you are' : 'Drop a pin on the map'}
+              <Button size="small" variant="secondary" icon="pin" onClick={props.onTapToStart}>
+                Drop a pin on the map
               </Button>
               <DestinationSearch
                 destinations={props.destinations}
