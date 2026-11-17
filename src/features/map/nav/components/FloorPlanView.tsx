@@ -171,6 +171,20 @@ export function FloorPlanView({
         <ZoomControl position={immersive ? 'bottomright' : 'topleft'} />
         <LineScale metresPerUnit={geometry.metresPerUnit} />
         {onZoom && <ZoomWatcher onZoom={onZoom} />}
+        {/* The building's walls: every walkable shape drawn again, underneath,
+            with a thick wall-coloured outline. The shapes on top cover its
+            inner half, so only the outside edge of the building (and of any
+            courtyard) is left showing, as one continuous wall. */}
+        {drawn
+          .filter((region) => region.kind !== 'void')
+          .map((region) => (
+            <Polygon
+              key={`shell:${region.id}`}
+              positions={[ring(region.polygon), ...(region.holes ?? []).map(ring)]}
+              className={styles.shell}
+              interactive={false}
+            />
+          ))}
         {/* key: shapes are made once per floor; a name change redraws only that room. */}
         {drawn.map((region) => (
           <RegionShape

@@ -52,12 +52,26 @@
    always visible when zoomed out, never heavy close up. The fallback is the
    plan at zoom -2, until the first zoom is known. */
 .map {
-  --wall: clamp(0.75px, calc(0.1 * var(--px-per-m, 5.4px)), 1.5px);
+  --wall: clamp(1px, calc(0.15 * var(--px-per-m, 5.4px)), 2.5px);
+  /* The outside wall. Only half of this shows (the shapes cover the rest),
+     so it reads as 1.5px zoomed out and up to 4px close up. */
+  --outer-wall: clamp(3px, calc(0.8 * var(--px-per-m, 5.4px)), 8px);
   --selection-line: calc(0.2 * var(--px-per-m, 5.4px));
 }
 
-/* Corridors are the floor itself: the same colour as the ground, with no
-   outline, so the rooms stand out as solid blocks. */
+/* Under everything: the building's outline (see FloorPlanView). Filled
+   like a corridor, so small gaps between traced shapes (often doorways) read
+   as floor, not wall. */
+.shell {
+  fill: var(--plan-corridor);
+  fill-opacity: 1;
+  stroke: var(--plan-outer-wall);
+  stroke-width: var(--outer-wall);
+  stroke-linejoin: round;
+}
+
+/* Corridors are the floor itself: a shade off the ground, with no outline
+   of their own, so the inside of the building reads as one space. */
 .corridor {
   fill: var(--plan-corridor);
   fill-opacity: 1;
