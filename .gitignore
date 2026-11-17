@@ -25,3 +25,19 @@ ios/
 # Indoor map: local debug page (npm run map:debug) and the school layout PDF
 map-debug/
 map-inputs/
+
+# Secrets and keys of any kind: never commit them
+*.pem
+*.key
+*.p12
+*.pfx
+*.keystore
+*.jks
+*.mobileprovision
+service-account*.json
+google-services.json
+GoogleService-Info.plist
+supabase/.temp/
+supabase/.branches/
+.npmrc
+.secrets

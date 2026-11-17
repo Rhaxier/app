@@ -5,6 +5,8 @@ import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
+  // GitHub Pages serves the app from /<repo>/; the Pages workflow sets VITE_BASE.
+  base: process.env.VITE_BASE ?? '/',
   // Tailwind is only for shadcn/ui components (src/components/ui); the app's
   // own screens use CSS Modules and the tokens in src/styles/tokens.css.
   plugins: [react(), tailwindcss()],

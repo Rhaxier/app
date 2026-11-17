@@ -33,7 +33,7 @@ export async function signInWithSchoolAccount(provider: SchoolProvider): Promise
   const { error } = await supabase.auth.signInWithOAuth({
     provider,
     options: {
-      redirectTo: window.location.origin,
+      redirectTo: window.location.origin + import.meta.env.BASE_URL,
       // Microsoft only shares the email address if asked for it.
       scopes: provider === 'azure' ? 'email' : undefined,
       // A hint so the account picker shows school accounts first.

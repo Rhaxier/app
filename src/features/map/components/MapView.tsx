@@ -81,7 +81,16 @@ export function MapView({ floor, children, onMapClick, label, immersive }: MapVi
         markerZoomAnimation={animate}
         attributionControl={false}
       >
-        <ImageOverlay url={floor.image_path} bounds={bounds} className={styles.plan} />
+        <ImageOverlay
+          // Plans saved as '/floorplans/...' must also work under a sub-path (GitHub Pages).
+          url={
+            floor.image_path.startsWith('/')
+              ? import.meta.env.BASE_URL + floor.image_path.slice(1)
+              : floor.image_path
+          }
+          bounds={bounds}
+          className={styles.plan}
+        />
         <ZoomControl position={immersive ? 'bottomright' : 'topleft'} />
         {onMapClick && <ClickHandler floor={floor} onMapClick={onMapClick} />}
         {children}
