@@ -29,7 +29,19 @@ applyTheme();
 watchSystemTheme();
 // Motion timing for CSS (--motion-*, --ease-*), from src/lib/motion.ts.
 installMotionTokens();
-
+// After a new deploy, an open or cached copy of the app can ask for files
+// that no longer exist (their names change with every build). Vite reports
+// that as "vite:preloadError"; reloading once fetches the new build. The
+// session flag stops a reload loop if a file is genuinely missing.
+window.addEventListener('vite:preloadError', (event) => {
+  if (sessionStorage.getItem('reloaded-after-deploy')) return;
+  sessionStorage.setItem('reloaded-after-deploy', '1');
+  event.preventDefault();
+  window.location.reload();
+});
+window.addEventListener('load', () => {
+  setTimeout(() => sessionStorage.removeItem('reloaded-after-deploy'), 10_000);
+});
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />
