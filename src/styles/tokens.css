@@ -145,17 +145,17 @@
   /* The placeholder floor plans (public/floorplans) are drawn light, like most
      real plans; dark mode inverts them into the dark architect's plan. */
   --plan-filter: invert(1) hue-rotate(180deg);
-  /* The indoor map (features/map/nav): pure greys, no blue, so the plan reads
-     like a printed drawing; only status colours (fix-it, in use) stand out. */
-  --plan-ground: #000000; /* behind the plan */
-  --plan-corridor: #141414;
-  --plan-room: #262626;
-  --plan-room-unnamed: #1a1a1a; /* rooms without a name: quieter */
-  --plan-stairs: #333333;
-  --plan-void: #0d0d0d; /* courtyards and light wells */
-  --plan-wall: #6b6b6b;
-  --plan-wall-soft: #3d3d3d; /* corridor edges and unnamed rooms */
-  --plan-label: #c7c7c7; /* room names: 9:1 on a room */
+  /* The indoor map (features/map/nav): pure greys, no blue. Rooms are solid
+     blocks on the ground; corridors are the ground itself and walls barely
+     show. Only status colours (fix-it, in use) stand out. */
+  --plan-ground: #000000; /* behind and around the plan */
+  --plan-corridor: #000000;
+  --plan-room: #1c1c1c;
+  --plan-room-unnamed: #0e0e0e; /* rooms without a name: quieter */
+  --plan-stairs: #2a2a2a;
+  --plan-wall: #2e2e2e;
+  --plan-wall-soft: #1a1a1a; /* unnamed rooms */
+  --plan-label: #a8a8a8; /* room names: 7:1 on a room */
   --plan-mark: #f2f2f2; /* the selection, the route and named entrances */
   --plan-mark-soft: rgba(255, 255, 255, 0.14);
   --chevron-down: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%239d9da3' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
@@ -319,14 +319,13 @@
   --selroom: var(--on-accsoft);
   --plan-filter: none;
   --plan-ground: #f2f2f2;
-  --plan-corridor: #f7f7f7;
+  --plan-corridor: #f2f2f2;
   --plan-room: #ffffff;
-  --plan-room-unnamed: #fafafa;
+  --plan-room-unnamed: #f8f8f8;
   --plan-stairs: #e2e2e2;
-  --plan-void: #e8e8e8;
-  --plan-wall: #8c8c8c;
-  --plan-wall-soft: #c4c4c4;
-  --plan-label: #3d3d3d; /* 10.9:1 on a room */
+  --plan-wall: #dadada;
+  --plan-wall-soft: #e9e9e9;
+  --plan-label: #5c5c5c; /* 6.7:1 on a room */
   --plan-mark: #1a1a1a;
   --plan-mark-soft: rgba(0, 0, 0, 0.09);
   --chevron-down: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%238a8a8e' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
