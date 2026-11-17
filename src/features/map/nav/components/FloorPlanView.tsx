@@ -104,10 +104,17 @@ export function FloorPlanView({
     () => geometry.regions.filter((region) => region.floor === floor),
     [geometry, floor],
   );
-  // Voids (courtyards, and the page margins the tracing picked up) are empty
-  // space: they're left undrawn, so they look like the ground around the
-  // building. They still count when finding what a tap landed on.
-  const drawn = useMemo(() => regions.filter((region) => region.kind !== 'void'), [regions]);
+  // What's drawn, bottom to top: voids first (courtyards, and roofs of the
+  // floors below, which show the building's outline), then everything else.
+  // Voids wholly outside the plan's bounds are the drawing's page margins,
+  // picked up by the tracing, and are left out.
+  const drawn = useMemo(
+    () => [
+      ...regions.filter((region) => region.kind === 'void' && insidePlan(region, bounds)),
+      ...regions.filter((region) => region.kind !== 'void'),
+    ],
+    [regions, bounds],
+  );
   const places = useMemo(
     () => geometry.places.filter((place) => place.floor === floor),
     [geometry, floor],
@@ -252,7 +259,9 @@ function RegionShape({
         : styles.roomUnnamed
       : region.kind === 'stairwell'
         ? styles.stairwell
-        : styles.corridor;
+        : region.kind === 'void'
+          ? styles.void
+          : styles.corridor;
   const positions = [ring(region.polygon), ...(region.holes ?? []).map(ring)];
   return (
     <Polygon
@@ -264,6 +273,13 @@ function RegionShape({
         <Tooltip sticky>{name || `${region.id} (no name)`}</Tooltip>
       )}
     </Polygon>
+  );
+}
+
+/** Does any part of the region lie within the plan's bounds? */
+function insidePlan(region: Region, bounds: Geometry['bounds']): boolean {
+  return region.polygon.some(
+    ([x, y]) => x >= bounds.minX && x <= bounds.maxX && y >= bounds.minY && y <= bounds.maxY,
   );
 }
 

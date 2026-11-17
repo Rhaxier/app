@@ -153,6 +153,7 @@
   --plan-room: #1c1c1c;
   --plan-room-unnamed: #0e0e0e; /* rooms without a name: quieter */
   --plan-stairs: #2a2a2a;
+  --plan-void: #1f1f1f; /* courtyards, and the roofs of lower floors */
   --plan-wall: #4d4d4d;
   --plan-wall-soft: #333333; /* unnamed rooms */
   --plan-label: #a8a8a8; /* room names: 7:1 on a room */
@@ -323,6 +324,7 @@
   --plan-room: #ffffff;
   --plan-room-unnamed: #f8f8f8;
   --plan-stairs: #e2e2e2;
+  --plan-void: #e6e6e6;
   --plan-wall: #b8b8b8;
   --plan-wall-soft: #d1d1d1;
   --plan-label: #5c5c5c; /* 6.7:1 on a room */

@@ -89,6 +89,14 @@
   stroke-width: var(--wall);
 }
 
+/* Courtyards and the roofs of the floors below: a flat shape just off the
+   ground colour, so each floor sits on the outline of the whole building. */
+.void {
+  fill: var(--plan-void);
+  fill-opacity: 1;
+  stroke: none;
+}
+
 /* Places and entrances are markers a fixed size on screen, so they stay easy
    to see and tap. Their outlines thin with the zoom like every other line,
    but stop at the width they were drawn at, so a ring never fills in. */
