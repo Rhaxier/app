@@ -48,10 +48,11 @@
 
 /* Lines are drawn in metres (planScale.ts, LINE_M). FloorPlanView keeps
    --px-per-m, the screen pixels per metre at the current zoom, on the map, so
-   every line grows and shrinks at exactly the rate the plan does. The
-   fallback is the plan at zoom -2, until the first zoom is known. */
+   lines grow and shrink with the plan. Walls stay between 0.75px and 1.5px:
+   always visible when zoomed out, never heavy close up. The fallback is the
+   plan at zoom -2, until the first zoom is known. */
 .map {
-  --wall: calc(0.1 * var(--px-per-m, 5.4px));
+  --wall: clamp(0.75px, calc(0.1 * var(--px-per-m, 5.4px)), 1.5px);
   --selection-line: calc(0.2 * var(--px-per-m, 5.4px));
 }
 
@@ -98,9 +99,9 @@
   stroke-width: min(2px, var(--wall));
 }
 
-/* Doorways in from outside: a small dot in the walls' grey. */
+/* Doorways in from outside: a small dot, quieter than the walls. */
 .entrance {
-  fill: var(--plan-wall);
+  fill: var(--plan-wall-soft);
   fill-opacity: 1;
   stroke: none;
 }

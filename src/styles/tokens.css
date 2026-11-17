@@ -153,8 +153,8 @@
   --plan-room: #1c1c1c;
   --plan-room-unnamed: #0e0e0e; /* rooms without a name: quieter */
   --plan-stairs: #2a2a2a;
-  --plan-wall: #2e2e2e;
-  --plan-wall-soft: #1a1a1a; /* unnamed rooms */
+  --plan-wall: #4d4d4d;
+  --plan-wall-soft: #333333; /* unnamed rooms */
   --plan-label: #a8a8a8; /* room names: 7:1 on a room */
   --plan-mark: #f2f2f2; /* the selection, the route and named entrances */
   --plan-mark-soft: rgba(255, 255, 255, 0.14);
@@ -323,8 +323,8 @@
   --plan-room: #ffffff;
   --plan-room-unnamed: #f8f8f8;
   --plan-stairs: #e2e2e2;
-  --plan-wall: #dadada;
-  --plan-wall-soft: #e9e9e9;
+  --plan-wall: #b8b8b8;
+  --plan-wall-soft: #d1d1d1;
   --plan-label: #5c5c5c; /* 6.7:1 on a room */
   --plan-mark: #1a1a1a;
   --plan-mark-soft: rgba(0, 0, 0, 0.09);
