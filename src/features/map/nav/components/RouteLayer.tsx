@@ -135,13 +135,15 @@ function RouteLine({ points, weight }: { points: { x: number; y: number }[]; wei
         ref={glow}
         positions={positions}
         interactive={false}
-        pathOptions={{ className: styles.glow, weight: weight * 2.6 }}
+        className={styles.glow}
+        pathOptions={{ weight: weight * 2.6 }}
       />
       <Polyline
         ref={line}
         positions={positions}
         interactive={false}
-        pathOptions={{ className: styles.line, weight }}
+        className={styles.line}
+        pathOptions={{ weight }}
       />
     </>
   );

@@ -95,7 +95,7 @@ export function ConnectorMarkers({
               center={toLatLng(connector.positions[other] as Point)}
               radius={14}
               interactive={false}
-              pathOptions={{ className: styles.ghost }}
+              className={styles.ghost}
             />
           )),
       )}
@@ -105,7 +105,7 @@ export function ConnectorMarkers({
           key={`snap:${stop.connector}`}
           positions={[toLatLng(stop.position), toLatLng(stop.snap.point)]}
           interactive={false}
-          pathOptions={{ className: styles.snapLine }}
+          className={styles.snapLine}
         />
       ))}
 
@@ -122,7 +122,7 @@ export function ConnectorMarkers({
                   center={toLatLng(live)}
                   radius={20}
                   interactive={false}
-                  pathOptions={{ className: styles.warning }}
+                  className={styles.warning}
                 />
               )}
               <Marker
@@ -150,14 +150,17 @@ export function ConnectorMarkers({
             <Polyline
               positions={[toLatLng(adding.point), toLatLng(addingSnap.point)]}
               interactive={false}
-              pathOptions={{ className: styles.snapLine }}
+              className={styles.snapLine}
             />
           )}
+          {/* key: a shape's class is set when it's made (see FloorPlanView), so a
+              change of look makes a new one. */}
           <CircleMarker
+            key={addingSnap ? 'add:snaps' : 'add:off'}
             center={toLatLng(adding.point)}
             radius={15}
             interactive={false}
-            pathOptions={{ className: addingSnap ? styles.addGhost : styles.warning }}
+            className={addingSnap ? styles.addGhost : styles.warning}
           />
         </>
       )}

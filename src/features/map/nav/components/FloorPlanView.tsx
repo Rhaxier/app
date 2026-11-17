@@ -10,6 +10,13 @@
 // The plan is drawn to scale (../planScale.ts): line widths are set in metres
 // and room names in map units, so both follow the zoom.
 //
+// Every shape gets its look from a CSS class passed as `className` when it's
+// made, never inside `pathOptions`: react-leaflet applies pathOptions after
+// the shape is drawn, and Leaflet only reads the class while drawing, so a
+// class there is lost and the shape shows Leaflet's default thick blue. (It
+// only looks right in development, where React draws every layer twice.)
+// A shape whose class can change has the class in its key, so it's remade.
+//
 // Coordinates: see ./latlng.ts.
 import L from 'leaflet';
 import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
@@ -173,20 +180,18 @@ export function FloorPlanView({
             center={toLatLng(place)}
             radius={6}
             interactive={!quiet}
-            pathOptions={{ className: styles.place }}
+            className={styles.place}
           >
             {!quiet && <Tooltip>{names?.[place.id] || place.id}</Tooltip>}
           </CircleMarker>
         ))}
         {entrances.map((door) => (
           <CircleMarker
-            key={door.id}
+            key={`${door.id}:${named?.has(door.id) ? 'n' : 'u'}`}
             center={toLatLng(door)}
             radius={4}
             interactive={!quiet}
-            pathOptions={{
-              className: named?.has(door.id) ? styles.entranceNamed : styles.entrance,
-            }}
+            className={named?.has(door.id) ? styles.entranceNamed : styles.entrance}
           >
             {!quiet && <Tooltip>{names?.[door.id] || `Entrance ${door.id}`}</Tooltip>}
           </CircleMarker>
@@ -197,7 +202,7 @@ export function FloorPlanView({
             key={`selected:${selectedRegion.id}`}
             positions={[ring(selectedRegion.polygon), ...(selectedRegion.holes ?? []).map(ring)]}
             interactive={false}
-            pathOptions={{ className: styles.selected }}
+            className={styles.selected}
           />
         )}
         {selectedPoint && (
@@ -206,7 +211,7 @@ export function FloorPlanView({
             center={toLatLng(selectedPoint)}
             radius={10}
             interactive={false}
-            pathOptions={{ className: styles.selectedPoint }}
+            className={styles.selectedPoint}
           />
         )}
         {names && named && (
@@ -252,7 +257,7 @@ function RegionShape({
   return (
     <Polygon
       positions={positions}
-      pathOptions={{ className }}
+      className={className}
       interactive={!quiet && region.kind === 'room'}
     >
       {!quiet && region.kind === 'room' && (
