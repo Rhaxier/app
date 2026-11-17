@@ -7,13 +7,25 @@
 // are SVG shapes styled only by CSS classes, so the colours come from the
 // tokens and follow light and dark mode.
 //
+// The plan is drawn to scale (../planScale.ts): line widths are set in metres
+// and room names in map units, so both follow the zoom.
+//
+// Every shape gets its look from a CSS class passed as `className` when it's
+// made, never inside `pathOptions`: react-leaflet applies pathOptions after
+// the shape is drawn, and Leaflet only reads the class while drawing, so a
+// class there is lost and the shape shows Leaflet's default thick blue. (It
+// only looks right in development, where React draws every layer twice.)
+// A shape whose class can change has the class in its key, so it's remade.
+//
 // Coordinates: see ./latlng.ts.
 import L from 'leaflet';
-import { useEffect, useMemo, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
 import {
   CircleMarker,
   MapContainer,
+  Pane,
   Polygon,
+  SVGOverlay,
   Tooltip,
   useMap,
   useMapEvents,
@@ -22,6 +34,7 @@ import {
 import { prefersReducedMotion } from '@/lib/motion';
 import { entranceDoors } from '../assignments.ts';
 import { distance, indexGeometry, regionAt } from '../graph.ts';
+import { LABEL_MAX_PX, placeLabel, pxPerMetre, pxPerUnit } from '../planScale.ts';
 import type { FloorId, Geometry, Point, Region } from '../types.ts';
 import styles from './FloorPlanView.module.css';
 import { fromLatLng, toLatLng } from './latlng.ts';
@@ -91,6 +104,17 @@ export function FloorPlanView({
     () => geometry.regions.filter((region) => region.floor === floor),
     [geometry, floor],
   );
+  // What's drawn, bottom to top: voids first (courtyards, and roofs of the
+  // floors below, which show the building's outline), then everything else.
+  // Voids wholly outside the plan's bounds are the drawing's page margins,
+  // picked up by the tracing, and are left out.
+  const drawn = useMemo(
+    () => [
+      ...regions.filter((region) => region.kind === 'void' && insidePlan(region, bounds)),
+      ...regions.filter((region) => region.kind !== 'void'),
+    ],
+    [regions, bounds],
+  );
   const places = useMemo(
     () => geometry.places.filter((place) => place.floor === floor),
     [geometry, floor],
@@ -145,9 +169,10 @@ export function FloorPlanView({
         attributionControl={false}
       >
         <ZoomControl position={immersive ? 'bottomright' : 'topleft'} />
+        <LineScale metresPerUnit={geometry.metresPerUnit} />
         {onZoom && <ZoomWatcher onZoom={onZoom} />}
         {/* key: shapes are made once per floor; a name change redraws only that room. */}
-        {regions.map((region) => (
+        {drawn.map((region) => (
           <RegionShape
             key={`${region.id}:${named?.has(region.id) ? 'n' : 'u'}`}
             region={region}
@@ -162,20 +187,18 @@ export function FloorPlanView({
             center={toLatLng(place)}
             radius={6}
             interactive={!quiet}
-            pathOptions={{ className: styles.place }}
+            className={styles.place}
           >
             {!quiet && <Tooltip>{names?.[place.id] || place.id}</Tooltip>}
           </CircleMarker>
         ))}
         {entrances.map((door) => (
           <CircleMarker
-            key={door.id}
+            key={`${door.id}:${named?.has(door.id) ? 'n' : 'u'}`}
             center={toLatLng(door)}
             radius={4}
             interactive={!quiet}
-            pathOptions={{
-              className: named?.has(door.id) ? styles.entranceNamed : styles.entrance,
-            }}
+            className={named?.has(door.id) ? styles.entranceNamed : styles.entrance}
           >
             {!quiet && <Tooltip>{names?.[door.id] || `Entrance ${door.id}`}</Tooltip>}
           </CircleMarker>
@@ -186,7 +209,7 @@ export function FloorPlanView({
             key={`selected:${selectedRegion.id}`}
             positions={[ring(selectedRegion.polygon), ...(selectedRegion.holes ?? []).map(ring)]}
             interactive={false}
-            pathOptions={{ className: styles.selected }}
+            className={styles.selected}
           />
         )}
         {selectedPoint && (
@@ -195,7 +218,16 @@ export function FloorPlanView({
             center={toLatLng(selectedPoint)}
             radius={10}
             interactive={false}
-            pathOptions={{ className: styles.selected }}
+            className={styles.selectedPoint}
+          />
+        )}
+        {names && named && (
+          <RoomLabels
+            bounds={mapBounds}
+            plan={bounds}
+            regions={drawn}
+            named={named}
+            names={names}
           />
         )}
         {onSelect && <ClickToSelect geometry={geometry} floor={floor} onSelect={onSelect} />}
@@ -234,7 +266,7 @@ function RegionShape({
   return (
     <Polygon
       positions={positions}
-      pathOptions={{ className }}
+      className={className}
       interactive={!quiet && region.kind === 'room'}
     >
       {!quiet && region.kind === 'room' && (
@@ -242,6 +274,139 @@ function RegionShape({
       )}
     </Polygon>
   );
+}
+
+/** Does any part of the region lie within the plan's bounds? */
+function insidePlan(region: Region, bounds: Geometry['bounds']): boolean {
+  return region.polygon.some(
+    ([x, y]) => x >= bounds.minX && x <= bounds.maxX && y >= bounds.minY && y <= bounds.maxY,
+  );
+}
+
+/**
+ * Keeps two sizes on the map for FloorPlanView.module.css: --px-per-m (screen
+ * pixels per metre, for line widths) and --label-max (10pt in map units, the
+ * size room names stop growing at). Updated when a zoom ends: while one is
+ * running, Leaflet stretches the drawing as a whole, lines and names
+ * included, so they already change at the zoom's rate.
+ */
+function LineScale({ metresPerUnit }: { metresPerUnit: number }) {
+  const map = useMapEvents({ zoomend: () => update() });
+  function update() {
+    const zoom = map.getZoom();
+    const style = map.getContainer().style;
+    style.setProperty('--px-per-m', `${pxPerMetre(zoom, metresPerUnit)}px`);
+    // In the names' SVG a CSS pixel is one map unit.
+    style.setProperty('--label-max', `${LABEL_MAX_PX / pxPerUnit(zoom)}px`);
+  }
+  useEffect(update, [map, metresPerUnit]);
+  return null;
+}
+
+/**
+ * Every named room's name, drawn as SVG text on top of the plan, in map units,
+ * so it shrinks and grows with the plan, smoothly even mid-zoom, until it
+ * reaches 10pt and stops (--label-max). Each room's place, angle and size
+ * come from placeLabel and never change with the zoom, so the names don't
+ * jump about, and rooms of the same shape show their names alike.
+ */
+function RoomLabels({
+  bounds,
+  plan,
+  regions,
+  named,
+  names,
+}: {
+  bounds: L.LatLngBoundsExpression;
+  plan: Geometry['bounds'];
+  regions: Region[];
+  named: ReadonlySet<string>;
+  names: Record<string, string>;
+}) {
+  const map = useMap();
+  const font = useLabelFont(map.getContainer());
+
+  // Worked out once per floor, name and font, not on every zoom.
+  const labels = useMemo(() => {
+    const list: { id: string; name: string; x: number; y: number; angle: number; size: number }[] =
+      [];
+    for (const region of regions) {
+      const name = names[region.id];
+      if (region.kind !== 'room' || !named.has(region.id) || !name) continue;
+      const placement = placeLabel(region, measureEm(name, font));
+      if (placement) list.push({ id: region.id, name, ...placement });
+    }
+    return list;
+  }, [regions, named, names, font]);
+
+  const viewBox = `${plan.minX} ${plan.minY} ${plan.maxX - plan.minX} ${plan.maxY - plan.minY}`;
+  return (
+    <Pane name="room-labels" style={{ zIndex: 450, pointerEvents: 'none' }}>
+      <SVGOverlay
+        bounds={bounds as L.LatLngBoundsLiteral}
+        attributes={{
+          viewBox,
+          preserveAspectRatio: 'none',
+          class: styles.labels,
+          'aria-hidden': 'true',
+        }}
+      >
+        {labels.map((label) => (
+          // The name goes in as text, never as markup: room names are typed by admins.
+          <text
+            key={label.id}
+            data-room-label=""
+            x={label.x}
+            y={label.y}
+            transform={label.angle ? `rotate(${label.angle} ${label.x} ${label.y})` : undefined}
+            style={{ '--size': `${label.size}px` } as CSSProperties}
+          >
+            {label.name}
+          </text>
+        ))}
+      </SVGOverlay>
+    </Pane>
+  );
+}
+
+/**
+ * The CSS font of a room name (FloorPlanView.module.css, .labels text), for
+ * measuring it. Measured again once the app's typeface has loaded, since a
+ * fallback font has different widths.
+ */
+function useLabelFont(container: HTMLElement): string {
+  const [fontsLoaded, setFontsLoaded] = useState(0);
+  useEffect(() => {
+    let live = true;
+    document.fonts?.ready.then(() => live && setFontsLoaded((n) => n + 1));
+    return () => {
+      live = false;
+    };
+  }, []);
+  return useMemo(
+    () => `400 100px ${getComputedStyle(container).fontFamily}`,
+    // fontsLoaded: re-read after the typeface arrives.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [container, fontsLoaded],
+  );
+}
+
+let measuringContext: CanvasRenderingContext2D | null | undefined;
+
+/**
+ * How wide `text` is in ems (its width at a font size of 1), measured in
+ * `font`, which is set at 100px for precision.
+ */
+function measureEm(text: string, font: string): number {
+  if (measuringContext === undefined) {
+    // Test runs (jsdom) have no canvas; they get an estimate instead.
+    measuringContext = /jsdom/i.test(navigator.userAgent)
+      ? null
+      : document.createElement('canvas').getContext('2d');
+  }
+  if (!measuringContext) return text.length * 0.55;
+  measuringContext.font = font;
+  return measuringContext.measureText(text).width / 100;
 }
 
 /** A click picks the place or entrance marker it is on, otherwise the room under it. */

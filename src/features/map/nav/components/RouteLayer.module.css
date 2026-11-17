@@ -1,16 +1,17 @@
-/* The route line: accent on top of a wide soft glow. Leaflet sets the width
-   (it follows the zoom); the colours come from tokens, so both themes work. */
+/* The route line: the plan's mark colour (near-black, near-white in dark
+   mode) on top of a wide soft glow. Leaflet sets the width, which follows the
+   zoom (planScale.ts); the colours come from tokens, so both themes work. */
 
 .glow {
-  stroke: var(--acc);
-  stroke-opacity: 0.22;
+  stroke: var(--plan-mark);
+  stroke-opacity: 0.16;
   stroke-linecap: round;
   stroke-linejoin: round;
   fill: none;
 }
 
 .line {
-  stroke: var(--acc);
+  stroke: var(--plan-mark);
   stroke-opacity: 1;
   stroke-linecap: round;
   stroke-linejoin: round;

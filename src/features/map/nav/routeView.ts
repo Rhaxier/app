@@ -52,16 +52,6 @@ export function startFloor(result: RouteOk): FloorId | undefined {
   return result.legs[0]?.floor ?? result.steps[0]?.floor;
 }
 
-/**
- * Route line width in pixels for a map zoom level. Leaflet keeps strokes the
- * same width at every zoom, so the line is scaled by hand: thin when the
- * whole school is in view, bolder close up, never thinner than 3 px.
- */
-export function routeLineWeight(zoom: number): number {
-  const weight = 5 * Math.pow(2, (zoom + 1) / 2);
-  return Math.round(Math.min(14, Math.max(3, weight)) * 10) / 10;
-}
-
 export const formatDistance = (metres: number) =>
   metres < 10 ? `${Math.max(1, Math.round(metres))} m` : `${Math.round(metres / 5) * 5} m`;
 

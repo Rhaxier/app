@@ -1,5 +1,5 @@
-/* The traced floor plan. Every colour is a token, so light and dark mode
-   both work. Leaflet sets fill and stroke as SVG attributes; these classes
+/* The traced floor plan. Every colour is a --plan-* token (tokens.css):
+   neutral greys in both light and dark mode. Leaflet sets fill and stroke as SVG attributes; these classes
    override them (CSS beats presentation attributes). */
 
 .frame {
@@ -7,7 +7,7 @@
   width: 100%;
   max-height: 70vh;
   border-radius: var(--r-card);
-  background: var(--paper);
+  background: var(--plan-ground);
   box-shadow: var(--e1);
 }
 
@@ -46,70 +46,113 @@
   box-shadow: var(--e1);
 }
 
+/* Lines are drawn in metres (planScale.ts, LINE_M). FloorPlanView keeps
+   --px-per-m, the screen pixels per metre at the current zoom, on the map, so
+   lines grow and shrink with the plan. Walls stay between 0.75px and 1.5px:
+   always visible when zoomed out, never heavy close up. The fallback is the
+   plan at zoom -2, until the first zoom is known. */
+.map {
+  --wall: clamp(0.75px, calc(0.1 * var(--px-per-m, 5.4px)), 1.5px);
+  --selection-line: calc(0.2 * var(--px-per-m, 5.4px));
+}
+
+/* Corridors are the floor itself: the same colour as the ground, with no
+   outline, so the rooms stand out as solid blocks. */
 .corridor {
-  fill: var(--paper);
+  fill: var(--plan-corridor);
   fill-opacity: 1;
-  stroke: var(--hair);
-  stroke-width: 1;
+  stroke: none;
 }
 
 .room {
-  fill: var(--card);
+  fill: var(--plan-room);
   fill-opacity: 1;
-  stroke: var(--line);
-  stroke-width: 1;
+  stroke: var(--plan-wall);
+  stroke-width: var(--wall);
   cursor: pointer;
 }
 
 /* Unnamed rooms stay on the plan but quieter: students can't search for them. */
 .roomUnnamed {
-  fill: var(--card);
-  fill-opacity: 0.45;
-  stroke: var(--faint);
-  stroke-width: 1;
+  fill: var(--plan-room-unnamed);
+  fill-opacity: 1;
+  stroke: var(--plan-wall-soft);
+  stroke-width: var(--wall);
   cursor: pointer;
 }
 
 /* Where the floor plan shows a staircase symbol: a hint for placing stairs. */
 .stairwell {
-  fill: var(--hatch);
+  fill: var(--plan-stairs);
   fill-opacity: 1;
-  stroke: var(--line);
-  stroke-width: 1;
+  stroke: var(--plan-wall);
+  stroke-width: var(--wall);
 }
 
+/* Courtyards and the roofs of the floors below: a flat shape just off the
+   ground colour, so each floor sits on the outline of the whole building. */
 .void {
-  fill: var(--hair);
-  fill-opacity: 0.5;
+  fill: var(--plan-void);
+  fill-opacity: 1;
   stroke: none;
 }
 
+/* Places and entrances are markers a fixed size on screen, so they stay easy
+   to see and tap. Their outlines thin with the zoom like every other line,
+   but stop at the width they were drawn at, so a ring never fills in. */
 .place {
-  fill: var(--card);
+  fill: var(--plan-room);
   fill-opacity: 1;
-  stroke: var(--muted);
-  stroke-width: 2;
+  stroke: var(--plan-wall);
+  stroke-width: min(2px, var(--wall));
 }
 
+/* Doorways in from outside: a small dot, quieter than the walls. */
 .entrance {
-  fill: var(--paper);
+  fill: var(--plan-wall-soft);
   fill-opacity: 1;
-  stroke: var(--faint);
-  stroke-width: 2;
+  stroke: none;
 }
 
 .entranceNamed {
-  fill: var(--acc);
+  fill: var(--plan-mark);
   fill-opacity: 1;
-  stroke: var(--card);
-  stroke-width: 2;
+  stroke: var(--plan-room);
+  stroke-width: min(2px, var(--wall));
 }
 
 .selected {
-  fill: var(--selroom);
-  fill-opacity: 0.35;
-  stroke: var(--acc);
-  stroke-width: 3;
+  fill: var(--plan-mark);
+  fill-opacity: 0.08;
+  stroke: var(--plan-mark);
+  stroke-width: var(--selection-line);
+}
+
+/* The selected place or entrance (a ring around its marker). */
+.selectedPoint {
+  fill: var(--plan-mark);
+  fill-opacity: 0.08;
+  stroke: var(--plan-mark);
+  stroke-width: min(3px, var(--selection-line));
+}
+
+/* Room names (RoomLabels in FloorPlanView): SVG text in map units, in the
+   app's body text style (Instrument Sans, regular). Each name has its own
+   size (--size, from placeLabel), never more than 10pt on screen
+   (--label-max). Nothing in it can be tapped, so a tap reaches the room. */
+.labels {
+  overflow: visible;
+  pointer-events: none;
+}
+
+.labels text {
+  fill: var(--plan-label);
+  font-family: var(--font);
+  font-size: min(var(--size), var(--label-max, 26.67px));
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  text-anchor: middle;
+  dominant-baseline: central;
 }
 
 /* The stairs and lifts editor: the plan is only a background to place on. */

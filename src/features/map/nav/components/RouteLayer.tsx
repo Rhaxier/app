@@ -1,20 +1,21 @@
-// The route on the floor in view: an accent line with a soft glow, the
-// destination pin, and a chip at each change of floor.
+// The route on the floor in view: a dark line (light in dark mode) with a
+// soft glow, the destination pin, and a chip at each change of floor.
 //
 // Only this floor's stretch is drawn: the other floors' parts would sit on
 // top of rooms they don't go through. The chip at the stairs or lift says
 // what to do and switches floor when tapped.
 //
-// Line width follows the zoom (Leaflet keeps strokes the same width at every
-// zoom, which looks hairline close up). A new route draws itself in along its
-// length with Motion, unless the device asks for less motion.
+// The line is half a metre wide on the floor, so it thins and thickens at
+// exactly the rate the plan zooms (planScale.ts). A new route draws itself in
+// along its length with Motion, unless the device asks for less motion.
 import type L from 'leaflet';
 import { animate } from 'motion/react';
 import { useEffect, useRef } from 'react';
 import { Polyline, useMap } from 'react-leaflet';
 import { duration, easeOut, prefersReducedMotion } from '@/lib/motion';
 import type { RouteOk } from '../router.ts';
-import { floorChanges, legsOnFloor, routeLineWeight } from '../routeView.ts';
+import { routeLineWeight } from '../planScale.ts';
+import { floorChanges, legsOnFloor } from '../routeView.ts';
 import type { FloorId } from '../types.ts';
 import { toLatLng } from './latlng.ts';
 import { DestinationPin, FloorChangeChip } from './NavPins.tsx';
@@ -22,6 +23,8 @@ import styles from './RouteLayer.module.css';
 
 interface RouteLayerProps {
   result: RouteOk;
+  /** The plan's scale (geometry.metresPerUnit), to size the line in metres. */
+  metresPerUnit: number;
   floor: FloorId;
   zoom: number;
   destinationName: string;
@@ -34,6 +37,7 @@ const floorWord = (id: FloorId) => (id === 'G' ? 'the ground floor' : `floor ${i
 
 export function RouteLayer({
   result,
+  metresPerUnit,
   floor,
   zoom,
   destinationName,
@@ -42,7 +46,7 @@ export function RouteLayer({
 }: RouteLayerProps) {
   const legs = legsOnFloor(result, floor);
   const changes = floorChanges(result);
-  const weight = routeLineWeight(zoom);
+  const weight = routeLineWeight(zoom, metresPerUnit);
   const last = result.legs[result.legs.length - 1];
   const end = last?.points[last.points.length - 1];
   // A new route (or floor) re-mounts the lines, which replays the draw-in.
@@ -131,13 +135,15 @@ function RouteLine({ points, weight }: { points: { x: number; y: number }[]; wei
         ref={glow}
         positions={positions}
         interactive={false}
-        pathOptions={{ className: styles.glow, weight: weight * 2.6 }}
+        className={styles.glow}
+        pathOptions={{ weight: weight * 2.6 }}
       />
       <Polyline
         ref={line}
         positions={positions}
         interactive={false}
-        pathOptions={{ className: styles.line, weight }}
+        className={styles.line}
+        pathOptions={{ weight }}
       />
     </>
   );
