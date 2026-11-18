@@ -91,7 +91,7 @@ function IndoorMap() {
 }
 
 type Pin = { floor: FloorId; point: Point; end: RouteEnd };
-type Layer = 'reports' | 'inUse';
+type Layer = 'reports' | 'inUse' | 'connectors';
 
 export function MapScreen({ geometry, router }: { geometry: Geometry; router: Router }) {
   const { version, assignments, connectors, overrides } = useNavRouter();
@@ -129,7 +129,11 @@ export function MapScreen({ geometry, router }: { geometry: Geometry; router: Ro
   const [stepFree, setStepFreeState] = useState(readStepFree);
   const [stepIndex, setStepIndex] = useState(0);
   const [collapsed, setCollapsed] = useState(false);
-  const [layers, setLayers] = useState<Record<Layer, boolean>>({ reports: true, inUse: true });
+  const [layers, setLayers] = useState<Record<Layer, boolean>>({
+    reports: true,
+    inUse: true,
+    connectors: true,
+  });
   const [connectorId, setConnectorId] = useState<string | null>(null);
 
   function setStepFree(value: boolean) {
@@ -360,17 +364,19 @@ export function MapScreen({ geometry, router }: { geometry: Geometry; router: Ro
               padding={margins}
             />
           )}
-          {connectors
-            .filter((c) => c.floors.includes(floor) && c.positions[floor])
-            .map((c) => (
-              <ConnectorPin
-                key={`connector:${c.id}`}
-                connector={c}
-                at={c.positions[floor] as Point}
-                selected={c.id === connectorId}
-                onSelect={() => setConnectorId(c.id)}
-              />
-            ))}
+          {/* Hiding the icons only tidies the plan: routes still use every staircase and lift. */}
+          {layers.connectors &&
+            connectors
+              .filter((c) => c.floors.includes(floor) && c.positions[floor])
+              .map((c) => (
+                <ConnectorPin
+                  key={`connector:${c.id}`}
+                  connector={c}
+                  at={c.positions[floor] as Point}
+                  selected={c.id === connectorId}
+                  onSelect={() => setConnectorId(c.id)}
+                />
+              ))}
           {pin && pin.floor === floor && (
             <HereMarker at={pin.point} onDrop={(point) => dropPin(point, floor)} />
           )}
@@ -410,6 +416,16 @@ export function MapScreen({ geometry, router }: { geometry: Geometry; router: Ro
               onClick={() => setLayers((l) => ({ ...l, inUse: !l.inUse }))}
             >
               In use now
+            </FilterChip>
+            <FilterChip
+              glass
+              selected={layers.connectors}
+              onClick={() => {
+                setLayers((l) => ({ ...l, connectors: !l.connectors }));
+                setConnectorId(null);
+              }}
+            >
+              Stairs and lifts
             </FilterChip>
           </div>
         </div>

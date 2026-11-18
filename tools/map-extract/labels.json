@@ -2498,7 +2498,7 @@
   ]
  },
  "links": {
-  "_comment": "From the school: the auditorium is entered on the ground floor by its two side doors and on the first floor through two small lobbies. The two doors at its top corners are backstage doors. The ramps inside it are not stairs and are not modelled.",
+  "_comment": "From the school: the auditorium is entered on the ground floor by its two side doors and on the first floor through two small lobbies. The two doors at its top corners are backstage doors. The ramps inside it are not stairs and are not modelled. Not from the school, from the plan: G-D267 is the door the tracer guessed for the Principal's office, through its top wall: the plan draws its only door into Principal Secretary, which has the door to the corridor (route check, 2026-11-18).",
   "entrances": {
    "G-R074": [
     "1-R112",
@@ -2507,7 +2507,8 @@
   },
   "restrictedDoors": [
    "G-D083",
-   "G-D084"
+   "G-D084",
+   "G-D267"
   ]
  }
 }

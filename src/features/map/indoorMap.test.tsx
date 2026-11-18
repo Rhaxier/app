@@ -66,7 +66,7 @@ vi.mock('./nav/components/RouteLayer', async () => {
   };
 });
 vi.mock('./nav/components/NavPins', () => ({
-  ConnectorPin: () => null,
+  ConnectorPin: (props: { connector: { name: string } }) => <p>Icon: {props.connector.name}</p>,
   HereMarker: () => <p>Pin</p>,
   ReportCountPin: () => null,
   BusyDot: () => null,
@@ -106,14 +106,14 @@ const lift: Connector = {
   available: true,
 };
 
-function renderMap(router: Router, url = '/') {
+function renderMap(router: Router, url = '/', connectors: Connector[] = []) {
   const value: NavRouterValue = {
     router,
     version: 1,
     ready: true,
     error: null,
     geometry,
-    connectors: [],
+    connectors,
     overrides: { doorAvailable: {}, edgeTags: {} },
     assignments,
     activePresetId: null,
@@ -209,6 +209,18 @@ describe('indoor map: a route between floors (real router, fixture lift)', () =>
     await expand();
     expect(within(panel()).getByText(/Your pin, floor 3/)).toBeInTheDocument();
     expect(within(panel()).getByText(/Step 1 of/)).toBeInTheDocument();
+  });
+
+  it('hides the stairs and lift icons but still routes by the lift', async () => {
+    renderMap(createRouter(geometry, [lift]), '/?from=G-R030&to=3-R043', [lift]);
+    expect(screen.getByText('Icon: Fixture lift')).toBeInTheDocument();
+    const chip = screen.getByRole('button', { name: 'Stairs and lifts' });
+    await userEvent.click(chip);
+    expect(chip).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.queryByText('Icon: Fixture lift')).not.toBeInTheDocument();
+    expect(
+      screen.getAllByRole('button', { name: 'Take the lift up to Third Floor' }).length,
+    ).toBeGreaterThan(0);
   });
 
   it('shrinks to one line while waiting for the pin, and Cancel brings it back', async () => {

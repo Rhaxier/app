@@ -22,7 +22,8 @@ Three details, each found by the wall audit of 2026-11-17 (MAP_NOTES.md):
     roofs of lower floors, drawn on the upper pages, reach further out than
     the rooms.
 Pieces the tracing cannot see (a wall hidden under room-name text) are added
-by hand from walls_patch.json.
+by hand from walls_patch.json, and openings people walk through (steps up to a
+door) are cut out of the traced walls there.
 
 Run (one-off, after extract.py, only when the PDF changes; see MAP_NOTES.md):
     python tools/map-extract/walls.py
@@ -242,6 +243,43 @@ def gap_fills(candidates, walls, shape, leave_out=()):
     return fills
 
 
+def cut_openings(lines, boxes):
+    """Removes the parts of lines (flat [x0, y0, x1, y1, ...]) inside the boxes (x0, y0, x1, y1).
+
+    For openings the plan draws as a wall but that people walk through (steps up to a door).
+    """
+    out = []
+    for line in lines:
+        pts = [(line[k], line[k + 1]) for k in range(0, len(line), 2)]
+        piece = [pts[0]]
+        for (ax, ay), (bx, by) in zip(pts, pts[1:]):
+            # Liang-Barsky: the stretch t0..t1 of this segment inside each box.
+            cuts = []
+            for x0, y0, x1, y1 in boxes:
+                t0, t1 = 0.0, 1.0
+                for p_, q_ in ((-(bx - ax), ax - x0), (bx - ax, x1 - ax), (-(by - ay), ay - y0), (by - ay, y1 - ay)):
+                    if p_ == 0:
+                        if q_ < 0:
+                            t0, t1 = 1.0, 0.0
+                    elif p_ < 0:
+                        t0 = max(t0, q_ / p_)
+                    else:
+                        t1 = min(t1, q_ / p_)
+                if t0 < t1:
+                    cuts.append((t0, t1))
+            at = lambda t: (round(ax + (bx - ax) * t, 1), round(ay + (by - ay) * t, 1))
+            for t0, t1 in sorted(cuts):
+                if t0 > 0:
+                    piece.append(at(t0))
+                if len(piece) >= 2:
+                    out.append(piece)
+                piece = [at(t1)]
+            piece.append((bx, by))
+        if len(piece) >= 2:
+            out.append(piece)
+    return [[v for p in piece for v in p] for piece in out]
+
+
 def main():
     pages = load_pages()
     transforms = json.load(open(REPORT))["transforms"]
@@ -280,6 +318,10 @@ def main():
             if not any(left <= x <= right for x, _ in pts):
                 continue
             lines.append([round(v, 1) for p in pts for v in p])
+        openings = [area["page_box"] for area in patch_file.get("openings", []) if area["floor"] == fid]
+        if openings:
+            boxes = [(t["sx"] * x0 + t["tx"], t["sy"] * y0 + t["ty"], t["sx"] * x1 + t["tx"], t["sy"] * y1 + t["ty"]) for x0, y0, x1, y1 in openings]
+            lines = cut_openings(lines, boxes)
         for piece in patch:
             if piece["floor"] == fid:
                 pts = [(t["sx"] * x + t["tx"], t["sy"] * y + t["ty"]) for x, y in piece["page"]]

@@ -953,6 +953,45 @@ the warning on `rdp()`).
 `audit_walls.py`, `AUDIT.md` (the list), overlays and crops (`step1/` = before the fixes).
 Re-run: `python tools/map-extract/review/audit_walls.py`.
 
+## Route check (2026-11-18)
+
+With the school's real stairs (exported from `map_connectors` on 2026-11-18), Digital Learning
+Center to 12 B took Stairs 5 (70 m) instead of Stairs 2 (46 m). Stair boxes are traced like small
+rooms, with a point of kind `room` in the middle, and stairs placed inside a stair box are reached
+through it; the through-room penalty (40 m) was charged there on both floors. It now applies only
+to regions of kind `room` (`isRealRoom` in `router.ts`). Checked on 150 random cross-floor trips
+with the real stairs: the 3 that are still longer than the shortest staircase avoid cutting through
+a room (Sewing, Budhayana Spark Lab, Agile Learning Center (2-2)), as intended.
+
+Also fixed:
+
+- **Principal's office.** The plan draws one green door mark under Principal Secretary and Director
+  together; the tracer gave it to Director only, so the Principal + Secretary suite looked cut off and
+  got a guessed door through the Principal's top wall (`G-D267`). `G-D267` is now `restricted`
+  (routes never use it; the id stays, in `labels.json` `links.restrictedDoors` too), and the
+  Secretary's door to the corridor is added by hand to `geometry.json`: door `G-D268`, node
+  `G-N0965`, edges `G-E1010` and `G-E1011`. Nothing else in `geometry.json` changed.
+- **Drawing.** A route's line now stops at the start and destination rooms' doors instead of running
+  on to the point in the middle of the room, which could cross inner walls (door recesses,
+  partitions). The room is highlighted; distance and time still count the whole walk (`router.ts`).
+
+- **Steps above the PRE circle (G).** From the school: steps lead from the main hall down to door
+  `G-D169`. The wall there is cut open (`walls_patch.json` "openings", applied by `walls.py`) and a
+  walking link added: node `G-N0966` on the hall's line, edges `G-E1012`/`G-E1013` (along that
+  line) and `G-E1014` (down the steps, tagged `steps`, so step-free routes skip it).
+
+- **Three doorways into the main hall (G)**, in the wall under the dashed line between PYP 1
+  Supervisor and Asst. MSO, one under each gap of the dashed line (asked for on 2026-11-18). Cut
+  open in `walls_patch.json` "openings"; walking links: nodes `G-N0967`, `G-N0968`, edges
+  `G-E1015`-`G-E1021`.
+
+Known, not fixed (they come from the traced room shapes; fixing them renumbers ids): Discovery
+Centre's outline spills past its top wall (the wall under the "PYP 2 Supervisor" text had a gap
+when the rooms were traced), and a guessed door sits inside the Swimming Pool basin.
+
+**`geometry.json` now holds hand additions.** Re-running `extract.py` would drop `G-D268`, bring back
+the guessed door, and renumber ids. Re-add them by hand after any re-run.
+
 ## Re-running the tracer
 
 ```

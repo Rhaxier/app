@@ -49,9 +49,11 @@
   outline-offset: 2px;
 }
 
-/* Lifts and stairs on the student map. */
+/* Lifts and stairs on the student map. No `position` here: Leaflet places
+   markers with position: absolute (which also anchors the badge). Setting it
+   to relative put every marker after the first one lower by the height of the
+   ones before it, so the stairs drifted off their spots when zoomed out. */
 .connector {
-  position: relative;
   display: grid;
   place-items: center;
   color: var(--ink);

@@ -35,6 +35,29 @@
       "why": "Joins the diagonal wall to the middle of that cross-bar, as drawn (audit 2-M03)."
     }
   ],
+  "_openings": "Stretches of drawn wall that people walk through, cut out of the traced walls. 'page_box' is [x0, y0, x1, y1]. The matching walking link is in geometry.json.",
+  "openings": [
+    {
+      "floor": "G",
+      "page_box": [1847, 2090, 1957, 2107],
+      "why": "Steps from the main hall down to door G-D169, above the PRE circle by the Principal's office (from the school, 2026-11-18). Walking link: G-E1014, tagged steps."
+    },
+    {
+      "floor": "G",
+      "page_box": [1831, 1735, 1865, 1750],
+      "why": "Doorway (west) from the corridor between PYP 1 Supervisor and Asst. MSO into the main hall, under the west gap of the dashed line (asked for, 2026-11-18). Walking link in geometry.json."
+    },
+    {
+      "floor": "G",
+      "page_box": [1891, 1735, 1928, 1750],
+      "why": "Doorway (middle) from the corridor between PYP 1 Supervisor and Asst. MSO into the main hall, under the middle gap of the dashed line (asked for, 2026-11-18). Walking link in geometry.json."
+    },
+    {
+      "floor": "G",
+      "page_box": [1963, 1735, 1999, 1750],
+      "why": "Doorway (east) from the corridor between PYP 1 Supervisor and Asst. MSO into the main hall, under the east gap of the dashed line (asked for, 2026-11-18). Walking link in geometry.json."
+    }
+  ],
   "_unchanged": "Areas the audit marked UNSURE and that were chosen to stay as first traced: walls.py fills no gaps inside these boxes. 'page_box' is [x0, y0, x1, y1] with 10 px to spare.",
   "unchanged": [
     {

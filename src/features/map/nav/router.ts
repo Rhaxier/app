@@ -36,7 +36,10 @@ export const STAIRS_COST_M = 15;
 export const LIFT_COST_M = 20;
 export const STAIRS_SECONDS_PER_FLOOR = 15;
 export const LIFT_SECONDS_PER_FLOOR = 25;
-/** Cutting through a room that is neither the start nor the destination is discouraged, not banned. */
+/**
+ * Cutting through a room that is neither the start nor the destination is discouraged, not banned.
+ * Stair boxes don't count as rooms here.
+ */
 export const THROUGH_ROOM_PENALTY_M = 40;
 /**
  * Each stretch outside the building counts like this many extra metres. The school
@@ -139,6 +142,12 @@ type Rules = { stepFree: boolean; respectAvailability: boolean };
 type Overlay = { nodes: Map<string, NavNode>; edges: Map<string, NavEdge[]> };
 
 type Found = { nodes: NavNode[]; edges: NavEdge[]; cost: number };
+
+/** A room someone works in, as opposed to a stair box (traced as a room-like region). */
+function isRealRoom(graph: NavGraph, node: NavNode): boolean {
+  const region = node.region ? graph.index.regions.get(node.region) : undefined;
+  return region?.kind === 'room';
+}
 
 function edgeUsable(graph: NavGraph, edge: NavEdge, rules: Rules): boolean {
   const connector = edge.connector ? graph.connectors.get(edge.connector) : undefined;
@@ -263,7 +272,10 @@ function findPath(
         const floors = Math.abs((levelOf.get(next.floor) ?? 0) - (levelOf.get(here.floor) ?? 0));
         cost = floors * (edge.kind === 'stairs' ? STAIRS_COST_M : LIFT_COST_M);
       }
-      if (next.kind === 'room' && nextId !== goalId) {
+      // Only real rooms count. A stair box is traced like a small room, with a point in
+      // its middle, and stairs placed inside one are reached through that point; the
+      // penalty there made a nearer staircase lose to one further away.
+      if (next.kind === 'room' && nextId !== goalId && isRealRoom(graph, next)) {
         cost += THROUGH_ROOM_PENALTY_M;
       }
       if (edge.tags?.includes('outdoor')) {
@@ -543,7 +555,25 @@ function describe(
     const nextConnector = next?.connector ? graph.connectors.get(next.connector) : undefined;
 
     if (run.length > 1) {
-      legs.push({ floor: run[0].floor, points: run.map((node) => ({ x: node.x, y: node.y })) });
+      let points = run.map((node) => ({ x: node.x, y: node.y }));
+      // The line is drawn to the room's door, not on to the point in the middle of the
+      // room: that last stretch is a straight line and can cross the room's inner walls
+      // (a door recess, a partition). The room itself is highlighted on the map. The
+      // distance and time below still count the whole walk.
+      const n = run.length;
+      if (isFirst && start.isRoom && run[0].kind === 'room' && run[1].kind === 'door' && n > 2) {
+        points = points.slice(1);
+      }
+      if (
+        isLast &&
+        end.isRoom &&
+        run[n - 1].kind === 'room' &&
+        run[n - 2].kind === 'door' &&
+        points.length > 2
+      ) {
+        points = points.slice(0, -1);
+      }
+      legs.push({ floor: run[0].floor, points });
       let runM = 0;
       for (let i = 1; i < run.length; i += 1) {
         runM += distance(run[i - 1], run[i]) * metresPerUnit;

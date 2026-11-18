@@ -510,14 +510,68 @@ describe('the real school map', () => {
     expect(fromFirst.legs.map((leg) => leg.floor)).toEqual(['1']);
     const fromGround = expectOk(router.route(room(firstRoomOn('G', 'PYP3 B')), auditorium));
     expect(fromGround.legs.map((leg) => leg.floor)).toEqual(['G']);
-    // The two backstage doors (top corners of the hall) are restricted.
+    // The two backstage doors (top corners of the hall) are restricted, and so is the
+    // door the tracer guessed through the Principal's wall (see the next test).
     const restricted = geometry.doors.filter((door) => door.restricted).map((door) => door.id);
-    expect(restricted).toEqual(['G-D083', 'G-D084']);
+    expect(restricted).toEqual(['G-D083', 'G-D084', 'G-D267']);
     // No point of the route sits on a backstage door.
     const backstage = geometry.doors.filter((door) => door.restricted);
     for (const point of fromGround.legs[0].points) {
       expect(backstage.some((door) => door.x === point.x && door.y === point.y)).toBe(false);
     }
+  });
+
+  it('enters the Principal through Principal Secretary, as the plan draws it', () => {
+    const router = createRouter(geometry);
+    const principal = room(firstRoomOn('G', 'Principal'));
+    const route = expectOk(router.route(room(firstRoomOn('G', 'Director')), principal));
+    const guessed = geometry.doors.find((door) => door.id === 'G-D267');
+    const viaSecretary = geometry.doors.find((door) => door.id === 'G-D175');
+    const points = route.legs.flatMap((leg) => leg.points);
+    expect(points.some((p) => p.x === guessed?.x && p.y === guessed?.y)).toBe(false);
+    expect(points.at(-1)).toEqual({ x: viaSecretary?.x, y: viaSecretary?.y });
+  });
+
+  it('draws a room’s route to its door, not across the room', () => {
+    const router = createRouter(geometry);
+    const from = firstRoomOn('G', 'PYP3 C');
+    const to = firstRoomOn('G', 'PYP3 D');
+    const route = expectOk(router.route(room(from), room(to)));
+    const centre = (id: string) => geometry.nodes.find((n) => n.kind === 'room' && n.region === id);
+    const points = route.legs.flatMap((leg) => leg.points);
+    const doorAt = (p: { x: number; y: number }) =>
+      geometry.doors.some((door) => door.x === p.x && door.y === p.y);
+    expect(points[0]).not.toEqual({ x: centre(from)?.x, y: centre(from)?.y });
+    expect(points.at(-1)).not.toEqual({ x: centre(to)?.x, y: centre(to)?.y });
+    expect(doorAt(points[0])).toBe(true);
+    expect(doorAt(points.at(-1) as { x: number; y: number })).toBe(true);
+  });
+
+  it('picks the nearer staircase even when its stairs stand inside a stair box', () => {
+    // TEST FIXTURES at the spots of two real staircases: one in the stair box by PYP3 C
+    // (it serves 12 B), one in the corridor west of the auditorium. Walking through a
+    // stair box used to cost like cutting through a classroom, so the far one won.
+    const at = (id: string, x: number, y: number): Connector => ({
+      id,
+      type: 'stairs',
+      name: id,
+      floors: ['G', '1', '2', '3'],
+      positions: { G: { x, y }, 1: { x, y }, 2: { x, y }, 3: { x, y } },
+      accessible: false,
+      available: true,
+    });
+    const router = createRouter(geometry, [
+      at('in-stair-box', 1215, 975),
+      at('by-auditorium', 1527, 1189),
+    ]);
+    const route = expectOk(
+      router.route(
+        room(firstRoomOn('G', 'Digital Learning Center')),
+        room(firstRoomOn('3', '12 B')),
+      ),
+    );
+    expect(route.connectors).toEqual(['in-stair-box']);
+    expect(route.distanceM).toBeLessThan(50);
   });
 
   it('routes between real rooms on one floor, and across floors with a fixture staircase', () => {
