@@ -124,6 +124,12 @@ export type Geometry = {
   doors: Door[];
   nodes: NavNode[];
   edges: NavEdge[];
+  /**
+   * The walls as drawn on the plan (walls.json: per floor, polylines as flat
+   * [x0, y0, x1, y1, ...] lists), added when the map is loaded. The router uses them
+   * to tell a corridor stretch inside a room's outline from the room itself.
+   */
+  walls?: Partial<Record<FloorId, number[][]>>;
 };
 
 // ---------- Layer 2: connectors and other admin-editable state ----------

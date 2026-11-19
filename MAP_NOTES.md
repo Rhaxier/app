@@ -953,6 +953,30 @@ the warning on `rdp()`).
 `audit_walls.py`, `AUDIT.md` (the list), overlays and crops (`step1/` = before the fixes).
 Re-run: `python tools/map-extract/review/audit_walls.py`.
 
+## Route check (2026-11-19): shortest and fastest routes
+
+Digital Learning Center to Budhayana Spark Lab took Stairs 15 (72 m) instead of Stairs 3 (45 m).
+Three causes, all fixed in code (no map data changed):
+
+- **Corridors inside room outlines.** A gap in Sewing's bottom wall let the tracing join the corridor
+  beside it to the room (1-R001). A room is one point in its middle joined to its doors, so every
+  walk along that corridor went through the middle of Sewing, drawn across the room and charged the
+  through-room penalty. `roomPassages` (`graph.ts`) adds direct links between two doors of one room
+  when the line between them stays inside the outline, crosses no drawn wall, runs between walls no
+  more than a corridor apart, doesn't run along a wall, and is walled off from the room's middle.
+  It uses the drawn walls (`walls.json`, now loaded with the map as `geometry.walls`); without them
+  nothing is added. Today: Sewing's corridor (5 links) and the lobby of Staff Room (3-1) (1 link).
+  Not added for real rooms such as Discovery Centre or STEAM Studio.
+- **The search.** A* used the straight-line distance on the destination's floor as its guess and
+  zero elsewhere; that guess ignored the floors, and on some trips across floors the search settled
+  for a longer route. It is now Dijkstra's search (about 1.3 ms a route on this map).
+- **Stairs and lift cost.** Their cost now equals the walk that takes as long (15 s and 25 s a
+  floor at 1.2 m/s: 18 m and 30 m), so the cheapest route is the fastest one shown.
+
+Checked with the real stairs on 2988 routes: 479 faster (398 shorter; the rest skip a staircase or
+a slow lift ride), none lost. On 400 cross-floor trips, the only faster routes the router doesn't
+take cut through someone's room (`THROUGH_ROOM_PENALTY_M`, 40 m), as intended.
+
 ## Route check (2026-11-18)
 
 With the school's real stairs (exported from `map_connectors` on 2026-11-18), Digital Learning

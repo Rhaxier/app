@@ -17,6 +17,7 @@ export type MapData = {
 
 export function loadMapData(): MapData {
   const geometry = JSON.parse(readFileSync(`${dataDir}geometry.json`, 'utf8')) as Geometry;
+  geometry.walls = JSON.parse(readFileSync(`${dataDir}walls.json`, 'utf8'));
   const connectors = JSON.parse(readFileSync(`${dataDir}connectors.json`, 'utf8')) as Connector[];
   const loaded = parseAssignmentsCsv(readFileSync(`${dataDir}assignments.csv`, 'utf8'), geometry);
   return { geometry, connectors, assignments: loaded.assignments, assignmentIssues: loaded.issues };

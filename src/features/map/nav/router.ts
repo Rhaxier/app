@@ -7,8 +7,11 @@
 // How a search works:
 //   1. Each end (a room, a named place, or any point on a floor) becomes a graph node.
 //      A free point is snapped to the nearest walkable spot first.
-//   2. A* finds the cheapest path. Cost is metres walked, plus a fixed extra for
-//      each floor climbed, so stairs always cost more than staying on the flat.
+//   2. Dijkstra's search finds the cheapest path. Cost is metres walked, plus a fixed
+//      extra for each floor climbed, so stairs always cost more than staying on the flat.
+//      (It used to be A*, guided by the straight-line distance on the destination's
+//      floor. That guess ignored the other floors, and on some trips across floors the
+//      search settled for a longer route; the graph is small enough to search fully.)
 //   3. In step-free mode, stairs and anything tagged `steps` or `narrow` are left out.
 //   4. Lifts, stairs and doors marked unavailable are left out in every mode.
 
@@ -30,12 +33,17 @@ import type {
 
 /** Average indoor walking speed. */
 export const WALK_SPEED_M_PER_S = 1.2;
-/** Climbing one floor by stairs counts like walking this many extra metres. */
-export const STAIRS_COST_M = 15;
-/** Riding one floor by lift (including the wait) counts like walking this many extra metres. */
-export const LIFT_COST_M = 20;
 export const STAIRS_SECONDS_PER_FLOOR = 15;
+/** Riding one floor by lift, including the wait. */
 export const LIFT_SECONDS_PER_FLOOR = 25;
+/**
+ * Climbing one floor by stairs counts like walking this many extra metres: the walk that
+ * takes as long. Search cost and the time shown then agree, so the cheapest route is the
+ * fastest one (apart from the extra for cutting through a room).
+ */
+export const STAIRS_COST_M = STAIRS_SECONDS_PER_FLOOR * WALK_SPEED_M_PER_S;
+/** Riding one floor by lift counts like walking this many extra metres (as above). */
+export const LIFT_COST_M = LIFT_SECONDS_PER_FLOOR * WALK_SPEED_M_PER_S;
 /**
  * Cutting through a room that is neither the start nor the destination is discouraged, not banned.
  * Stair boxes don't count as rooms here.
@@ -236,16 +244,12 @@ function findPath(
   if (!goal || !start) {
     return undefined;
   }
-  // Straight-line distance never overestimates the walk, which is what A* needs.
-  // On another floor we cannot say anything useful, so the estimate is zero.
-  const estimate = (node: NavNode) =>
-    node.floor === goal.floor ? distance(node, goal) * metresPerUnit : 0;
 
   const best = new Map<string, number>([[startId, 0]]);
   const cameBy = new Map<string, { edge: NavEdge; from: string }>();
   const done = new Set<string>();
   const queue = createQueue();
-  queue.push(estimate(start), startId);
+  queue.push(0, startId);
 
   while (queue.size > 0) {
     const [, id] = queue.pop();
@@ -285,7 +289,7 @@ function findPath(
       if (total < (best.get(nextId) ?? Infinity)) {
         best.set(nextId, total);
         cameBy.set(nextId, { edge, from: id });
-        queue.push(total + estimate(next), nextId);
+        queue.push(total, nextId);
       }
     }
   }

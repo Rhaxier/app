@@ -21,6 +21,7 @@ import type { RouteOk, RouteResult } from './router.ts';
 import type { Connector, Geometry, NavEdge, NavNode, Region } from './types.ts';
 import { validateMap } from './validate.ts';
 import realGeometryText from './data/geometry.json?raw';
+import realWallsText from './data/walls.json?raw';
 import realConnectorsText from './data/connectors.json?raw';
 
 const FLOORS = ['G', '1', '2'];
@@ -483,7 +484,10 @@ describe('linking connectors on the fixture building', () => {
 });
 
 describe('the real school map', () => {
-  const geometry = JSON.parse(realGeometryText) as Geometry;
+  const geometry = {
+    ...(JSON.parse(realGeometryText) as Geometry),
+    walls: JSON.parse(realWallsText),
+  };
   const firstRoomOn = (floor: string, label: string) =>
     geometry.regions.find((region) => region.floor === floor && region.sourceLabel === label)
       ?.id as string;
@@ -545,6 +549,56 @@ describe('the real school map', () => {
     expect(points.at(-1)).not.toEqual({ x: centre(to)?.x, y: centre(to)?.y });
     expect(doorAt(points[0])).toBe(true);
     expect(doorAt(points.at(-1) as { x: number; y: number })).toBe(true);
+  });
+
+  it('walks along the corridor that the tracing joined to Sewing, not through the room', () => {
+    // TEST FIXTURES at the spots of three real staircases between G and 1. Sewing's
+    // outline (1-R001) runs into the corridor beside it, which used to send every walk
+    // along that corridor through the middle of the Sewing room.
+    const at = (id: string, x: number, y: number): Connector => ({
+      id,
+      type: 'stairs',
+      name: id,
+      floors: ['G', '1'],
+      positions: { G: { x, y }, 1: { x, y } },
+      accessible: false,
+      available: true,
+    });
+    const router = createRouter(geometry, [
+      at('by-sewing', 1599, 636),
+      at('by-inclusion', 1749, 972),
+      at('by-it-services', 2210, 666),
+    ]);
+    const route = expectOk(
+      router.route(
+        room(firstRoomOn('G', 'Digital Learning Center')),
+        room(firstRoomOn('1', 'Budhayana Spark Lab')),
+      ),
+    );
+    expect(route.connectors).toEqual(['by-sewing']);
+    const sewing = geometry.nodes.find((n) => n.kind === 'room' && n.region === '1-R001');
+    const points = route.legs.flatMap((leg) => leg.points);
+    expect(points.some((p) => p.x === sewing?.x && p.y === sewing?.y)).toBe(false);
+    expect(route.distanceM).toBeLessThan(50);
+  });
+
+  it('adds corridor links only where a corridor runs inside a room outline', () => {
+    const { passages } = indexGeometry(geometry);
+    const roomsWithLinks = new Set(
+      passages.map((edge) => {
+        const door = geometry.doors.find(
+          (d) => d.id === geometry.nodes.find((n) => n.id === edge.a)?.door,
+        );
+        return [door?.a, door?.b].find(
+          (id) => geometry.regions.find((r) => r.id === id)?.kind === 'room',
+        );
+      }),
+    );
+    expect(roomsWithLinks.has('1-R001')).toBe(true); // Sewing's corridor
+    expect(roomsWithLinks.has(firstRoomOn('G', 'Discovery Centre'))).toBe(false); // a real room
+    expect(roomsWithLinks.has(firstRoomOn('1', 'STEAM Studio'))).toBe(false); // two doors, one wall
+    // Without the drawn walls nothing is added.
+    expect(indexGeometry({ ...geometry, walls: undefined }).passages).toEqual([]);
   });
 
   it('picks the nearer staircase even when its stairs stand inside a stair box', () => {

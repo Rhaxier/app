@@ -78,6 +78,8 @@ export type GeometryIndex = {
   mainComponent: Map<FloorId, string>;
   /** Ids of doors marked `restricted` (not for students). */
   restrictedDoors: Set<string>;
+  /** Extra walk edges along corridor stretches inside room outlines (see roomPassages). */
+  passages: NavEdge[];
 };
 
 export function indexGeometry(geometry: Geometry): GeometryIndex {
@@ -137,6 +139,7 @@ export function indexGeometry(geometry: Geometry): GeometryIndex {
   const restrictedDoors = new Set(
     geometry.doors.filter((door) => door.restricted).map((door) => door.id),
   );
+  const passages = roomPassages(geometry, regions);
   return {
     geometry,
     nodes,
@@ -146,7 +149,179 @@ export function indexGeometry(geometry: Geometry): GeometryIndex {
     component,
     mainComponent,
     restrictedDoors,
+    passages,
   };
+}
+
+// ---------- corridor stretches inside room outlines ----------
+//
+// The traced plan models a room as one point in its middle, joined to each of
+// its doors. Where a gap in a wall let the tracing run a room's outline into
+// the corridor beside it (Sewing on the first floor, for example), every walk
+// along that corridor was sent through the room's middle: a detour, drawn
+// across the room, and charged as cutting through someone's room.
+//
+// So between two doors of one room, a direct edge is added when the straight
+// line between them stays inside the room's outline, crosses no drawn wall,
+// runs between walls no wider apart than a corridor, and has a drawn wall
+// between it and the room's middle: a corridor stretch, walled off from the
+// room. Inside an ordinary
+// room the middle is in plain view, no edge is added, and walking through the
+// room is still discouraged by the router. The traced outlines alone can't
+// tell: a wall shows in them only as a hairline, so the drawn walls
+// (geometry.walls, from walls.json) are used. Without them nothing is added.
+
+/** How far apart (map units) the points checked along a line are. */
+const PASSAGE_STEP = 4;
+/** A door sits in (or on) a wall: crossings this close to a line's ends don't count. */
+const DOOR_CLEARANCE = 8;
+/**
+ * Corridors here are 2.5 m (about 54 units) wide. Along a corridor stretch the walls on
+ * the two sides are at most this far apart (about 4 m); across a room, or along one of
+ * its walls, they are not.
+ */
+const CORRIDOR_MAX_WIDTH = 90;
+/** Closer than this (map units) to a wall, a point is on it. */
+const ON_WALL = 4;
+
+function insideRegion(point: Point, region: Region): boolean {
+  return (
+    pointInPolygon(point, region.polygon) &&
+    !(region.holes ?? []).some((hole) => pointInPolygon(point, hole))
+  );
+}
+
+/** Does the line a-b stay inside the region between fractions `from` and `to` of its length? */
+function lineInside(a: Point, b: Point, region: Region, from: number, to: number): boolean {
+  const steps = Math.max(2, Math.ceil((distance(a, b) * (to - from)) / PASSAGE_STEP));
+  for (let i = 0; i <= steps; i += 1) {
+    const t = from + ((to - from) * i) / steps;
+    if (!insideRegion({ x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t }, region)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+type Segment = [number, number, number, number];
+
+/** Does the line a-b cross a wall segment, away from its ends by more than `clearance`? */
+function crossesWall(a: Point, b: Point, walls: Segment[], clearance: number): boolean {
+  const length = distance(a, b);
+  if (length === 0) return false;
+  const [minX, maxX] = [Math.min(a.x, b.x), Math.max(a.x, b.x)];
+  const [minY, maxY] = [Math.min(a.y, b.y), Math.max(a.y, b.y)];
+  for (const [x1, y1, x2, y2] of walls) {
+    if (Math.max(x1, x2) < minX || Math.min(x1, x2) > maxX) continue;
+    if (Math.max(y1, y2) < minY || Math.min(y1, y2) > maxY) continue;
+    const d = (b.x - a.x) * (y2 - y1) - (b.y - a.y) * (x2 - x1);
+    if (d === 0) continue;
+    const t = ((x1 - a.x) * (y2 - y1) - (y1 - a.y) * (x2 - x1)) / d;
+    const u = ((x1 - a.x) * (b.y - a.y) - (y1 - a.y) * (b.x - a.x)) / d;
+    if (u < 0 || u > 1) continue;
+    const along = t * length;
+    if (along > clearance && along < length - clearance) return true;
+  }
+  return false;
+}
+
+/** How far from p, going in direction (dx, dy), the first wall is; Infinity past `max`. */
+function wallDistance(p: Point, dx: number, dy: number, max: number, walls: Segment[]): number {
+  const far = { x: p.x + dx * max, y: p.y + dy * max };
+  let best = Infinity;
+  for (const [x1, y1, x2, y2] of walls) {
+    if (Math.max(x1, x2) < Math.min(p.x, far.x) || Math.min(x1, x2) > Math.max(p.x, far.x))
+      continue;
+    if (Math.max(y1, y2) < Math.min(p.y, far.y) || Math.min(y1, y2) > Math.max(p.y, far.y))
+      continue;
+    const d = (far.x - p.x) * (y2 - y1) - (far.y - p.y) * (x2 - x1);
+    if (d === 0) continue;
+    const t = ((x1 - p.x) * (y2 - y1) - (y1 - p.y) * (x2 - x1)) / d;
+    const u = ((x1 - p.x) * (far.y - p.y) - (y1 - p.y) * (far.x - p.x)) / d;
+    if (t > 0 && t <= 1 && u >= 0 && u <= 1) best = Math.min(best, t * max);
+  }
+  return best;
+}
+
+/**
+ * Is the line a-b a corridor stretch? Most points along it have walls close together on
+ * both sides (a few may not: where a side corridor joins), and it doesn't run along a
+ * wall (two doors in one wall of a room: the line between them is inside the room).
+ */
+function betweenWalls(a: Point, b: Point, walls: Segment[]): boolean {
+  const length = distance(a, b);
+  const nx = -(b.y - a.y) / length;
+  const ny = (b.x - a.x) / length;
+  const steps = Math.max(4, Math.ceil(length / (2 * PASSAGE_STEP)));
+  let narrow = 0;
+  let alongWall = 0;
+  for (let i = 0; i <= steps; i += 1) {
+    const t = 0.15 + (0.7 * i) / steps;
+    const p = { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
+    const left = wallDistance(p, nx, ny, CORRIDOR_MAX_WIDTH, walls);
+    const right = wallDistance(p, -nx, -ny, CORRIDOR_MAX_WIDTH, walls);
+    if (left + right <= CORRIDOR_MAX_WIDTH) narrow += 1;
+    if (Math.min(left, right) < ON_WALL) alongWall += 1;
+  }
+  const points = steps + 1;
+  return narrow >= 0.6 * points && alongWall < 0.5 * points;
+}
+
+export function roomPassages(geometry: Geometry, regions: Map<string, Region>): NavEdge[] {
+  if (!geometry.walls) return [];
+  const wallsOf = new Map<FloorId, Segment[]>();
+  for (const [floor, lines] of Object.entries(geometry.walls)) {
+    const segments: Segment[] = [];
+    for (const line of lines ?? []) {
+      for (let k = 2; k < line.length; k += 2) {
+        segments.push([line[k - 2], line[k - 1], line[k], line[k + 1]]);
+      }
+    }
+    wallsOf.set(floor, segments);
+  }
+  const doorNode = new Map<string, NavNode>();
+  const roomNode = new Map<string, NavNode>();
+  for (const node of geometry.nodes) {
+    if (node.door) doorNode.set(node.door, node);
+    if (node.kind === 'room' && node.region) roomNode.set(node.region, node);
+  }
+  const doorsOfRoom = new Map<string, NavNode[]>();
+  for (const door of geometry.doors) {
+    const node = doorNode.get(door.id);
+    for (const side of [door.a, door.b]) {
+      if (node && regions.get(side)?.kind === 'room') {
+        doorsOfRoom.set(side, [...(doorsOfRoom.get(side) ?? []), node]);
+      }
+    }
+  }
+  const passages: NavEdge[] = [];
+  for (const [roomId, doors] of doorsOfRoom) {
+    const region = regions.get(roomId) as Region;
+    const middle = roomNode.get(roomId);
+    if (!middle) continue;
+    for (let i = 0; i < doors.length; i += 1) {
+      for (let j = i + 1; j < doors.length; j += 1) {
+        const [a, b] = [doors[i], doors[j]];
+        if (distance(a, b) < 1) continue;
+        const walls = wallsOf.get(region.floor) ?? [];
+        // The ends are doors, on the outline itself, so only the inner part is checked.
+        if (!lineInside(a, b, region, 0.1, 0.9)) continue;
+        if (crossesWall(a, b, walls, DOOR_CLEARANCE)) continue;
+        if (!betweenWalls(a, b, walls)) continue;
+        // The room's own space: its middle is in plain view from the line.
+        const half = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+        if (!crossesWall(half, middle, walls, 0)) continue;
+        passages.push({
+          id: `passage:${a.id}:${b.id}`,
+          a: a.id,
+          b: b.id,
+          length: Math.round(distance(a, b) * 10) / 10,
+          kind: 'walk',
+        });
+      }
+    }
+  }
+  return passages;
 }
 
 // ---------- snapping a free point to the walkable graph ----------
@@ -513,7 +688,7 @@ export function buildNavGraph(
     const extra: EdgeTag[] | undefined = overrides.edgeTags[edge.id];
     return extra ? { ...edge, tags: [...new Set([...(edge.tags ?? []), ...extra])] } : edge;
   };
-  const edges = [...index.geometry.edges.map(withTags), ...link.edges];
+  const edges = [...index.geometry.edges.map(withTags), ...index.passages, ...link.edges];
   const adjacency = new Map<string, NavEdge[]>();
   for (const edge of edges) {
     for (const end of [edge.a, edge.b]) {

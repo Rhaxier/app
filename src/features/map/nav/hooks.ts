@@ -50,7 +50,13 @@ export function useGeometry(enabled = true) {
   return useQuery({
     queryKey: geometryKey,
     enabled,
-    queryFn: async () => (await import('./data/geometry.json')).default as unknown as Geometry,
+    queryFn: async () => {
+      const [geometry, walls] = await Promise.all([
+        import('./data/geometry.json'),
+        import('./data/walls.json'),
+      ]);
+      return { ...(geometry.default as unknown as Geometry), walls: walls.default };
+    },
     staleTime: Infinity,
     gcTime: Infinity,
   });
