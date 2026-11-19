@@ -280,6 +280,7 @@ def cut_openings(lines, boxes):
     return [[v for p in piece for v in p] for piece in out]
 
 
+
 def main():
     pages = load_pages()
     transforms = json.load(open(REPORT))["transforms"]
