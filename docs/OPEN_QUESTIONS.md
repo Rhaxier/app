@@ -687,3 +687,29 @@ order`, one line per period per weekday. A weekday is its name or its first thre
 - To change it: when Term 3 starts, **Admin > School calendar > Upload bell times** with
   `docs/timetable/bell-times-2026-27-term3.csv`, and upload `bell-times-2026-27.csv` again
   for the next year's Terms 1–2 (or a new file once the school publishes 2027–28).
+
+## Q57: The app's name and icon on people's Home Screens
+
+- Default used: the name "School App" (the same placeholder as `school.appName`) and an
+  original placeholder icon: the favicon's line mortarboard on the design's accent blue.
+  No school logo is used: the logo admins upload (Admin > Branding) lives in the
+  database, and a Home Screen icon has to be a file in the build.
+- Where it lives: `public/manifest.webmanifest` (`name`, `short_name`), `index.html`
+  (`apple-mobile-web-app-title`, `<title>`), `src/config/school.ts` (`appName`), and the
+  icon's source `tools/app-icons/app-icon-1024.png` (its sizes are in `public/icons/`).
+- To change it: edit the name in those four places (`short_name` shows at most about 12
+  letters under the icon). For the icon, replace `tools/app-icons/app-icon-1024.png` with a
+  1024 × 1024 PNG (full square, artwork inside the middle 80%) and run
+  `python tools/app-icons/make_icons.py`. People who already installed the app delete it
+  from the Home Screen and add it again to see the new icon.
+
+## Q58: The status bar in the installed iPhone app
+
+- Default used: `black-translucent`: the app draws under the status bar (clock, battery),
+  like a native app, with `env(safe-area-inset-top)` keeping content clear of it. Apple
+  doesn't document whether the clock turns dark on a light page, so in light mode it may
+  stay white and be hard to read. Not checked on a device yet.
+- Where it lives: `index.html`, `<meta name="apple-mobile-web-app-status-bar-style">`.
+- To change it: if the clock is hard to read in light mode on a real iPhone, set it to
+  `default` (a plain bar above the app that follows the system's light or dark mode),
+  then delete the app from the Home Screen and add it again.

@@ -4,6 +4,7 @@
 // so it's clear they exist (docs/OPEN_QUESTIONS.md, Q5).
 import { useState, type FormEvent } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
+import { InstallHint } from '@/app/InstallHint';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Icon } from '@/components/Icon';
@@ -140,6 +141,8 @@ export function LoginPage() {
         )}
         {!isDev && <FormError message={formError} />}
       </Card>
+      {/* iPhone and iPad Safari only: install first, then sign in once, in the app. */}
+      <InstallHint />
     </main>
   );
 }

@@ -17,6 +17,45 @@
     padding: 0;
   }
 
+  /* iPhones enlarge the text when turned sideways unless told not to. */
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  /*
+   * The installed app (Add to Home Screen; README, "Install on iPhone"). It
+   * should feel like an app, not a web page: the page doesn't bounce past
+   * its ends (scroll areas inside it still scroll), and pressing and holding
+   * the navigation or a button doesn't select its text or pop up a link
+   * preview. Text people read, and every field, stay selectable. A browser
+   * tab is left exactly as it was.
+   */
+  @media (display-mode: standalone) {
+    html,
+    body {
+      overscroll-behavior: none;
+    }
+
+    nav,
+    button,
+    [role='tab'],
+    [role='switch'],
+    .pressable {
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    input,
+    textarea,
+    select,
+    [contenteditable] {
+      -webkit-user-select: text;
+      user-select: text;
+    }
+  }
+
   body {
     min-height: 100vh;
     background: var(--paper);

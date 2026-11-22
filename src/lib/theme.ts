@@ -19,7 +19,11 @@ export type Theme = 'dark' | 'light';
 export const THEME_STORAGE_KEY = 'campus-theme';
 const LIGHT_QUERY = '(prefers-color-scheme: light)';
 
-/** The browser's top bar colour, matching --paper in each theme. */
+/**
+ * The browser's top bar colour, matching --paper in each theme. index.html has
+ * two theme-color tags (one per system theme); both are set to the theme in
+ * use, so a choice under Me > Appearance wins over the system's.
+ */
 const THEME_COLOR: Record<Theme, string> = { dark: '#000000', light: '#f2f2f7' };
 
 export const themeOptions: { value: ThemePreference; label: string }[] = [
@@ -55,7 +59,9 @@ function systemPrefersLight(): boolean {
 export function applyTheme(preference: ThemePreference = getThemePreference()): Theme {
   const theme = resolveTheme(preference, systemPrefersLight());
   document.documentElement.classList.toggle('light', theme === 'light');
-  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', THEME_COLOR[theme]);
+  document
+    .querySelectorAll('meta[name="theme-color"]')
+    .forEach((meta) => meta.setAttribute('content', THEME_COLOR[theme]));
   return theme;
 }
 

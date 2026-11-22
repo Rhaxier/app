@@ -7,6 +7,7 @@
 // On a wide laptop or an iPad turned sideways, Home is a dashboard: news, the
 // tools and announcements on the left; bell times and today at school in a
 // column on the right (HomePage.module.css). On a phone the order is as above.
+import { InstallHint } from '@/app/InstallHint';
 import { HomeAnnouncements } from '@/features/announcements/components/HomeAnnouncements';
 import { PinnedAnnouncements } from '@/features/announcements/components/PinnedAnnouncements';
 import { useCurrentUser } from '@/features/auth/hooks';
@@ -22,8 +23,10 @@ export function HomePage() {
   const visible = useFeatureVisible(isAdmin(useCurrentUser()));
   return (
     <div className={`stack ${styles.home}`}>
-      <div className={styles.header}>
+      <div className={`stack ${styles.header}`}>
         <HomeHeader />
+        {/* iPhone and iPad Safari only, until it's closed. */}
+        <InstallHint />
       </div>
       <div className={`stack-tight ${styles.lead}`}>
         {visible('announcements') && <PinnedAnnouncements />}

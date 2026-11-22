@@ -158,6 +158,11 @@ npm run format        # Prettier
 npm run build         # production build into dist/
 ```
 
+On Windows, run `npm test` from a folder path that starts with a capital drive letter
+(`C:\Users\…`, not `c:\users\…`). From a lowercase one, Vitest loads its own files twice
+and every test file fails with "Vitest failed to find the current suite". VS Code's
+terminal can open with a lowercase path: `cd C:\Users\…\app` first.
+
 ## Email and push (not switched on yet)
 
 Every notification already writes a row to `push_outbox`, and for staff who get email
@@ -188,6 +193,56 @@ $$);
 Venue reminders (`venue_reminders()`, hourly) and scheduled announcements
 (`publish_due_announcements()`, every five minutes) are already scheduled by migrations
 when pg_cron is available, which it is on Supabase.
+
+## Phones, iPads and laptops
+
+The design is drawn for a phone, and phones keep it exactly. On an iPad (744px and wider)
+the bottom tab bar becomes a glass rail on the left, and on a laptop (1024px and wider) a
+sidebar with labels; screens spread into two columns and card grids, sheets become
+dialogs, and the map's controls move beside the plan. How it works and where the rules
+live: "Screen sizes" in `docs/ARCHITECTURE.md`.
+
+## Install on iPhone and iPad (Add to Home Screen)
+
+The web app installs on a phone or iPad like an app: its own icon and name on the Home
+Screen, and it opens full screen without Safari's bars. There's no App Store step.
+
+**To install (Safari):** open the app, tap **Share** (on iOS 26 it's under the **•••**
+button), then **Add to Home Screen**, leave **Open as Web App** on, and tap **Add**. People
+using Safari on an iPhone or iPad see a small hint saying this on the sign-in screen and
+on Home, until they install or close it (`src/app/InstallHint.tsx`, `src/lib/install.ts`).
+Chrome on Android offers **Install app** in its menu.
+
+Good to know:
+
+- **Sign in again after installing.** The installed app keeps its own sign-in, separate
+  from Safari's. That's why the hint shows on the sign-in screen: install first, then sign
+  in once, in the app.
+- **New icon or launch screen?** iOS keeps what it saw when the app was added. Delete the
+  app from the Home Screen and add it again to see the new one. New versions of the app
+  itself arrive as usual: the installed app loads the latest one when it starts.
+- **No offline mode and no service worker, on purpose.** iOS doesn't need one to install
+  the app, the app is online-only (sign-in, Realtime, bookings and reports all need the
+  server), and a worker that cached `index.html` could keep old versions alive after a
+  deploy. The built files are already cached by the browser.
+- **What makes it work:** `public/manifest.webmanifest` (name, icons, full screen),
+  `index.html` (the iOS tags, the launch screens, a first-paint background so it never
+  flashes white), and `env(safe-area-inset-*)` in the CSS (the notch, the status bar and
+  the home indicator).
+
+**Replacing the icon:** put a 1024 × 1024 PNG at `tools/app-icons/app-icon-1024.png` (a
+full square, no rounded corners: phones round them; keep the artwork inside the middle
+80%), then run:
+
+```bash
+python tools/app-icons/make_icons.py    # needs Pillow: pip install pillow
+```
+
+It writes every size into `public/icons/` and the launch screens. The current icon is a
+placeholder grown from the favicon (`tools/app-icons/app-icon.svg`). **The name** on the
+Home Screen ("School App") is in `public/manifest.webmanifest` (`name`, `short_name`: at
+most 12 letters show under the icon) and in `index.html` (`apple-mobile-web-app-title`).
+See Q57 in `docs/OPEN_QUESTIONS.md`.
 
 ## Phone apps (Capacitor)
 

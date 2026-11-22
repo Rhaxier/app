@@ -25,7 +25,9 @@
   flex-direction: column;
   width: 100%;
   max-width: var(--content-max);
-  max-height: 88vh;
+  /* In the installed app the page runs under the status bar: a tall sheet
+     stops below it. (In a browser tab the inset is 0, so it's just 88vh.) */
+  max-height: min(88vh, calc(100vh - env(safe-area-inset-top) - var(--space-6)));
   overflow: hidden;
   border-radius: var(--r-sheet);
 }

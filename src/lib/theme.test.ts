@@ -46,4 +46,20 @@ describe('the saved choice', () => {
     expect(applyTheme()).toBe('light');
     expect(document.documentElement).toHaveClass('light');
   });
+
+  it("sets both of index.html's browser bar colours to the chosen theme", () => {
+    // index.html has one per system theme; a choice in the app wins over both.
+    document.head.innerHTML = `
+      <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
+      <meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)" />`;
+    const colours = () =>
+      [...document.querySelectorAll('meta[name="theme-color"]')].map((meta) =>
+        meta.getAttribute('content'),
+      );
+    setThemePreference('light');
+    expect(colours()).toEqual(['#f2f2f7', '#f2f2f7']);
+    setThemePreference('dark');
+    expect(colours()).toEqual(['#000000', '#000000']);
+    document.head.innerHTML = '';
+  });
 });

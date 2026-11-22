@@ -2,13 +2,166 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <!-- viewport-fit=cover: in the installed app the page runs under the
+         status bar and the home indicator; the CSS keeps content clear of
+         them with env(safe-area-inset-*). -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#000000" />
+    <!-- The browser bar's colour in each theme (--paper). src/lib/theme.ts
+         sets both to the theme chosen under Me > Appearance. -->
+    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)" />
+    <meta name="color-scheme" content="dark light" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>School App</title>
+
+    <!-- Installing on a phone ("Add to Home Screen"; README, "Install on
+         iPhone"). The app opens full screen with its own icon and name. The
+         name is a placeholder, like school.appName in src/config/school.ts. -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="School App" />
+    <!-- The installed app draws under the status bar, like a native app. -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <!-- Launch screens: the app's own background, so it never opens on white. -->
+    <!-- startup-images:start (made by tools/app-icons/make_icons.py) -->
+    <link
+      rel="apple-touch-startup-image"
+      media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: dark)"
+      href="/icons/startup/startup-750x1334-dark.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: light)"
+      href="/icons/startup/startup-750x1334-light.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)"
+      href="/icons/startup/startup-1242x2208-dark.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)"
+      href="/icons/startup/startup-1242x2208-light.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)"
+      href="/icons/startup/startup-1125x2436-dark.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)"
+      href="/icons/startup/startup-1125x2436-light.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: dark)"
+      href="/icons/startup/startup-828x1792-dark.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: light)"
+      href="/icons/startup/startup-828x1792-light.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)"
+      href="/icons/startup/startup-1242x2688-dark.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)"
+      href="/icons/startup/startup-1242x2688-light.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)"
+      href="/icons/startup/startup-1170x2532-dark.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)"
+      href="/icons/startup/startup-1170x2532-light.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)"
+      href="/icons/startup/startup-1284x2778-dark.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)"
+      href="/icons/startup/startup-1284x2778-light.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)"
+      href="/icons/startup/startup-1179x2556-dark.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)"
+      href="/icons/startup/startup-1179x2556-light.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)"
+      href="/icons/startup/startup-1290x2796-dark.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)"
+      href="/icons/startup/startup-1290x2796-light.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="(device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)"
+      href="/icons/startup/startup-1206x2622-dark.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="(device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)"
+      href="/icons/startup/startup-1206x2622-light.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="(device-width: 420px) and (device-height: 912px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)"
+      href="/icons/startup/startup-1260x2736-dark.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="(device-width: 420px) and (device-height: 912px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)"
+      href="/icons/startup/startup-1260x2736-light.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)"
+      href="/icons/startup/startup-1320x2868-dark.png"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      media="(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)"
+      href="/icons/startup/startup-1320x2868-light.png"
+    />
+    <!-- startup-images:end -->
+
+    <!-- The page's background before any stylesheet arrives (an installed
+         app shows it while starting): the same colours as --paper. -->
+    <style>
+      html {
+        background: #000;
+      }
+      html.light {
+        background: #f2f2f7;
+      }
+    </style>
     <script>
       // Light or dark before the first paint, so the page never flashes the
-      // wrong colours. The same rule as resolveTheme() in src/lib/theme.ts.
+      // wrong colours. The same rule as resolveTheme() in src/lib/theme.ts,
+      // and the browser bar follows (THEME_COLOR there).
       (function () {
         var choice = 'system';
         try {
@@ -18,6 +171,12 @@
           choice === 'light' ||
           (choice === 'system' && window.matchMedia('(prefers-color-scheme: light)').matches);
         if (light) document.documentElement.classList.add('light');
+        if (choice !== 'system') {
+          var metas = document.querySelectorAll('meta[name="theme-color"]');
+          for (var i = 0; i < metas.length; i++) {
+            metas[i].setAttribute('content', light ? '#f2f2f7' : '#000000');
+          }
+        }
       })();
     </script>
   </head>

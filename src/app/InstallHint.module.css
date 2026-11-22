@@ -1,0 +1,50 @@
+/* A content card (the surface glass, like the rest of the screen), not
+   floating chrome: it sits in the page and scrolls with it. */
+.hint {
+  composes: surface from global;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-1) var(--space-3) var(--space-4);
+  border-radius: var(--r-card);
+}
+
+/* Blue: "your next step" (design PDF page 5). */
+.icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--r-tag);
+  background: var(--accsoft);
+  color: var(--acc);
+}
+
+.text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.title {
+  font-size: var(--text-body);
+  font-weight: 600;
+  line-height: var(--leading-body);
+}
+
+/* 44px to tap. */
+.close {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--touch-min);
+  height: var(--touch-min);
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}

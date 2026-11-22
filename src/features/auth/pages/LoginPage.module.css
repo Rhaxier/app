@@ -6,7 +6,10 @@
   min-height: 100vh;
   max-width: var(--content-max);
   margin: 0 auto;
-  padding: var(--space-8) var(--space-5);
+  /* Clear of the status bar and home indicator in the installed app (both
+     0 in a browser tab). */
+  padding: calc(var(--space-8) + env(safe-area-inset-top)) var(--space-5)
+    calc(var(--space-8) + env(safe-area-inset-bottom));
 }
 
 .brand {

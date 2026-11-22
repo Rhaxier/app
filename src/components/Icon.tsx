@@ -52,6 +52,14 @@ const paths = {
       <path d="m20 20-4.3-4.3" />
     </>
   ),
+  // The system Share symbol (a box with an arrow up), for "tap Share".
+  share: (
+    <>
+      <path d="M12 3.5v11" />
+      <path d="m8 7.5 4-4 4 4" />
+      <path d="M8.5 10.5h-2a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-8a1 1 0 0 0-1-1h-2" />
+    </>
+  ),
   folder: (
     <path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2v8.5a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z" />
   ),

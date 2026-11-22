@@ -19,7 +19,8 @@
 /* The maintenance banner runs across the top of every screen. */
 .banner {
   max-width: var(--content-max-wide);
-  margin: var(--space-3) auto 0;
+  /* Below the status bar in the installed app (0 in a browser tab). */
+  margin: calc(var(--space-3) + env(safe-area-inset-top)) auto 0;
   width: calc(100% - 2 * var(--space-4));
 }
 
@@ -27,6 +28,6 @@
 :global(:root[data-nav]) .banner {
   width: auto;
   max-width: none;
-  margin: var(--space-3) var(--screen-margin-wide) 0
+  margin: calc(var(--space-3) + env(safe-area-inset-top)) var(--screen-margin-wide) 0
     calc(var(--nav-space) + var(--screen-margin-wide));
 }
