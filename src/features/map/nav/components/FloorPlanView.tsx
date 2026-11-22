@@ -33,7 +33,7 @@ import {
   ZoomControl,
 } from 'react-leaflet';
 import { prefersReducedMotion } from '@/lib/motion';
-import { RefitOnMargins } from '../../components/FitPlan.tsx';
+import { FollowFrameSize, RefitOnMargins } from '../../components/FitPlan.tsx';
 import { fitPadding, type MapMargins } from '../../mapMargins.ts';
 import { entranceDoors } from '../assignments.ts';
 import { distance, indexGeometry, regionAt } from '../graph.ts';
@@ -171,6 +171,7 @@ export function FloorPlanView({
         <ZoomControl position={immersive ? 'bottomright' : 'topleft'} />
         {immersive && <RefitOnMargins bounds={mapBounds} margins={immersive} />}
         <LineScale metresPerUnit={geometry.metresPerUnit} />
+        <FollowFrameSize />
         {onZoom && <ZoomWatcher onZoom={onZoom} />}
         {/* key: shapes are made once per floor; a name change redraws only that room. */}
         {drawn.map((region) => (

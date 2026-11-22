@@ -5,7 +5,9 @@
   gap: var(--space-3);
 }
 
-@media (min-width: 600px) {
+/* Widths here are the screen column's (@container screen, AppLayout.module.css),
+   not the window's, so the side navigation and admin menu beside it count. */
+@container screen (min-width: 560px) {
   .filters {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }

@@ -6,6 +6,11 @@
   align-items: start;
 }
 
+/* Laptops: a little narrower on a small screen, so the section keeps room. */
+:global(:root[data-nav]) .layout {
+  grid-template-columns: clamp(232px, 22vw, 288px) minmax(0, 1fr);
+}
+
 /* The menu stays in view while a long section scrolls. */
 .side {
   position: sticky;
@@ -15,6 +20,18 @@
   padding-right: var(--space-2);
 }
 
+/* Laptops: no tab bar below it (the side navigation is on the left). */
+:global(:root[data-nav]) .side {
+  top: var(--space-5);
+  max-height: calc(100vh - 2 * var(--space-5));
+}
+
 .content {
   min-width: 0;
+}
+
+/* Laptops: the section lays itself out by its own width (@container screen
+   in the admin screens' CSS), not the whole column's: the menu takes some. */
+:global(:root[data-nav]) .content {
+  container: screen / inline-size;
 }

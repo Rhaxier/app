@@ -9,14 +9,21 @@
 // width, not only the window, which a media query can't know. Plain styling
 // belongs in CSS container queries instead (@container screen …).
 //
-// Where ResizeObserver doesn't exist (the test browser) the width is 0, so
-// the phone layout shows.
-import { useCallback, useEffect, useState } from 'react';
+// The first width is read before the screen is first drawn, so the layout
+// never flashes from one arrangement to the other. Where the browser can't
+// measure (the test browser) the width is 0, so the phone layout shows.
+import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 
 export function useElementWidth<T extends HTMLElement>(): [(element: T | null) => void, number] {
   const [element, setElement] = useState<T | null>(null);
   const [width, setWidth] = useState(0);
 
+  // Before the first paint: the width it has now.
+  useLayoutEffect(() => {
+    if (element) setWidth(Math.round(element.getBoundingClientRect().width));
+  }, [element]);
+
+  // Then every change.
   useEffect(() => {
     if (!element || typeof ResizeObserver === 'undefined') return;
     const observer = new ResizeObserver(([entry]) => {

@@ -29,3 +29,20 @@ export function RefitOnMargins({
   }, [key]);
   return null;
 }
+
+/**
+ * Tells Leaflet when its frame changes size without the window changing: a
+ * layout that puts the map beside a list once it knows how much room there
+ * is (Admin > Map and rooms). Leaflet only watches the window by itself, and
+ * would otherwise draw the plan for the old size.
+ */
+export function FollowFrameSize() {
+  const map = useMap();
+  useEffect(() => {
+    if (typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver(() => map.invalidateSize({ pan: false }));
+    observer.observe(map.getContainer());
+    return () => observer.disconnect();
+  }, [map]);
+  return null;
+}

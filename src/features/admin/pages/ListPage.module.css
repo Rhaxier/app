@@ -39,6 +39,13 @@
   gap: var(--space-2);
 }
 
+/* Tablets and laptops: the field keeps a sensible width with its button
+   right beside it, instead of the button at the far edge of a wide screen. */
+:global(:root[data-nav]) .addRow {
+  grid-template-columns: minmax(0, 420px) auto;
+  justify-content: start;
+}
+
 .warning {
   color: var(--fixink);
   font-size: var(--text-body);
@@ -141,7 +148,9 @@
   gap: var(--space-3);
 }
 
-@media (min-width: 600px) {
+/* Widths here are the screen column's (@container screen, AppLayout.module.css),
+   not the window's, so the side navigation and admin menu beside it count. */
+@container screen (min-width: 560px) {
   .filters {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }

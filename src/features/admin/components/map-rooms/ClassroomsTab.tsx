@@ -26,7 +26,6 @@ import {
 import { useNavRouter } from '@/features/map/nav/routerContext';
 import type { Geometry } from '@/features/map/nav/types';
 import { errorMessage } from '@/lib/errors';
-import { useMediaQuery, WIDE_SCREEN } from '@/lib/useMediaQuery';
 import { footnotes } from '../../strings';
 import { AssignmentCsv } from './AssignmentCsv';
 import { floorLabel } from './labels';
@@ -34,6 +33,7 @@ import styles from './MapRooms.module.css';
 import { RoomEditor } from './RoomEditor';
 import { RoomTable } from './RoomTable';
 import { TermBar } from './TermBar';
+import { useSideBySide } from './useSideBySide';
 
 export function ClassroomsTab() {
   const { geometry, activePresetId, error } = useNavRouter();
@@ -84,7 +84,7 @@ function TermEditor({
   presetName: string;
 }) {
   const assignments = useAssignments(presetId);
-  const wide = useMediaQuery(WIDE_SCREEN);
+  const [measure, wide] = useSideBySide(780);
   const [floor, setFloor] = useState(geometry.floors[0]?.id ?? 'G');
   const [selectedId, setSelectedId] = useState<string | null>(null);
   // `seq` counters: a new pick moves the map or the list, re-renders don't.
@@ -135,7 +135,7 @@ function TermEditor({
         presetName={presetName}
         assignments={list}
       />
-      <div className={styles.layout}>
+      <div ref={measure} className={`${styles.layout} ${wide ? styles.wide : ''}`}>
         <div className={styles.mapColumn}>
           <SegmentedControl
             label="Floor"

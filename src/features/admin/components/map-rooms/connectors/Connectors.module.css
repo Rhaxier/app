@@ -13,16 +13,26 @@
   gap: 16px;
 }
 
-@media (min-width: 900px) {
-  .layout {
-    grid-template-columns: minmax(0, 3fr) minmax(320px, 2fr);
-    align-items: start;
-  }
+/* Map beside the panels when the section has room (../useSideBySide.ts). */
+.wide {
+  grid-template-columns: minmax(0, 3fr) minmax(320px, 2fr);
+  align-items: start;
+}
 
-  .mapColumn {
-    position: sticky;
-    top: 16px;
-  }
+.wide .mapColumn {
+  position: sticky;
+  top: 16px;
+}
+
+/* Tablets and laptops: a large canvas for placing stairs and lifts, as tall
+   as the window, with the panels at a comfortable width beside it. */
+:global(:root[data-nav]) .wide {
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 380px);
+}
+
+:global(:root[data-nav]) .wide .mapColumn > [role='region'] {
+  height: max(420px, calc(100vh - 2 * var(--space-5)));
+  max-height: none;
 }
 
 .mapColumn,
@@ -156,4 +166,9 @@
   border-radius: var(--r-card);
   background: var(--card);
   box-shadow: var(--e2, var(--e1));
+}
+
+/* Tablets and laptops: no tab bar, so near the bottom edge. */
+:global(:root[data-nav]) .saveBar {
+  bottom: calc(var(--space-4) + env(safe-area-inset-bottom));
 }

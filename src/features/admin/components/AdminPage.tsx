@@ -6,8 +6,8 @@
 // about 760px unless the section asks for the full width (the overview).
 import type { ReactNode } from 'react';
 import { PageHeader } from '@/components/PageHeader';
-import { useMediaQuery, WIDE_SCREEN } from '@/lib/useMediaQuery';
 import styles from './AdminPage.module.css';
+import { useMenuBeside } from '../useMenuBeside';
 
 interface AdminPageProps {
   title: string;
@@ -19,7 +19,8 @@ interface AdminPageProps {
 }
 
 export function AdminPage({ title, description, actions, fullWidth, children }: AdminPageProps) {
-  const wide = useMediaQuery(WIDE_SCREEN);
+  // With the menu beside the section (AdminLayout), no back link.
+  const wide = useMenuBeside();
   return (
     <div className={['stack', !fullWidth && styles.readable].filter(Boolean).join(' ')}>
       <PageHeader

@@ -1,21 +1,33 @@
-/* Admin > Map and rooms. Map first on phones; map beside the list on laptops. */
+/* Admin > Map and rooms. Map first on phones; map beside the list when the
+   section has room (.wide: useSideBySide.ts decides, for the CSS and for
+   whether the room editor is a card or a sheet). */
 
 .layout {
   display: grid;
   gap: 16px;
 }
 
-@media (min-width: 900px) {
-  .layout {
-    grid-template-columns: minmax(0, 3fr) minmax(320px, 2fr);
-    align-items: start;
-  }
+.wide {
+  grid-template-columns: minmax(0, 3fr) minmax(320px, 2fr);
+  align-items: start;
+}
 
-  /* The map stays in view while the list scrolls. */
-  .mapColumn {
-    position: sticky;
-    top: 16px;
-  }
+/* The map stays in view while the list scrolls. */
+.wide .mapColumn {
+  position: sticky;
+  top: 16px;
+}
+
+/* Tablets and laptops: the list keeps a comfortable width and the map takes
+   the rest, as tall as the window (below the floor switch), so there's room
+   to zoom in on a room. */
+:global(:root[data-nav]) .wide {
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 380px);
+}
+
+:global(:root[data-nav]) .wide .mapColumn > [role='region'] {
+  height: max(420px, calc(100vh - 2 * var(--space-5) - var(--touch-min) - 12px));
+  max-height: none;
 }
 
 .mapColumn,

@@ -10,10 +10,17 @@ or `/admin`.
 
 ## Layout
 
-- **Laptop (900px and wider):** the menu on the left (`AdminMenu compact`), the chosen
-  section on the right. `/admin` shows the Overview.
-- **Phone:** `/admin` is the menu as a list screen. Each section opens full-screen with a
-  back link to the menu.
+- **Laptop** (1024px and wider; also a phone 900px wide or more, turned sideways): the
+  menu on the left (`AdminMenu compact`), the chosen section on the right. `/admin`
+  shows the Overview. The app's side navigation stays a narrow rail here, to leave room.
+- **Phone and tablet:** `/admin` is the menu as a list screen. Each section opens
+  full-width with a back link to the menu.
+- Which one is decided in `src/features/admin/useMenuBeside.ts`. Section CSS uses
+  `@container screen (min-width: …)`: the section's own width, after the menu.
+- **Map and rooms** puts the map beside the room list or the stairs and lifts panels once
+  the section is wide enough (`map-rooms/useSideBySide.ts`); on a tablet or laptop the
+  map then fills the window's height. Narrower, they stack and the editor opens as a
+  dialog.
 
 The menu's groups and sections are one list in `src/features/admin/sections.ts`; the
 routes are in `src/features/admin/routes.ts`. To add a section, add it to both, and give it

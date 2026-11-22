@@ -43,13 +43,13 @@ import { createRouter } from '@/features/map/nav/router';
 import { useNavRouter } from '@/features/map/nav/routerContext';
 import type { Connector, FloorId, Geometry, Point } from '@/features/map/nav/types';
 import { errorMessage } from '@/lib/errors';
-import { useMediaQuery, WIDE_SCREEN } from '@/lib/useMediaQuery';
 import { footnotes } from '../../../strings';
 import { floorLabel } from '../labels';
 import { ConnectorPanel } from './ConnectorPanel';
 import styles from './Connectors.module.css';
 import { TryRoute } from './TryRoute';
 import { ValidationPanel } from './ValidationPanel';
+import { useSideBySide } from '../useSideBySide';
 
 type Tool = 'select' | 'stairs' | 'lift';
 
@@ -62,7 +62,7 @@ export function ConnectorsTab() {
 
 function Editor({ geometry, saved }: { geometry: Geometry; saved: Connector[] }) {
   const { assignments } = useNavRouter();
-  const wide = useMediaQuery(WIDE_SCREEN);
+  const [measure, wide] = useSideBySide(880);
   const save = useSaveConnectors();
   const markAvailable = useSetAvailable();
   const index = useMemo(() => indexGeometry(geometry), [geometry]);
@@ -241,7 +241,7 @@ function Editor({ geometry, saved }: { geometry: Geometry; saved: Connector[] })
       </div>
       <p className="meta">{footnotes.mapRooms.tools}</p>
 
-      <div className={styles.layout}>
+      <div ref={measure} className={`${styles.layout} ${wide ? styles.wide : ''}`}>
         <div className={styles.mapColumn}>
           <FloorPlanView
             geometry={geometry}

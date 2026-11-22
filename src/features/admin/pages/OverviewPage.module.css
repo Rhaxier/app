@@ -5,13 +5,15 @@
   gap: var(--space-3);
 }
 
-@media (min-width: 600px) {
+/* Widths here are the screen column's (@container screen, AppLayout.module.css),
+   not the window's, so the side navigation and admin menu beside it count. */
+@container screen (min-width: 560px) {
   .attention {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (min-width: 1100px) {
+@container screen (min-width: 1060px) {
   .attention {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
@@ -71,7 +73,7 @@
   gap: var(--space-3);
 }
 
-@media (min-width: 900px) {
+@container screen (min-width: 860px) {
   .tiles {
     grid-template-columns: repeat(5, minmax(0, 1fr));
   }
@@ -83,7 +85,7 @@
   gap: var(--space-3);
 }
 
-@media (min-width: 1100px) {
+@container screen (min-width: 1060px) {
   .charts {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }

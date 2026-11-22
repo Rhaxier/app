@@ -1,12 +1,12 @@
 // /admin itself. On a laptop the menu is already on the left, so this shows
 // the Overview. On a phone it's the menu: a list of every section.
-import { useMediaQuery, WIDE_SCREEN } from '@/lib/useMediaQuery';
 import { PageHeader } from '@/components/PageHeader';
 import { AdminMenu } from '../components/AdminMenu';
 import { OverviewPage } from './OverviewPage';
+import { useMenuBeside } from '../useMenuBeside';
 
 export function AdminIndexPage() {
-  const wide = useMediaQuery(WIDE_SCREEN);
+  const wide = useMenuBeside();
   if (wide) return <OverviewPage />;
   return (
     <div className="stack">
