@@ -83,82 +83,105 @@ export function ProjectDetailPage() {
     <div className="stack">
       <PageHeader back={back} title={item.title} subtitle={item.subject ?? undefined} />
 
-      <Card className="stack-tight">
-        <div className={styles.statusRow}>
-          <StatusBadge map={projectStatus} status={item.status} />
-          {!isOwner && item.owner && (
-            <span className="meta">
-              {item.owner.full_name}
-              {item.owner.grade ? ` · Grade ${item.owner.grade}` : ''}
-            </span>
+      {/* Tablets and laptops: the project, its status and who it's shared
+          with on the left; feedback and files on the right. On a phone, one
+          after the other. */}
+      <div className="split">
+        <div className="stack">
+          <Card className="stack-tight">
+            <div className={styles.statusRow}>
+              <StatusBadge map={projectStatus} status={item.status} />
+              {!isOwner && item.owner && (
+                <span className="meta">
+                  {item.owner.full_name}
+                  {item.owner.grade ? ` · Grade ${item.owner.grade}` : ''}
+                </span>
+              )}
+            </div>
+            {item.description && <p className={styles.description}>{item.description}</p>}
+            {item.link_url && (
+              <a
+                href={item.link_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.link}
+              >
+                <Icon name="link" size={18} />
+                Open the project link
+              </a>
+            )}
+          </Card>
+
+          {canReview && (
+            <section className="stack-tight" aria-label="Set status">
+              <span className="label">Set status</span>
+              <div className="row-wrap">
+                {reviewerStatuses.map((option) => (
+                  <Button
+                    key={option.value}
+                    size="small"
+                    variant={item.status === option.value ? 'primary' : 'secondary'}
+                    aria-pressed={item.status === option.value}
+                    disabled={setStatus.isPending}
+                    onClick={() => setStatus.mutate(option.value)}
+                  >
+                    {option.label}
+                  </Button>
+                ))}
+              </div>
+              <FormError message={setStatus.isError ? errorMessage(setStatus.error) : null} />
+            </section>
+          )}
+
+          {isOwner && (
+            <section className="stack-tight" aria-labelledby="sharing-heading">
+              <SectionHeader id="sharing-heading" title="Shared with" />
+              {item.shares.length === 0 && (
+                <p className="meta">Not shared yet. Teachers only see projects you share.</p>
+              )}
+              <div className="row-wrap">
+                {item.shares.map((s) => (
+                  <span key={s.teacher_id} className={styles.teacher}>
+                    <Tag tone="accent">{s.teacher?.full_name}</Tag>
+                    <button
+                      type="button"
+                      className={styles.unshare}
+                      aria-label={`Stop sharing with ${s.teacher?.full_name}`}
+                      onClick={() => unshare.mutate(s.teacher_id)}
+                    >
+                      <Icon name="close" size={16} />
+                    </button>
+                  </span>
+                ))}
+              </div>
+              <Button
+                variant="secondary"
+                icon="plus"
+                className={styles.share}
+                onClick={() => setSharing(true)}
+              >
+                Share with a teacher
+              </Button>
+            </section>
           )}
         </div>
-        {item.description && <p className={styles.description}>{item.description}</p>}
-        {item.link_url && (
-          <a href={item.link_url} target="_blank" rel="noopener noreferrer" className={styles.link}>
-            <Icon name="link" size={18} />
-            Open the project link
-          </a>
-        )}
-      </Card>
 
-      {canReview && (
-        <section className="stack-tight" aria-label="Set status">
-          <span className="label">Set status</span>
-          <div className="row-wrap">
-            {reviewerStatuses.map((option) => (
-              <Button
-                key={option.value}
-                size="small"
-                variant={item.status === option.value ? 'primary' : 'secondary'}
-                aria-pressed={item.status === option.value}
-                disabled={setStatus.isPending}
-                onClick={() => setStatus.mutate(option.value)}
-              >
-                {option.label}
-              </Button>
-            ))}
-          </div>
-          <FormError message={setStatus.isError ? errorMessage(setStatus.error) : null} />
-        </section>
-      )}
+        <div className="stack">
+          <section className="stack-tight" aria-labelledby="feedback-heading">
+            <SectionHeader id="feedback-heading" title="Feedback" />
+            <FeedbackThread
+              projectId={item.id}
+              feedback={item.feedback}
+              canGiveFeedback={canReview}
+            />
+          </section>
 
-      {isOwner && (
-        <section className="stack-tight" aria-labelledby="sharing-heading">
-          <SectionHeader id="sharing-heading" title="Shared with" />
-          {item.shares.length === 0 && (
-            <p className="meta">Not shared yet. Teachers only see projects you share.</p>
-          )}
-          <div className="row-wrap">
-            {item.shares.map((s) => (
-              <span key={s.teacher_id} className={styles.teacher}>
-                <Tag tone="accent">{s.teacher?.full_name}</Tag>
-                <button
-                  type="button"
-                  className={styles.unshare}
-                  aria-label={`Stop sharing with ${s.teacher?.full_name}`}
-                  onClick={() => unshare.mutate(s.teacher_id)}
-                >
-                  <Icon name="close" size={16} />
-                </button>
-              </span>
-            ))}
-          </div>
-          <Button variant="secondary" icon="plus" onClick={() => setSharing(true)}>
-            Share with a teacher
-          </Button>
-        </section>
-      )}
-
-      <section className="stack-tight" aria-labelledby="feedback-heading">
-        <SectionHeader id="feedback-heading" title="Feedback" />
-        <FeedbackThread projectId={item.id} feedback={item.feedback} canGiveFeedback={canReview} />
-      </section>
-
-      <section className="stack-tight" aria-labelledby="files-heading">
-        <SectionHeader id="files-heading" title="Files" />
-        <Attachments projectId={item.id} canEdit={isOwner} />
-      </section>
+          <section className="stack-tight" aria-labelledby="files-heading">
+            <SectionHeader id="files-heading" title="Files" />
+            <Attachments projectId={item.id} canEdit={isOwner} />
+          </section>
+        </div>
+      </div>
 
       {isOwner && (
         <div className={styles.actions}>

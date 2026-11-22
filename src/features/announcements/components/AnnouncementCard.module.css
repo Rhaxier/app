@@ -62,3 +62,16 @@
   font-size: var(--text-body);
   font-weight: 600;
 }
+
+/* In a grid of cards (tablets and laptops), cards in a row share one height,
+   and the link fills the card, so the whole card stays one tap target. */
+@container screen (min-width: 600px) {
+  .card {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .link {
+    flex: 1;
+  }
+}

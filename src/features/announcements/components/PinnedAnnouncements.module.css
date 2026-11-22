@@ -24,3 +24,13 @@
 .slide > * {
   flex: 1;
 }
+
+/* Tablets and laptops: the cards stay inside the screen's column (there is
+   no phone edge to slide off), still one card wide and still swipeable. */
+@container screen (min-width: 600px) {
+  .track {
+    margin: 0;
+    padding: 0 0 4px;
+    scroll-padding: 0;
+  }
+}

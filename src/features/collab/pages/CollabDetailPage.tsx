@@ -80,143 +80,155 @@ export function CollabDetailPage() {
     <div className="stack">
       <PageHeader back={back} title={item.title} />
 
-      <Card className="stack-tight">
-        <div className={styles.who}>
-          <Avatar name={owner} initials={item.owner?.avatar_initials} tone="quiet" />
-          <div className={styles.whoText}>
-            <p className={styles.name}>{owner}</p>
+      {/* Tablets and laptops: the post on the left; joining, requests, the
+          team and moderation on the right. On a phone, one after the other. */}
+      <div className="split">
+        <div className="stack">
+          <Card className="stack-tight">
+            <div className={styles.who}>
+              <Avatar name={owner} initials={item.owner?.avatar_initials} tone="quiet" />
+              <div className={styles.whoText}>
+                <p className={styles.name}>{owner}</p>
+                <p className="meta">
+                  {item.owner?.grade ? `Grade ${item.owner.grade} · ` : ''}
+                  {relativeTime(item.created_at)}
+                </p>
+              </div>
+              <StatusBadge map={collabStatus} status={item.status} />
+            </div>
+            {item.description && <p className={styles.description}>{item.description}</p>}
+            <p className={`label ${styles.muted} ${styles.lookingFor}`}>Looking for</p>
+            <div className="row-wrap">
+              {item.skills.map((skill) => (
+                <Tag key={skill}>{skill}</Tag>
+              ))}
+            </div>
             <p className="meta">
-              {item.owner?.grade ? `Grade ${item.owner.grade} · ` : ''}
-              {relativeTime(item.created_at)}
+              {filledLabel(item)}
+              {item.supervisor && ` · Supervised by ${item.supervisor.full_name}`}
             </p>
-          </div>
-          <StatusBadge map={collabStatus} status={item.status} />
+          </Card>
+
+          {item.hidden_by && (
+            <Card className={styles.hidden}>
+              <p className={styles.hiddenTitle}>Hidden while a teacher reviews it</p>
+              {item.hidden_reason && <p>{item.hidden_reason}</p>}
+            </Card>
+          )}
         </div>
-        {item.description && <p className={styles.description}>{item.description}</p>}
-        <p className={`label ${styles.muted} ${styles.lookingFor}`}>Looking for</p>
-        <div className="row-wrap">
-          {item.skills.map((skill) => (
-            <Tag key={skill}>{skill}</Tag>
-          ))}
-        </div>
-        <p className="meta">
-          {filledLabel(item)}
-          {item.supervisor && ` · Supervised by ${item.supervisor.full_name}`}
-        </p>
-      </Card>
 
-      {item.hidden_by && (
-        <Card className={styles.hidden}>
-          <p className={styles.hiddenTitle}>Hidden while a teacher reviews it</p>
-          {item.hidden_reason && <p>{item.hidden_reason}</p>}
-        </Card>
-      )}
-
-      {/* The requester's side */}
-      {state === 'can_ask' && (
-        <Button fullWidth onClick={() => setAsking(true)}>
-          Ask to join
-        </Button>
-      )}
-      {state === 'requested' && myRequest && (
-        <Card className="stack-tight">
-          <p>You've asked to join. The owner will accept or decline, and may email you first.</p>
-          <Button
-            variant="secondary"
-            loading={setRequest.isPending}
-            onClick={() => setRequest.mutate({ requestId: myRequest.id, status: 'withdrawn' })}
-          >
-            Withdraw my request
-          </Button>
-        </Card>
-      )}
-      {state === 'declined' && (
-        <p className="meta">Thanks for offering. The owner has gone with other people this time.</p>
-      )}
-      {state === 'full' && <p className="meta">This team is full.</p>}
-      {state === 'on_team' && myRequest && (
-        <section className="stack-tight" aria-labelledby="team-heading">
-          <SectionHeader id="team-heading" title="Your team" />
-          <TeamList postId={item.id} />
-          <Button
-            variant="quiet"
-            loading={setRequest.isPending}
-            onClick={() => setRequest.mutate({ requestId: myRequest.id, status: 'withdrawn' })}
-          >
-            Leave the team
-          </Button>
-        </section>
-      )}
-      <FormError message={setRequest.isError ? errorMessage(setRequest.error) : null} />
-
-      {/* The owner's side, and the staff safeguarding view */}
-      {(isOwner || isStaff(user)) && (
-        <section className="stack-tight" aria-labelledby="requests-heading">
-          <SectionHeader id="requests-heading" title="Requests" />
-          <RequestsList
-            postId={item.id}
-            postTitle={item.title}
-            canDecide={isOwner}
-            isFull={item.status === 'full'}
-          />
-        </section>
-      )}
-      {isOwner && item.accepted_count > 0 && (
-        <section className="stack-tight" aria-labelledby="owner-team-heading">
-          <SectionHeader id="owner-team-heading" title="Team" />
-          <TeamList postId={item.id} />
-        </section>
-      )}
-      {isOwner && (
-        <div className={styles.actions}>
-          <ButtonLink to={`/collab/${item.id}/edit`} variant="secondary" icon="edit">
-            Edit
-          </ButtonLink>
-          <Button
-            variant="secondary"
-            loading={setClosed.isPending}
-            onClick={() => setClosed.mutate(item.status !== 'closed')}
-          >
-            {item.status === 'closed' ? 'Reopen' : 'Close post'}
-          </Button>
-        </div>
-      )}
-
-      {isStaff(user) && !isOwner && (
-        <Card className="stack-tight">
-          <h3>Moderation</h3>
-          <FormError message={setHidden.isError ? errorMessage(setHidden.error) : null} />
-          {item.hidden_by ? (
-            <Button
-              variant="secondary"
-              loading={setHidden.isPending}
-              onClick={() => setHidden.mutate({ hiddenBy: null, reason: null })}
-            >
-              Unhide
-            </Button>
-          ) : (
-            <Button variant="secondary" icon="eyeOff" onClick={() => setHiding(true)}>
-              Hide pending review
+        <div className="stack">
+          {/* The requester's side */}
+          {state === 'can_ask' && (
+            <Button fullWidth onClick={() => setAsking(true)}>
+              Ask to join
             </Button>
           )}
-          {isAdmin(user) && (
+          {state === 'requested' && myRequest && (
+            <Card className="stack-tight">
+              <p>
+                You've asked to join. The owner will accept or decline, and may email you first.
+              </p>
+              <Button
+                variant="secondary"
+                loading={setRequest.isPending}
+                onClick={() => setRequest.mutate({ requestId: myRequest.id, status: 'withdrawn' })}
+              >
+                Withdraw my request
+              </Button>
+            </Card>
+          )}
+          {state === 'declined' && (
+            <p className="meta">
+              Thanks for offering. The owner has gone with other people this time.
+            </p>
+          )}
+          {state === 'full' && <p className="meta">This team is full.</p>}
+          {state === 'on_team' && myRequest && (
+            <section className="stack-tight" aria-labelledby="team-heading">
+              <SectionHeader id="team-heading" title="Your team" />
+              <TeamList postId={item.id} />
+              <Button
+                variant="quiet"
+                loading={setRequest.isPending}
+                onClick={() => setRequest.mutate({ requestId: myRequest.id, status: 'withdrawn' })}
+              >
+                Leave the team
+              </Button>
+            </section>
+          )}
+          <FormError message={setRequest.isError ? errorMessage(setRequest.error) : null} />
+
+          {/* The owner's side, and the staff safeguarding view */}
+          {(isOwner || isStaff(user)) && (
+            <section className="stack-tight" aria-labelledby="requests-heading">
+              <SectionHeader id="requests-heading" title="Requests" />
+              <RequestsList
+                postId={item.id}
+                postTitle={item.title}
+                canDecide={isOwner}
+                isFull={item.status === 'full'}
+              />
+            </section>
+          )}
+          {isOwner && item.accepted_count > 0 && (
+            <section className="stack-tight" aria-labelledby="owner-team-heading">
+              <SectionHeader id="owner-team-heading" title="Team" />
+              <TeamList postId={item.id} />
+            </section>
+          )}
+          {isOwner && (
+            <div className={styles.actions}>
+              <ButtonLink to={`/collab/${item.id}/edit`} variant="secondary" icon="edit">
+                Edit
+              </ButtonLink>
+              <Button
+                variant="secondary"
+                loading={setClosed.isPending}
+                onClick={() => setClosed.mutate(item.status !== 'closed')}
+              >
+                {item.status === 'closed' ? 'Reopen' : 'Close post'}
+              </Button>
+            </div>
+          )}
+
+          {isStaff(user) && !isOwner && (
+            <Card className="stack-tight">
+              <h3>Moderation</h3>
+              <FormError message={setHidden.isError ? errorMessage(setHidden.error) : null} />
+              {item.hidden_by ? (
+                <Button
+                  variant="secondary"
+                  loading={setHidden.isPending}
+                  onClick={() => setHidden.mutate({ hiddenBy: null, reason: null })}
+                >
+                  Unhide
+                </Button>
+              ) : (
+                <Button variant="secondary" icon="eyeOff" onClick={() => setHiding(true)}>
+                  Hide pending review
+                </Button>
+              )}
+              {isAdmin(user) && (
+                <Button variant="quiet" icon="trash" onClick={() => setConfirmDelete(true)}>
+                  Remove post
+                </Button>
+              )}
+            </Card>
+          )}
+          {isOwner && (
             <Button variant="quiet" icon="trash" onClick={() => setConfirmDelete(true)}>
-              Remove post
+              Delete post
             </Button>
           )}
-        </Card>
-      )}
-      {isOwner && (
-        <Button variant="quiet" icon="trash" onClick={() => setConfirmDelete(true)}>
-          Delete post
-        </Button>
-      )}
 
-      {!isOwner && (
-        <Button variant="ghost" icon="flag" onClick={() => setReporting(true)}>
-          Report this post
-        </Button>
-      )}
+          {!isOwner && (
+            <Button variant="ghost" icon="flag" onClick={() => setReporting(true)}>
+              Report this post
+            </Button>
+          )}
+        </div>
+      </div>
 
       <Sheet open={asking} title="Ask to join" onClose={() => setAsking(false)}>
         <TextField

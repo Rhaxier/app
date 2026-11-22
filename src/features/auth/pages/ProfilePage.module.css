@@ -10,3 +10,16 @@
   font-weight: 600;
   letter-spacing: 0;
 }
+
+/* Tablets and laptops: the buttons sit in a row at their natural width,
+   rather than stretching across the screen. (":is(a, button)" so this wins
+   over the buttons' own full-width rule.) */
+@container screen (min-width: 600px) {
+  .buttons {
+    flex-flow: row wrap;
+  }
+
+  .buttons > :is(a, button) {
+    width: auto;
+  }
+}

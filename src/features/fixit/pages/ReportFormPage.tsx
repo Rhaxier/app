@@ -103,107 +103,113 @@ export function ReportFormPage() {
         <p>{SAFETY_COPY}</p>
       </div>
 
-      <form className="stack" onSubmit={handleSubmit} noValidate>
-        <SelectField
-          label="Where is it?"
-          value={values.roomId}
-          onChange={(e) => update('roomId', e.target.value)}
-          error={errors.roomId}
-        >
-          <option value="">Choose a room…</option>
-          {rooms.data?.map((room) => (
-            <option key={room.id} value={room.id}>
-              {roomLabel(room)}
-            </option>
-          ))}
-        </SelectField>
-
-        {values.roomId && <DuplicateCheck roomId={values.roomId} />}
-
-        {(targetOptions.length > 0 || values.mapTarget) && (
+      {/* Tablets and laptops: where it is (and reports already open there) on
+          the left, what's wrong on the right. On a phone, one after the other. */}
+      <form className={`stack ${styles.columns}`} onSubmit={handleSubmit} noValidate>
+        <div className="stack">
           <SelectField
-            label="Is it about a lift, stairs or a door? (optional)"
-            hint="Staff decide whether it is out of order; your report doesn't close it."
-            value={values.mapTarget}
-            onChange={(e) => update('mapTarget', e.target.value)}
+            label="Where is it?"
+            value={values.roomId}
+            onChange={(e) => update('roomId', e.target.value)}
+            error={errors.roomId}
           >
-            <option value="">No</option>
-            {targetOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
+            <option value="">Choose a room…</option>
+            {rooms.data?.map((room) => (
+              <option key={room.id} value={room.id}>
+                {roomLabel(room)}
               </option>
             ))}
           </SelectField>
-        )}
 
-        <fieldset className={styles.fieldset}>
-          <legend className={styles.legend}>What kind of problem?</legend>
-          <div className="row-wrap">
-            {categories.map((category) => (
-              <FilterChip
-                key={category.key}
-                selected={values.category === category.key}
-                onClick={() => update('category', category.key)}
-              >
-                <Icon name={iconName(category.icon)} size={18} />
-                {category.name}
-              </FilterChip>
-            ))}
-          </div>
-          {errors.category && (
-            <p className={styles.error} role="alert">
-              {errors.category}
-            </p>
-          )}
-        </fieldset>
+          {values.roomId && <DuplicateCheck roomId={values.roomId} />}
 
-        <TextArea
-          label="What's wrong?"
-          placeholder="e.g. Projector won't turn on"
-          rows={3}
-          maxLength={1000}
-          value={values.description}
-          onChange={(e) => update('description', e.target.value)}
-          error={errors.description}
-        />
-
-        <div className="stack-tight">
-          <span className={styles.legend}>Photo (optional)</span>
-          <input
-            ref={photoInput}
-            id="report-photo"
-            type="file"
-            accept="image/*"
-            capture="environment"
-            className="visually-hidden"
-            onChange={(e) => update('photo', e.target.files?.[0] ?? null)}
-          />
-          <Button variant="secondary" icon="camera" onClick={() => photoInput.current?.click()}>
-            {values.photo ? `Change photo (${values.photo.name})` : 'Add a photo'}
-          </Button>
-          {errors.photo && (
-            <p className={styles.error} role="alert">
-              {errors.photo}
-            </p>
+          {(targetOptions.length > 0 || values.mapTarget) && (
+            <SelectField
+              label="Is it about a lift, stairs or a door? (optional)"
+              hint="Staff decide whether it is out of order; your report doesn't close it."
+              value={values.mapTarget}
+              onChange={(e) => update('mapTarget', e.target.value)}
+            >
+              <option value="">No</option>
+              {targetOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </SelectField>
           )}
         </div>
 
-        {isStaff(user) && (
-          <CheckboxField
-            label="Urgent"
-            hint="Emails the responsible team straight away."
-            checked={values.urgent}
-            onChange={(e) => update('urgent', e.target.checked)}
-          />
-        )}
+        <div className="stack">
+          <fieldset className={styles.fieldset}>
+            <legend className={styles.legend}>What kind of problem?</legend>
+            <div className="row-wrap">
+              {categories.map((category) => (
+                <FilterChip
+                  key={category.key}
+                  selected={values.category === category.key}
+                  onClick={() => update('category', category.key)}
+                >
+                  <Icon name={iconName(category.icon)} size={18} />
+                  {category.name}
+                </FilterChip>
+              ))}
+            </div>
+            {errors.category && (
+              <p className={styles.error} role="alert">
+                {errors.category}
+              </p>
+            )}
+          </fieldset>
 
-        <FormError message={create.isError ? errorMessage(create.error) : null} />
-        <Button type="submit" fullWidth loading={create.isPending}>
-          Send report
-        </Button>
-        <p className="meta">
-          Other students see the problem, not who reported it. Staff can see who reported it.
-        </p>
+          <TextArea
+            label="What's wrong?"
+            placeholder="e.g. Projector won't turn on"
+            rows={3}
+            maxLength={1000}
+            value={values.description}
+            onChange={(e) => update('description', e.target.value)}
+            error={errors.description}
+          />
+
+          <div className="stack-tight">
+            <span className={styles.legend}>Photo (optional)</span>
+            <input
+              ref={photoInput}
+              id="report-photo"
+              type="file"
+              accept="image/*"
+              capture="environment"
+              className="visually-hidden"
+              onChange={(e) => update('photo', e.target.files?.[0] ?? null)}
+            />
+            <Button variant="secondary" icon="camera" onClick={() => photoInput.current?.click()}>
+              {values.photo ? `Change photo (${values.photo.name})` : 'Add a photo'}
+            </Button>
+            {errors.photo && (
+              <p className={styles.error} role="alert">
+                {errors.photo}
+              </p>
+            )}
+          </div>
+
+          {isStaff(user) && (
+            <CheckboxField
+              label="Urgent"
+              hint="Emails the responsible team straight away."
+              checked={values.urgent}
+              onChange={(e) => update('urgent', e.target.checked)}
+            />
+          )}
+
+          <FormError message={create.isError ? errorMessage(create.error) : null} />
+          <Button type="submit" fullWidth loading={create.isPending}>
+            Send report
+          </Button>
+          <p className="meta">
+            Other students see the problem, not who reported it. Staff can see who reported it.
+          </p>
+        </div>
       </form>
     </div>
   );

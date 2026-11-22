@@ -47,7 +47,7 @@ export function CollabPage() {
           Post your project to find teammates.
         </EmptyState>
       )}
-      <div className="stack-tight stagger">
+      <div className="card-grid stagger">
         {shown.map((post) => (
           <PostCard
             key={post.id}

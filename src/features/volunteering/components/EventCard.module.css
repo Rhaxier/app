@@ -122,3 +122,11 @@
   font-size: var(--text-meta);
   text-align: right;
 }
+
+/* In a grid of cards (tablets and laptops), cards in a row share one height:
+   the roles sit at the bottom, so they line up across the row. */
+@container screen (min-width: 600px) {
+  .roles {
+    margin-top: auto;
+  }
+}

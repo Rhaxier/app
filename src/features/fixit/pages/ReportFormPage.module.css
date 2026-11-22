@@ -35,3 +35,14 @@
   font-size: var(--text-meta);
   font-weight: 500;
 }
+
+/* Tablets and laptops: the form's two halves side by side, equal widths
+   (where it is, and what's wrong). */
+@container screen (min-width: 700px) {
+  .columns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+    gap: var(--space-6);
+  }
+}

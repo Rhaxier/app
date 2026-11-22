@@ -4,6 +4,10 @@
 // exact times, with one Request button. The list shows the chosen date's own
 // periods, so a short Friday looks shorter. The calendar listens to Realtime,
 // so an approval made elsewhere appears here at once.
+//
+// With room (a laptop, an iPad turned sideways), the calendar sits on the left
+// and the request (the bar's times and Request button, as a card) and the
+// custom time on the right, instead of a bar floating over the periods.
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button, ButtonLink } from '@/components/Button';
@@ -22,6 +26,7 @@ import { dayNote, schoolDaysOfWeek, type CalendarData } from '@/features/school/
 import { useAppSettings } from '@/features/settings/hooks';
 import { atSchoolTime, dayLabels, dayRange, formatTimeRange } from '@/lib/dates';
 import { useDocumentTitle } from '@/lib/useDocumentTitle';
+import { useElementWidth } from '@/lib/useElementWidth';
 import type { Venue } from '../api';
 import { PeriodList } from '../components/PeriodList';
 import { useApprovedBookings, useLiveBookings, useVenues, useWaitingRequests } from '../hooks';
@@ -101,6 +106,9 @@ interface BookingCalendarProps {
   venues: Venue[];
 }
 
+/** The screen width (px) from which the request sits beside the calendar. */
+const SIDE_PANEL_MIN = 700;
+
 // Split out so its state starts once settings and venues are loaded.
 function BookingCalendar({
   settings,
@@ -116,6 +124,8 @@ function BookingCalendar({
   const floors = useFloors();
   useLiveBookings();
   useDocumentTitle('Book a venue');
+  const [measure, width] = useElementWidth<HTMLDivElement>();
+  const sidePanel = width >= SIDE_PANEL_MIN;
 
   const venueId = searchParams.get('venue') ?? venues[0].id;
   const venue = venues.find((v) => v.id === venueId) ?? venues[0];
@@ -225,8 +235,23 @@ function BookingCalendar({
       ? 'Choose periods or a time'
       : 'Choose free periods';
 
+  const requestButton = (
+    <Button
+      variant="accent"
+      fullWidth={sidePanel}
+      disabled={!chosen}
+      aria-label={chosen ? `Request ${chosenLabel}` : undefined}
+      onClick={request}
+    >
+      Request
+    </Button>
+  );
+
   return (
-    <div className={`stack ${styles.page}`}>
+    <div
+      ref={measure}
+      className={[`stack ${styles.page}`, sidePanel && styles.withPanel].filter(Boolean).join(' ')}
+    >
       <header className={styles.header}>
         <div className={styles.topRow}>
           <p className="label">Book a venue</p>
@@ -260,98 +285,108 @@ function BookingCalendar({
         <p className={styles.about}>{about}</p>
       </header>
 
-      <DateStrip
-        days={days}
-        selected={day}
-        onSelect={(d) => {
-          setDay(d);
-          clearChoice();
-        }}
-        canGoBack={weekOffset > 0}
-        onPreviousWeek={() => changeWeek(weekOffset - 1)}
-        onNextWeek={() => changeWeek(weekOffset + 1)}
-        dayNoteFor={(d) =>
-          dayNote(d, calendar, venue.id)?.text ??
-          (buildSlots(d, periods).length === 0 ? 'No periods' : null)
-        }
-        // Holidays stay selectable, so you can see that day's periods are
-        // closed; only days without any periods are greyed out.
-        isDisabled={(d) => buildSlots(d, periods).length === 0}
-      />
-
-      {(approved.isError || waiting.isError) && (
-        <ErrorState
-          error={approved.error ?? waiting.error}
-          onRetry={() => {
-            approved.refetch();
-            waiting.refetch();
-          }}
-        />
-      )}
-      {slots.length === 0 ? (
-        <EmptyState icon="calendar" title="No periods this day" />
-      ) : approved.isPending ? (
-        <LoadingState shape="slot" />
-      ) : (
-        <>
-          {closedReason && (
-            <p className={styles.closed} role="status">
-              {closedReason}. Nothing can be booked this day.
-            </p>
-          )}
-          <PeriodList
-            slots={slots}
-            states={states}
-            onToggle={togglePeriod}
-            dayLabel={dayLabels(day).long}
+      {/* Side by side when there's room (styles.withPanel); otherwise these
+          wrappers have no box of their own and everything is one column. */}
+      <div className={styles.columns}>
+        <div className={styles.calendar}>
+          <DateStrip
+            days={days}
+            selected={day}
+            onSelect={(d) => {
+              setDay(d);
+              clearChoice();
+            }}
+            canGoBack={weekOffset > 0}
+            onPreviousWeek={() => changeWeek(weekOffset - 1)}
+            onNextWeek={() => changeWeek(weekOffset + 1)}
+            dayNoteFor={(d) =>
+              dayNote(d, calendar, venue.id)?.text ??
+              (buildSlots(d, periods).length === 0 ? 'No periods' : null)
+            }
+            // Holidays stay selectable, so you can see that day's periods are
+            // closed; only days without any periods are greyed out.
+            isDisabled={(d) => buildSlots(d, periods).length === 0}
           />
-        </>
-      )}
 
-      {allowCustomTimes && slots.length > 0 && !closedReason && (
-        <Card as="section" className="stack-tight" aria-labelledby="custom-time-heading">
-          <h3 id="custom-time-heading">Another time</h3>
-          <p className="meta">For times that aren't periods, e.g. after school.</p>
-          <FieldRow>
-            <TextField
-              label="From"
-              type="time"
-              value={custom.from}
-              onChange={(e) => changeCustom({ from: e.target.value })}
+          {(approved.isError || waiting.isError) && (
+            <ErrorState
+              error={approved.error ?? waiting.error}
+              onRetry={() => {
+                approved.refetch();
+                waiting.refetch();
+              }}
             />
-            <TextField
-              label="Until"
-              type="time"
-              value={custom.to}
-              onChange={(e) => changeCustom({ to: e.target.value })}
-            />
-          </FieldRow>
-          {customProblem && (
-            <p className={styles.problem} role="status">
-              {customProblem}
-            </p>
           )}
-        </Card>
-      )}
+          {slots.length === 0 ? (
+            <EmptyState icon="calendar" title="No periods this day" />
+          ) : approved.isPending ? (
+            <LoadingState shape="slot" />
+          ) : (
+            <>
+              {closedReason && (
+                <p className={styles.closed} role="status">
+                  {closedReason}. Nothing can be booked this day.
+                </p>
+              )}
+              <PeriodList
+                slots={slots}
+                states={states}
+                onToggle={togglePeriod}
+                dayLabel={dayLabels(day).long}
+              />
+            </>
+          )}
+        </div>
+
+        <div className={styles.side}>
+          {sidePanel && (
+            <Card as="section" className="stack-tight" aria-label="Your request" aria-live="polite">
+              <p className={chosen ? styles.panelTimes : styles.panelPrompt}>{chosenLabel}</p>
+              <p className="meta">{caption}</p>
+              {requestButton}
+            </Card>
+          )}
+          {allowCustomTimes && slots.length > 0 && !closedReason && (
+            <Card as="section" className="stack-tight" aria-labelledby="custom-time-heading">
+              <h3 id="custom-time-heading">Another time</h3>
+              <p className="meta">For times that aren't periods, e.g. after school.</p>
+              <FieldRow>
+                <TextField
+                  label="From"
+                  type="time"
+                  value={custom.from}
+                  onChange={(e) => changeCustom({ from: e.target.value })}
+                />
+                <TextField
+                  label="Until"
+                  type="time"
+                  value={custom.to}
+                  onChange={(e) => changeCustom({ to: e.target.value })}
+                />
+              </FieldRow>
+              {customProblem && (
+                <p className={styles.problem} role="status">
+                  {customProblem}
+                </p>
+              )}
+            </Card>
+          )}
+        </div>
+      </div>
 
       {/* One next step (design PDF page 7): a floating bar with the exact
           times and one Request button, above the tab bar. */}
-      <PageChrome>
-        <div className={`glass thick ${styles.bar}`} aria-live="polite">
-          <div className={styles.barText}>
-            <p className={chosen ? styles.barTimes : styles.barPrompt}>{chosenLabel}</p>
-            <p className="meta">{caption}</p>
+      {!sidePanel && (
+        <PageChrome>
+          <div className={`glass thick ${styles.bar}`} aria-live="polite">
+            <div className={styles.barText}>
+              <p className={chosen ? styles.barTimes : styles.barPrompt}>{chosenLabel}</p>
+              <p className="meta">{caption}</p>
+            </div>
+            {requestButton}
           </div>
-          <Button
-            variant="accent"
-            disabled={!chosen}
-            aria-label={chosen ? `Request ${chosenLabel}` : undefined}
-            onClick={request}
-          >
-            Request
-          </Button>
-        </div>
-      </PageChrome>
+        </PageChrome>
+      )}
     </div>
   );
 }

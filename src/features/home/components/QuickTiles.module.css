@@ -62,3 +62,12 @@
 .problem {
   background: var(--fix);
 }
+
+/* With room (an iPad, a laptop), the six tools sit in one row. The width is
+   the tiles' own column on Home (the "home-lead" container in
+   HomePage.module.css), which is narrower on the laptop dashboard. */
+@container home-lead (min-width: 600px) {
+  .grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}

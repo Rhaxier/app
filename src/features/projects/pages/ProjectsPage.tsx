@@ -65,7 +65,7 @@ export function ProjectsPage() {
         </ul>
       )}
       {!staff && (
-        <ButtonLink to="/projects/new" icon="plus" fullWidth>
+        <ButtonLink to="/projects/new" icon="plus" fullWidth className={styles.newProject}>
           New project
         </ButtonLink>
       )}

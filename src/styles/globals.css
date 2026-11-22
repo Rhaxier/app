@@ -229,7 +229,7 @@
     }
   }
 
-  @container screen (min-width: 760px) {
+  @container screen (min-width: 700px) {
     .split {
       display: grid;
       grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);

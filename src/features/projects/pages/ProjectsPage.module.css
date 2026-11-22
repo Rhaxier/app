@@ -9,3 +9,32 @@
 .list li + li {
   border-top: 1px solid var(--line);
 }
+
+/* Tablets and laptops: still one card, with the projects two across. Each
+   project draws a hairline on its right and bottom; the card clips the ones
+   on its outer edges, so only the dividers between projects show (the same
+   trick as the Home tools, QuickTiles.module.css). */
+@container screen (min-width: 600px) {
+  .list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .list li {
+    box-shadow:
+      1px 0 0 var(--line),
+      0 1px 0 var(--line);
+  }
+
+  .list li + li {
+    border-top: 0;
+  }
+
+  /* The one button under the list keeps a natural width. ("a." so this
+     wins over the button's own full-width rule, whichever loads first.) */
+  a.newProject {
+    align-self: flex-end;
+    width: auto;
+    min-width: 200px;
+  }
+}

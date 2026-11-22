@@ -94,95 +94,103 @@ export function EventDetailPage() {
         title={item.title}
       />
 
-      <Card className="stack-tight">
-        {item.status !== 'published' && (
-          <StatusBadge map={volunteerEventStatus} status={item.status} />
-        )}
-        <dl className={styles.facts}>
-          <dt>When</dt>
-          <dd>
-            {formatDate(item.starts_at)}, {formatTimeRange(item.starts_at, item.ends_at)}
-          </dd>
-          <dt>Where</dt>
-          <dd>
-            {item.room ? (
-              <Link to={`/map?room=${encodeURIComponent(item.room.code)}`}>
-                {item.room.name} ({item.room.code})
-              </Link>
-            ) : (
-              item.place_text
+      {/* Tablets and laptops: the event on the left, its roles (where you
+          sign up) on the right. On a phone, one after the other as before. */}
+      <div className="split">
+        <div className="stack">
+          <Card className="stack-tight">
+            {item.status !== 'published' && (
+              <StatusBadge map={volunteerEventStatus} status={item.status} />
             )}
-          </dd>
-          <dt>SUPW hours</dt>
-          <dd>{item.supw_hours}</dd>
-          {item.signup_deadline && (
-            <>
-              <dt>Sign up by</dt>
-              <dd>{formatDateTime(item.signup_deadline)}</dd>
-            </>
+            <dl className={styles.facts}>
+              <dt>When</dt>
+              <dd>
+                {formatDate(item.starts_at)}, {formatTimeRange(item.starts_at, item.ends_at)}
+              </dd>
+              <dt>Where</dt>
+              <dd>
+                {item.room ? (
+                  <Link to={`/map?room=${encodeURIComponent(item.room.code)}`}>
+                    {item.room.name} ({item.room.code})
+                  </Link>
+                ) : (
+                  item.place_text
+                )}
+              </dd>
+              <dt>SUPW hours</dt>
+              <dd>{item.supw_hours}</dd>
+              {item.signup_deadline && (
+                <>
+                  <dt>Sign up by</dt>
+                  <dd>{formatDateTime(item.signup_deadline)}</dd>
+                </>
+              )}
+              <dt>Roles</dt>
+              <dd>
+                {item.allow_multiple_roles
+                  ? 'You may sign up for more than one'
+                  : 'One role per student'}
+              </dd>
+            </dl>
+            {item.description && <p className={styles.description}>{item.description}</p>}
+          </Card>
+
+          {/* The creator's view while a teacher hasn't approved it yet. */}
+          {isOrganiser && item.status === 'awaiting_approval' && (
+            <Card className="stack-tight">
+              <h3>Waiting for a teacher</h3>
+              <p className="meta">
+                Only teachers and admins can see it until one of them approves it.
+              </p>
+            </Card>
           )}
-          <dt>Roles</dt>
-          <dd>
-            {item.allow_multiple_roles
-              ? 'You may sign up for more than one'
-              : 'One role per student'}
-          </dd>
-        </dl>
-        {item.description && <p className={styles.description}>{item.description}</p>}
-      </Card>
+          {isOrganiser && item.status === 'sent_back' && (
+            <Card className="stack-tight">
+              <h3>A teacher sent this back</h3>
+              <p className={styles.note}>“{item.approval_note}”</p>
+              <FormError message={setStatus.isError ? errorMessage(setStatus.error) : null} />
+              <div className={styles.twoButtons}>
+                <ButtonLink to={`/volunteer/${item.id}/edit`} variant="secondary">
+                  Edit
+                </ButtonLink>
+                <Button
+                  loading={setStatus.isPending}
+                  onClick={() => setStatus.mutate({ status: 'awaiting_approval' })}
+                >
+                  Resubmit
+                </Button>
+              </div>
+            </Card>
+          )}
 
-      {/* The creator's view while a teacher hasn't approved it yet. */}
-      {isOrganiser && item.status === 'awaiting_approval' && (
-        <Card className="stack-tight">
-          <h3>Waiting for a teacher</h3>
-          <p className="meta">Only teachers and admins can see it until one of them approves it.</p>
-        </Card>
-      )}
-      {isOrganiser && item.status === 'sent_back' && (
-        <Card className="stack-tight">
-          <h3>A teacher sent this back</h3>
-          <p className={styles.note}>“{item.approval_note}”</p>
-          <FormError message={setStatus.isError ? errorMessage(setStatus.error) : null} />
-          <div className={styles.twoButtons}>
-            <ButtonLink to={`/volunteer/${item.id}/edit`} variant="secondary">
-              Edit
-            </ButtonLink>
-            <Button
-              loading={setStatus.isPending}
-              onClick={() => setStatus.mutate({ status: 'awaiting_approval' })}
-            >
-              Resubmit
-            </Button>
-          </div>
-        </Card>
-      )}
+          {isStaff(user) && !isOrganiser && item.status === 'awaiting_approval' && (
+            <ApprovalPanel eventId={item.id} />
+          )}
+        </div>
 
-      {isStaff(user) && !isOrganiser && item.status === 'awaiting_approval' && (
-        <ApprovalPanel eventId={item.id} />
-      )}
-
-      <section className="stack-tight" aria-labelledby="roles-heading">
-        <SectionHeader id="roles-heading" title="Roles" />
-        <FormError message={setMyStatus.isError ? errorMessage(setMyStatus.error) : null} />
-        <ul className="stack-tight">
-          {item.roles.map((role) => (
-            <RoleCard
-              key={role.id}
-              role={role}
-              mySignup={mine.find((signup) => signup.role_id === role.id)}
-              blockedReason={blockedReason(item, user.id, mine, role)}
-              busy={setMyStatus.isPending}
-              onSignUp={() => setSigningUpFor(role)}
-              onWithdraw={(signup) =>
-                setMyStatus.mutate({ signupId: signup.id, status: 'withdrawn' })
-              }
-              onSignUpAgain={(signup) =>
-                setMyStatus.mutate({ signupId: signup.id, status: 'applied' })
-              }
-            />
-          ))}
-        </ul>
-      </section>
+        <section className="stack-tight" aria-labelledby="roles-heading">
+          <SectionHeader id="roles-heading" title="Roles" />
+          <FormError message={setMyStatus.isError ? errorMessage(setMyStatus.error) : null} />
+          <ul className="stack-tight">
+            {item.roles.map((role) => (
+              <RoleCard
+                key={role.id}
+                role={role}
+                mySignup={mine.find((signup) => signup.role_id === role.id)}
+                blockedReason={blockedReason(item, user.id, mine, role)}
+                busy={setMyStatus.isPending}
+                onSignUp={() => setSigningUpFor(role)}
+                onWithdraw={(signup) =>
+                  setMyStatus.mutate({ signupId: signup.id, status: 'withdrawn' })
+                }
+                onSignUpAgain={(signup) =>
+                  setMyStatus.mutate({ signupId: signup.id, status: 'applied' })
+                }
+              />
+            ))}
+          </ul>
+        </section>
+      </div>
 
       {canSeeSignups && item.status !== 'awaiting_approval' && item.status !== 'sent_back' && (
         <section className="stack-tight" aria-labelledby="signups-heading">

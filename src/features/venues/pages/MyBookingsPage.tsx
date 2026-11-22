@@ -34,14 +34,16 @@ export function MyBookingsPage() {
       {isStaff(user) && (toSupervise.data?.length ?? 0) > 0 && (
         <section className="stack-tight" aria-labelledby="supervise-heading">
           <SectionHeader id="supervise-heading" title="Waiting for you" />
-          {toSupervise.data!.map((booking) => (
-            <BookingCard
-              key={booking.id}
-              booking={booking}
-              showRequester
-              actions={<SupervisorActions booking={booking} />}
-            />
-          ))}
+          <div className="card-grid">
+            {toSupervise.data!.map((booking) => (
+              <BookingCard
+                key={booking.id}
+                booking={booking}
+                showRequester
+                actions={<SupervisorActions booking={booking} />}
+              />
+            ))}
+          </div>
         </section>
       )}
 
@@ -57,33 +59,37 @@ export function MyBookingsPage() {
       {upcoming.length > 0 && (
         <section className="stack-tight" aria-labelledby="upcoming-heading">
           <SectionHeader id="upcoming-heading" title="Upcoming" />
-          {upcoming.map((booking) => (
-            <BookingCard
-              key={booking.id}
-              booking={booking}
-              actions={
-                <Button
-                  variant="secondary"
-                  size="small"
-                  loading={decide.isPending && cancellingId === booking.id}
-                  onClick={() => {
-                    setCancellingId(booking.id);
-                    decide.mutate({ id: booking.id, status: 'cancelled' });
-                  }}
-                >
-                  Cancel booking
-                </Button>
-              }
-            />
-          ))}
+          <div className="card-grid">
+            {upcoming.map((booking) => (
+              <BookingCard
+                key={booking.id}
+                booking={booking}
+                actions={
+                  <Button
+                    variant="secondary"
+                    size="small"
+                    loading={decide.isPending && cancellingId === booking.id}
+                    onClick={() => {
+                      setCancellingId(booking.id);
+                      decide.mutate({ id: booking.id, status: 'cancelled' });
+                    }}
+                  >
+                    Cancel booking
+                  </Button>
+                }
+              />
+            ))}
+          </div>
         </section>
       )}
       {history.length > 0 && (
         <section className="stack-tight" aria-labelledby="history-heading">
           <SectionHeader id="history-heading" title="Past and closed" />
-          {history.map((booking) => (
-            <BookingCard key={booking.id} booking={booking} />
-          ))}
+          <div className="card-grid">
+            {history.map((booking) => (
+              <BookingCard key={booking.id} booking={booking} />
+            ))}
+          </div>
         </section>
       )}
     </div>

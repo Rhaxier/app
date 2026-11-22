@@ -59,7 +59,7 @@ export function ProfilePage() {
         />
       </Card>
 
-      <div className="stack-tight">
+      <div className={`stack-tight ${styles.buttons}`}>
         <ButtonLink to="/notifications/settings" variant="secondary" icon="settings" fullWidth>
           Notification settings
         </ButtonLink>

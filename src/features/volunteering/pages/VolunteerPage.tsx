@@ -76,7 +76,7 @@ export function VolunteerPage() {
           {filter === 'all' ? 'New volunteering events will appear here.' : 'Try another filter.'}
         </EmptyState>
       )}
-      <div className="stack-tight stagger">
+      <div className="card-grid stagger">
         {visible.map((event) => (
           <EventCard key={event.id} event={event} signup={activeSignupFor(event.id, signups)} />
         ))}

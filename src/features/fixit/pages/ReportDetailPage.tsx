@@ -38,77 +38,93 @@ export function ReportDetailPage() {
   }
 
   const item = report.data;
+  const staff = isStaff(user);
+  const meToo = isOpen(item.status) && (
+    <MeTooButton
+      reportId={item.id}
+      count={item.vote_count}
+      votedByMe={item.voted_by_me}
+      reportedByMe={item.reported_by_me}
+      fullWidth
+    />
+  );
   return (
     <div className="stack">
       <PageHeader back={back} eyebrow={reportLabel(item)} title={reportTitle(item.description)} />
 
-      <Card className="stack-tight">
-        <div className="row-wrap">
-          <StatusBadge map={reportStatus} status={item.status} />
-          {item.urgent && <Badge tone="attention">Urgent</Badge>}
-          <Badge tone="quiet">{item.category_name}</Badge>
+      {/* Tablets and laptops: the report on the left; on the right, the staff
+          panel (staff) or "Me too" (everyone else). On a phone, one after the
+          other as before: the report, "Me too", the staff panel. */}
+      <div className="split">
+        <div className="stack">
+          <Card className="stack-tight">
+            <div className="row-wrap">
+              <StatusBadge map={reportStatus} status={item.status} />
+              {item.urgent && <Badge tone="attention">Urgent</Badge>}
+              <Badge tone="quiet">{item.category_name}</Badge>
+            </div>
+            {/* The title is the first line; show the rest only if there is more. */}
+            {item.description.trim() !== reportTitle(item.description) && (
+              <p className={styles.description}>{item.description}</p>
+            )}
+            {item.photo_path && (
+              <ReportPhoto
+                path={item.photo_path}
+                alt={`Photo of: ${reportTitle(item.description)}`}
+              />
+            )}
+            <p className="meta">{reportSummary(item)}</p>
+            <dl className={styles.facts}>
+              {item.room_code && (
+                <>
+                  <dt>Where</dt>
+                  <dd>
+                    <Link to={`/map?room=${encodeURIComponent(item.room_code)}`}>
+                      {item.room_name} ({item.room_code})
+                    </Link>
+                  </dd>
+                </>
+              )}
+              <dt>Reported</dt>
+              <dd>
+                {formatDateTime(item.created_at)}
+                {item.reported_by_me ? ' by you' : ''}
+                {/* Only staff receive the reporter's name. */}
+                {item.reporter_name && !item.reported_by_me ? ` by ${item.reporter_name}` : ''}
+              </dd>
+              {item.assigned_to_name && (
+                <>
+                  <dt>Assigned to</dt>
+                  <dd>{item.assigned_to_name}</dd>
+                </>
+              )}
+              {item.resolved_at && (
+                <>
+                  <dt>Resolved</dt>
+                  <dd>{formatDateTime(item.resolved_at)}</dd>
+                </>
+              )}
+              {item.duplicate_of && (
+                <>
+                  <dt>Same as</dt>
+                  <dd>
+                    <Link to={`/reports/${item.duplicate_of}`}>the original report</Link>
+                  </dd>
+                </>
+              )}
+            </dl>
+            {item.status_note && <p className={styles.note}>{item.status_note}</p>}
+          </Card>
+          {staff && meToo}
         </div>
-        {/* The title is the first line; show the rest only if there is more. */}
-        {item.description.trim() !== reportTitle(item.description) && (
-          <p className={styles.description}>{item.description}</p>
-        )}
-        {item.photo_path && (
-          <ReportPhoto path={item.photo_path} alt={`Photo of: ${reportTitle(item.description)}`} />
-        )}
-        <p className="meta">{reportSummary(item)}</p>
-        <dl className={styles.facts}>
-          {item.room_code && (
-            <>
-              <dt>Where</dt>
-              <dd>
-                <Link to={`/map?room=${encodeURIComponent(item.room_code)}`}>
-                  {item.room_name} ({item.room_code})
-                </Link>
-              </dd>
-            </>
-          )}
-          <dt>Reported</dt>
-          <dd>
-            {formatDateTime(item.created_at)}
-            {item.reported_by_me ? ' by you' : ''}
-            {/* Only staff receive the reporter's name. */}
-            {item.reporter_name && !item.reported_by_me ? ` by ${item.reporter_name}` : ''}
-          </dd>
-          {item.assigned_to_name && (
-            <>
-              <dt>Assigned to</dt>
-              <dd>{item.assigned_to_name}</dd>
-            </>
-          )}
-          {item.resolved_at && (
-            <>
-              <dt>Resolved</dt>
-              <dd>{formatDateTime(item.resolved_at)}</dd>
-            </>
-          )}
-          {item.duplicate_of && (
-            <>
-              <dt>Same as</dt>
-              <dd>
-                <Link to={`/reports/${item.duplicate_of}`}>the original report</Link>
-              </dd>
-            </>
-          )}
-        </dl>
-        {item.status_note && <p className={styles.note}>{item.status_note}</p>}
-      </Card>
 
-      {isOpen(item.status) && (
-        <MeTooButton
-          reportId={item.id}
-          count={item.vote_count}
-          votedByMe={item.voted_by_me}
-          reportedByMe={item.reported_by_me}
-          fullWidth
-        />
-      )}
-
-      {isStaff(user) && <StaffReportPanel key={`${item.id}-${item.status}`} report={item} />}
+        {(staff || meToo) && (
+          <div className="stack split-aside">
+            {!staff && meToo}
+            {staff && <StaffReportPanel key={`${item.id}-${item.status}`} report={item} />}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

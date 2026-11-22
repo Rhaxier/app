@@ -28,7 +28,7 @@ export function AnnouncementsPage() {
           School news will appear here.
         </EmptyState>
       )}
-      <div className="stack-tight">
+      <div className="card-grid">
         {announcements.data?.map((announcement) => (
           <AnnouncementCard
             key={announcement.id}

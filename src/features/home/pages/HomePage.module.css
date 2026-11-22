@@ -1,0 +1,48 @@
+/* Home on a phone: one column (the .stack on .home), in this order: the
+   greeting, news and tools, bell times, today at school, announcements. The
+   right-hand column (.side) has no box of its own there, so its two sections
+   sit in the column like the others. */
+.side {
+  display: contents;
+}
+
+/* The tools (QuickTiles) go from three across to six across by this
+   column's width. */
+.lead {
+  container: home-lead / inline-size;
+}
+
+/* A laptop or an iPad turned sideways: a dashboard. News, the tools and the
+   announcements on the left; bell times and today at school on the right. */
+@container screen (min-width: 840px) {
+  .home {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    grid-template-rows: auto auto 1fr;
+    grid-template-areas:
+      'header header'
+      'lead side'
+      'news side';
+    align-items: start;
+    column-gap: var(--space-6);
+  }
+
+  .header {
+    grid-area: header;
+  }
+
+  .lead {
+    grid-area: lead;
+  }
+
+  .news {
+    grid-area: news;
+  }
+
+  .side {
+    grid-area: side;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-block);
+  }
+}

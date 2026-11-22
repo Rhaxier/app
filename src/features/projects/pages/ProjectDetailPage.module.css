@@ -39,3 +39,23 @@
   grid-template-columns: 1fr 1fr;
   gap: var(--space-3);
 }
+
+/* Tablets and laptops: buttons keep a natural width instead of stretching
+   across the screen; Edit, Mark complete and Delete sit in one row. */
+@container screen (min-width: 600px) {
+  .actions {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(140px, auto);
+    justify-content: start;
+  }
+
+  /* The placeholder that keeps the phone's two-by-two grid in step. */
+  .actions > span:empty {
+    display: none;
+  }
+
+  .share {
+    align-self: flex-start;
+  }
+}
