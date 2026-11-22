@@ -16,6 +16,7 @@
 //   4. Lifts, stairs and doors marked unavailable are left out in every mode.
 
 import { buildNavGraph, distance, floorGroups, indexGeometry, snapToWalkable } from './graph.ts';
+import { shapeRoute } from './routeShape.ts';
 import type { GeometryIndex, NavGraph } from './graph.ts';
 import { NO_OVERRIDES } from './types.ts';
 import type {
@@ -577,7 +578,11 @@ function describe(
       ) {
         points = points.slice(0, -1);
       }
-      legs.push({ floor: run[0].floor, points });
+      // Drawn square to the corridors (routeShape.ts); the counts below use the path itself.
+      legs.push({
+        floor: run[0].floor,
+        points: shapeRoute(points, graph.index, run[0].floor, metresPerUnit),
+      });
       let runM = 0;
       for (let i = 1; i < run.length; i += 1) {
         runM += distance(run[i - 1], run[i]) * metresPerUnit;

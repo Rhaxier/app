@@ -184,7 +184,7 @@ const CORRIDOR_MAX_WIDTH = 90;
 /** Closer than this (map units) to a wall, a point is on it. */
 const ON_WALL = 4;
 
-function insideRegion(point: Point, region: Region): boolean {
+export function insideRegion(point: Point, region: Region): boolean {
   return (
     pointInPolygon(point, region.polygon) &&
     !(region.holes ?? []).some((hole) => pointInPolygon(point, hole))
@@ -203,10 +203,10 @@ function lineInside(a: Point, b: Point, region: Region, from: number, to: number
   return true;
 }
 
-type Segment = [number, number, number, number];
+export type Segment = [number, number, number, number];
 
 /** Does the line a-b cross a wall segment, away from its ends by more than `clearance`? */
-function crossesWall(a: Point, b: Point, walls: Segment[], clearance: number): boolean {
+export function crossesWall(a: Point, b: Point, walls: Segment[], clearance: number): boolean {
   const length = distance(a, b);
   if (length === 0) return false;
   const [minX, maxX] = [Math.min(a.x, b.x), Math.max(a.x, b.x)];
