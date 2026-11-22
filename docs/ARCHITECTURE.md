@@ -167,8 +167,8 @@ layout of their own; on phones nothing changes.
   layout.
 - **The side navigation is the tab bar turned upright**: the same tabs (`tabsFor`), the
   same lens and search button, plus the bell and Me at the bottom (on a phone those are
-  in the Home header). On the admin dashboard it stays a rail even on a laptop, to leave
-  room for the admin menu. `AppLayout` marks `<html>` with `data-nav="rail"` or
+  in the Home header). On the map and the admin dashboard it stays a rail even on a
+  laptop, to leave the room to the plan and the admin menu. `AppLayout` marks `<html>` with `data-nav="rail"` or
   `"sidebar"`; CSS for anything fixed to the screen uses `--nav-space` to keep clear.
 - **Three screen widths** (`src/app/screenWidths.ts`): `reading` (720px: forms, text),
   `page` (1160px: card lists, detail screens, the map) and `wide` (1440px: the desk view
@@ -184,6 +184,10 @@ layout of their own; on phones nothing changes.
   themselves.
 - **Sheets become dialogs** in the middle of the screen, and search becomes a panel near
   the top, on tablets and laptops.
+- **The map** fills the screen under the rail. On a laptop or an iPad turned sideways its
+  controls and card form one column at the left and the plan fits beside it; on an iPad
+  held upright they stay along the top and bottom, as on a phone, so the plan stays large
+  (`src/features/map/mapMargins.ts`).
 - **Testing a size:** `setScreenSize(width, height)` from `src/test/media.ts`, then
   `resetScreenSize()` after the test.
 

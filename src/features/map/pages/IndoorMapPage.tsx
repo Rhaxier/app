@@ -2,7 +2,10 @@
 //
 // The traced floor plan fills the screen; glass controls float on top (where
 // to, floor, layers) and the directions panel sits at the bottom above the
-// tab bar. A student picks where to go (search, or tap a room), says where
+// tab bar. On a laptop or an iPad turned sideways the same controls and
+// panel stack in one column on the left, beside the side navigation, and the
+// plan fits to the right of it; on an iPad held upright they sit along the
+// top and bottom as on a phone (../mapMargins.ts, MapPage.module.css). A student picks where to go (search, or tap a room), says where
 // they are (drop the "I'm here" pin, or name the nearest classroom), and
 // gets a route: the line on each floor, a chip at each change of floor, and
 // the steps one by one. Routes are worked out in the browser by the shared
@@ -35,6 +38,7 @@ import { DestinationSearch } from '../components/DestinationSearch';
 import { ConnectorCard } from '../components/ConnectorCard';
 import { DirectionsPanel } from '../components/DirectionsPanel';
 import { roomsInUse } from '../logic';
+import { marginsFor, useMapArrangement } from '../mapMargins';
 import { searchableDestinations, type Destination } from '../nav/assignments';
 import { FloorPlanView } from '../nav/components/FloorPlanView';
 import { BusyDot, ConnectorPin, HereMarker, ReportCountPin } from '../nav/components/NavPins';
@@ -50,7 +54,7 @@ import { snapStart } from '../nav/startPoint';
 import type { FloorId, Geometry, Point } from '../nav/types';
 import styles from './MapPage.module.css';
 
-// Where the plan fits on screen, clear of the floating controls (px).
+// Where the plan fits on a phone's screen, clear of the floating controls (px).
 const PLAN_MARGINS = { top: 132, bottom: 150 };
 // With a route: room for the directions card (small or full) under the line.
 const ROUTE_MARGINS = { top: 140, bottom: 220 };
@@ -299,7 +303,14 @@ export function MapScreen({ geometry, router }: { geometry: Geometry; router: Ro
     : null;
 
   const sheetOpen = Boolean(selectedReport || panelOpen || selectedConnector);
-  const margins = result?.ok ? (collapsed ? ROUTE_MARGINS : ROUTE_MARGINS_FULL) : PLAN_MARGINS;
+  // The same margins on a tablet or laptop, moved to where the controls are
+  // there (beside the side navigation, or in a column at the side).
+  const arrangement = useMapArrangement();
+  const planMargins = marginsFor(arrangement, PLAN_MARGINS);
+  const margins = marginsFor(
+    arrangement,
+    result?.ok ? (collapsed ? ROUTE_MARGINS : ROUTE_MARGINS_FULL) : PLAN_MARGINS,
+  );
 
   return (
     <div className={styles.page}>
@@ -314,7 +325,7 @@ export function MapScreen({ geometry, router }: { geometry: Geometry; router: Ro
           named={named}
           names={names}
           selectedId={destination?.floor === floor ? destination.roomId : null}
-          immersive={PLAN_MARGINS}
+          immersive={planMargins}
           onZoom={setZoom}
           crosshair={tapping}
           onSelect={
@@ -382,125 +393,130 @@ export function MapScreen({ geometry, router }: { geometry: Geometry; router: Ro
           )}
         </FloorPlanView>
 
-        <div className={styles.top}>
-          <div className={styles.topRow}>
-            <DestinationSearch
-              destinations={destinations}
-              label="Where to?"
-              onPick={pickDestination}
-            />
-            <SegmentedControl
-              label="Floor"
-              compact
-              floating
-              value={floor}
-              onChange={setFloor}
-              options={geometry.floors.map((f) => ({ value: f.id, label: f.id }))}
-            />
+        {/* One column at the side on a wide screen held sideways; otherwise it
+            has no box of its own, and .top and .bottom float at the top and
+            bottom. */}
+        <div className={styles.panel}>
+          <div className={styles.top}>
+            <div className={styles.topRow}>
+              <DestinationSearch
+                destinations={destinations}
+                label="Where to?"
+                onPick={pickDestination}
+              />
+              <SegmentedControl
+                label="Floor"
+                compact
+                floating
+                value={floor}
+                onChange={setFloor}
+                options={geometry.floors.map((f) => ({ value: f.id, label: f.id }))}
+              />
+            </div>
+            <div className={`scroll-row ${styles.chips}`} role="group" aria-label="Show on the map">
+              <FilterChip
+                glass
+                marker="report"
+                selected={layers.reports}
+                onClick={() => setLayers((l) => ({ ...l, reports: !l.reports }))}
+              >
+                {floorReportSpots.length > 0
+                  ? `${floorReportSpots.reduce((n, [, list]) => n + list.length, 0)} open fix-it reports`
+                  : 'Fix-it reports'}
+              </FilterChip>
+              <FilterChip
+                glass
+                marker="busy"
+                selected={layers.inUse}
+                onClick={() => setLayers((l) => ({ ...l, inUse: !l.inUse }))}
+              >
+                In use now
+              </FilterChip>
+              <FilterChip
+                glass
+                selected={layers.connectors}
+                onClick={() => {
+                  setLayers((l) => ({ ...l, connectors: !l.connectors }));
+                  setConnectorId(null);
+                }}
+              >
+                Stairs and lifts
+              </FilterChip>
+            </div>
           </div>
-          <div className={`scroll-row ${styles.chips}`} role="group" aria-label="Show on the map">
-            <FilterChip
-              glass
-              marker="report"
-              selected={layers.reports}
-              onClick={() => setLayers((l) => ({ ...l, reports: !l.reports }))}
-            >
-              {floorReportSpots.length > 0
-                ? `${floorReportSpots.reduce((n, [, list]) => n + list.length, 0)} open fix-it reports`
-                : 'Fix-it reports'}
-            </FilterChip>
-            <FilterChip
-              glass
-              marker="busy"
-              selected={layers.inUse}
-              onClick={() => setLayers((l) => ({ ...l, inUse: !l.inUse }))}
-            >
-              In use now
-            </FilterChip>
-            <FilterChip
-              glass
-              selected={layers.connectors}
-              onClick={() => {
-                setLayers((l) => ({ ...l, connectors: !l.connectors }));
-                setConnectorId(null);
-              }}
-            >
-              Stairs and lifts
-            </FilterChip>
-          </div>
-        </div>
 
-        <div className={styles.bottom}>
-          {selectedConnector ? (
-            <ConnectorCard
-              connector={selectedConnector}
-              floor={floor}
-              onClose={() => setConnectorId(null)}
-            />
-          ) : selectedReport ? (
-            <ReportCard
-              report={selectedReport}
-              others={reportsHere}
-              onPick={(id) => {
-                const next = new URLSearchParams(params);
-                next.set('report', id);
-                setParams(next, { replace: true });
-              }}
-              onClose={() => {
-                const next = new URLSearchParams(params);
-                next.delete('report');
-                setParams(next, { replace: true });
-              }}
-            />
-          ) : panelOpen ? (
-            <DirectionsPanel
-              destinations={destinations}
-              start={start}
-              destination={destination}
-              tapping={tapping}
-              pinMessage={pinMessage}
-              stepFree={stepFree}
-              result={result}
-              stepIndex={step}
-              isAdmin={isAdmin(user)}
-              notice={notice?.text ?? null}
-              reportLink={reportLink}
-              collapsed={collapsed}
-              onCollapsed={setCollapsed}
-              onTapToStart={() => {
-                setTapping((t) => !t);
-                setPinMessage(null);
-              }}
-              onPickStart={pickStart}
-              onPickDestination={pickDestination}
-              onClearStart={() => {
-                setPin(null);
-                setEnds({ from: null });
-              }}
-              onClearDestination={() => setEnds({ to: null })}
-              onSwap={() => {
-                if (fromPlace && destination) {
-                  setEnds({ from: destination.roomId, to: fromPlace.roomId });
-                }
-              }}
-              onStepFree={setStepFree}
-              onStep={showStep}
-              onClose={() => {
-                setPanelOpen(false);
-                setTapping(false);
-                setPin(null);
-                setEnds({ to: null, from: null });
-              }}
-            />
-          ) : (
-            <button
-              type="button"
-              className={`glass thin ${styles.hint} ${styles.hintButton}`}
-              onClick={() => setPanelOpen(true)}
-            >
-              Get directions
-            </button>
-          )}
+          <div className={styles.bottom}>
+            {selectedConnector ? (
+              <ConnectorCard
+                connector={selectedConnector}
+                floor={floor}
+                onClose={() => setConnectorId(null)}
+              />
+            ) : selectedReport ? (
+              <ReportCard
+                report={selectedReport}
+                others={reportsHere}
+                onPick={(id) => {
+                  const next = new URLSearchParams(params);
+                  next.set('report', id);
+                  setParams(next, { replace: true });
+                }}
+                onClose={() => {
+                  const next = new URLSearchParams(params);
+                  next.delete('report');
+                  setParams(next, { replace: true });
+                }}
+              />
+            ) : panelOpen ? (
+              <DirectionsPanel
+                destinations={destinations}
+                start={start}
+                destination={destination}
+                tapping={tapping}
+                pinMessage={pinMessage}
+                stepFree={stepFree}
+                result={result}
+                stepIndex={step}
+                isAdmin={isAdmin(user)}
+                notice={notice?.text ?? null}
+                reportLink={reportLink}
+                collapsed={collapsed}
+                onCollapsed={setCollapsed}
+                onTapToStart={() => {
+                  setTapping((t) => !t);
+                  setPinMessage(null);
+                }}
+                onPickStart={pickStart}
+                onPickDestination={pickDestination}
+                onClearStart={() => {
+                  setPin(null);
+                  setEnds({ from: null });
+                }}
+                onClearDestination={() => setEnds({ to: null })}
+                onSwap={() => {
+                  if (fromPlace && destination) {
+                    setEnds({ from: destination.roomId, to: fromPlace.roomId });
+                  }
+                }}
+                onStepFree={setStepFree}
+                onStep={showStep}
+                onClose={() => {
+                  setPanelOpen(false);
+                  setTapping(false);
+                  setPin(null);
+                  setEnds({ to: null, from: null });
+                }}
+              />
+            ) : (
+              <button
+                type="button"
+                className={`glass thin ${styles.hint} ${styles.hintButton}`}
+                onClick={() => setPanelOpen(true)}
+              >
+                Get directions
+              </button>
+            )}
+          </div>
         </div>
       </PageChrome>
     </div>

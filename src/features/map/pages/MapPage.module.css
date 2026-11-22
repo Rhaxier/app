@@ -69,3 +69,84 @@
   outline: 2px solid var(--acc);
   outline-offset: 2px;
 }
+
+/* ---------------------------------------------------------------------------
+   Tablets and laptops (../mapMargins.ts has the same three arrangements, for
+   fitting the plan). The plan fills the screen under the side navigation.
+
+   An iPad held upright: the controls along the top and the card at the
+   bottom, as on a phone, but beside the navigation and with no tab bar
+   below. A column at the side would leave the plan a narrow strip.
+   --------------------------------------------------------------------------- */
+.panel {
+  --map-panel: 380px; /* MAP_PANEL_WIDTH in ../mapMargins.ts */
+  display: contents;
+}
+
+:global(:root[data-nav]) .top,
+:global(:root[data-nav]) .bottom {
+  right: auto;
+  left: var(--nav-space);
+  width: min(560px, calc(100vw - var(--nav-space)));
+  max-width: none;
+  margin: 0;
+}
+
+:global(:root[data-nav]) .bottom {
+  bottom: calc(var(--chrome-inset) + env(safe-area-inset-bottom));
+}
+
+/* Every chip fits on a tablet or laptop, so they wrap instead of scrolling. */
+:global(:root[data-nav]) .chips {
+  flex-wrap: wrap;
+  overflow-x: visible;
+  margin: 0;
+  padding: 0;
+}
+
+/* ---------------------------------------------------------------------------
+   A wide screen held sideways (a laptop, an iPad turned; SIDE_PANEL_QUERY):
+   the controls and the card under them form one column at the left, from
+   the top of the screen to the bottom, and the plan fits to the right of it.
+   Same glass pieces, stacked; the card scrolls inside itself when it's long.
+   --------------------------------------------------------------------------- */
+@media (min-width: 1024px) and (min-height: 500px) and (orientation: landscape) {
+  :global(:root[data-nav]) .panel {
+    position: fixed;
+    top: calc(var(--chrome-inset) + env(safe-area-inset-top));
+    bottom: calc(var(--chrome-inset) + env(safe-area-inset-bottom));
+    left: calc(var(--nav-space) + var(--chrome-inset));
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    width: var(--map-panel);
+    pointer-events: none;
+  }
+
+  :global(:root[data-nav]) .top,
+  :global(:root[data-nav]) .bottom {
+    position: static;
+    width: auto;
+    padding: 0;
+  }
+
+  :global(:root[data-nav]) .bottom {
+    flex: 0 1 auto;
+    min-height: 0;
+  }
+
+  /* The directions, a report or a staircase: as tall as the column allows,
+     scrolling inside. */
+  :global(:root[data-nav]) .bottom > * {
+    flex: 0 1 auto;
+    min-height: 0;
+    max-height: none;
+    overflow-y: auto;
+  }
+
+  /* "Get directions" spans the column, like the card that replaces it. */
+  :global(:root[data-nav]) .hintButton {
+    align-self: stretch;
+  }
+}

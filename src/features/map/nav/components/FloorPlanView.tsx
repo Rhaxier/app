@@ -33,6 +33,8 @@ import {
   ZoomControl,
 } from 'react-leaflet';
 import { prefersReducedMotion } from '@/lib/motion';
+import { RefitOnMargins } from '../../components/FitPlan.tsx';
+import { fitPadding, type MapMargins } from '../../mapMargins.ts';
 import { entranceDoors } from '../assignments.ts';
 import { distance, indexGeometry, regionAt } from '../graph.ts';
 import { LABEL_MAX_PX, placeLabel, pxPerMetre, pxPerUnit } from '../planScale.ts';
@@ -69,7 +71,7 @@ interface FloorPlanViewProps {
   /** Show a crosshair cursor (an Add tool is active). */
   crosshair?: boolean;
   /** Fill the screen behind floating controls; the plan fits between these margins (px). */
-  immersive?: { top: number; bottom: number };
+  immersive?: MapMargins;
   /** Told the zoom level when it changes (the route line is scaled with it). */
   onZoom?: (zoom: number) => void;
   /** Extra layers drawn on top (markers, routes). */
@@ -152,11 +154,7 @@ export function FloorPlanView({
         className={styles.map}
         crs={L.CRS.Simple}
         bounds={mapBounds}
-        boundsOptions={
-          immersive
-            ? { paddingTopLeft: [16, immersive.top], paddingBottomRight: [16, immersive.bottom] }
-            : undefined
-        }
+        boundsOptions={immersive ? fitPadding(immersive) : undefined}
         // How far the plan can be dragged off screen. Full screen needs more
         // room, so a student can pull the plan up from under the directions
         // card without it springing back.
@@ -171,6 +169,7 @@ export function FloorPlanView({
         attributionControl={false}
       >
         <ZoomControl position={immersive ? 'bottomright' : 'topleft'} />
+        {immersive && <RefitOnMargins bounds={mapBounds} margins={immersive} />}
         <LineScale metresPerUnit={geometry.metresPerUnit} />
         {onZoom && <ZoomWatcher onZoom={onZoom} />}
         {/* key: shapes are made once per floor; a name change redraws only that room. */}

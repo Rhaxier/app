@@ -253,3 +253,15 @@
   margin: 0;
   font-weight: 600;
 }
+
+/* A wide screen held sideways: the panel sits in the map's side column
+   (about 380px wide; MapPage.module.css), so the two ends stack there too. */
+@media (min-width: 1024px) and (min-height: 500px) and (orientation: landscape) {
+  :global(:root[data-nav]) .ends {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  :global(:root[data-nav]) .ends > .iconButton {
+    justify-self: center;
+  }
+}

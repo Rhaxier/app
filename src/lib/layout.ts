@@ -21,6 +21,17 @@ export const LAPTOP_QUERY = '(min-width: 1024px) and (min-height: 500px)';
 
 export type LayoutMode = 'phone' | 'tablet' | 'laptop';
 
+/**
+ * The room the side navigation takes from the left edge, in px: the same as
+ * --nav-space in tokens.css (16px inset + the rail or sidebar). For code that
+ * must place things in px, such as fitting the map's plan beside it.
+ */
+export const NAV_SPACE: Record<LayoutMode, number> = {
+  phone: 0,
+  tablet: 16 + 72,
+  laptop: 16 + 232,
+};
+
 /** The layout for this screen size. Re-renders when the window is resized or turned. */
 export function useLayoutMode(): LayoutMode {
   const tablet = useMediaQuery(TABLET_QUERY);

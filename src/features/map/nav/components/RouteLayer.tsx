@@ -13,6 +13,7 @@ import { animate } from 'motion/react';
 import { useEffect, useRef } from 'react';
 import { Polyline, useMap } from 'react-leaflet';
 import { duration, easeOut, prefersReducedMotion } from '@/lib/motion';
+import type { MapMargins } from '../../mapMargins.ts';
 import type { RouteOk } from '../router.ts';
 import { routeLineWeight } from '../planScale.ts';
 import { floorChanges, legsOnFloor } from '../routeView.ts';
@@ -30,7 +31,7 @@ interface RouteLayerProps {
   destinationName: string;
   onShowFloor: (floor: FloorId) => void;
   /** Margins (px) kept clear of the floating controls when fitting the view. */
-  padding: { top: number; bottom: number };
+  padding: MapMargins;
 }
 
 const floorWord = (id: FloorId) => (id === 'G' ? 'the ground floor' : `floor ${id}`);
@@ -157,14 +158,14 @@ function FitToRoute({
 }: {
   routeKey: string;
   points: { x: number; y: number }[];
-  padding: { top: number; bottom: number };
+  padding: MapMargins;
 }) {
   const map = useMap();
   useEffect(() => {
     if (points.length === 0) return;
     map.fitBounds(points.map(toLatLng), {
-      paddingTopLeft: [24, padding.top],
-      paddingBottomRight: [24, padding.bottom],
+      paddingTopLeft: [padding.left ?? 24, padding.top],
+      paddingBottomRight: [padding.right ?? 24, padding.bottom],
       maxZoom: 0,
       animate: !prefersReducedMotion(),
     });

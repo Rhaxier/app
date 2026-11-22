@@ -15,6 +15,8 @@ import { ImageOverlay, MapContainer, useMapEvents, ZoomControl } from 'react-lea
 import { prefersReducedMotion } from '@/lib/motion';
 import type { Floor } from '../api';
 import { fromLatLng } from '../logic';
+import { fitPadding, type MapMargins } from '../mapMargins';
+import { RefitOnMargins } from './FitPlan';
 import styles from './MapView.module.css';
 
 interface MapViewProps {
@@ -24,8 +26,8 @@ interface MapViewProps {
   onMapClick?: (point: { x: number; y: number }) => void;
   /** Accessible description of the map. */
   label: string;
-  /** Fill the screen; the plan fits between these margins (px): [top, bottom]. */
-  immersive?: { top: number; bottom: number };
+  /** Fill the screen; the plan fits between these margins (px). */
+  immersive?: MapMargins;
 }
 
 function ClickHandler({
@@ -63,11 +65,7 @@ export function MapView({ floor, children, onMapClick, label, immersive }: MapVi
         className={styles.map}
         crs={L.CRS.Simple}
         bounds={bounds}
-        boundsOptions={
-          immersive
-            ? { paddingTopLeft: [16, immersive.top], paddingBottomRight: [16, immersive.bottom] }
-            : undefined
-        }
+        boundsOptions={immersive ? fitPadding(immersive) : undefined}
         maxBounds={[
           [-floor.height * 0.5, -floor.width * 0.5],
           [floor.height * 1.5, floor.width * 1.5],
@@ -92,6 +90,7 @@ export function MapView({ floor, children, onMapClick, label, immersive }: MapVi
           className={styles.plan}
         />
         <ZoomControl position={immersive ? 'bottomright' : 'topleft'} />
+        {immersive && <RefitOnMargins bounds={bounds} margins={immersive} />}
         {onMapClick && <ClickHandler floor={floor} onMapClick={onMapClick} />}
         {children}
       </MapContainer>

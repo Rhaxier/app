@@ -78,3 +78,20 @@
 :global([data-sheet]) .immersive :global(.leaflet-control-zoom) {
   display: none;
 }
+
+/* Tablets and laptops: the plan fills the whole screen, under the floating
+   side navigation (as it sits under the tab bar on a phone). The zoom buttons
+   go to the bottom-right corner, clear of the Dev button in development, and
+   stay visible: the controls' column no longer covers that corner. */
+:global(:root[data-nav]) .immersive {
+  max-width: none;
+}
+
+:global(:root[data-nav]) .immersive :global(.leaflet-bottom.leaflet-right) {
+  right: calc(var(--chrome-inset) + env(safe-area-inset-right));
+  bottom: calc(var(--chrome-inset) + env(safe-area-inset-bottom) + 60px);
+}
+
+:global(:root[data-nav] [data-sheet]) .immersive :global(.leaflet-control-zoom) {
+  display: block;
+}

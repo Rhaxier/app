@@ -6,8 +6,9 @@
 //   phone   the floating tab bar at the bottom, and a phone-width column
 //           (wider for the staff desk view and the admin dashboard)
 //   tablet  the glass icon rail on the left (SideNav)
-//   laptop  the rail grows into a sidebar with labels; on the admin
-//           dashboard it stays a rail, so the admin menu and editors get the room
+//   laptop  the rail grows into a sidebar with labels; on the map and the
+//           admin dashboard it stays a rail, so the plan, the admin menu and
+//           the editors get the room
 // On tablets and laptops each screen gets a width from screenWidths.ts, and
 // <html> carries data-nav="rail" or "sidebar", so anything fixed to the
 // screen (toasts, the map) can keep clear of the navigation (--nav-space).
@@ -41,10 +42,15 @@ import styles from './AppLayout.module.css';
 
 type Nav = 'bar' | 'rail' | 'sidebar';
 
+/** Screens that are a workspace, not a page: the rail leaves them the width. */
+function isWorkspace(pathname: string): boolean {
+  const onMap = pathname === '/map' || pathname === '/map/indoor';
+  return onMap || pathname === '/admin' || pathname.startsWith('/admin/');
+}
+
 function navFor(mode: LayoutMode, pathname: string): Nav {
   if (mode === 'phone') return 'bar';
-  const onAdmin = pathname === '/admin' || pathname.startsWith('/admin/');
-  return mode === 'laptop' && !onAdmin ? 'sidebar' : 'rail';
+  return mode === 'laptop' && !isWorkspace(pathname) ? 'sidebar' : 'rail';
 }
 
 export function AppLayout() {

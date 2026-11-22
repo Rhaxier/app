@@ -5,13 +5,15 @@
 // phone layout.
 //
 // It understands the simple media queries the app uses: min-width,
-// max-width, min-height and max-height in px, joined with "and". Anything
-// else (dark mode, reduced motion…) doesn't match.
+// max-width, min-height and max-height in px, and orientation, joined with
+// "and". Anything else (dark mode, reduced motion…) doesn't match.
 
 let current: { width: number; height: number } | null = null;
 
 function matches(query: string, width: number, height: number): boolean {
   return query.split(/\s+and\s+/).every((part) => {
+    if (part.includes('orientation: landscape')) return width > height;
+    if (part.includes('orientation: portrait')) return height >= width;
     const found = /\((min|max)-(width|height):\s*(\d+)px\)/.exec(part);
     if (!found) return false;
     const [, bound, side, value] = found;

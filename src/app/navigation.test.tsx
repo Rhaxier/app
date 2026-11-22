@@ -1,7 +1,7 @@
 // The right navigation for each kind of screen (src/lib/layout.ts): the
 // bottom tab bar on phones (also when turned sideways), the icon rail on
-// tablets, the sidebar with labels on laptops, and the rail again on the
-// admin dashboard, which needs the width for its own menu.
+// tablets, the sidebar with labels on laptops, and the rail again on the map
+// and the admin dashboard, which need the width.
 import { QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, within } from '@testing-library/react';
 import { createMemoryRouter, RouterProvider } from 'react-router-dom';
@@ -126,6 +126,18 @@ describe('Navigation by screen size', () => {
     setScreenSize(1280, 800);
     renderAt('/');
     expect(screen.getByRole('link', { name: 'Approvals' })).toHaveAttribute('href', '/approvals');
+  });
+
+  it('uses the rail on the map, even on a laptop, so the plan gets the width', () => {
+    setScreenSize(1280, 800);
+    renderAt('/map');
+    expect(document.documentElement.dataset.nav).toBe('rail');
+  });
+
+  it('keeps the sidebar on the report form under the map', () => {
+    setScreenSize(1280, 800);
+    renderAt('/map/report');
+    expect(document.documentElement.dataset.nav).toBe('sidebar');
   });
 
   it('uses the rail on the admin dashboard, even on a laptop', () => {

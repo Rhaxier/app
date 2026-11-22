@@ -27,12 +27,14 @@ import { RoomCard } from '../components/RoomCard';
 import { RoomSearch } from '../components/RoomSearch';
 import { useLegacyFloors, useLegacyRooms } from '../hooks';
 import { reportSpots, roomsInUse } from '../logic';
+import { marginsFor, useMapArrangement } from '../mapMargins';
 import styles from './MapPage.module.css';
 
 type Layer = 'rooms' | 'inUse' | 'reports';
 
-// Where the plan fits on screen, clear of the floating controls (px): below
-// the search bar and chips, above the hint and the tab bar.
+// Where the plan fits on a phone's screen, clear of the floating controls
+// (px): below the search bar and chips, above the hint and the tab bar.
+// marginsFor() moves them for tablets and laptops.
 const PLAN_MARGINS = { top: 132, bottom: 150 };
 
 export function MapPage() {
@@ -52,6 +54,7 @@ export function MapPage() {
     inUse: true,
     reports: true,
   });
+  const planMargins = marginsFor(useMapArrangement(), PLAN_MARGINS);
 
   if (floors.isPending || rooms.isPending) return <LoadingState shape="block" />;
   if (floors.isError) return <ErrorState error={floors.error} onRetry={() => floors.refetch()} />;
@@ -105,7 +108,7 @@ export function MapPage() {
       {/* The map and its controls are fixed to the screen: PageChrome keeps
           them in place (and fades them) while screens slide. */}
       <PageChrome attributes={{ 'data-sheet': sheetOpen || undefined }}>
-        <MapView floor={floor} label={`Floor ${floor.name} plan`} immersive={PLAN_MARGINS}>
+        <MapView floor={floor} label={`Floor ${floor.name} plan`} immersive={planMargins}>
           {floorRooms.map((room) => {
             const inUse = busy.get(room.id);
             const selected = room.id === selectedRoom?.id;
@@ -163,66 +166,79 @@ export function MapPage() {
           )}
         </MapView>
 
-        {/* Floating controls over the top of the plan. */}
-        <div className={styles.top}>
-          <div className={styles.topRow}>
-            <RoomSearch
-              rooms={rooms.data}
-              floorName={(id) => floors.data.find((f) => f.id === id)?.name ?? ''}
-              onPick={(room) => show({ room: room.code })}
-            />
-            <SegmentedControl
-              label="Floor"
-              compact
-              floating
-              value={floor.name}
-              onChange={(name) => show({ floor: name })}
-              options={floors.data.map((f) => ({ value: f.name, label: f.name }))}
-            />
+        {/* Floating controls over the top of the plan. On a wide screen held
+            sideways they and the details card form one column (.panel). */}
+        <div className={styles.panel}>
+          <div className={styles.top}>
+            <div className={styles.topRow}>
+              <RoomSearch
+                rooms={rooms.data}
+                floorName={(id) => floors.data.find((f) => f.id === id)?.name ?? ''}
+                onPick={(room) => show({ room: room.code })}
+              />
+              <SegmentedControl
+                label="Floor"
+                compact
+                floating
+                value={floor.name}
+                onChange={(name) => show({ floor: name })}
+                options={floors.data.map((f) => ({ value: f.name, label: f.name }))}
+              />
+            </div>
+            <div className={`scroll-row ${styles.chips}`} role="group" aria-label="Show on the map">
+              <FilterChip
+                glass
+                marker="report"
+                selected={layers.reports}
+                onClick={() => toggle('reports')}
+              >
+                {floorReports.length > 0
+                  ? `${floorReports.length} open fix-it ${floorReports.length === 1 ? 'report' : 'reports'}`
+                  : 'Fix-it reports'}
+              </FilterChip>
+              <FilterChip
+                glass
+                marker="room"
+                selected={layers.rooms}
+                onClick={() => toggle('rooms')}
+              >
+                Rooms
+              </FilterChip>
+              <FilterChip
+                glass
+                marker="busy"
+                selected={layers.inUse}
+                onClick={() => toggle('inUse')}
+              >
+                In use now
+              </FilterChip>
+            </div>
           </div>
-          <div className={`scroll-row ${styles.chips}`} role="group" aria-label="Show on the map">
-            <FilterChip
-              glass
-              marker="report"
-              selected={layers.reports}
-              onClick={() => toggle('reports')}
-            >
-              {floorReports.length > 0
-                ? `${floorReports.length} open fix-it ${floorReports.length === 1 ? 'report' : 'reports'}`
-                : 'Fix-it reports'}
-            </FilterChip>
-            <FilterChip glass marker="room" selected={layers.rooms} onClick={() => toggle('rooms')}>
-              Rooms
-            </FilterChip>
-            <FilterChip glass marker="busy" selected={layers.inUse} onClick={() => toggle('inUse')}>
-              In use now
-            </FilterChip>
-          </div>
-        </div>
 
-        {/* The details sheet, or a hint, just above the tab bar. */}
-        <div className={styles.bottom}>
-          {selectedReport && (
-            <ReportCard
-              report={selectedReport}
-              others={selectedSpot?.reports ?? [selectedReport]}
-              onPick={(id) => show({ report: id })}
-              onClose={() => show({})}
-            />
-          )}
-          {selectedRoom && !selectedReport && (
-            <RoomCard
-              room={selectedRoom}
-              inUse={busy.get(selectedRoom.id)}
-              venue={venues.data?.find((venue) => venue.room_id === selectedRoom.id)}
-              openReports={
-                openReports.filter((report) => report.room_id === selectedRoom.id).length
-              }
-            />
-          )}
-          {!sheetOpen && (
-            <p className={`glass thin ${styles.hint}`}>Tap a pin, or search, to see a room.</p>
-          )}
+          {/* The details sheet, or a hint, just above the tab bar. */}
+          <div className={styles.bottom}>
+            {selectedReport && (
+              <ReportCard
+                report={selectedReport}
+                others={selectedSpot?.reports ?? [selectedReport]}
+                onPick={(id) => show({ report: id })}
+                onClose={() => show({})}
+              />
+            )}
+            {selectedRoom && !selectedReport && (
+              <RoomCard
+                room={selectedRoom}
+                inUse={busy.get(selectedRoom.id)}
+                venue={venues.data?.find((venue) => venue.room_id === selectedRoom.id)}
+                openReports={
+                  openReports.filter((report) => report.room_id === selectedRoom.id).length
+                }
+              />
+            )}
+            {!sheetOpen && (
+              <p className={`glass thin ${styles.hint}`}>Tap a pin, or search, to see a room.</p>
+            )}
+          </div>
         </div>
       </PageChrome>
     </div>
