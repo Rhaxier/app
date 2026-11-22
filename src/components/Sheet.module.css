@@ -57,7 +57,34 @@
   flex-direction: column;
   gap: var(--space-4);
   overflow-y: auto;
+  /* Scrolling to the end of a long sheet stops there, instead of carrying
+     on and scrolling the screen behind it. */
+  overscroll-behavior: contain;
   padding: var(--space-2) var(--space-5) var(--space-6);
+}
+
+/* ---------------------------------------------------------------------------
+   Tablets and laptops (Sheet.tsx): a dialog in the middle of the screen, not
+   a sheet at the bottom. Same glass, radius and parts; no grab bar, because
+   nothing is dragged.
+   --------------------------------------------------------------------------- */
+.dialog {
+  align-items: center;
+  padding: calc(var(--space-6) + env(safe-area-inset-top)) var(--space-6)
+    calc(var(--space-6) + env(safe-area-inset-bottom));
+}
+
+.dialog .panel {
+  max-width: 560px;
+  max-height: min(80vh, 760px);
+}
+
+.dialog .grabber {
+  display: none;
+}
+
+.dialog .header {
+  padding-top: var(--space-5);
 }
 
 .close {

@@ -1,0 +1,219 @@
+/*
+ * The side navigation (tablets and laptops). The tab bar's glass pill, turned
+ * upright: Regular glass, radius 31 with 5px padding, so the lens inside is
+ * 31 − 5 = 26, exactly as in the tab bar. It floats 16px in from the screen
+ * edges (page 10) and the safe areas (the notch side of an iPad or an
+ * installed app). AppLayout keeps the content clear of it with --nav-space
+ * (tokens.css).
+ */
+.nav {
+  position: fixed;
+  top: calc(var(--chrome-inset) + env(safe-area-inset-top));
+  bottom: calc(var(--chrome-inset) + env(safe-area-inset-bottom));
+  left: calc(var(--chrome-inset) + env(safe-area-inset-left));
+  z-index: 800;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: 5px;
+  border-radius: var(--r-tabbar);
+}
+
+.rail {
+  width: var(--rail-width);
+}
+
+.expanded {
+  width: var(--sidebar-width);
+}
+
+/* ---------- Search, at the top ---------- */
+
+.searchSlot {
+  flex: none;
+  display: flex;
+  justify-content: center;
+}
+
+.search,
+.searchSpace {
+  width: 50px;
+  height: 50px;
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  border: 0;
+  background: var(--segbg);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+/* On a laptop the button is a field-like pill: icon, "Search", the shortcut. */
+.expanded .search,
+.expanded .searchSpace {
+  width: 100%;
+  height: var(--touch-min);
+}
+
+.expanded .search {
+  justify-content: flex-start;
+  padding: 0 var(--space-2) 0 14px;
+  color: var(--muted);
+  font-size: var(--text-reading);
+}
+
+.searchText {
+  flex: 1;
+  text-align: left;
+}
+
+.shortcut {
+  padding: 2px 6px;
+  border-radius: var(--r-seg-thumb);
+  background: var(--segbg);
+  color: var(--muted);
+  font-family: var(--font);
+  font-size: var(--text-meta);
+  font-weight: 500;
+}
+
+/* ---------- The tabs ---------- */
+
+.tabs {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-height: 0;
+  /* A short window (a laptop with the dev tools open) scrolls the tabs
+     rather than pushing the account rows off the bottom. */
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border-radius: var(--r-lens);
+  color: var(--tabtext);
+  text-decoration: none;
+  /* The icon and label colours cross-fade as the lens arrives (as in TabBar). */
+  transition:
+    color var(--motion-base) var(--ease-out),
+    transform var(--motion-fast) var(--ease-out),
+    filter var(--motion-fast) var(--ease-out);
+}
+
+/* Rail: icon over a small label, like a tab bar tab. */
+.rail .item {
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+  min-height: 58px;
+  font-size: var(--text-tab);
+  font-weight: 500;
+  line-height: 12px;
+}
+
+/* Laptop: icon beside a full-size label, 48px rows. */
+.expanded .item {
+  gap: var(--space-3);
+  min-height: 48px;
+  padding: 0 14px;
+  font-size: var(--text-reading);
+  font-weight: 500;
+}
+
+.lens {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.icon,
+.label,
+.bell,
+.meText {
+  position: relative;
+  z-index: 1;
+}
+
+.icon {
+  flex: none;
+}
+
+.label {
+  white-space: nowrap;
+}
+
+.active {
+  color: var(--acc);
+}
+
+/* A mouse shows where a click will land; touch never sees it (no false hovers on tap). */
+@media (hover: hover) and (pointer: fine) {
+  .item:not(.active):hover {
+    background: var(--lens);
+  }
+}
+
+/* ---------- The bell and you, at the bottom ---------- */
+
+.account {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: var(--space-2);
+  border-top: 0.5px solid var(--line);
+}
+
+.rail .accountItem {
+  min-height: 52px;
+}
+
+.bell {
+  display: grid;
+  place-items: center;
+}
+
+/* The design's unread dot (page 11), as on the Home bell. */
+.dot {
+  position: absolute;
+  top: -2px;
+  right: -3px;
+  width: 11px;
+  height: 11px;
+  border: 2px solid var(--card);
+  border-radius: 50%;
+  background: var(--acc);
+}
+
+.expanded .me {
+  padding-left: 9px;
+}
+
+.meText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  color: var(--ink);
+}
+
+.meName {
+  overflow: hidden;
+  font-size: var(--text-body);
+  font-weight: 600;
+  line-height: 17px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

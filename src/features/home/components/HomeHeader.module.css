@@ -39,6 +39,16 @@
   text-decoration: none;
 }
 
+/* The bell and avatar. No box of its own on a phone, so the row is laid out
+   exactly as without it; on tablets and laptops the side navigation has them. */
+.account {
+  display: contents;
+}
+
+:global(:root[data-nav]) .account {
+  display: none;
+}
+
 .me {
   position: relative;
   display: grid;

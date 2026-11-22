@@ -187,4 +187,60 @@
   .scroll-row > * {
     flex: none;
   }
+
+  /*
+   * Tablets and laptops. These respond to the width of the screen's column
+   * (the "screen" container in AppLayout.module.css), not the window: the
+   * phone column is at most 440px wide, so on a phone none of this applies.
+   */
+
+  /* Cards in a list (events, posts, news): a stack on a phone; two across on
+     an iPad, three on a wide laptop. Cards never stretch wider than ~560px,
+     and cards side by side share one height, so rows line up. */
+  .card-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-tight);
+  }
+
+  /* Two columns on a detail screen: what it is on the left, what you can do
+     on the right (sign up, requests, the staff panel). On a phone the two are
+     simply one after the other, as before. Put .stack on each column. */
+  .split {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-block);
+  }
+
+  @container screen (min-width: 600px) {
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: var(--space-4);
+    }
+
+    /* With room for every chip, they wrap instead of scrolling sideways
+       (sideways scrolling is awkward with a mouse). */
+    .scroll-row {
+      flex-wrap: wrap;
+      overflow-x: visible;
+      margin: 0;
+      padding: 5px 0;
+    }
+  }
+
+  @container screen (min-width: 760px) {
+    .split {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
+      align-items: start;
+      gap: var(--space-6);
+    }
+
+    /* The side column stays in view while a long main column scrolls. */
+    .split-aside {
+      position: sticky;
+      top: var(--space-5);
+    }
+  }
 }

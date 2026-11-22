@@ -45,6 +45,27 @@
   overscroll-behavior: contain;
 }
 
+/* ---------------------------------------------------------------------------
+   Tablets and laptops: a panel in the upper middle of the screen, as tall as
+   its results (up to 70% of the screen), like Spotlight. A full-height panel
+   there would be mostly empty glass. It still grows out of the search button
+   in the side navigation (SideNav), and Cancel stays for touch screens.
+   --------------------------------------------------------------------------- */
+:global(:root[data-nav]) .panel {
+  display: flex;
+  flex-direction: column;
+  top: calc(max(10vh, var(--space-8)) + env(safe-area-inset-top));
+  bottom: auto;
+  width: min(640px, calc(100% - 2 * var(--space-8)));
+  max-height: min(70vh, 680px);
+}
+
+:global(:root[data-nav]) .content {
+  flex: 1 1 auto;
+  height: auto;
+  min-height: 0;
+}
+
 .cancel {
   align-self: center;
   min-height: var(--touch-min);

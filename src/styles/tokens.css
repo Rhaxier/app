@@ -229,7 +229,19 @@
   /* ---- Layout -------------------------------------------------------------- */
   --phone-width: 390px;
   --content-max: 480px; /* the phone column, centred on a desktop */
-  --content-max-wide: 1180px; /* staff desk view and admin dashboard */
+  --content-max-wide: 1180px; /* staff desk view and admin dashboard, phone layout */
+
+  /* Tablets and laptops (src/lib/layout.ts). The side navigation floats on
+     the left; --nav-space is the room it takes, from the screen edge to its
+     right side, set by the data-nav attribute (below). Screens then get
+     one of three widths (src/app/screenWidths.ts). */
+  --rail-width: 72px; /* tablets: icons with small labels */
+  --sidebar-width: 232px; /* laptops: icons with full labels */
+  --nav-space: 0px; /* phones: no side navigation */
+  --screen-margin-wide: 32px;
+  --content-max-reading: 720px; /* text and forms */
+  --content-max-page: 1160px; /* card grids, two-column screens */
+  --content-max-desk: 1440px; /* the desk view and the admin dashboard */
 
   /* ---- Press and focus (page 11) ------------------------------------------- */
   /* Focus: 0 0 0 3px accent at 45%, offset 2px, keyboard only (see globals.css). */
@@ -333,4 +345,19 @@
   --plan-mark: #1a1a1a;
   --plan-mark-soft: rgba(0, 0, 0, 0.09);
   --chevron-down: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%238a8a8e' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+}
+
+/* ---------------------------------------------------------------------------
+   The side navigation's room (tablets and laptops). AppLayout puts
+   data-nav="rail" or "sidebar" on <html> while the side navigation shows;
+   phones have no attribute and keep --nav-space at 0. Anything fixed to the
+   screen that must stay clear of the navigation (toasts, the map, the
+   booking bar) reads --nav-space.
+   --------------------------------------------------------------------------- */
+:root[data-nav='rail'] {
+  --nav-space: calc(var(--chrome-inset) + var(--rail-width) + env(safe-area-inset-left));
+}
+
+:root[data-nav='sidebar'] {
+  --nav-space: calc(var(--chrome-inset) + var(--sidebar-width) + env(safe-area-inset-left));
 }

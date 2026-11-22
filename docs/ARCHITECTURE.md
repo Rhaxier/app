@@ -150,6 +150,43 @@ mode is designed separately, not inverted.
 - **Floor plans are drawn light.** Dark mode inverts the plan image (`--plan-filter`), so
   a real plan uploaded by an admin becomes a dark architect's plan too.
 
+### Screen sizes: phone, tablet, laptop
+
+The design is drawn for a 390px phone. On iPads and laptops the same screens get a
+layout of their own; on phones nothing changes.
+
+| Layout | When (`src/lib/layout.ts`)     | Navigation                                    | Screen column                        |
+| ------ | ------------------------------ | --------------------------------------------- | ------------------------------------ |
+| phone  | anything smaller               | the floating tab bar at the bottom (`TabBar`) | 480px, centred                       |
+| tablet | 744px wide **and** 500px tall  | a glass icon rail on the left (`SideNav`)     | up to 720 / 1160 / 1440px (below)    |
+| laptop | 1024px wide **and** 500px tall | the rail with full labels, a sidebar          | the same; three cards across at 1280 |
+
+- **Why 744 and the height check.** 1024 is Tailwind's `lg`; the tablet layout starts at
+  744 rather than Tailwind's `md` (768) so an iPad mini held upright gets it too. The
+  height check keeps iPhones turned sideways (wide but only ~430px tall) on the phone
+  layout.
+- **The side navigation is the tab bar turned upright**: the same tabs (`tabsFor`), the
+  same lens and search button, plus the bell and Me at the bottom (on a phone those are
+  in the Home header). On the admin dashboard it stays a rail even on a laptop, to leave
+  room for the admin menu. `AppLayout` marks `<html>` with `data-nav="rail"` or
+  `"sidebar"`; CSS for anything fixed to the screen uses `--nav-space` to keep clear.
+- **Three screen widths** (`src/app/screenWidths.ts`): `reading` (720px: forms, text),
+  `page` (1160px: card lists, detail screens, the map) and `wide` (1440px: the desk view
+  and admin).
+- **Screens follow their own width, not the window's.** The screen column is a CSS
+  container named `screen`, so screen CSS uses `@container screen (min-width: …)`. The
+  phone column is at most 440px wide, so a rule from 600px up can never show on a phone.
+  Two shared layouts live in `globals.css`: `.card-grid` (cards two or three across) and
+  `.split` with `.split-aside` (a detail screen's main column plus a sticky side column).
+- **Fixed things go outside the column.** Being a container makes the column the frame
+  for `position: fixed` inside it, so fixed chrome is drawn at the end of `<body>`
+  instead: with `PageChrome` (the map, the booking bar); `Sheet` and `Toaster` do it
+  themselves.
+- **Sheets become dialogs** in the middle of the screen, and search becomes a panel near
+  the top, on tablets and laptops.
+- **Testing a size:** `setScreenSize(width, height)` from `src/test/media.ts`, then
+  `resetScreenSize()` after the test.
+
 ### shadcn/ui and Tailwind
 
 shadcn/ui is set up (`components.json`, Radix base) for components the app doesn't have

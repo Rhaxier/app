@@ -3,7 +3,8 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
+import { resetScreenSize, setScreenSize } from '@/test/media';
 import { Sheet } from './Sheet';
 
 function SheetWithField() {
@@ -47,5 +48,27 @@ describe('Sheet', () => {
     );
     await userEvent.keyboard('{Escape}');
     expect(closed).toBe(true);
+  });
+
+  describe('by screen size', () => {
+    afterEach(() => resetScreenSize());
+
+    it('rises from the bottom on a phone', () => {
+      setScreenSize(390, 844);
+      render(<SheetWithField />);
+      expect(screen.getByRole('dialog', { name: 'Add a note' })).toHaveAttribute(
+        'data-variant',
+        'sheet',
+      );
+    });
+
+    it('is a dialog in the middle of the screen on a tablet or laptop', () => {
+      setScreenSize(1024, 768);
+      render(<SheetWithField />);
+      expect(screen.getByRole('dialog', { name: 'Add a note' })).toHaveAttribute(
+        'data-variant',
+        'dialog',
+      );
+    });
   });
 });

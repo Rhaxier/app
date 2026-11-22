@@ -22,3 +22,11 @@
   margin: var(--space-3) auto 0;
   width: calc(100% - 2 * var(--space-4));
 }
+
+/* Tablets and laptops: across the content, clear of the side navigation. */
+:global(:root[data-nav]) .banner {
+  width: auto;
+  max-width: none;
+  margin: var(--space-3) var(--screen-margin-wide) 0
+    calc(var(--nav-space) + var(--screen-margin-wide));
+}

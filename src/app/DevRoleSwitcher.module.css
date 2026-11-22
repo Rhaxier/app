@@ -19,6 +19,13 @@
   bottom: calc(var(--tabbar-space) + var(--space-3));
 }
 
+/* Tablets and laptops: no tab bar, so the bottom-right corner of the screen,
+   out of the content's way. */
+:global(:root[data-nav]) .trigger {
+  right: calc(var(--space-4) + env(safe-area-inset-right));
+  bottom: calc(var(--space-4) + env(safe-area-inset-bottom));
+}
+
 .group {
   display: flex;
   flex-direction: column;

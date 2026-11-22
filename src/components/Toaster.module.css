@@ -12,6 +12,14 @@
   pointer-events: none;
 }
 
+/* Tablets and laptops: no tab bar, so near the bottom edge, centred under
+   the screen's content (to the right of the side navigation). */
+:global(:root[data-nav]) .stack {
+  left: calc(50% + var(--nav-space) / 2);
+  bottom: calc(var(--space-6) + env(safe-area-inset-bottom));
+  width: min(calc(100% - var(--nav-space) - 2 * var(--space-6)), 440px);
+}
+
 .toast {
   display: flex;
   align-items: center;

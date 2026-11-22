@@ -47,3 +47,6 @@ __pycache__/
 
 # Wall audit pictures (tools/map-extract/review): they show the real school plan, like layout.pdf
 tools/map-extract/review/
+
+# Layout screenshots from the audit and the checks (Playwright): never committed
+screenshots/

@@ -54,10 +54,17 @@ export function HomeHeader() {
               <Icon name="search" size={20} />
             </button>
           )}
-          <NotificationBell />
-          <Link to="/me" className={`${styles.me} pressable`} aria-label={`Me: ${user.full_name}`}>
-            <Avatar name={user.full_name} initials={user.avatar_initials} tone="ink" />
-          </Link>
+          {/* On tablets and laptops these two live in the side navigation. */}
+          <span className={styles.account}>
+            <NotificationBell />
+            <Link
+              to="/me"
+              className={`${styles.me} pressable`}
+              aria-label={`Me: ${user.full_name}`}
+            >
+              <Avatar name={user.full_name} initials={user.avatar_initials} tone="ink" />
+            </Link>
+          </span>
         </div>
       </div>
       <h1 className={styles.greeting}>

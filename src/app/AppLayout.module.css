@@ -11,6 +11,10 @@
      scroll clear of the floating tab bar. */
   padding: calc(var(--space-3) + env(safe-area-inset-top)) var(--screen-margin)
     calc(var(--tabbar-space) + var(--space-8));
+  /* Screens lay themselves out by this column's width (@container screen),
+     not the window's. On a phone it is at most 440px, so no wide layout can
+     appear there. See AppLayout.tsx for the one thing to know about it. */
+  container: screen / inline-size;
 }
 
 /* One screen (two, briefly, while one leaves: see AppLayout.tsx). */
@@ -21,6 +25,35 @@
 /* The admin dashboard is desktop-first: a side menu plus content needs room. */
 .wide {
   max-width: var(--content-max-wide);
+}
+
+/* ---------------------------------------------------------------------------
+   Tablets and laptops: the side navigation is on the left (SideNav), so the
+   column is centred in the space to its right, with wider margins, and no
+   room is kept for a tab bar at the bottom. Its width depends on the screen
+   (src/app/screenWidths.ts).
+   --------------------------------------------------------------------------- */
+:global(:root[data-nav]) .shell {
+  padding-left: var(--nav-space);
+}
+
+:global(:root[data-nav]) .main {
+  /* Level with the top of the navigation (16px in, plus its 5px padding). */
+  padding: calc(var(--space-5) + env(safe-area-inset-top))
+    calc(var(--screen-margin-wide) + env(safe-area-inset-right))
+    calc(var(--space-8) + env(safe-area-inset-bottom)) var(--screen-margin-wide);
+}
+
+:global(:root[data-nav]) .reading {
+  max-width: calc(var(--content-max-reading) + 2 * var(--screen-margin-wide));
+}
+
+:global(:root[data-nav]) .page {
+  max-width: calc(var(--content-max-page) + 2 * var(--screen-margin-wide));
+}
+
+:global(:root[data-nav]) .wide {
+  max-width: calc(var(--content-max-desk) + 2 * var(--screen-margin-wide));
 }
 
 /* Keyboard users can jump past the header straight to the content. */
