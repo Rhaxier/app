@@ -13,6 +13,7 @@ import { useRooms } from '@/features/map/hooks';
 import { roomLabel } from '@/features/map/logic';
 import { useEvents } from '@/features/volunteering/hooks';
 import { formatDate } from '@/lib/dates';
+import { fade } from '@/lib/motion';
 import { SearchOverlayContext } from './context';
 import type { SearchSources } from './logic';
 
@@ -136,4 +137,27 @@ export function useSearchOverlay() {
   const state = useContext(SearchOverlayContext);
   if (!state) throw new Error('useSearchOverlay must be used inside SearchOverlayProvider');
   return state;
+}
+
+/**
+ * Motion props for a search button's icon (TabBar, SideNav). When the panel
+ * shrinks back into the button, the button starts out panel-sized and Motion
+ * scales it down; the icon is kept at its size, but not perfectly at first,
+ * so it stays hidden while the button is still big and fades in as it
+ * settles. On any other mount (a page load) it's simply there.
+ *
+ * `away` is true while the button is replaced by the open panel.
+ */
+export function useSearchIconReturn(away: boolean) {
+  const wasAway = useRef(false);
+  if (away) wasAway.current = true;
+  const returning = !away && wasAway.current;
+  useEffect(() => {
+    if (!away) wasAway.current = false;
+  }, [away]);
+  return {
+    initial: returning ? { opacity: 0 } : false,
+    animate: { opacity: 1 },
+    transition: { opacity: { ...fade, delay: 0.24 } },
+  } as const;
 }

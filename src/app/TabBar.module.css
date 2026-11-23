@@ -99,6 +99,13 @@
   pointer-events: auto;
 }
 
+/* The icon inside: its own box, so Motion can keep it at its size while the
+   button morphs to and from the search panel (TabBar.tsx). */
+.searchIcon {
+  display: grid;
+  place-items: center;
+}
+
 /* Six tabs (staff) on a phone narrower than 390px: each tab needs about 50px
    so no label touches the next, which leaves no room for the search button.
    It moves into the Home header there (HomeHeader.module.css). */

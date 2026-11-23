@@ -15,7 +15,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Icon } from '@/components/Icon';
 import { useCurrentUser } from '@/features/auth/hooks';
 import { SEARCH_MORPH_ID } from '@/features/search/context';
-import { useSearchOverlay } from '@/features/search/hooks';
+import { useSearchIconReturn, useSearchOverlay } from '@/features/search/hooks';
 import { useFeatureVisible } from '@/features/settings/hooks';
 import { spring } from '@/lib/motion';
 import { isAdmin } from '@/lib/permissions';
@@ -33,6 +33,7 @@ export function TabBar() {
   const tabs = tabsFor(user, visible);
   // While the overlay that grew out of the button is open, the button is the overlay.
   const morphedAway = search.open && search.origin === 'button';
+  const iconReturn = useSearchIconReturn(morphedAway);
 
   return (
     <nav
@@ -79,7 +80,16 @@ export function TabBar() {
           aria-haspopup="dialog"
           onClick={() => search.openSearch('button')}
         >
-          <Icon name="search" size={21} />
+          {/* `layout`: Motion keeps the icon at its size while the button morphs. */}
+          <motion.span
+            layout="position"
+            className={styles.searchIcon}
+            initial={iconReturn.initial}
+            animate={iconReturn.animate}
+            transition={{ ...iconReturn.transition, layout: spring.sheet }}
+          >
+            <Icon name="search" size={21} />
+          </motion.span>
         </motion.button>
       )}
     </nav>

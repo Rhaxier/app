@@ -36,6 +36,13 @@ export const spring = {
   pop: { type: 'spring', duration: 0.3, bounce: 0.22 },
 } satisfies Record<string, Transition>;
 
+/**
+ * No animation: the change lands at once. For a layout change that should
+ * follow its container rather than glide, like the side navigation's parts
+ * when the sidebar snaps to a rail (SideNav).
+ */
+export const instant: Transition = { type: false };
+
 /** A plain fade, for things that only appear and disappear. */
 export const fade: Transition = { duration: duration.base / 1000, ease: easeOut };
 

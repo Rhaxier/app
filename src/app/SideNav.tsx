@@ -12,16 +12,25 @@
 //
 // It sits on glass, so nothing inside it is glass (never glass on glass):
 // the search button and the active lens are soft fills, as in the tab bar.
+//
+// Two animation rules keep it calm:
+//   - When the sidebar becomes a rail (opening the map on a laptop) or back,
+//     it changes at once, so the search button and the lens change with it
+//     instead of gliding out from their old size, sticking out of the rail.
+//   - The search button's contents counter-scale while the button morphs to
+//     and from the search panel, so the icon and label keep their size
+//     rather than stretching with the shape.
 import { AnimatePresence, motion } from 'motion/react';
+import { useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Avatar } from '@/components/Avatar';
 import { Icon } from '@/components/Icon';
 import { useCurrentUser } from '@/features/auth/hooks';
 import { useUnreadCount } from '@/features/notifications/hooks';
 import { SEARCH_MORPH_ID } from '@/features/search/context';
-import { useSearchOverlay } from '@/features/search/hooks';
+import { useSearchIconReturn, useSearchOverlay } from '@/features/search/hooks';
 import { useFeatureVisible } from '@/features/settings/hooks';
-import { spring } from '@/lib/motion';
+import { instant, spring } from '@/lib/motion';
 import { isAdmin, isStaff } from '@/lib/permissions';
 import { roleLabel } from '@/lib/status';
 import { isTabActive, tabsFor } from './tabs';
@@ -44,8 +53,15 @@ export function SideNav({ expanded }: { expanded: boolean }) {
   const search = useSearchOverlay();
   const { data: unread = 0 } = useUnreadCount();
   const tabs = tabsFor(user, visible);
+  // True for the one render in which the sidebar becomes a rail or back.
+  const lastExpanded = useRef(expanded);
+  const reshaped = lastExpanded.current !== expanded;
+  useEffect(() => {
+    lastExpanded.current = expanded;
+  }, [expanded]);
   // While the overlay that grew out of the button is open, the button is the overlay.
   const morphedAway = search.open && search.origin === 'button';
+  const iconReturn = useSearchIconReturn(morphedAway);
 
   // The bell and Me have their own rows here, so they light up instead of Home.
   const onInbox = pathname === '/notifications' || pathname.startsWith('/notifications/');
@@ -68,20 +84,29 @@ export function SideNav({ expanded }: { expanded: boolean }) {
             layoutId={SEARCH_MORPH_ID}
             className={`${styles.search} pressable`}
             style={{ borderRadius: radius }}
-            transition={spring.sheet}
+            transition={reshaped ? instant : spring.sheet}
             aria-label={expanded ? undefined : 'Search'}
             aria-haspopup="dialog"
             onClick={() => search.openSearch('button')}
           >
-            <Icon name="search" size={20} />
-            {expanded && (
-              <>
-                <span className={styles.searchText}>Search</span>
-                <kbd className={styles.shortcut} aria-hidden="true">
-                  {shortcutLabel()}
-                </kbd>
-              </>
-            )}
+            {/* `layout`: Motion keeps this at its real size while the button morphs. */}
+            <motion.span
+              layout="position"
+              className={styles.searchInner}
+              initial={iconReturn.initial}
+              animate={iconReturn.animate}
+              transition={{ ...iconReturn.transition, layout: reshaped ? instant : spring.sheet }}
+            >
+              <Icon name="search" size={20} />
+              {expanded && (
+                <>
+                  <span className={styles.searchText}>Search</span>
+                  <kbd className={styles.shortcut} aria-hidden="true">
+                    {shortcutLabel()}
+                  </kbd>
+                </>
+              )}
+            </motion.span>
           </motion.button>
         )}
       </div>
@@ -98,7 +123,7 @@ export function SideNav({ expanded }: { expanded: boolean }) {
                   .join(' ')}
                 aria-current={active ? 'page' : undefined}
               >
-                {active && <Lens />}
+                {active && <Lens instant={reshaped} />}
                 <Icon name={tab.icon} size={22} className={styles.icon} />
                 <span className={styles.label}>{tab.label}</span>
               </Link>
@@ -116,7 +141,7 @@ export function SideNav({ expanded }: { expanded: boolean }) {
           aria-current={onInbox ? 'page' : undefined}
           aria-label={expanded ? undefined : bellLabel}
         >
-          {onInbox && <Lens />}
+          {onInbox && <Lens instant={reshaped} />}
           <span className={styles.bell}>
             <Icon name="bell" size={22} className={styles.icon} />
             {/* The same live dot as the Home bell (NotificationBell). */}
@@ -154,7 +179,7 @@ export function SideNav({ expanded }: { expanded: boolean }) {
           aria-current={onMe ? 'page' : undefined}
           aria-label={expanded ? undefined : `Me: ${user.full_name}`}
         >
-          {onMe && <Lens />}
+          {onMe && <Lens instant={reshaped} />}
           <span className={styles.icon}>
             <Avatar name={user.full_name} initials={user.avatar_initials} size="small" tone="ink" />
           </span>
@@ -170,13 +195,16 @@ export function SideNav({ expanded }: { expanded: boolean }) {
   );
 }
 
-/** The raised lens behind the active row: one element that springs from row to row. */
-function Lens() {
+/**
+ * The raised lens behind the active row: one element that springs from row to
+ * row. `instant` while the sidebar reshapes: it lands on its row at once.
+ */
+function Lens({ instant: now }: { instant: boolean }) {
   return (
     <motion.span
       layoutId="side-lens"
       className={`lens ${styles.lens}`}
-      transition={spring.indicator}
+      transition={now ? instant : spring.indicator}
       aria-hidden="true"
     />
   );

@@ -43,9 +43,6 @@
 
 .search {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
   border: 0;
   background: var(--segbg);
   color: var(--ink);
@@ -59,8 +56,21 @@
   height: var(--touch-min);
 }
 
-.expanded .search {
+/* The contents (SideNav: kept at their size while the button morphs). */
+.searchInner {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.expanded .searchInner {
   justify-content: flex-start;
+}
+
+.expanded .search {
   padding: 0 var(--space-2) 0 14px;
   color: var(--muted);
   font-size: var(--text-reading);
