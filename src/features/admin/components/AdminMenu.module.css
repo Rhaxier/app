@@ -51,8 +51,11 @@
   font-size: var(--text-body);
 }
 
-.compact .link:hover {
-  background: var(--segbg);
+/* A mouse or trackpad only: on a touchscreen a tapped row would keep it. */
+@media (hover: hover) and (pointer: fine) {
+  .compact .link:hover {
+    background: var(--segbg);
+  }
 }
 
 /* NavLink marks the current section with aria-current="page". */

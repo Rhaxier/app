@@ -2,6 +2,7 @@
 // the profile to load. RequireRole shows a friendly "staff only" message.
 // RequireFeature shows a note while an admin has switched a feature off.
 // These are conveniences: the database refuses the data anyway (RLS).
+import { useEffect } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { Button } from '@/components/Button';
 import { EmptyState, ErrorState, LoadingState } from '@/components/States';
@@ -10,6 +11,7 @@ import type { FeatureName } from '@/features/settings/api';
 import { useFeatureVisible } from '@/features/settings/hooks';
 import { featureLabel } from '@/features/settings/logic';
 import { isAdmin, isStaff } from '@/lib/permissions';
+import { holdSplash } from '@/lib/splash';
 import styles from './guards.module.css';
 
 export function RequireAuth() {
@@ -64,6 +66,8 @@ export function RequireFeature({ feature }: { feature: FeatureName }) {
 }
 
 function FullPageLoading() {
+  // The loading screen (src/lib/splash.ts) stays up while the sign-in check runs.
+  useEffect(() => holdSplash(), []);
   return (
     <div className={styles.page}>
       <LoadingState />

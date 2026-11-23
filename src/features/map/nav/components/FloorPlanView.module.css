@@ -3,6 +3,8 @@
    override them (CSS beats presentation attributes). */
 
 .frame {
+  /* The plan fades in as it's drawn, rather than popping in. */
+  animation: plan-in var(--motion-base) var(--ease-out) both;
   overflow: hidden;
   width: 100%;
   max-height: 70vh;
@@ -217,4 +219,10 @@
 
 :global(:root[data-nav] [data-sheet]) .immersive :global(.leaflet-control-zoom) {
   display: block;
+}
+
+@keyframes plan-in {
+  from {
+    opacity: 0;
+  }
 }

@@ -10,6 +10,7 @@
 // Wrap only the map screens in it: the geometry file is loaded the first
 // time a provider mounts, and stays out of the rest of the app's download.
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useSettled } from '@/lib/useSettled';
 import {
   useActiveAssignments,
   useConnectors,
@@ -39,10 +40,14 @@ export function NavRouterProvider({ children }: { children: ReactNode }) {
   useMapRealtime();
 
   // Created once per geometry, with no stairs, flags or names yet: the
-  // effects below add them as they load.
+  // effects below add them as they load. Not before the screen has finished
+  // arriving (src/lib/useSettled.ts): building it, and the map it lets
+  // appear, takes long enough to make the screen change stutter on a
+  // tablet. The data still starts loading straight away.
+  const settled = useSettled();
   const router = useMemo(
-    () => (geometry.data ? createRouter(geometry.data) : null),
-    [geometry.data],
+    () => (geometry.data && settled ? createRouter(geometry.data) : null),
+    [geometry.data, settled],
   );
   const [applied, setApplied] = useState<Applied>({ version: 0 });
 

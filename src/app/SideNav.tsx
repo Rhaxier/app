@@ -15,13 +15,14 @@
 //
 // How it moves:
 //   - When the sidebar narrows into a rail (opening the map or the admin
-//     dashboard on a laptop) or widens back, the glass and the search button
-//     change their real width (CSS transitions in SideNav.module.css), so
-//     nothing is ever stretched. Every icon sits at the same distance from the
-//     left in both shapes, so the icons stay still while the glass closes in
-//     around them; the rows glide to their new heights (Motion, position
-//     only), the lens narrows with its row, and the new labels fade in as the
-//     shape settles.
+//     dashboard on a laptop) or widens back, the glass, the search button and
+//     the rows change their real size with CSS transitions
+//     (SideNav.module.css), so nothing is ever stretched. The sidebar is
+//     fixed to the screen, so resizing it lays out only itself, never the
+//     page. Every icon sits at the same distance from the left in both
+//     shapes, so the icons stay still while the glass closes in around them;
+//     the lens narrows with its row, and the new labels fade in as the shape
+//     settles.
 //   - The search button's contents keep their size while the button morphs
 //     to and from the search panel, and fade back in as it settles.
 import { AnimatePresence, motion } from 'motion/react';
@@ -39,12 +40,6 @@ import { isAdmin, isStaff } from '@/lib/permissions';
 import { roleLabel } from '@/lib/status';
 import { isTabActive, tabsFor } from './tabs';
 import styles from './SideNav.module.css';
-
-/** The sidebar narrowing into a rail and back: the same timing as its CSS width (--motion-slow, --ease-out). */
-const RESHAPE = { duration: duration.slow / 1000, ease: easeOut };
-
-/** Rows that glide to their new place when the shape changes. */
-const MotionLink = motion.create(Link);
 
 /** The search button's corner radius in px, for the morph into the overlay. */
 const SEARCH_RADIUS = { rail: 25, expanded: 22 };
@@ -140,9 +135,7 @@ export function SideNav({ expanded }: { expanded: boolean }) {
           const active = !onInbox && !onMe && isTabActive(tab, pathname);
           return (
             <li key={tab.to}>
-              <MotionLink
-                layout="position"
-                transition={RESHAPE}
+              <Link
                 to={tab.to}
                 className={[styles.item, active && styles.active, 'pressable']
                   .filter(Boolean)
@@ -156,16 +149,14 @@ export function SideNav({ expanded }: { expanded: boolean }) {
                 <motion.span {...label(tab.to)} className={styles.label}>
                   {tab.label}
                 </motion.span>
-              </MotionLink>
+              </Link>
             </li>
           );
         })}
       </ul>
 
       <div className={styles.account}>
-        <MotionLink
-          layout="position"
-          transition={RESHAPE}
+        <Link
           to="/notifications"
           className={[styles.item, styles.accountItem, onInbox && styles.active, 'pressable']
             .filter(Boolean)
@@ -196,10 +187,8 @@ export function SideNav({ expanded }: { expanded: boolean }) {
               {unread > 0 && <span className="visually-hidden">, {unread} unread</span>}
             </motion.span>
           )}
-        </MotionLink>
-        <MotionLink
-          layout="position"
-          transition={RESHAPE}
+        </Link>
+        <Link
           to="/me"
           className={[
             styles.item,
@@ -223,7 +212,7 @@ export function SideNav({ expanded }: { expanded: boolean }) {
               {who && <span className="meta">{who}</span>}
             </motion.span>
           )}
-        </MotionLink>
+        </Link>
       </div>
     </nav>
   );

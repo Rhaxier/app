@@ -120,8 +120,11 @@
   cursor: pointer;
 }
 
-.problem:hover:not(:disabled) {
-  background: var(--paper);
+/* A mouse or trackpad only: on a touchscreen a tapped row would keep it. */
+@media (hover: hover) and (pointer: fine) {
+  .problem:hover:not(:disabled) {
+    background: var(--paper);
+  }
 }
 
 .problem:focus-visible {

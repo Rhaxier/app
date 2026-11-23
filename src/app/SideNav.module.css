@@ -154,9 +154,11 @@
   border-radius: var(--r-lens);
   color: var(--tabtext);
   text-decoration: none;
-  /* The icon and label colours cross-fade as the lens arrives (as in TabBar). */
+  /* The icon and label colours cross-fade as the lens arrives (as in TabBar);
+     the row's height follows the glass when the sidebar becomes a rail. */
   transition:
     color var(--motion-base) var(--ease-out),
+    min-height var(--motion-slow) var(--ease-out),
     transform var(--motion-fast) var(--ease-out),
     filter var(--motion-fast) var(--ease-out);
 }
@@ -278,7 +280,8 @@
 /* Less motion: the glass and the search button change shape at once. */
 @media (prefers-reduced-motion: reduce) {
   .nav,
-  .search {
+  .search,
+  .item {
     transition: none;
   }
 }

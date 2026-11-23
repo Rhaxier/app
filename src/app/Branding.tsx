@@ -12,6 +12,7 @@ import { Icon } from '@/components/Icon';
 import { usePublicStatus } from '@/features/settings/hooks';
 import { accentProblem, brandAccents } from '@/lib/contrast';
 import { formatDateTime } from '@/lib/dates';
+import { rememberBrand } from '@/lib/splash';
 import styles from './Notices.module.css';
 
 /**
@@ -29,7 +30,15 @@ const BRAND_PROPERTIES = [
 ];
 
 export function Branding() {
-  const accent = usePublicStatus().data?.accent_color;
+  const status = usePublicStatus().data;
+  const accent = status?.accent_color;
+
+  // The crest and name for the next start's loading screen (src/lib/splash.ts).
+  const logo = status?.logo_url ?? null;
+  const name = status?.school_name ?? null;
+  useEffect(() => {
+    if (status) rememberBrand({ logo, name });
+  }, [status, logo, name]);
 
   useEffect(() => {
     const root = document.documentElement.style;

@@ -1,10 +1,13 @@
 // Shown instead of the app when .env hasn't been filled in, so a first run
 // explains what to do instead of failing with network errors.
+import { useEffect } from 'react';
 import { Card } from '@/components/Card';
 import { PageHeader } from '@/components/PageHeader';
 import styles from './guards.module.css';
+import { releaseSplash } from '@/lib/splash';
 
 export function SetupScreen() {
+  useEffect(() => releaseSplash(), []);
   return (
     <div className={styles.page}>
       <PageHeader eyebrow="Almost there" title="Connect to Supabase" />

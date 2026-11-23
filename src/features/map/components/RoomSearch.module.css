@@ -63,8 +63,11 @@
   cursor: pointer;
 }
 
-.result:hover {
-  background: var(--segbg);
+/* A mouse or trackpad only: on a touchscreen a tapped row would keep it. */
+@media (hover: hover) and (pointer: fine) {
+  .result:hover {
+    background: var(--segbg);
+  }
 }
 
 .code {

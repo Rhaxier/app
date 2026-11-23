@@ -82,7 +82,24 @@ export type GeometryIndex = {
   passages: NavEdge[];
 };
 
+/**
+ * Lookups over the geometry, made once per geometry object. Several parts of
+ * the map ask for them when it opens (the router, the page, the plan), and
+ * making them includes finding the corridor passages, so they share one copy.
+ * The geometry is never changed after loading, so the copy stays right.
+ */
+const indexCache = new WeakMap<Geometry, GeometryIndex>();
+
 export function indexGeometry(geometry: Geometry): GeometryIndex {
+  let index = indexCache.get(geometry);
+  if (!index) {
+    index = buildIndex(geometry);
+    indexCache.set(geometry, index);
+  }
+  return index;
+}
+
+function buildIndex(geometry: Geometry): GeometryIndex {
   const nodes = new Map(geometry.nodes.map((node) => [node.id, node]));
   const regions = new Map(geometry.regions.map((region) => [region.id, region]));
   const walkableByFloor = new Map<FloorId, Region[]>();
@@ -267,9 +284,72 @@ function betweenWalls(a: Point, b: Point, walls: Segment[]): boolean {
   return narrow >= 0.6 * points && alongWall < 0.5 * points;
 }
 
+// ---------- finding the walls near a spot, quickly ----------
+//
+// A floor has around a thousand wall pieces. Checking every one for every line
+// tested here took about half a second each time the map opened (four times
+// that on a tablet), right while the screen was animating. Filed in a grid of
+// squares, a check only looks at the few walls in the squares it touches.
+
+/** The walls of a floor, filed by grid square. */
+export type WallGrid = { cells: Map<string, Segment[]>; size: number };
+
+const WALL_CELL = 64;
+
+export function wallGrid(walls: Segment[], size = WALL_CELL): WallGrid {
+  const cells = new Map<string, Segment[]>();
+  for (const wall of walls) {
+    const [x1, y1, x2, y2] = wall;
+    for (
+      let cx = Math.floor(Math.min(x1, x2) / size);
+      cx <= Math.floor(Math.max(x1, x2) / size);
+      cx += 1
+    ) {
+      for (
+        let cy = Math.floor(Math.min(y1, y2) / size);
+        cy <= Math.floor(Math.max(y1, y2) / size);
+        cy += 1
+      ) {
+        const key = `${cx},${cy}`;
+        const list = cells.get(key);
+        if (list) list.push(wall);
+        else cells.set(key, [wall]);
+      }
+    }
+  }
+  return { cells, size };
+}
+
+/** Every wall in the grid squares that the box (map units) touches. */
+export function wallsNear(
+  grid: WallGrid,
+  minX: number,
+  minY: number,
+  maxX: number,
+  maxY: number,
+): Segment[] {
+  const near = new Set<Segment>();
+  for (let cx = Math.floor(minX / grid.size); cx <= Math.floor(maxX / grid.size); cx += 1) {
+    for (let cy = Math.floor(minY / grid.size); cy <= Math.floor(maxY / grid.size); cy += 1) {
+      for (const wall of grid.cells.get(`${cx},${cy}`) ?? []) near.add(wall);
+    }
+  }
+  return [...near];
+}
+
+/** The walls within `reach` of the line a-b (a superset: whole grid squares). */
+const wallsAlong = (grid: WallGrid, a: Point, b: Point, reach: number) =>
+  wallsNear(
+    grid,
+    Math.min(a.x, b.x) - reach,
+    Math.min(a.y, b.y) - reach,
+    Math.max(a.x, b.x) + reach,
+    Math.max(a.y, b.y) + reach,
+  );
+
 export function roomPassages(geometry: Geometry, regions: Map<string, Region>): NavEdge[] {
   if (!geometry.walls) return [];
-  const wallsOf = new Map<FloorId, Segment[]>();
+  const wallsOf = new Map<FloorId, WallGrid>();
   for (const [floor, lines] of Object.entries(geometry.walls)) {
     const segments: Segment[] = [];
     for (const line of lines ?? []) {
@@ -277,7 +357,7 @@ export function roomPassages(geometry: Geometry, regions: Map<string, Region>): 
         segments.push([line[k - 2], line[k - 1], line[k], line[k + 1]]);
       }
     }
-    wallsOf.set(floor, segments);
+    wallsOf.set(floor, wallGrid(segments));
   }
   const doorNode = new Map<string, NavNode>();
   const roomNode = new Map<string, NavNode>();
@@ -303,14 +383,17 @@ export function roomPassages(geometry: Geometry, regions: Map<string, Region>): 
       for (let j = i + 1; j < doors.length; j += 1) {
         const [a, b] = [doors[i], doors[j]];
         if (distance(a, b) < 1) continue;
-        const walls = wallsOf.get(region.floor) ?? [];
+        const grid = wallsOf.get(region.floor);
+        // Only the walls that can matter: near the line, as far out as a corridor is wide.
+        const walls = grid ? wallsAlong(grid, a, b, CORRIDOR_MAX_WIDTH) : [];
         // The ends are doors, on the outline itself, so only the inner part is checked.
         if (!lineInside(a, b, region, 0.1, 0.9)) continue;
         if (crossesWall(a, b, walls, DOOR_CLEARANCE)) continue;
         if (!betweenWalls(a, b, walls)) continue;
         // The room's own space: its middle is in plain view from the line.
         const half = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
-        if (!crossesWall(half, middle, walls, 0)) continue;
+        const towardMiddle = grid ? wallsAlong(grid, half, middle, 0) : [];
+        if (!crossesWall(half, middle, towardMiddle, 0)) continue;
         passages.push({
           id: `passage:${a.id}:${b.id}`,
           a: a.id,

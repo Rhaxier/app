@@ -85,8 +85,11 @@
   cursor: pointer;
 }
 
-.rowButton:hover {
-  background: var(--paper);
+/* A mouse or trackpad only: on a touchscreen a tapped row would keep it. */
+@media (hover: hover) and (pointer: fine) {
+  .rowButton:hover {
+    background: var(--paper);
+  }
 }
 
 .rowButton:focus-visible {

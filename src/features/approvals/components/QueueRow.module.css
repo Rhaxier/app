@@ -42,8 +42,11 @@
   text-decoration: none;
 }
 
-.title a:hover {
-  text-decoration: underline;
+/* A mouse or trackpad only: on a touchscreen a tapped row would keep it. */
+@media (hover: hover) and (pointer: fine) {
+  .title a:hover {
+    text-decoration: underline;
+  }
 }
 
 .by {
