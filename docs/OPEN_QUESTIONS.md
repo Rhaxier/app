@@ -129,7 +129,7 @@ cloud dashboard's SQL editor.
 - Where it lives: `app_settings.school_name`; table `supw_targets` (one row per grade,
   replacing the old single `app_settings.supw_hours_target`, which the migration copied
   to every grade); `src/config/school.ts` (name shown before sign-in, app name);
-  `public/favicon.svg`.
+  `public/favicon.png` (the school crest).
 - To change it: **Admin > Features > Volunteering** for each grade's SUPW target
   (students see their progress on the Volunteer tab); **Admin > School calendar > Terms
   and holidays** for term dates; **Admin > System > Branding** for the school's name,
@@ -690,17 +690,20 @@ order`, one line per period per weekday. A weekday is its name or its first thre
 
 ## Q57: The app's name and icon on people's Home Screens
 
-- Default used: the name "School App" (the same placeholder as `school.appName`) and an
-  original placeholder icon: the favicon's line mortarboard on the design's accent blue.
-  No school logo is used: the logo admins upload (Admin > Branding) lives in the
-  database, and a Home Screen icon has to be a file in the build.
+- Default used: the name "School App" (the same placeholder as `school.appName`). The icon
+  is the school crest (the logo uploaded under Admin > Branding) on a white tile. A Home
+  Screen icon has to be a file in the build, so it is a copy
+  (`public/brand/school-crest.webp`, also the loading screen's first-visit crest): a new
+  logo uploaded under Branding reaches the loading screen by itself, but the icon only
+  when the steps below are run again.
 - Where it lives: `public/manifest.webmanifest` (`name`, `short_name`), `index.html`
   (`apple-mobile-web-app-title`, `<title>`), `src/config/school.ts` (`appName`), and the
   icon's source `tools/app-icons/app-icon-1024.png` (its sizes are in `public/icons/`).
 - To change it: edit the name in those four places (`short_name` shows at most about 12
   letters under the icon). For the icon, replace `tools/app-icons/app-icon-1024.png` with a
   1024 × 1024 PNG (full square, artwork inside the middle 80%) and run
-  `python tools/app-icons/make_icons.py`. People who already installed the app delete it
+  `python tools/app-icons/make_icons.py`. The browser tab's icon is `public/favicon.png`
+  (the crest on its own, 64 × 64). People who already installed the app delete it
   from the Home Screen and add it again to see the new icon.
 
 ## Q58: The status bar in the installed iPhone app

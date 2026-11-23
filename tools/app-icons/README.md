@@ -6,8 +6,8 @@ one picture.
 - `app-icon-1024.png`: the picture everything is made from. 1024 × 1024, a full square
   (no rounded corners: phones round them), artwork inside the middle 80% (Android cuts
   icons into circles and other shapes).
-- `app-icon.svg`: the source of the current placeholder icon (the favicon's mark on the
-  accent blue). Not needed if you replace the PNG with your own picture.
+  It is the school crest (`public/brand/school-crest.webp`, the logo uploaded under Admin >
+  Branding) on a white tile, sized so its corners stay inside the circle Android cuts.
 - `make_icons.py`: makes `public/icons/` (the icons and launch screens) and the launch
   screens' tags in `index.html`.
 

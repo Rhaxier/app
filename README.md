@@ -238,8 +238,9 @@ full square, no rounded corners: phones round them; keep the artwork inside the 
 python tools/app-icons/make_icons.py    # needs Pillow: pip install pillow
 ```
 
-It writes every size into `public/icons/` and the launch screens. The current icon is a
-placeholder grown from the favicon (`tools/app-icons/app-icon.svg`). **The name** on the
+It writes every size into `public/icons/` and the launch screens. The current icon is the
+school crest from Admin > Branding (`public/brand/school-crest.webp`) on a white tile; the
+browser tab's icon is `public/favicon.png`. **The name** on the
 Home Screen ("School App") is in `public/manifest.webmanifest` (`name`, `short_name`: at
 most 12 letters show under the icon) and in `index.html` (`apple-mobile-web-app-title`).
 See Q57 in `docs/OPEN_QUESTIONS.md`.
